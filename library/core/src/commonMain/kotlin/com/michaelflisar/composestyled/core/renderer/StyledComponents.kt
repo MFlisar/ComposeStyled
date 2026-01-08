@@ -1,0 +1,107 @@
+package com.michaelflisar.composestyled.core.renderer
+
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.TextAutoSize
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import com.michaelflisar.composestyled.core.components.StyledButtonConfig
+import com.michaelflisar.composestyled.core.components.StyledButtonDefaults
+import com.michaelflisar.composestyled.core.components.StyledCardConfig
+import com.michaelflisar.composestyled.core.components.StyledCardDefaults
+import com.michaelflisar.composestyled.core.components.StyledInputConfig
+import com.michaelflisar.composestyled.core.components.StyledInputDefaults
+import com.michaelflisar.composestyled.core.theme.StyledTheme
+
+interface StyledComponents {
+
+    @Composable
+    fun Root(content: @Composable () -> Unit)
+
+    @Composable
+    fun Surface(
+        modifier: Modifier = Modifier,
+        shape: Shape = RectangleShape,
+        color: Color = StyledTheme.colors.surface,
+        contentColor: Color = StyledTheme.colors.onSurface,
+        border: BorderStroke? = null,
+        content: @Composable () -> Unit,
+    )
+
+    @Composable
+    fun Button(
+        onClick: () -> Unit,
+        modifier: Modifier = Modifier,
+        enabled: Boolean = true,
+        shape: Shape = StyledTheme.shapes.button,
+        config: StyledButtonConfig = StyledButtonDefaults.configPrimary(),
+        contentPadding: PaddingValues = StyledButtonDefaults.contentPadding(),
+        interactionSource: MutableInteractionSource? = null,
+        content: @Composable RowScope.() -> Unit,
+    )
+
+    @Composable
+    fun Card(
+        modifier: Modifier = Modifier,
+        shape: Shape = StyledTheme.shapes.card,
+        config: StyledCardConfig = StyledCardDefaults.configFilled(),
+        contentPadding: PaddingValues = PaddingValues(0.dp),
+        content: @Composable ColumnScope.() -> Unit,
+    )
+
+    @Composable
+    fun Text(
+        text: String,
+        modifier: Modifier = Modifier,
+        style: TextStyle = TextStyle.Default,
+        color: Color = StyledTheme.colors.onBackground,
+        overflow: TextOverflow = TextOverflow.Clip,
+        softWrap: Boolean = true,
+        maxLines: Int = Int.MAX_VALUE,
+        minLines: Int = 1,
+        autoSize: TextAutoSize? = null,
+    )
+
+    @Composable
+    fun Input(
+        value: String,
+        onValueChange: (String) -> Unit,
+        modifier: Modifier = Modifier,
+        config: StyledInputConfig = StyledInputDefaults.configFilled(),
+        enabled: Boolean = true,
+        readOnly: Boolean = false,
+        textStyle: TextStyle = StyledTheme.typography.bodyMedium,
+        label: @Composable (() -> Unit)? = null,
+        placeholder: @Composable (() -> Unit)? = null,
+        leadingIcon: @Composable (() -> Unit)? = null,
+        trailingIcon: @Composable (() -> Unit)? = null,
+        prefix: @Composable (() -> Unit)? = null,
+        suffix: @Composable (() -> Unit)? = null,
+        supportingText: @Composable (() -> Unit)? = null,
+        isError: Boolean = false,
+        visualTransformation: VisualTransformation = VisualTransformation.None,
+        keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+        keyboardActions: KeyboardActions = KeyboardActions.Default,
+        singleLine: Boolean = false,
+        maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
+        minLines: Int = 1,
+        interactionSource: MutableInteractionSource? = null,
+        shape: Shape = StyledTheme.shapes.input,
+    )
+}
+
+internal val LocalStyledComponents =
+    staticCompositionLocalOf<StyledComponents> { error("No StyledComponents provided!") }
