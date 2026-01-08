@@ -37,7 +37,7 @@ val buildTargets = Targets(
     iOS = true,
     // desktop
     windows = true,
-    macOS = true,
+    macOS = false, // because compose-unstyled does not support macOS yet
     // web
     wasm = true
 )
@@ -89,6 +89,10 @@ kotlin {
         commonMain.dependencies {
 
             implementation(libs.jetbrains.kotlinx.coroutines.core)
+
+            implementation(deps.composeunstyled.theming)
+            implementation(deps.composeunstyled.platformtheme)
+            //implementation(deps.composeunstyled.primitives)
 
             api(libs.jetbrains.compose.runtime)
             api(libs.jetbrains.compose.foundation)

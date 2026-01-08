@@ -2,29 +2,17 @@ package com.michaelflisar.composestyled.core.renderer
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
-import com.michaelflisar.composestyled.core.components.StyledButtonConfig
+import com.michaelflisar.composestyled.core.StyledTheme
+import com.michaelflisar.composestyled.core.components.StyledButton
 import com.michaelflisar.composestyled.core.components.StyledButtonDefaults
-import com.michaelflisar.composestyled.core.components.StyledCardConfig
-import com.michaelflisar.composestyled.core.components.StyledCardDefaults
-import com.michaelflisar.composestyled.core.components.StyledInputConfig
-import com.michaelflisar.composestyled.core.components.StyledInputDefaults
-import com.michaelflisar.composestyled.core.theme.StyledTheme
 
 interface StyledComponents {
 
@@ -43,15 +31,16 @@ interface StyledComponents {
 
     @Composable
     fun Button(
+        variant: StyledButton.Variant,
         onClick: () -> Unit,
         modifier: Modifier = Modifier,
         enabled: Boolean = true,
         shape: Shape = StyledTheme.shapes.button,
-        config: StyledButtonConfig = StyledButtonDefaults.configPrimary(),
         contentPadding: PaddingValues = StyledButtonDefaults.contentPadding(),
         interactionSource: MutableInteractionSource? = null,
         content: @Composable RowScope.() -> Unit,
     )
+    /*
 
     @Composable
     fun Card(
@@ -100,7 +89,7 @@ interface StyledComponents {
         minLines: Int = 1,
         interactionSource: MutableInteractionSource? = null,
         shape: Shape = StyledTheme.shapes.input,
-    )
+    )*/
 }
 
 internal val LocalStyledComponents =

@@ -1,4 +1,4 @@
-package com.michaelflisar.composestyled.core.theme
+package com.michaelflisar.composestyled.core.tokens
 
 import androidx.compose.runtime.Immutable
 
