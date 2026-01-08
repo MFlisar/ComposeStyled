@@ -1,6 +1,7 @@
 package com.michaelflisar.composestyled.core.components
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
@@ -21,7 +22,7 @@ import com.michaelflisar.composestyled.core.renderer.LocalStyledComponents
 import com.michaelflisar.composestyled.core.runtime.interaction.rememberStyledResolveState
 import com.michaelflisar.composestyled.core.tokens.StyledColors
 
-object StyledInput : BaseStyledComponent {
+object StyledTextField : BaseStyledComponent {
 
     internal val Property = ThemeProperty<StatefulBaseColorDef>("input")
 
@@ -46,14 +47,12 @@ object StyledInput : BaseStyledComponent {
         ) : Variant()
     }
 
-    @Composable
     override fun registerStyle(builder: ThemeBuilder, colors: StyledColors) {
         with(builder) {
             properties[Property] = createDefaultKeyMap(colors)
         }
     }
 
-    @Composable
     private fun createDefaultKeyMap(colors: StyledColors): Map<ThemeToken<StatefulBaseColorDef>, StatefulBaseColorDef> {
         val filled = StatefulBaseColorDef(
             normal = BaseColorDef(
@@ -102,10 +101,13 @@ object StyledInput : BaseStyledComponent {
 // Defaults
 // ----------------------
 
-object StyledInputDefaults {
+object StyledTextFieldDefaults {
 
-    // currently no defaults
-
+    @Composable
+    fun contentPadding() = PaddingValues(
+        horizontal = StyledTheme.paddings.medium,
+        vertical = StyledTheme.paddings.small,
+    )
 }
 
 // ----------------------
@@ -113,10 +115,10 @@ object StyledInputDefaults {
 // ----------------------
 
 @Composable
-fun StyledInput(
+fun StyledTextField(
     value: String,
     onValueChange: (String) -> Unit,
-    variant: StyledInput.Variant = StyledInput.Variant.Filled,
+    variant: StyledTextField.Variant = StyledTextField.Variant.Filled,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     readOnly: Boolean = false,
@@ -139,8 +141,8 @@ fun StyledInput(
     shape: Shape = StyledTheme.shapes.input,
 ) {
     val colorDef = when (variant) {
-        is StyledInput.Variant.Token -> Theme[StyledInput.Property][variant.token]
-        is StyledInput.Variant.Custom -> variant.colorDef
+        is StyledTextField.Variant.Token -> Theme[StyledTextField.Property][variant.token]
+        is StyledTextField.Variant.Custom -> variant.colorDef
     }
 
     val resolveState = rememberStyledResolveState(
@@ -150,7 +152,7 @@ fun StyledInput(
     )
     val colors = colorDef.resolve(resolveState)
 
-    LocalStyledComponents.current.Input(
+    LocalStyledComponents.current.TextField(
         value = value,
         onValueChange = onValueChange,
         colors = colors,
@@ -172,6 +174,7 @@ fun StyledInput(
         singleLine = singleLine,
         maxLines = maxLines,
         minLines = minLines,
+        contentPadding = StyledTextFieldDefaults.contentPadding(),
         interactionSource = interactionSource,
         shape = shape,
     )

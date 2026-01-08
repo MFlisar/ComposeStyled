@@ -1,6 +1,5 @@
 package com.michaelflisar.composestyled.core.components
 
-import androidx.compose.runtime.Composable
 import com.composeunstyled.theme.ThemeBuilder
 import com.michaelflisar.composestyled.core.tokens.StyledColors
 
@@ -11,7 +10,6 @@ import com.michaelflisar.composestyled.core.tokens.StyledColors
  */
 internal interface BaseStyledComponent {
 
-    @Composable
     fun registerStyle(
         builder: ThemeBuilder,
         colors: StyledColors,

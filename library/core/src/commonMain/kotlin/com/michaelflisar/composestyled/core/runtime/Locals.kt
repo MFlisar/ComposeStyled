@@ -2,6 +2,7 @@ package com.michaelflisar.composestyled.core.runtime
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -25,6 +26,20 @@ fun ProvideTextStyle(style: TextStyle, content: @Composable () -> Unit) =
         content = content
     )
 
+/**
+ * Provides multiple styled locals at once.
+ *
+ * @param contentColor The content color to provide. If null, the current content color is used.
+ * @param backgroundColor The background color to provide. If null, the current background color is used.
+ * @param textStyle The text style to provide. If null, the current text style is used.
+ * @param indication The indication to provide. If null, the current indication is used.
+ * @param applyTransparentBackgroundColor If true, allows providing a transparent background color.
+ * @param content The composable content that will have access to the provided locals.
+ *
+ * only public because of usage in other modules, should not be used directly elsewhere
+ *
+ */
+@InternalComposeApi
 @Composable
 fun ProvideStyledLocals(
     contentColor: Color? = null,
@@ -35,7 +50,8 @@ fun ProvideStyledLocals(
 ) {
     CompositionLocalProvider(
         LocalContentColor provides (contentColor ?: LocalContentColor.current),
-        LocalBackgroundColor provides (backgroundColor.takeIf { it != Color.Transparent || applyTransparentBackgroundColor } ?: LocalBackgroundColor.current),
+        LocalBackgroundColor provides (backgroundColor.takeIf { it != Color.Transparent || applyTransparentBackgroundColor }
+            ?: LocalBackgroundColor.current),
         LocalTextStyle provides (textStyle ?: LocalTextStyle.current),
         content = content
     )

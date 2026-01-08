@@ -88,6 +88,8 @@ kotlin {
 
             api(project(":composestyled:core"))
 
+            implementation(deps.composeunstyled.primitives)
+
         }
     }
 }

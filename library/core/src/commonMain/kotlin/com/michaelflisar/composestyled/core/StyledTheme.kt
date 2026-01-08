@@ -1,13 +1,20 @@
 package com.michaelflisar.composestyled.core
 
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.ReadOnlyComposable
+import com.composeunstyled.platformtheme.bright
 import com.composeunstyled.platformtheme.buildPlatformTheme
+import com.composeunstyled.platformtheme.indications
+import com.composeunstyled.theme.Theme
 import com.michaelflisar.composestyled.core.components.ComponentRegistry
 import com.michaelflisar.composestyled.core.renderer.LocalStyledComponents
 import com.michaelflisar.composestyled.core.renderer.StyledComponents
-import com.michaelflisar.composestyled.core.runtime.ProvideStyledLocals
+import com.michaelflisar.composestyled.core.runtime.LocalBackgroundColor
+import com.michaelflisar.composestyled.core.runtime.LocalContentColor
+import com.michaelflisar.composestyled.core.runtime.LocalTextStyle
 import com.michaelflisar.composestyled.core.tokens.LocalStyledColors
 import com.michaelflisar.composestyled.core.tokens.LocalStyledPaddings
 import com.michaelflisar.composestyled.core.tokens.LocalStyledShapes
@@ -37,6 +44,13 @@ object StyledTheme {
         @Composable @ReadOnlyComposable get() = LocalStyledSpacings.current
 }
 
+val PlatformTheme = buildPlatformTheme {
+    // register component styles in compose unstyled theme
+    val colors = LocalStyledColors.current
+    ComponentRegistry.registerAll(this, colors)
+}
+
+@OptIn(InternalComposeApi::class)
 @Composable
 fun StyledTheme(
     styledComponents: StyledComponents,
@@ -52,32 +66,34 @@ fun StyledTheme(
     // - indications (bright, dimmed)
     // - interaction sizes (default, minimum)
     // - shapes (roundedNone, roundedSmall, roundedMedium, roundedLarge, roundedFull)
-    buildPlatformTheme {
 
-        // compose unstyled predefined platform theme tokens
-        // => can be used inside styled components if needed
-        // E.g.:
-        // val h5 = Theme[textStyles][heading5]
-        // val indication = Theme[indications][bright]
-        // val roundNone = Theme[com.composeunstyled.platformtheme.shapes][roundedNone]
-        // val size = Theme[interactiveSizes][sizeDefault]
+    CompositionLocalProvider(
+        // components
+        LocalStyledComponents provides styledComponents,
+        // styled locals
+        LocalStyledColors provides colors,
+        LocalStyledShapes provides shapes,
+        LocalStyledTypography provides typography,
+        LocalStyledPaddings provides paddings,
+        LocalStyledSpacings provides spacings
+    ) {
+        PlatformTheme {
 
-        // register component styles in compose unstyled theme
-        ComponentRegistry.registerAll(this, colors)
+            // compose unstyled predefined platform theme tokens
+            // => can be used inside styled components if needed
+            // E.g.:
+            // val h5 = Theme[textStyles][heading5]
+            // val indication = Theme[indications][bright]
+            // val roundNone = Theme[com.composeunstyled.platformtheme.shapes][roundedNone]
+            // val size = Theme[interactiveSizes][sizeDefault]
 
-        CompositionLocalProvider(
-            LocalStyledComponents provides styledComponents,
-            LocalStyledColors provides colors,
-            LocalStyledShapes provides shapes,
-            LocalStyledTypography provides typography,
-            LocalStyledPaddings provides paddings,
-            LocalStyledSpacings provides spacings,
-        ) {
-            ProvideStyledLocals(
-                contentColor = colors.onBackground,
-                backgroundColor = colors.background,
-                textStyle = typography.bodyMedium,
-                applyTransparentBackgroundColor = true // here we save the background color even if it's transparent
+            val indication = Theme[indications][bright]
+
+            CompositionLocalProvider(
+                LocalIndication provides indication,
+                LocalContentColor provides colors.onBackground,
+                LocalBackgroundColor provides colors.background,
+                LocalTextStyle provides typography.bodyMedium
             ) {
                 styledComponents.Root(content)
             }

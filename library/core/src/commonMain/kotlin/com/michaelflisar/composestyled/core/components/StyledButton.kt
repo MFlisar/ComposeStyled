@@ -48,7 +48,6 @@ object StyledButton : BaseStyledComponent {
 
     }
 
-    @Composable
     override fun registerStyle(
         builder: ThemeBuilder,
         colors: StyledColors,
@@ -58,7 +57,6 @@ object StyledButton : BaseStyledComponent {
         }
     }
 
-    @Composable
     private fun createDefaultKeyMap(colors: StyledColors): Map<ThemeToken<StatefulBaseColorDef>, StatefulBaseColorDef> {
         val buttonFilledPrimary = StatefulBaseColorDef(
             normal = BaseColorDef(

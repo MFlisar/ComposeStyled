@@ -17,31 +17,29 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.michaelflisar.composestyled.core.components.StyledButton
-import com.michaelflisar.composestyled.core.components.StyledButtonVariant
-import com.michaelflisar.composestyled.core.components.StyledCard
-import com.michaelflisar.composestyled.core.components.StyledInput
-import com.michaelflisar.composestyled.core.components.StyledInputVariant
-import com.michaelflisar.composestyled.core.components.StyledSurface
-import com.michaelflisar.composestyled.core.components.StyledText
 import com.michaelflisar.composestyled.core.StyledTheme
 import com.michaelflisar.composestyled.core.classes.ThemeMode
+import com.michaelflisar.composestyled.core.components.StyledButton
+import com.michaelflisar.composestyled.core.components.StyledCard
+import com.michaelflisar.composestyled.core.components.StyledSurface
+import com.michaelflisar.composestyled.core.components.StyledText
+import com.michaelflisar.composestyled.core.components.StyledTextField
 import com.michaelflisar.composestyled.core.tokens.StyledPaddings
 import com.michaelflisar.composestyled.core.tokens.StyledShapes
 import com.michaelflisar.composestyled.core.tokens.StyledSpacings
 import com.michaelflisar.composestyled.core.tokens.StyledTypography
 import com.michaelflisar.composestyled.core.tokens.darkStyledColors
 import com.michaelflisar.composestyled.core.tokens.lightStyledColors
-import com.michaelflisar.composestyled.theme.material3.StyledMaterial3Theme
+import com.michaelflisar.composestyled.theme.android.StyledComponentsAndroid
 
 @Composable
 fun DemoApp(
     platform: String,
 ) {
+    val isDarkMode = isSystemInDarkTheme()
     var mode by remember { mutableStateOf<ThemeMode>(ThemeMode.System) }
 
     // generate theme variables
-    val isDarkMode = isSystemInDarkTheme()
     val colors = remember(mode, isDarkMode) {
         when (mode) {
             ThemeMode.Light -> lightStyledColors()
@@ -55,7 +53,8 @@ fun DemoApp(
     val spacings = remember { StyledSpacings() }
 
     // apply theme
-    StyledMaterial3Theme(
+    StyledTheme(
+        styledComponents = StyledComponentsAndroid,
         colors = colors,
         shapes = shapes,
         typography = typography,
@@ -64,6 +63,15 @@ fun DemoApp(
     ) {
         Content(platform)
     }
+    //StyledMaterial3Theme(
+    //    colors = colors,
+    //    shapes = shapes,
+    //    typography = typography,
+    //    paddings = paddings,
+    //    spacings = spacings
+    //) {
+    //    Content(platform)
+    //}
 }
 
 @Composable
@@ -83,7 +91,10 @@ private fun Content(platform: String) {
                 horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacings.medium)
             ) {
                 DemoScreen.entries.forEach {
-                    StyledButton(onClick = { screen = it }) {
+                    StyledButton(
+                        variant = StyledButton.Variant.FilledPrimary,
+                        onClick = { screen = it }
+                    ) {
                         StyledText(text = it.name)
                     }
                 }
@@ -118,29 +129,29 @@ private fun ButtonsScreen() {
         Row(horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacings.medium)) {
             StyledButton(
                 onClick = { },
-                variant = StyledButtonVariant.Filled
+                variant = StyledButton.Variant.FilledPrimary
             ) { StyledText("Filled") }
             StyledButton(
                 onClick = { },
-                variant = StyledButtonVariant.Outlined
+                variant = StyledButton.Variant.Outlined
             ) { StyledText("Outlined") }
-            StyledButton(onClick = { }, variant = StyledButtonVariant.Text) { StyledText("Text") }
+            StyledButton(onClick = { }, variant = StyledButton.Variant.Text) { StyledText("Text") }
         }
         Row(horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacings.medium)) {
             StyledButton(
                 onClick = { },
                 enabled = false,
-                variant = StyledButtonVariant.Filled
+                variant = StyledButton.Variant.FilledPrimary
             ) { StyledText("Disabled") }
             StyledButton(
                 onClick = { },
                 enabled = false,
-                variant = StyledButtonVariant.Outlined
+                variant = StyledButton.Variant.Outlined
             ) { StyledText("Disabled") }
             StyledButton(
                 onClick = { },
                 enabled = false,
-                variant = StyledButtonVariant.Text
+                variant = StyledButton.Variant.Text
             ) { StyledText("Disabled") }
         }
     }
@@ -171,11 +182,11 @@ private fun CardsScreen() {
                 ) {
                     StyledButton(
                         onClick = { },
-                        variant = StyledButtonVariant.Filled
+                        variant = StyledButton.Variant.FilledPrimary
                     ) { StyledText("Action") }
                     StyledButton(
                         onClick = { },
-                        variant = StyledButtonVariant.Text
+                        variant = StyledButton.Variant.Text
                     ) { StyledText("Secondary") }
                 }
             }
@@ -208,38 +219,38 @@ private fun InputsScreen() {
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         StyledText("Inputs")
-        StyledInput(
+        StyledTextField(
             value = text,
             onValueChange = { text = it },
-            variant = StyledInputVariant.Filled,
-            placeholder = "Filled"
+            variant = StyledTextField.Variant.Filled,
+            placeholder = { StyledText("Filled") }
         )
-        StyledInput(
+        StyledTextField(
             value = text2,
             onValueChange = { text2 = it },
-            variant = StyledInputVariant.Outlined,
-            placeholder = "Outlined"
+            variant = StyledTextField.Variant.Outlined,
+            placeholder = { StyledText("Outlined") }
         )
-        StyledInput(
+        StyledTextField(
             value = "Error text",
             onValueChange = { },
             isError = true,
-            variant = StyledInputVariant.Outlined,
-            placeholder = "Error"
+            variant = StyledTextField.Variant.Outlined,
+            placeholder = { StyledText("Error") }
         )
-        StyledInput(
+        StyledTextField(
             value = roText,
             onValueChange = { roText = it },
             readOnly = true,
-            variant = StyledInputVariant.Filled,
-            placeholder = "Read-only"
+            variant = StyledTextField.Variant.Filled,
+            placeholder = { StyledText("Read-only") }
         )
-        StyledInput(
+        StyledTextField(
             value = "Disabled",
             onValueChange = { },
             enabled = false,
-            variant = StyledInputVariant.Filled,
-            placeholder = "Disabled"
+            variant = StyledTextField.Variant.Filled,
+            placeholder = { StyledText("Disabled") }
         )
     }
 }

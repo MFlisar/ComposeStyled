@@ -13,7 +13,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.foundation.text.TextAutoSize
+import androidx.compose.ui.text.style.TextOverflow
 import com.michaelflisar.composestyled.core.classes.colors.BaseColor
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.text.TextLayoutResult
 
 /**
  * Defines the platform specific implementations of styled components.
@@ -49,7 +56,17 @@ interface StyledComponents {
     )
 
     @Composable
-    fun Input(
+    fun Checkbox(
+        checked: Boolean,
+        onCheckedChange: (Boolean) -> Unit,
+        colors: BaseColor,
+        modifier: Modifier,
+        enabled: Boolean,
+        interactionSource: MutableInteractionSource,
+    )
+
+    @Composable
+    fun TextField(
         value: String,
         onValueChange: (String) -> Unit,
         colors: BaseColor,
@@ -71,35 +88,41 @@ interface StyledComponents {
         singleLine: Boolean,
         maxLines: Int,
         minLines: Int,
+        contentPadding: PaddingValues,
         interactionSource: MutableInteractionSource,
         shape: Shape,
-    )
-
-    /*
-
-    @Composable
-    fun Card(
-        modifier: Modifier = Modifier,
-        shape: Shape = StyledTheme.shapes.card,
-        config: StyledCardConfig = StyledCardDefaults.configFilled(),
-        contentPadding: PaddingValues = PaddingValues(0.dp),
-        content: @Composable ColumnScope.() -> Unit,
     )
 
     @Composable
     fun Text(
         text: String,
-        modifier: Modifier = Modifier,
-        style: TextStyle = TextStyle.Default,
-        color: Color = StyledTheme.colors.onBackground,
-        overflow: TextOverflow = TextOverflow.Clip,
-        softWrap: Boolean = true,
-        maxLines: Int = Int.MAX_VALUE,
-        minLines: Int = 1,
-        autoSize: TextAutoSize? = null,
+        modifier: Modifier,
+        style: TextStyle,
+        textAlign: TextAlign,
+        lineHeight: TextUnit,
+        fontSize: TextUnit,
+        letterSpacing: TextUnit,
+        fontWeight: FontWeight?,
+        color: Color,
+        fontFamily: FontFamily?,
+        singleLine: Boolean,
+        minLines: Int,
+        maxLines: Int,
+        onTextLayout: ((TextLayoutResult) -> Unit)?,
+        overflow: TextOverflow,
+        autoSize: TextAutoSize?,
     )
 
-    */
+    @Composable
+    fun Card(
+        modifier: Modifier,
+        shape: Shape,
+        backgroundColor: Color,
+        contentColor: Color,
+        border: BorderStroke?,
+        contentPadding: PaddingValues,
+        content: @Composable androidx.compose.foundation.layout.ColumnScope.() -> Unit,
+    )
 }
 
 internal val LocalStyledComponents =

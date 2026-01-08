@@ -100,7 +100,7 @@ kotlin {
 
 
             implementation(project(":composestyled:themes:android"))
-            implementation(project(":composestyled:themes:material3"))
+            //implementation(project(":composestyled:themes:material3"))
 
         }
     }

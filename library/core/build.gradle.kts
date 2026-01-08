@@ -92,7 +92,6 @@ kotlin {
 
             implementation(deps.composeunstyled.theming)
             implementation(deps.composeunstyled.platformtheme)
-            //implementation(deps.composeunstyled.primitives)
 
             api(libs.jetbrains.compose.runtime)
             api(libs.jetbrains.compose.foundation)
