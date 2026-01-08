@@ -22,7 +22,7 @@ data class StatefulBaseColorDef(
     // Verantwortung: wählt Zustand nach Priorität, wendet Disabled-Treatment an, liefert finale Farben
     @Composable
     @ReadOnlyComposable
-    fun resolve(
+    internal fun resolve(
         state: StyledResolveState,
     ): BaseColor {
         val base = when (state.interaction) {

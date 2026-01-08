@@ -53,7 +53,7 @@ interface StyledComponents {
         value: String,
         onValueChange: (String) -> Unit,
         colors: BaseColor,
-        modifier: Modifier = Modifier,
+        modifier: Modifier,
         enabled: Boolean,
         readOnly: Boolean,
         textStyle: TextStyle,

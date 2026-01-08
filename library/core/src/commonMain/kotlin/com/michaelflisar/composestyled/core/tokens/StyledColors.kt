@@ -22,7 +22,7 @@ data class StyledColors(
     val disableFactors: StyledDisableFactors = StyledDisableFactors(),
 ) {
     @Immutable
-    class Definition(
+    data class Definition(
         val color: Color,
         val onColor: Color,
     )

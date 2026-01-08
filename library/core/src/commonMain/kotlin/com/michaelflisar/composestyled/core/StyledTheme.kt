@@ -3,16 +3,8 @@ package com.michaelflisar.composestyled.core
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
-import com.composeunstyled.platformtheme.bright
 import com.composeunstyled.platformtheme.buildPlatformTheme
-import com.composeunstyled.platformtheme.heading5
-import com.composeunstyled.platformtheme.indications
-import com.composeunstyled.platformtheme.interactiveSizes
-import com.composeunstyled.platformtheme.roundedNone
-import com.composeunstyled.platformtheme.sizeDefault
-import com.composeunstyled.platformtheme.textStyles
-import com.composeunstyled.theme.Theme
-import com.michaelflisar.composestyled.core.components.StyledButton
+import com.michaelflisar.composestyled.core.components.ComponentRegistry
 import com.michaelflisar.composestyled.core.renderer.LocalStyledComponents
 import com.michaelflisar.composestyled.core.renderer.StyledComponents
 import com.michaelflisar.composestyled.core.runtime.ProvideStyledLocals
@@ -62,18 +54,16 @@ fun StyledTheme(
     // - shapes (roundedNone, roundedSmall, roundedMedium, roundedLarge, roundedFull)
     buildPlatformTheme {
 
-        val h5 = Theme[textStyles][heading5]
-        val indication = Theme[indications][bright]
-        val roundNone = Theme[com.composeunstyled.platformtheme.shapes][roundedNone]
-        val size = Theme[interactiveSizes][sizeDefault]
+        // compose unstyled predefined platform theme tokens
+        // => can be used inside styled components if needed
+        // E.g.:
+        // val h5 = Theme[textStyles][heading5]
+        // val indication = Theme[indications][bright]
+        // val roundNone = Theme[com.composeunstyled.platformtheme.shapes][roundedNone]
+        // val size = Theme[interactiveSizes][sizeDefault]
 
         // register component styles in compose unstyled theme
-        val allStyledComponents = listOf(
-            StyledButton
-        )
-        allStyledComponents.forEach {
-            it.registerStyle(this, colors)
-        }
+        ComponentRegistry.registerAll(this, colors)
 
         CompositionLocalProvider(
             LocalStyledComponents provides styledComponents,

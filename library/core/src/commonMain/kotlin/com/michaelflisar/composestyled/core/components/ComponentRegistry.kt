@@ -4,17 +4,15 @@ import androidx.compose.runtime.Composable
 import com.composeunstyled.theme.ThemeBuilder
 import com.michaelflisar.composestyled.core.tokens.StyledColors
 
-/**
- * Internal hook used by [com.michaelflisar.composestyled.core.StyledTheme] to register component styles
- * into the compose-unstyled [ThemeBuilder].
- *
- */
-internal interface BaseStyledComponent {
+internal object ComponentRegistry {
 
     @Composable
-    fun registerStyle(
+    fun registerAll(
         builder: ThemeBuilder,
         colors: StyledColors,
-    )
-
+    ) {
+        StyledButton.registerStyle(builder, colors)
+        StyledInput.registerStyle(builder, colors)
+        // ...
+    }
 }

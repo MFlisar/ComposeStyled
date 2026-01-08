@@ -21,7 +21,7 @@ import com.michaelflisar.composestyled.core.renderer.LocalStyledComponents
 import com.michaelflisar.composestyled.core.runtime.interaction.rememberStyledResolveState
 import com.michaelflisar.composestyled.core.tokens.StyledColors
 
-object StyledInput : BaseStyledComponent() {
+object StyledInput : BaseStyledComponent {
 
     internal val Property = ThemeProperty<StatefulBaseColorDef>("input")
 

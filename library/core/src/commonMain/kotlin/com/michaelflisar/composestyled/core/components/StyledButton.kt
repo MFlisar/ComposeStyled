@@ -20,7 +20,8 @@ import com.michaelflisar.composestyled.core.renderer.LocalStyledComponents
 import com.michaelflisar.composestyled.core.runtime.interaction.rememberStyledResolveState
 import com.michaelflisar.composestyled.core.tokens.StyledColors
 
-object StyledButton : BaseStyledComponent() {
+
+object StyledButton : BaseStyledComponent {
 
     internal val Property = ThemeProperty<StatefulBaseColorDef>("button")
 
