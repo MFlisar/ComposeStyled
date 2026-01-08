@@ -9,6 +9,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import com.michaelflisar.composestyled.core.classes.colors.BaseColor
 import com.michaelflisar.composestyled.core.components.StyledButton
 
 /**
@@ -34,7 +35,7 @@ interface StyledComponents {
 
     @Composable
     fun Button(
-        config: StyledButton.Config,
+        colors: BaseColor,
         onClick: () -> Unit,
         modifier: Modifier,
         enabled: Boolean,

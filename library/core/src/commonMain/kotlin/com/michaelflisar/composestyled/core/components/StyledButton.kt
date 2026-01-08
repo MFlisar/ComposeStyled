@@ -17,6 +17,7 @@ import com.michaelflisar.composestyled.core.classes.colors.StatefulBaseColorDef
 import com.michaelflisar.composestyled.core.classes.wrappers.StyledThemeProperty
 import com.michaelflisar.composestyled.core.classes.wrappers.StyledThemeToken
 import com.michaelflisar.composestyled.core.renderer.LocalStyledComponents
+import com.michaelflisar.composestyled.core.runtime.interaction.rememberStyledResolveState
 import com.michaelflisar.composestyled.core.tokens.StyledColors
 
 object StyledButton {
@@ -74,7 +75,7 @@ object StyledButton {
         val buttonOutlined = StatefulBaseColorDef(
             normal = BaseColorDef(
                 background = Color.Transparent,
-                foreground = colors.onBackground,
+                foreground = colors.primary,
                 border = colors.outlineVariant
             )
         )
@@ -124,10 +125,11 @@ fun StyledButton(
         Theme[StyledButton.Property.property][token.token]
     } ?: (variant as StyledButton.Variant.Custom).colorDef
 
-    val config = StyledButton.Config(colorDef = color)
+    val resolveState = rememberStyledResolveState(interactionSource, enabled)
+    val colors = color.resolve(resolveState)
 
     LocalStyledComponents.current.Button(
-        config = config,
+        colors = colors,
         onClick = onClick,
         modifier = modifier,
         enabled = enabled,

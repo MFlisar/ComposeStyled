@@ -23,7 +23,6 @@ data class StatefulBaseColorDef(
     @Composable
     @ReadOnlyComposable
     fun resolve(
-        theme: StyledTheme,
         state: StyledResolveState,
     ): BaseColor {
         val base = when (state.interaction) {
@@ -33,7 +32,7 @@ data class StatefulBaseColorDef(
             StyledInteractionState.Pressed -> pressed ?: focused ?: hovered ?: normal
             StyledInteractionState.Normal -> normal
         }
-        val disableFactors = theme.colors.disableFactors
+        val disableFactors = StyledTheme.colors.disableFactors
         fun Color.treat(disableFactorType: DisableFactorType) = if (state.enabled) this else copy(alpha = alpha * disableFactors.get(disableFactorType))
         return BaseColor(
             background = base.background.treat(DisableFactorType.Default),
