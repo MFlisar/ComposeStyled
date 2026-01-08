@@ -68,7 +68,12 @@ fun StyledTheme(
         val size = Theme[interactiveSizes][sizeDefault]
 
         // register component styles in compose unstyled theme
-        StyledButton.registerStyle(this, colors)
+        val allStyledComponents = listOf(
+            StyledButton
+        )
+        allStyledComponents.forEach {
+            it.registerStyle(this, colors)
+        }
 
         CompositionLocalProvider(
             LocalStyledComponents provides styledComponents,

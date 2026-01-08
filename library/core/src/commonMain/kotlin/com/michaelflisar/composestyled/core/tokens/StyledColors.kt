@@ -18,6 +18,7 @@ data class StyledColors(
     val primaryDef: Definition,
     val outlineDef: Definition,
     val outlineVariantDef: Definition,
+    val errorDef: Definition,
     val disableFactors: StyledDisableFactors = StyledDisableFactors(),
 ) {
     @Immutable
@@ -65,6 +66,12 @@ data class StyledColors(
 
     val onOutlineVariant: Color
         @Composable @ReadOnlyComposable get() = outlineVariantDef.onColor
+
+    val error: Color
+        @Composable @ReadOnlyComposable get() = errorDef.color
+
+    val onError: Color
+        @Composable @ReadOnlyComposable get() = errorDef.onColor
 }
 
 @Immutable
@@ -105,6 +112,11 @@ fun lightStyledColors() = StyledColors(
     outlineVariantDef = StyledColors.Definition(
         Color(0xFFCAC4D0),
         Color(0xFF79747E)
+    ),
+    // Material3 error + onError
+    errorDef = StyledColors.Definition(
+        Color(0xFFB3261E),
+        Color(0xFFFFFFFF)
     )
 )
 
@@ -138,6 +150,11 @@ fun darkStyledColors() = StyledColors(
     outlineVariantDef = StyledColors.Definition(
         Color(0xFF44424F),
         Color(0xFF938F99)
+    ),
+    // Material3 error + onError (dark)
+    errorDef = StyledColors.Definition(
+        Color(0xFFF2B8B5),
+        Color(0xFF601410)
     )
 )
 

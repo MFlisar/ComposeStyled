@@ -20,7 +20,7 @@ import com.michaelflisar.composestyled.core.classes.StyledResolveState
  * - Disabled is intentionally NOT represented here. Use [StyledResolveState.enabled].
  */
 @Composable
-internal fun rememberStyledInteractionState(
+fun rememberStyledInteractionState(
     interactionSource: InteractionSource?,
     isError: Boolean = false
 ): StyledInteractionState {
@@ -49,7 +49,7 @@ internal fun rememberStyledInteractionState(
  * Convenience helper to build a [StyledResolveState] from an [InteractionSource].
  */
 @Composable
-internal fun rememberStyledResolveState(
+fun rememberStyledResolveState(
     interactionSource: InteractionSource?,
     enabled: Boolean,
     isError: Boolean = false
