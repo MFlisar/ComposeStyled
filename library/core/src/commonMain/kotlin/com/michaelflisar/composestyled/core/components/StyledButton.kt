@@ -21,6 +21,10 @@ import com.michaelflisar.composestyled.core.tokens.StyledColors
 
 object StyledButton {
 
+    class Config(
+        val colorDef: StatefulBaseColorDef,
+    )
+
     internal val Property = StyledThemeProperty<StatefulBaseColorDef>("button")
 
     internal val ButtonFilledPrimary =
@@ -77,7 +81,7 @@ object StyledButton {
         val buttonText = StatefulBaseColorDef(
             normal = BaseColorDef(
                 background = Color.Transparent,
-                foreground = colors.onBackground,
+                foreground = colors.primary,
                 border = null
             )
         )
@@ -106,31 +110,24 @@ object StyledButtonDefaults {
 // ----------------------
 
 @Composable
-fun Test(
+fun StyledButton(
     variant: StyledButton.Variant,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    shape: Shape = StyledTheme.shapes.button,
+    contentPadding: PaddingValues = StyledButtonDefaults.contentPadding(),
+    interactionSource: MutableInteractionSource? = null,
+    content: @Composable RowScope.() -> Unit,
 ) {
     val color = variant.token?.let { token ->
         Theme[StyledButton.Property.property][token.token]
     } ?: (variant as StyledButton.Variant.Custom).colorDef
 
-    // TODO
-    //
+    val config = StyledButton.Config(colorDef = color)
 
-}
-
-@Composable
-fun StyledButton(
-    variant: StyledButton.Variant,
-    onClick: () -> Unit,
-    modifier: Modifier,
-    enabled: Boolean,
-    shape: Shape,
-    contentPadding: PaddingValues,
-    interactionSource: MutableInteractionSource?,
-    content: @Composable RowScope.() -> Unit,
-) {
     LocalStyledComponents.current.Button(
-        variant = variant,
+        config = config,
         onClick = onClick,
         modifier = modifier,
         enabled = enabled,

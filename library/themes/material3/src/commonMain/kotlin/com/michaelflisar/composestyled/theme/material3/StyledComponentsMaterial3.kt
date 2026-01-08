@@ -25,7 +25,7 @@ import com.michaelflisar.composestyled.core.components.StyledCardConfig
 import com.michaelflisar.composestyled.core.components.StyledInputConfig
 import com.michaelflisar.composestyled.core.renderer.StyledComponents
 import com.michaelflisar.composestyled.core.runtime.ProvideStyledLocals
-import com.michaelflisar.composestyled.core.theme.StyledTheme
+import com.michaelflisar.composestyled.core.StyledTheme
 import com.michaelflisar.composestyled.core.tokens.StyledColors
 import com.michaelflisar.composestyled.core.tokens.StyledShapes
 import com.michaelflisar.composestyled.core.tokens.StyledTypography

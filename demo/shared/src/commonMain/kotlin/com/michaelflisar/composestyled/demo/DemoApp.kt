@@ -24,8 +24,8 @@ import com.michaelflisar.composestyled.core.components.StyledInput
 import com.michaelflisar.composestyled.core.components.StyledInputVariant
 import com.michaelflisar.composestyled.core.components.StyledSurface
 import com.michaelflisar.composestyled.core.components.StyledText
-import com.michaelflisar.composestyled.core.theme.StyledTheme
-import com.michaelflisar.composestyled.core.theme.StyledThemeMode
+import com.michaelflisar.composestyled.core.StyledTheme
+import com.michaelflisar.composestyled.core.classes.ThemeMode
 import com.michaelflisar.composestyled.core.tokens.StyledPaddings
 import com.michaelflisar.composestyled.core.tokens.StyledShapes
 import com.michaelflisar.composestyled.core.tokens.StyledSpacings
@@ -38,15 +38,15 @@ import com.michaelflisar.composestyled.theme.material3.StyledMaterial3Theme
 fun DemoApp(
     platform: String,
 ) {
-    var mode by remember { mutableStateOf<StyledThemeMode>(StyledThemeMode.System) }
+    var mode by remember { mutableStateOf<ThemeMode>(ThemeMode.System) }
 
     // generate theme variables
     val isDarkMode = isSystemInDarkTheme()
     val colors = remember(mode, isDarkMode) {
         when (mode) {
-            StyledThemeMode.Light -> lightStyledColors()
-            StyledThemeMode.Dark -> darkStyledColors()
-            StyledThemeMode.System -> if (isDarkMode) darkStyledColors() else lightStyledColors()
+            ThemeMode.Light -> lightStyledColors()
+            ThemeMode.Dark -> darkStyledColors()
+            ThemeMode.System -> if (isDarkMode) darkStyledColors() else lightStyledColors()
         }
     }
     val shapes = remember { StyledShapes() }

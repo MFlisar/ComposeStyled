@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import com.michaelflisar.composestyled.core.components.StyledButtonConfig
 import com.michaelflisar.composestyled.core.runtime.ProvideStyledLocals
-import com.michaelflisar.composestyled.core.theme.StyledTheme
+import com.michaelflisar.composestyled.core.StyledTheme
 
 /**
  * Material3-based StyledButton.

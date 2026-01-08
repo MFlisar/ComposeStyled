@@ -15,12 +15,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import com.michaelflisar.composestyled.core.components.StyledButtonConfig
 import com.michaelflisar.composestyled.core.runtime.ProvideStyledLocals
-import com.michaelflisar.composestyled.core.theme.StyledTheme
+import com.michaelflisar.composestyled.core.StyledTheme
 
 @Composable
 internal fun StyledButtonImpl(

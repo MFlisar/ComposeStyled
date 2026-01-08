@@ -8,12 +8,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
-import com.michaelflisar.composestyled.core.StyledTheme
 import com.michaelflisar.composestyled.core.components.StyledButton
-import com.michaelflisar.composestyled.core.components.StyledButtonDefaults
 
+/**
+ * Defines the platform specific implementations of styled components.
+ *
+ * do not add default parameters here, only define them inside the actual implementations!
+ *
+ */
 interface StyledComponents {
 
     @Composable
@@ -21,23 +24,23 @@ interface StyledComponents {
 
     @Composable
     fun Surface(
-        modifier: Modifier = Modifier,
-        shape: Shape = RectangleShape,
-        color: Color = StyledTheme.colors.surface,
-        contentColor: Color = StyledTheme.colors.onSurface,
-        border: BorderStroke? = null,
+        modifier: Modifier,
+        shape: Shape,
+        color: Color,
+        contentColor: Color,
+        border: BorderStroke?,
         content: @Composable () -> Unit,
     )
 
     @Composable
     fun Button(
-        variant: StyledButton.Variant,
+        config: StyledButton.Config,
         onClick: () -> Unit,
-        modifier: Modifier = Modifier,
-        enabled: Boolean = true,
-        shape: Shape = StyledTheme.shapes.button,
-        contentPadding: PaddingValues = StyledButtonDefaults.contentPadding(),
-        interactionSource: MutableInteractionSource? = null,
+        modifier: Modifier,
+        enabled: Boolean,
+        shape: Shape,
+        contentPadding: PaddingValues,
+        interactionSource: MutableInteractionSource?,
         content: @Composable RowScope.() -> Unit,
     )
     /*

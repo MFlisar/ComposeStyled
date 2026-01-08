@@ -33,7 +33,7 @@ val buildTargets = Targets(
     iOS = true,
     // desktop
     windows = true,
-    macOS = true,
+    macOS = false, // because compose-unstyled does not support macOS yet
     // web
     wasm = true
 )

@@ -16,7 +16,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import com.michaelflisar.composestyled.core.components.StyledInputConfig
 import com.michaelflisar.composestyled.core.runtime.LocalContentColor
 import com.michaelflisar.composestyled.core.runtime.ProvideStyledLocals
-import com.michaelflisar.composestyled.core.theme.StyledTheme
+import com.michaelflisar.composestyled.core.StyledTheme
 
 /**
  * Material3-based input.

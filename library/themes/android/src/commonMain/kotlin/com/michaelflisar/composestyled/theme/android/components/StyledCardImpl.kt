@@ -7,18 +7,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.core.components.StyledCardConfig
-import com.michaelflisar.composestyled.core.components.StyledCardDefaults
 import com.michaelflisar.composestyled.core.runtime.ProvideStyledLocals
-import com.michaelflisar.composestyled.core.theme.StyledTheme
 
 @Composable
 internal fun StyledCardImpl(
