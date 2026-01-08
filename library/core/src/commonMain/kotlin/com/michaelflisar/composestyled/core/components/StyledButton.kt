@@ -34,26 +34,15 @@ object StyledButton {
     internal val ButtonText = StyledThemeToken<StatefulBaseColorDef>("button.text.default")
 
     sealed class Variant {
+        internal class Token internal constructor(
+            val token: StyledThemeToken<StatefulBaseColorDef>,
+        ) : Variant()
 
-        abstract val token: StyledThemeToken<StatefulBaseColorDef>?
+        class Custom(val colorDef: StatefulBaseColorDef) : Variant()
 
-        object FilledPrimary : Variant() {
-            override val token = ButtonFilledPrimary
-        }
-
-        object Outlined : Variant() {
-            override val token = ButtonOutlined
-        }
-
-        object Text : Variant() {
-            override val token = ButtonText
-        }
-
-        class Custom(
-            val colorDef: StatefulBaseColorDef,
-        ) : Variant() {
-            override val token = null
-        }
+        val FilledPrimary: Variant = Token(StyledThemeToken("button.filled.primary"))
+        val Outlined: Variant = Token(StyledThemeToken("button.outlined.default"))
+        val Text: Variant = Token(StyledThemeToken("button.text.default"))
     }
 
     @Composable
@@ -121,10 +110,10 @@ fun StyledButton(
     interactionSource: MutableInteractionSource? = null,
     content: @Composable RowScope.() -> Unit,
 ) {
-    val color = variant.token?.let { token ->
-        Theme[StyledButton.Property.property][token.token]
-    } ?: (variant as StyledButton.Variant.Custom).colorDef
-
+    val color = when (variant) {
+        is StyledButton.Variant.Token -> Theme[StyledButton.Property.property][variant.token.token]
+        is StyledButton.Variant.Custom -> variant.colorDef
+    }
     val resolveState = rememberStyledResolveState(interactionSource, enabled)
     val colors = color.resolve(resolveState)
 
