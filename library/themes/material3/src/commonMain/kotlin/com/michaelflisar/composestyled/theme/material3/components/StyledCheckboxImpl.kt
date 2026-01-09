@@ -8,6 +8,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import com.composeunstyled.UnstyledCheckbox
+import com.michaelflisar.composestyled.core.StyledTheme
 import com.michaelflisar.composestyled.core.classes.colors.BaseColorDef
 import com.michaelflisar.composestyled.core.classes.colors.StatefulBaseColorDef
 import com.michaelflisar.composestyled.core.components.StyledCheckbox
@@ -18,7 +19,10 @@ internal object StyledCheckboxImpl {
 
     @OptIn(InternalComposeStyledApi::class)
     @Composable
-    fun registerVariantStyles(colors: StyledColors) {
+    fun registerVariantStyles() {
+
+        val colors = StyledTheme.colors
+
         val unchecked = StatefulBaseColorDef(
             normal = BaseColorDef(
                 background = Color.Transparent,

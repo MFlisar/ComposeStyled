@@ -40,7 +40,7 @@ import com.michaelflisar.composestyled.core.tokens.StyledTypography
 object StyledComponentsMaterial3Wrapper : StyledComponents {
 
     @Composable
-    override fun registerAllComponents(colors: StyledColors) {
+    override fun registerAllComponents() {
         // ...
     }
 

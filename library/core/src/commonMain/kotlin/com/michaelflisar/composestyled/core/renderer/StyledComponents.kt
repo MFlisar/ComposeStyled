@@ -44,7 +44,7 @@ interface StyledComponents {
      * register all components inside the given ThemeBuilder
      */
     @Composable
-    fun registerAllComponents(colors: StyledColors)
+    fun registerAllComponents()
 
     /**
      * Root component to setup any platform specific requirements.

@@ -11,21 +11,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 import com.composeunstyled.UnstyledButton
+import com.michaelflisar.composestyled.core.StyledTheme
 import com.michaelflisar.composestyled.core.classes.colors.BaseColor
 import com.michaelflisar.composestyled.core.classes.colors.BaseColorDef
 import com.michaelflisar.composestyled.core.classes.colors.StatefulBaseColorDef
 import com.michaelflisar.composestyled.core.components.StyledButton
 import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
-import com.michaelflisar.composestyled.core.tokens.StyledColors
 import com.michaelflisar.composestyled.theme.material3.Material3
 
 internal object StyledButtonImpl {
 
     @OptIn(InternalComposeStyledApi::class)
     @Composable
-    fun registerVariantStyles(
-        colors: StyledColors,
-    ) {
+    fun registerVariantStyles() {
+
+        val colors = StyledTheme.colors
+
         val buttonFilledPrimary = StatefulBaseColorDef(
             normal = BaseColorDef(
                 background = colors.primary,
@@ -33,7 +34,7 @@ internal object StyledButtonImpl {
                 border = null
             ),
             hovered = BaseColorDef(
-                background = colors.primary.copy(alpha = Material3.AlphaHover),
+                background = Material3.hoverFromBackground(colors.primary),
                 foreground = colors.onPrimary,
                 border = null
             )
@@ -45,7 +46,7 @@ internal object StyledButtonImpl {
                 border = colors.outlineVariant
             ),
             hovered = BaseColorDef(
-                background = colors.primary.copy(alpha = Material3.AlphaHover),
+                background = Material3.hoverFromForeground(colors.onBackground),
                 foreground = colors.primary,
                 border = colors.outlineVariant
             ),
@@ -57,7 +58,7 @@ internal object StyledButtonImpl {
                 border = null
             ),
             hovered = BaseColorDef(
-                background = colors.primary.copy(alpha = Material3.AlphaHover),
+                background = Material3.hoverFromForeground(colors.onBackground),
                 foreground = colors.primary,
                 border = null
             )

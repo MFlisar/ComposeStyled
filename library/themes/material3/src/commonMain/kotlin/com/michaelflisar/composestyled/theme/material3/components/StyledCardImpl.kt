@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import com.michaelflisar.composestyled.core.StyledTheme
 import com.michaelflisar.composestyled.core.classes.colors.BaseColorDef
 import com.michaelflisar.composestyled.core.classes.colors.StatefulBaseColorDef
 import com.michaelflisar.composestyled.core.components.StyledCard
@@ -23,7 +24,10 @@ object StyledCardImpl {
 
     @OptIn(InternalComposeStyledApi::class)
     @Composable
-    fun registerVariantStyles(colors: StyledColors) {
+    fun registerVariantStyles() {
+
+        val colors = StyledTheme.colors
+
         val filled = StatefulBaseColorDef(
             normal = BaseColorDef(
                 background = colors.surface,

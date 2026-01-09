@@ -24,6 +24,7 @@ import com.composeunstyled.LocalContentColor
 import com.composeunstyled.LocalTextStyle
 import com.composeunstyled.TextField
 import com.composeunstyled.TextInput
+import com.michaelflisar.composestyled.core.StyledTheme
 import com.michaelflisar.composestyled.core.classes.colors.BaseColor
 import com.michaelflisar.composestyled.core.classes.colors.BaseColorDef
 import com.michaelflisar.composestyled.core.classes.colors.StatefulBaseColorDef
@@ -35,7 +36,10 @@ internal object StyledTextFieldImpl {
 
     @OptIn(InternalComposeStyledApi::class)
     @Composable
-    fun registerVariantStyles(colors: StyledColors) {
+    fun registerVariantStyles() {
+
+        val colors = StyledTheme.colors
+
         val filled = StatefulBaseColorDef(
             normal = BaseColorDef(
                 background = colors.surface,

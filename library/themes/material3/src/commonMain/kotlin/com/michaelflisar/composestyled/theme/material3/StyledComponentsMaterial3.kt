@@ -13,6 +13,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -28,24 +30,21 @@ import com.michaelflisar.composestyled.theme.material3.components.StyledButtonIm
 import com.michaelflisar.composestyled.theme.material3.components.StyledCardImpl
 import com.michaelflisar.composestyled.theme.material3.components.StyledCheckboxImpl
 import com.michaelflisar.composestyled.theme.material3.components.StyledIconImpl
+import com.michaelflisar.composestyled.theme.material3.components.StyledSeparatorImpl
 import com.michaelflisar.composestyled.theme.material3.components.StyledTextFieldImpl
 import com.michaelflisar.composestyled.theme.material3.components.StyledTextImpl
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.vector.ImageVector
-import com.michaelflisar.composestyled.core.tokens.StyledColors
-import com.michaelflisar.composestyled.theme.material3.components.StyledSeparatorImpl
 
 object StyledComponentsMaterial3 : StyledComponents {
 
     @Composable
-    override fun registerAllComponents(colors: StyledColors) {
-        StyledButtonImpl.registerVariantStyles(colors)
-        StyledTextFieldImpl.registerVariantStyles(colors)
-        StyledTextImpl.registerVariantStyles(colors)
-        StyledCardImpl.registerVariantStyles(colors)
-        StyledCheckboxImpl.registerVariantStyles(colors)
-        StyledSeparatorImpl.registerVariantStyles(colors)
-        StyledIconImpl.registerVariantStyles(colors)
+    override fun registerAllComponents() {
+        StyledButtonImpl.registerVariantStyles()
+        StyledTextFieldImpl.registerVariantStyles()
+        StyledTextImpl.registerVariantStyles()
+        StyledCardImpl.registerVariantStyles()
+        StyledCheckboxImpl.registerVariantStyles()
+        StyledSeparatorImpl.registerVariantStyles()
+        StyledIconImpl.registerVariantStyles()
     }
 
     // Root => use default

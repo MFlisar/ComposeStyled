@@ -8,6 +8,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
 import com.composeunstyled.Icon
+import com.michaelflisar.composestyled.core.StyledTheme
 import com.michaelflisar.composestyled.core.components.StyledIcon
 import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.core.tokens.StyledColors
@@ -16,7 +17,10 @@ internal object StyledIconImpl {
 
     @OptIn(InternalComposeStyledApi::class)
     @Composable
-    fun registerVariantStyles(colors: StyledColors) {
+    fun registerVariantStyles() {
+
+        val colors = StyledTheme.colors
+
         StyledIcon.registerVariantStyles(
             default = colors.onSurface,
             muted = colors.onSurfaceVariant,

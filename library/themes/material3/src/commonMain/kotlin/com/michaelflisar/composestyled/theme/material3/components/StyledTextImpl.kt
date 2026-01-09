@@ -12,6 +12,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import com.composeunstyled.Text
+import com.michaelflisar.composestyled.core.StyledTheme
 import com.michaelflisar.composestyled.core.components.StyledText
 import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.core.runtime.LocalTextStyle
@@ -21,7 +22,10 @@ internal object StyledTextImpl {
 
     @OptIn(InternalComposeStyledApi::class)
     @Composable
-    fun registerVariantStyles(colors: StyledColors) {
+    fun registerVariantStyles() {
+
+        val colors = StyledTheme.colors
+
         StyledText.registerVariantStyles(default = colors.onBackground)
     }
 

@@ -31,7 +31,7 @@ import com.michaelflisar.composestyled.core.tokens.StyledColors
 object StyledComponentsFluent2 : StyledComponents {
 
     @Composable
-    override fun registerAllComponents(colors: StyledColors) {
+    override fun registerAllComponents() {
        // ...
     }
 

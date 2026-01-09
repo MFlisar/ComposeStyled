@@ -1,238 +1,336 @@
-# Instruction for the library/core module
+# ComposeStyled – Copilot Instructions
 
-# Instruction for the library/themes/android module
+## 0) Big picture
 
-This module implements code with the help of compose unstyled.
+This repository provides a **design-system abstraction for Compose** with a strict separation of concerns:
 
-- Github: https://github.com/composablehorizons/compose-unstyled
-- Dokumentation: https://composables.com/docs/compose-unstyled/overview
+* **Core module (`library/core`)**
 
-# Instrcution for the library/themes/material3 module
+    * defines the **public ComposeStyled API**
+    * defines **components, variants, tokens, and interaction models**
+    * contains **no concrete visual design decisions**
 
-This module implements code with the help of compose material3.
+* **Theme modules (`library/themes/*`)**
 
----
+    * implement concrete **design systems** (Material3, Cupertino, Fluent2, …)
+    * register **component styles** and **renderers**
+    * are free to evolve without breaking the Core API
 
-## ComposeStyled – Copilot Instructions
+* **Renderer bridge**
 
-### 0) Big picture
+    * Core delegates all rendering through an **internal renderer bridge** (`LocalStyledComponents`)
+    * Themes provide the actual implementations
 
-This repo provides a design-system API for Compose with:
+### Core goal
 
-- a public Core API (`library/core`) that exposes only ComposeStyled types
-- internal usage of Compose Unstyled (`com.composeunstyled.theme.*`) for theme token storage / platform theme sourcing
-- one or more renderer implementations (e.g. `library/themes/*`) wired through an internal renderer bridge (`LocalStyledComponents`)
-- a demo app (Android) that uses the Material3 theme module.
-
-Core goal: Keep the public API stable, while allowing internal implementations and platform adapters to evolve.
-
-Themes are implemented in separate modules and do use following framework:
-
-Compose Unstyled:
-
-    * Github: https://github.com/composablehorizons/compose-unstyled
-    * Dokumentation: https://composables.com/docs/compose-unstyled/overview
+> **Keep the public API stable and neutral**,
+> while allowing **theme modules and renderers to change freely**.
 
 ---
 
-### 1) Module responsibilities
+## 1) Module responsibilities
 
-#### 1.1 `library/core`
+### 1.1 `library/core`
 
-Public API lives here. Must NOT expose:
+This is the **public API module**.
 
-- any `com.composeunstyled.*` types in public signatures
-- Material3 types
-- platform-specific theme APIs
+It MUST NOT expose in public APIs:
 
-It MAY use Compose Unstyled internally (in internal code or internal members), but the public API must remain ComposeStyled-only.
+* `com.composeunstyled.*`
+* Material3 APIs
+* platform-specific theme APIs
 
-`StyledTheme` is a singleton object (no instances). Never pass `StyledTheme` as a parameter to functions. Always access via `StyledTheme.*`.
+It MAY:
 
-`LocalStyledComponents` (renderer bridge) is internal. The public composables call into it.
+* use Compose Unstyled internally
+* use CompositionLocals internally
+* change internal implementation freely
 
-#### 1.2 `library/themes/material3`
+### Core invariants
 
-Implements the renderer (`LocalStyledComponents`) using compose unstyled.
+* `StyledTheme` is a **singleton `object`**
 
-It tries to mimic the Material3 design system which is documented here: https://m3.material.io/components
+    * ❌ never pass it as a parameter
+    * ✅ always access via `StyledTheme.*`
 
-#### 1.3 `library/themes/cupertino`
+* `LocalStyledComponents` is **internal**
 
-Implements the renderer (`LocalStyledComponents`) using compose unstyled.
-
-It tries to mimic the Cupertino design system which is documented here: https://developer.apple.com/design/human-interface-guidelines/presentation
-
-#### 1.3 `library/themes/fluent2`
-
-Implements the renderer (`LocalStyledComponents`) using compose unstyled.
-
-It tries to mimic the Fluent2 design system which is documented here: https://fluent2.microsoft.design/components/web/react/core/nav/usage
+    * public composables delegate rendering to it
+    * its API may change without breaking users
 
 ---
 
-### 2) API stability rules (core)
+### 1.2 `library/themes/material3`
 
-Treat `library/core` as a published library. Maintain binary compatibility.
+Implements a **Material3-like design system**, but:
 
-#### 2.1 Public composable evolution
+* **Rendering is done via Compose Unstyled**
+* Material3 is used only as a **design reference**
 
-- Keep `content: @Composable ...` as the last parameter (trailing lambda).
-- You may add new parameters only before the trailing lambda, with default values.
-- Never add parameters after the trailing lambda.
-- Avoid renaming or reordering parameters (named args break source compatibility).
-- Avoid public inline functions that depend on internal implementation details.
+    * [https://m3.material.io/components](https://m3.material.io/components)
 
-#### 2.2 Sealed types
+This module:
 
-Sealed types are ok because variants are controlled by the library.
-
-But users must not rely on exhaustive `when`. Add KDoc hints where relevant.
+* registers **Material3-style defaults** for all components
+* implements `LocalStyledComponents`
+* must NOT expose Material3 types to Core
 
 ---
 
-### 3) Theming model (core)
+### 1.3 `library/themes/cupertino`
 
-We use Compose Unstyled internally as a token store:
+Implements a **Cupertino-style design system** using Compose Unstyled.
 
-- `ThemeProperty<T>` groups related tokens (e.g. `"button"`, `"input"`).
-- `ThemeToken<T>` identifies a specific style (e.g. `"button.filled.primary"`).
+Design reference:
 
-In each component object (`StyledButton`, `StyledInput`, …) define:
-
-- `internal val Property = ThemeProperty<T>("...")`
-- `internal val TokenX = ThemeToken<T>("...")`
-- `internal fun registerStyle(builder, colors)` to register defaults
-
-Public API must not leak `Theme`, `ThemeBuilder`, `ThemeProperty`, `ThemeToken`.
-
-#### 3.1 Color/state model
-
-We represent component colors as:
-
-- `BaseColorDef` (background/foreground/border) using direct `Color`
-- `StatefulBaseColorDef` (normal/hovered/focused/pressed/error)
-- `StyledResolveState` with:
-  - `interaction: StyledInteractionState`
-  - `enabled: Boolean`
-
-Disabled treatment is applied centrally using `DisableFactorType` (e.g. `Default`/`Content`/`Outline`).
-
-- Border typically uses `Outline`
-- Foreground uses `Content`
-- Background uses `Default`
-
-#### 3.2 Interaction derivation (core helper)
-
-Use the core helper:
-
-- `rememberStyledResolveState(interactionSource, enabled, isError)`
-
-Priority:
-
-- Error > Pressed > Focused > Hovered > Normal
+* [https://developer.apple.com/design/human-interface-guidelines](https://developer.apple.com/design/human-interface-guidelines)
 
 ---
 
-### 4) Component pattern (core)
+### 1.4 `library/themes/fluent2`
 
-Each component follows the same structure:
+Implements a **Fluent 2-style design system** using Compose Unstyled.
 
-#### 4.1 Component object (e.g. `StyledButton`)
+Design reference:
 
-`object StyledButton`
-
-- defines `Property` + `ThemeTokens` internally
-- defines sealed class `Variant` with:
-  - built-ins in `companion object` (e.g. `FilledPrimary`, `Outlined`, `Text`)
-  - `fun custom(colorDef: StatefulBaseColorDef): Variant`
-  - `internal data class Token(...) : Variant()`
-  - `internal data class Custom(...) : Variant()`
-
-`registerStyle(builder, colors)` registers defaults.
-
-#### 4.2 Public composable (top-level)
-
-Top-level composable lives beside the object.
-
-Example pattern:
-
-- resolve the `StatefulBaseColorDef` by:
-  - token lookup if variant is `Token`
-  - use `Custom.colorDef` otherwise
-- derive `resolveState` via helper
-- call `colorDef.resolve(resolveState)` to produce final colors
-- delegate rendering to `LocalStyledComponents.current.<Component>(...)`
-
-#### 4.3 Defaults object
-
-`StyledXDefaults` provides shared defaults (padding, etc.) and must use the `StyledTheme.*` singleton.
+* [https://fluent2.microsoft.design](https://fluent2.microsoft.design)
 
 ---
 
-### 5) Renderer bridge rules
+## 2) API stability rules (core)
 
-`LocalStyledComponents` is internal and may change freely.
+Treat `library/core` as a **published library**.
 
-Renderers (Material3 etc.) implement methods like:
+### 2.1 Public composable evolution
 
-- `Button(colors, onClick, modifier, enabled, shape, contentPadding, interactionSource, content)`
-- `Input(value, onValueChange, colors, enabled, isError, shape, contentPadding, interactionSource, ...)`
+* Trailing `content: @Composable ...` **must always be last**
+* New parameters:
 
-Core computes states and resolves colors unless there is a strong reason to do it in the renderer.
-
-Prefer “core resolves” for consistent behavior across renderers.
-
----
-
-### 6) Rules for all themes modules (`library/themes/*`)
-
-- Implement `LocalStyledComponents` using compose unstyled primitives.
-- Do not re-implement token/state logic here unless unavoidable.
-
-Map:
-
-- `background` → container color
-- `foreground` → content (text/icon) color
-- `border` → outline / indicator if applicable
-
-Respect `interactionSource` passed from core (no extra sources unless required).
-
-Do not expose compose unstyled types in core.
+    * only **before** the trailing lambda
+    * must have **default values**
+* ❌ never reorder or rename parameters
+* ❌ avoid public `inline` APIs that depend on internals
 
 ---
 
-### 7) Rules for all wrapper modules (`library/wrapperthemes/*`)
+### 2.2 Sealed types
 
-Those do wrap some external theme (e.g. Material3) to provide a ready-to-use `StyledTheme`.
+Sealed types are allowed because:
 
-Do not expose the external theme types (e.g. Material3) in core.
+* all variants are controlled by the library
 
----
+However:
 
-### 8) Naming / style
-
-- Public APIs: `StyledXxx` prefix
-- Variants: nouns/adjectives (`FilledPrimary`, `Outlined`, `Text`)
-- Tokens: stable lowercase dotted ids (`"button.filled.primary"`)
-- Use KDoc on public declarations, English only.
-- Prefer `data object` only if you migrate variants to sealed interface; otherwise keep the current companion approach.
+* users must **not rely on exhaustive `when`**
+* add KDoc warnings where applicable
 
 ---
 
-### 9) What Copilot should do when editing/adding components
+## 3) Theming & token model (core)
 
-When asked to add a new component:
+Compose Unstyled is used **internally only** as a **token store**.
 
-1. Create object `StyledX` with internal `ThemeProperty` + tokens.
-2. Create Variant pattern identical to Button/Input.
-3. Implement `registerStyle(...)` + `createDefaultKeyMap(colors)`.
-4. Create `StyledXDefaults`.
-5. Create top-level `@Composable fun StyledX(...)`.
-6. Delegate to `LocalStyledComponents`.
-7. Update theme registration list so defaults are registered.
+Core defines:
 
-When changing APIs:
+* `ThemeProperty<T>` → component category (e.g. `"button"`)
+* `ThemeToken<T>` → concrete style key (e.g. `"button.filled.primary"`)
 
-- never pass `StyledTheme` as param (singleton only)
-- keep binary-compat rules
+### Core rule
+
+> **Core defines tokens and variants,
+> Theme modules define the actual styles.**
+
+Core MUST NOT:
+
+* register concrete visual defaults
+* assume any specific design system
+
+---
+
+## 4) Color & interaction model
+
+### 4.1 Color definitions
+
+* `BaseColorDef`
+
+    * `background`
+    * `foreground`
+    * `border`
+
+* `StatefulBaseColorDef`
+
+    * `normal`
+    * `hovered`
+    * `focused`
+    * `pressed`
+    * `error`
+
+### 4.2 Resolve state
+
+```kotlin
+StyledResolveState(
+    interaction: StyledInteractionState,
+    enabled: Boolean
+)
+```
+
+### 4.3 Disabled handling
+
+Disabled visuals are applied centrally using `DisableFactorType`:
+
+| Element    | DisableFactorType |
+| ---------- | ----------------- |
+| Background | Default           |
+| Foreground | Content           |
+| Border     | Outline           |
+
+---
+
+## 5) Interaction derivation (core helpers)
+
+Always use:
+
+```kotlin
+rememberStyledResolveState(
+    interactionSource,
+    enabled,
+    isError
+)
+```
+
+### Interaction priority
+
+**Keyboard mode**
+
+```
+Error > Pressed > Focused > Hovered > Normal
+```
+
+**Pointer (mouse / touch) mode**
+
+```
+Error > Pressed > Hovered > Normal
+```
+
+> Focus styling is **keyboard-only** by design.
+
+Decorations like focus rings must be handled **separately**, not via colors.
+
+---
+
+## 6) Component pattern (core)
+
+### 6.1 Component object
+
+Example: `StyledButton`
+
+* defines `ThemeProperty`
+* defines `ThemeToken`s
+* defines sealed `Variant`
+
+    * built-ins in `companion object`
+    * `custom(colorDef)` for overrides
+    * internal `Token` / `Custom` subclasses
+
+Core defines **what exists**, not **how it looks**.
+
+---
+
+### 6.2 Public composable
+
+Each component exposes a top-level composable:
+
+Responsibilities:
+
+1. resolve variant → `StatefulBaseColorDef`
+2. derive `StyledResolveState`
+3. resolve final colors
+4. delegate rendering to `LocalStyledComponents`
+
+---
+
+### 6.3 Defaults object
+
+`StyledXDefaults`:
+
+* provides layout defaults (padding, spacing, icon sizes)
+* must read values from `StyledTheme.*`
+* must NOT hardcode design-system values
+
+---
+
+## 7) Renderer bridge rules
+
+`LocalStyledComponents`:
+
+* is internal
+* may change freely
+* implemented by theme modules
+
+Renderers receive:
+
+* **resolved colors**
+* `interactionSource`
+* structural parameters (shape, padding, etc.)
+
+They must NOT:
+
+* re-derive interaction state
+* invent their own theming logic
+
+---
+
+## 8) Rules for all theme modules (`library/themes/*`)
+
+* Implement renderers using **Compose Unstyled**
+* Register styles via internal registration mechanisms
+* Map colors consistently:
+
+    * `background` → container
+    * `foreground` → text/icon
+    * `border` → outline/indicator
+
+Theme modules may:
+
+* animate
+* decorate
+* platform-optimize
+
+They must NOT:
+
+* leak Unstyled types into Core
+* change Core APIs
+
+---
+
+## 9) Naming & style rules
+
+* Public APIs: `StyledXxx`
+* Variants: semantic names (`FilledPrimary`, `Outlined`, `Text`)
+* Tokens: stable dotted lowercase ids
+* KDoc required on all public APIs
+* English only
+
+---
+
+## 10) Copilot instructions (very important)
+
+### When adding a new component
+
+Copilot MUST:
+
+1. follow the Button/Input pattern
+2. define tokens in Core
+3. **not** register concrete styles in Core
+4. delegate rendering to `LocalStyledComponents`
+5. add style registration in each theme module
+
+### When editing APIs
+
+Copilot MUST:
+
+* preserve binary compatibility
+* never pass `StyledTheme` as a parameter
+* keep renderer bridge internal
+
+---

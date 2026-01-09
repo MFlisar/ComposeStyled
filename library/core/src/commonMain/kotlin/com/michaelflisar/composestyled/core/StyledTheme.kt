@@ -68,18 +68,7 @@ fun StyledTheme(
     // - interaction sizes (default, minimum)
     // - shapes (roundedNone, roundedSmall, roundedMedium, roundedLarge, roundedFull)
 
-    // 1) register all component styles and create a theme
-    val platformTheme = key(styledComponents, colors) {
-        buildPlatformTheme {
-            CompositionLocalProvider(
-                LocalThemeBuilder provides this
-            ) {
-                styledComponents.registerAllComponents(colors)
-            }
-        }
-    }
-
-    // 2) provide the theme, the styled locals and foundation locals
+    // 1) provide the theme, the styled locals and foundation locals
     CompositionLocalProvider(
         // components
         LocalStyledComponents provides styledComponents,
@@ -90,6 +79,18 @@ fun StyledTheme(
         LocalStyledPaddings provides paddings,
         LocalStyledSpacings provides spacings
     ) {
+
+        // 1) register all component styles and create a theme
+        val platformTheme = key(styledComponents, colors) {
+            buildPlatformTheme {
+                CompositionLocalProvider(
+                    LocalThemeBuilder provides this
+                ) {
+                    styledComponents.registerAllComponents()
+                }
+            }
+        }
+
         platformTheme {
 
             // compose unstyled predefined platform theme tokens
