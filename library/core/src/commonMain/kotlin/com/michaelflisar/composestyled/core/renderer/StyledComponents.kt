@@ -1,26 +1,36 @@
 package com.michaelflisar.composestyled.core.renderer
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Indication
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.foundation.text.TextAutoSize
-import androidx.compose.ui.text.style.TextOverflow
-import com.michaelflisar.composestyled.core.classes.colors.BaseColor
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.text.TextLayoutResult
+import com.michaelflisar.composestyled.core.classes.colors.BaseColor
+import com.michaelflisar.composestyled.core.runtime.ProvideStyledLocals
+import com.michaelflisar.composestyled.core.tokens.StyledColors
 
 /**
  * Defines the platform specific implementations of styled components.
@@ -30,9 +40,25 @@ import androidx.compose.ui.text.TextLayoutResult
  */
 interface StyledComponents {
 
+    /**
+     * register all components inside the given ThemeBuilder
+     */
     @Composable
-    fun Root(content: @Composable () -> Unit)
+    fun registerAllComponents(colors: StyledColors)
 
+    /**
+     * Root component to setup any platform specific requirements.
+     *
+     * Default implementation just calls the content.
+     */
+    @Composable
+    fun Root(content: @Composable () -> Unit) {
+        content()
+    }
+
+    /**
+     * Surface has a default implementation that should work on most if not all platforms.
+     */
     @Composable
     fun Surface(
         modifier: Modifier,
@@ -41,7 +67,21 @@ interface StyledComponents {
         contentColor: Color,
         border: BorderStroke?,
         content: @Composable () -> Unit,
-    )
+    ) {
+        ProvideStyledLocals(
+            contentColor = contentColor,
+            backgroundColor = color,
+        ) {
+            Box(
+                modifier
+                    .clip(shape)
+                    .background(color)
+                    .then(if (border != null) Modifier.border(border, shape) else Modifier)
+            ) {
+                content()
+            }
+        }
+    }
 
     @Composable
     fun Button(
@@ -58,11 +98,18 @@ interface StyledComponents {
     @Composable
     fun Checkbox(
         checked: Boolean,
-        onCheckedChange: (Boolean) -> Unit,
-        colors: BaseColor,
         modifier: Modifier,
+        backgroundColor: Color,
+        contentColor: Color,
         enabled: Boolean,
-        interactionSource: MutableInteractionSource,
+        onCheckedChange: ((Boolean) -> Unit)?,
+        shape: Shape,
+        borderColor: Color,
+        borderWidth: Dp,
+        interactionSource: MutableInteractionSource?,
+        indication: Indication?,
+        contentDescription: String?,
+        checkIcon: @Composable () -> Unit,
     )
 
     @Composable
@@ -122,6 +169,38 @@ interface StyledComponents {
         border: BorderStroke?,
         contentPadding: PaddingValues,
         content: @Composable androidx.compose.foundation.layout.ColumnScope.() -> Unit,
+    )
+
+    @Composable
+    fun HorizontalSeparator(
+        modifier: Modifier,
+        color: Color,
+        thickness: Dp,
+    )
+
+    @Composable
+    fun VerticalSeparator(
+        modifier: Modifier,
+        color: Color,
+        thickness: Dp,
+    )
+
+    @Composable
+    fun Icon(
+        painter: Painter,
+        contentDescription: String?,
+        modifier: Modifier,
+        tint: Color,
+        size: Dp,
+    )
+
+    @Composable
+    fun Icon(
+        imageVector: ImageVector,
+        contentDescription: String?,
+        modifier: Modifier,
+        tint: Color,
+        size: Dp,
     )
 }
 

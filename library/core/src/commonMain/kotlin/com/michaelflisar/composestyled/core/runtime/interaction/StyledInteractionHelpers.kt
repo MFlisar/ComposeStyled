@@ -6,6 +6,8 @@ import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.input.InputMode
+import androidx.compose.ui.platform.LocalInputModeManager
 import com.michaelflisar.composestyled.core.classes.StyledInteractionState
 import com.michaelflisar.composestyled.core.classes.StyledResolveState
 
@@ -21,25 +23,17 @@ import com.michaelflisar.composestyled.core.classes.StyledResolveState
  */
 @Composable
 internal fun rememberStyledInteractionState(
-    interactionSource: InteractionSource?,
-    isError: Boolean = false
+    interactionSource: InteractionSource,
+    isError: Boolean = false,
 ): StyledInteractionState {
-    val pressed = if (interactionSource != null) {
-        val v by interactionSource.collectIsPressedAsState()
-        v
-    } else false
-    val focused = if (interactionSource != null) {
-        val v by interactionSource.collectIsFocusedAsState()
-        v
-    } else false
-    val hovered = if (interactionSource != null) {
-        val v by interactionSource.collectIsHoveredAsState()
-        v
-    } else false
+    val isKeyboard = LocalInputModeManager.current.inputMode == InputMode.Keyboard
+    val pressed by interactionSource.collectIsPressedAsState()
+    val focused by interactionSource.collectIsFocusedAsState()
+    val hovered by interactionSource.collectIsHoveredAsState()
     return when {
         isError -> StyledInteractionState.Error
         pressed -> StyledInteractionState.Pressed
-        focused -> StyledInteractionState.Focused
+        isKeyboard && focused -> StyledInteractionState.Focused
         hovered -> StyledInteractionState.Hovered
         else -> StyledInteractionState.Normal
     }
@@ -50,9 +44,9 @@ internal fun rememberStyledInteractionState(
  */
 @Composable
 internal fun rememberStyledResolveState(
-    interactionSource: InteractionSource?,
+    interactionSource: InteractionSource,
     enabled: Boolean,
-    isError: Boolean = false
+    isError: Boolean = false,
 ): StyledResolveState {
     return StyledResolveState(
         interaction = rememberStyledInteractionState(interactionSource, isError),

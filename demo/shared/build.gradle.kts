@@ -92,15 +92,23 @@ kotlin {
             // ..
 
             // Compose
-            // ..
+            implementation(libs.jetbrains.compose.material.icons.core)
+            implementation(libs.jetbrains.compose.material.icons.extended)
 
             // ------------------------
             // Library
             // ------------------------
 
+            // themes (core is included transitively)
+            implementation(project(":composestyled:themes:material3"))
+            implementation(project(":composestyled:themes:cupertino"))
+            implementation(project(":composestyled:themes:fluent2"))
 
-            implementation(project(":composestyled:themes:android"))
-            //implementation(project(":composestyled:themes:material3"))
+            // wrapper themes
+            implementation(project(":composestyled:wrapperthemes:material3"))
+
+            // optional components (provide some useful additional components)
+            implementation(project(":composestyled:components"))
 
         }
     }

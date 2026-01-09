@@ -20,6 +20,7 @@ data class StyledShapes(
     val button: Shape = RoundedCornerShape(size = small),
     val card: Shape = RoundedCornerShape(size = medium),
     val input: Shape = RoundedCornerShape(size = extraSmall),
+    val checkbox: Shape = RoundedCornerShape(size = extraSmall),
 )
 
 internal val LocalStyledShapes = staticCompositionLocalOf { StyledShapes() }

@@ -17,12 +17,21 @@ modules:
   - artifact-id: core
     description: This is the core module
     path: library/core
-  - artifact-id: theme-android
-    description: The android theme module
-    path: library/themes/android
+  - artifact-id: components
+    description: This is module providing various UI components
+    path: library/components
   - artifact-id: theme-material3
-    description: The Material3 theme module
+    description: The material3 theme module based on compose-unstyled
     path: library/themes/material3
+  - artifact-id: theme-cupertino
+    description: The cupertino theme module based on compose-unstyled
+    path: library/themes/cupertino
+  - artifact-id: theme-fluent2
+    description: The fluent2 theme module based on compose-unstyled
+    path: library/themes/fluent2
+  - artifact-id: themewrapper-material3
+    description: The wrapper theme around androidx.compose.material3
+    path: library/wrapperthemes/material3
 
 # XCFrameworks [name, path, targets (ios, macos)]
 xcframeworks: []

@@ -2,7 +2,6 @@ package com.michaelflisar.composestyled.core.runtime
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -39,7 +38,6 @@ fun ProvideTextStyle(style: TextStyle, content: @Composable () -> Unit) =
  * only public because of usage in other modules, should not be used directly elsewhere
  *
  */
-@InternalComposeApi
 @Composable
 fun ProvideStyledLocals(
     contentColor: Color? = null,

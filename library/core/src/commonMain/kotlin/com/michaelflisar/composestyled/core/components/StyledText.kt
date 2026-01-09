@@ -11,12 +11,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
-import com.composeunstyled.theme.ThemeBuilder
 import com.composeunstyled.theme.ThemeProperty
 import com.composeunstyled.theme.ThemeToken
 import com.michaelflisar.composestyled.core.StyledTheme
 import com.michaelflisar.composestyled.core.renderer.LocalStyledComponents
-import com.michaelflisar.composestyled.core.tokens.StyledColors
+import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
+import com.michaelflisar.composestyled.core.runtime.LocalThemeBuilder
 
 object StyledText : BaseStyledComponent {
 
@@ -34,10 +34,15 @@ object StyledText : BaseStyledComponent {
         internal data class Custom(val color: Color) : Variant()
     }
 
-    override fun registerStyle(builder: ThemeBuilder, colors: StyledColors) {
-        with(builder) {
+    /** Register variant styles for theming. */
+    @InternalComposeStyledApi
+    @Composable
+    fun registerVariantStyles(
+        default: Color,
+    ) {
+        with(LocalThemeBuilder.current) {
             properties[Property] = mapOf(
-                TokenDefault to colors.onBackground
+                TokenDefault to default,
             )
         }
     }
@@ -45,9 +50,13 @@ object StyledText : BaseStyledComponent {
 
 /** Defaults for [StyledText]. */
 object StyledTextDefaults {
+
     /** Default text color from the current [StyledTheme]. */
     @Composable
     fun color(): Color = StyledTheme.colors.onBackground
+
+    val style: TextStyle
+        @Composable get() = StyledTheme.typography.bodyMedium
 }
 
 /**
@@ -60,7 +69,7 @@ object StyledTextDefaults {
 fun StyledText(
     text: String,
     modifier: Modifier = Modifier,
-    style: TextStyle = StyledTheme.typography.bodyMedium,
+    style: TextStyle = StyledTextDefaults.style,
     textAlign: TextAlign = TextAlign.Unspecified,
     lineHeight: TextUnit = TextUnit.Unspecified,
     fontSize: TextUnit = style.fontSize,

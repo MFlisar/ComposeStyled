@@ -7,20 +7,18 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.composeunstyled.theme.Theme
-import com.composeunstyled.theme.ThemeBuilder
 import com.composeunstyled.theme.ThemeProperty
 import com.composeunstyled.theme.ThemeToken
 import com.michaelflisar.composestyled.core.StyledTheme
-import com.michaelflisar.composestyled.core.classes.colors.BaseColorDef
 import com.michaelflisar.composestyled.core.classes.colors.StatefulBaseColorDef
 import com.michaelflisar.composestyled.core.renderer.LocalStyledComponents
+import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
+import com.michaelflisar.composestyled.core.runtime.LocalThemeBuilder
 import com.michaelflisar.composestyled.core.runtime.interaction.rememberStyledResolveState
-import com.michaelflisar.composestyled.core.tokens.StyledColors
 
 object StyledCard : BaseStyledComponent {
 
@@ -41,33 +39,18 @@ object StyledCard : BaseStyledComponent {
         internal data class Custom(val colorDef: StatefulBaseColorDef) : Variant()
     }
 
-    override fun registerStyle(builder: ThemeBuilder, colors: StyledColors) {
-        with(builder) {
-            properties[Property] = createDefaultKeyMap(colors)
+    @InternalComposeStyledApi
+    @Composable
+    fun registerVariantStyles(
+        filled: StatefulBaseColorDef,
+        outlined: StatefulBaseColorDef,
+    ) {
+        with(LocalThemeBuilder.current) {
+            properties[Property] = mapOf(
+                TokenFilled to filled,
+                TokenOutlined to outlined,
+            )
         }
-    }
-
-    private fun createDefaultKeyMap(colors: StyledColors): Map<ThemeToken<StatefulBaseColorDef>, StatefulBaseColorDef> {
-        val filled = StatefulBaseColorDef(
-            normal = BaseColorDef(
-                background = colors.surface,
-                foreground = colors.onSurface,
-                border = null
-            )
-        )
-
-        val outlined = StatefulBaseColorDef(
-            normal = BaseColorDef(
-                background = Color.Transparent,
-                foreground = colors.onSurface,
-                border = colors.outlineVariant
-            )
-        )
-
-        return mapOf(
-            TokenFilled to filled,
-            TokenOutlined to outlined,
-        )
     }
 }
 

@@ -3,26 +3,31 @@ package com.michaelflisar.composestyled.core
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.key
 import com.composeunstyled.platformtheme.bright
 import com.composeunstyled.platformtheme.buildPlatformTheme
 import com.composeunstyled.platformtheme.indications
+import com.composeunstyled.platformtheme.interactiveSizes
+import com.composeunstyled.platformtheme.sizeDefault
+import com.composeunstyled.platformtheme.sizeMinimum
 import com.composeunstyled.theme.Theme
-import com.michaelflisar.composestyled.core.components.ComponentRegistry
 import com.michaelflisar.composestyled.core.renderer.LocalStyledComponents
 import com.michaelflisar.composestyled.core.renderer.StyledComponents
 import com.michaelflisar.composestyled.core.runtime.LocalBackgroundColor
 import com.michaelflisar.composestyled.core.runtime.LocalContentColor
 import com.michaelflisar.composestyled.core.runtime.LocalTextStyle
+import com.michaelflisar.composestyled.core.runtime.LocalThemeBuilder
 import com.michaelflisar.composestyled.core.tokens.LocalStyledColors
 import com.michaelflisar.composestyled.core.tokens.LocalStyledPaddings
 import com.michaelflisar.composestyled.core.tokens.LocalStyledShapes
+import com.michaelflisar.composestyled.core.tokens.LocalStyledSizes
 import com.michaelflisar.composestyled.core.tokens.LocalStyledSpacings
 import com.michaelflisar.composestyled.core.tokens.LocalStyledTypography
 import com.michaelflisar.composestyled.core.tokens.StyledColors
 import com.michaelflisar.composestyled.core.tokens.StyledPaddings
 import com.michaelflisar.composestyled.core.tokens.StyledShapes
+import com.michaelflisar.composestyled.core.tokens.StyledSizes
 import com.michaelflisar.composestyled.core.tokens.StyledSpacings
 import com.michaelflisar.composestyled.core.tokens.StyledTypography
 
@@ -42,15 +47,11 @@ object StyledTheme {
 
     val spacings: StyledSpacings
         @Composable @ReadOnlyComposable get() = LocalStyledSpacings.current
+
+    val sizes: StyledSizes
+        @Composable @ReadOnlyComposable get() = LocalStyledSizes.current
 }
 
-val PlatformTheme = buildPlatformTheme {
-    // register component styles in compose unstyled theme
-    val colors = LocalStyledColors.current
-    ComponentRegistry.registerAll(this, colors)
-}
-
-@OptIn(InternalComposeApi::class)
 @Composable
 fun StyledTheme(
     styledComponents: StyledComponents,
@@ -67,6 +68,18 @@ fun StyledTheme(
     // - interaction sizes (default, minimum)
     // - shapes (roundedNone, roundedSmall, roundedMedium, roundedLarge, roundedFull)
 
+    // 1) register all component styles and create a theme
+    val platformTheme = key(styledComponents, colors) {
+        buildPlatformTheme {
+            CompositionLocalProvider(
+                LocalThemeBuilder provides this
+            ) {
+                styledComponents.registerAllComponents(colors)
+            }
+        }
+    }
+
+    // 2) provide the theme, the styled locals and foundation locals
     CompositionLocalProvider(
         // components
         LocalStyledComponents provides styledComponents,
@@ -77,7 +90,7 @@ fun StyledTheme(
         LocalStyledPaddings provides paddings,
         LocalStyledSpacings provides spacings
     ) {
-        PlatformTheme {
+        platformTheme {
 
             // compose unstyled predefined platform theme tokens
             // => can be used inside styled components if needed
@@ -88,9 +101,18 @@ fun StyledTheme(
             // val size = Theme[interactiveSizes][sizeDefault]
 
             val indication = Theme[indications][bright]
+            val interactiveSizeDefault = Theme[interactiveSizes][sizeDefault]
+            val interactiveSizeSmall = Theme[interactiveSizes][sizeMinimum]
+            val interactiveSizes = StyledSizes(
+                minimumInteractiveSize = interactiveSizeDefault,
+                minimumInteractiveSizeSmall = interactiveSizeSmall
+            )
 
             CompositionLocalProvider(
+                // foundaton
                 LocalIndication provides indication,
+                // styled locals
+                LocalStyledSizes provides interactiveSizes,
                 LocalContentColor provides colors.onBackground,
                 LocalBackgroundColor provides colors.background,
                 LocalTextStyle provides typography.bodyMedium
