@@ -1,208 +1,76 @@
 package com.michaelflisar.composestyled.core.renderer
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Indication
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.staticCompositionLocalOf
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.TextLayoutResult
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.TextUnit
-import com.michaelflisar.composestyled.core.classes.colors.BaseColor
-import com.michaelflisar.composestyled.core.runtime.ProvideStyledLocals
-import com.michaelflisar.composestyled.core.tokens.StyledColors
+import com.michaelflisar.composestyled.core.components.StyledButtonTokenRenderer
+import com.michaelflisar.composestyled.core.components.StyledButtonWrapperRenderer
+import com.michaelflisar.composestyled.core.components.StyledCardTokenRenderer
+import com.michaelflisar.composestyled.core.components.StyledCardWrapperRenderer
+import com.michaelflisar.composestyled.core.components.StyledCheckboxTokenRenderer
+import com.michaelflisar.composestyled.core.components.StyledCheckboxWrapperRenderer
+import com.michaelflisar.composestyled.core.components.StyledIconTokenRenderer
+import com.michaelflisar.composestyled.core.components.StyledIconWrapperRenderer
+import com.michaelflisar.composestyled.core.components.StyledSeparatorTokenRenderer
+import com.michaelflisar.composestyled.core.components.StyledSeparatorWrapperRenderer
+import com.michaelflisar.composestyled.core.components.StyledSurfaceTokenRenderer
+import com.michaelflisar.composestyled.core.components.StyledSurfaceWrapperRenderer
+import com.michaelflisar.composestyled.core.components.StyledTextFieldTokenRenderer
+import com.michaelflisar.composestyled.core.components.StyledTextFieldWrapperRenderer
+import com.michaelflisar.composestyled.core.components.StyledTextTokenRenderer
+import com.michaelflisar.composestyled.core.components.StyledTextWrapperRenderer
+import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
 
-/**
- * Defines the platform specific implementations of styled components.
- *
- * do not add default parameters here, only define them inside the actual implementations!
- *
- */
-interface StyledComponents {
+sealed interface StyledComponents
 
-    /**
-     * register all components inside the given ThemeBuilder
-     */
+interface StyledTokenRenderer {
+
+    @InternalComposeStyledApi
     @Composable
-    fun registerAllComponents()
+    fun registerVariantStyles()
 
-    /**
-     * Root component to setup any platform specific requirements.
-     *
-     * Default implementation just calls the content.
-     */
-    @Composable
-    fun Root(content: @Composable () -> Unit) {
-        content()
-    }
+}
 
-    /**
-     * Surface has a default implementation that should work on most if not all platforms.
-     */
+data class StyledTokenCompontents(
+    val surface: StyledSurfaceTokenRenderer,
+    val button: StyledButtonTokenRenderer,
+    val card: StyledCardTokenRenderer,
+    val checkbox: StyledCheckboxTokenRenderer,
+    val icon: StyledIconTokenRenderer,
+    val separator: StyledSeparatorTokenRenderer,
+    val text: StyledTextTokenRenderer,
+    val textField: StyledTextFieldTokenRenderer,
+) : StyledComponents {
+
+    @InternalComposeStyledApi
     @Composable
-    fun Surface(
-        modifier: Modifier,
-        shape: Shape,
-        color: Color,
-        contentColor: Color,
-        border: BorderStroke?,
-        content: @Composable () -> Unit,
-    ) {
-        ProvideStyledLocals(
-            contentColor = contentColor,
-            backgroundColor = color,
-        ) {
-            Box(
-                modifier
-                    .clip(shape)
-                    .background(color)
-                    .then(if (border != null) Modifier.border(border, shape) else Modifier)
-            ) {
-                content()
-            }
+    fun registerAllComponents() {
+        listOf(
+            surface,
+            button,
+            card,
+            checkbox,
+            icon,
+            separator,
+            text,
+            textField,
+        ).forEach {
+            it.registerVariantStyles()
         }
     }
-
-    @Composable
-    fun Button(
-        colors: BaseColor,
-        onClick: () -> Unit,
-        modifier: Modifier,
-        enabled: Boolean,
-        shape: Shape,
-        contentPadding: PaddingValues,
-        interactionSource: MutableInteractionSource,
-        content: @Composable RowScope.() -> Unit,
-    )
-
-    @Composable
-    fun Checkbox(
-        checked: Boolean,
-        modifier: Modifier,
-        backgroundColor: Color,
-        contentColor: Color,
-        enabled: Boolean,
-        onCheckedChange: ((Boolean) -> Unit)?,
-        shape: Shape,
-        borderColor: Color,
-        borderWidth: Dp,
-        interactionSource: MutableInteractionSource?,
-        indication: Indication?,
-        contentDescription: String?,
-        checkIcon: @Composable () -> Unit,
-    )
-
-    @Composable
-    fun TextField(
-        value: String,
-        onValueChange: (String) -> Unit,
-        colors: BaseColor,
-        modifier: Modifier,
-        enabled: Boolean,
-        readOnly: Boolean,
-        textStyle: TextStyle,
-        label: @Composable (() -> Unit)?,
-        placeholder: @Composable (() -> Unit)?,
-        leadingIcon: @Composable (() -> Unit)?,
-        trailingIcon: @Composable (() -> Unit)?,
-        prefix: @Composable (() -> Unit)?,
-        suffix: @Composable (() -> Unit)?,
-        supportingText: @Composable (() -> Unit)?,
-        isError: Boolean,
-        visualTransformation: VisualTransformation,
-        keyboardOptions: KeyboardOptions,
-        keyboardActions: KeyboardActions,
-        singleLine: Boolean,
-        maxLines: Int,
-        minLines: Int,
-        contentPadding: PaddingValues,
-        interactionSource: MutableInteractionSource,
-        shape: Shape,
-    )
-
-    @Composable
-    fun Text(
-        text: String,
-        modifier: Modifier,
-        style: TextStyle,
-        textAlign: TextAlign,
-        lineHeight: TextUnit,
-        fontSize: TextUnit,
-        letterSpacing: TextUnit,
-        fontWeight: FontWeight?,
-        color: Color,
-        fontFamily: FontFamily?,
-        singleLine: Boolean,
-        minLines: Int,
-        maxLines: Int,
-        onTextLayout: ((TextLayoutResult) -> Unit)?,
-        overflow: TextOverflow,
-        autoSize: TextAutoSize?,
-    )
-
-    @Composable
-    fun Card(
-        modifier: Modifier,
-        shape: Shape,
-        backgroundColor: Color,
-        contentColor: Color,
-        border: BorderStroke?,
-        contentPadding: PaddingValues,
-        content: @Composable androidx.compose.foundation.layout.ColumnScope.() -> Unit,
-    )
-
-    @Composable
-    fun HorizontalSeparator(
-        modifier: Modifier,
-        color: Color,
-        thickness: Dp,
-    )
-
-    @Composable
-    fun VerticalSeparator(
-        modifier: Modifier,
-        color: Color,
-        thickness: Dp,
-    )
-
-    @Composable
-    fun Icon(
-        painter: Painter,
-        contentDescription: String?,
-        modifier: Modifier,
-        tint: Color,
-        size: Dp,
-    )
-
-    @Composable
-    fun Icon(
-        imageVector: ImageVector,
-        contentDescription: String?,
-        modifier: Modifier,
-        tint: Color,
-        size: Dp,
-    )
 }
+
+data class StyledWrapperComponents(
+    val root: @Composable (content: @Composable () -> Unit) -> Unit,
+    val surface: StyledSurfaceWrapperRenderer,
+    val button: StyledButtonWrapperRenderer,
+    val card: StyledCardWrapperRenderer,
+    val checkbox: StyledCheckboxWrapperRenderer,
+    val icon: StyledIconWrapperRenderer,
+    val separator: StyledSeparatorWrapperRenderer,
+    val text: StyledTextWrapperRenderer,
+    val textField: StyledTextFieldWrapperRenderer,
+) : StyledComponents
+
 
 internal val LocalStyledComponents =
     staticCompositionLocalOf<StyledComponents> { error("No StyledComponents provided!") }

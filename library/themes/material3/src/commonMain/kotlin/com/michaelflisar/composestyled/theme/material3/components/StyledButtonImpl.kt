@@ -3,27 +3,31 @@ package com.michaelflisar.composestyled.theme.material3.components
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.composeunstyled.UnstyledButton
 import com.michaelflisar.composestyled.core.StyledTheme
-import com.michaelflisar.composestyled.core.classes.colors.BaseColor
 import com.michaelflisar.composestyled.core.classes.colors.BaseColorDef
 import com.michaelflisar.composestyled.core.classes.colors.StatefulBaseColorDef
 import com.michaelflisar.composestyled.core.components.StyledButton
+import com.michaelflisar.composestyled.core.components.StyledButtonTokenRenderer
 import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
-import com.michaelflisar.composestyled.theme.material3.Material3
+import com.michaelflisar.composestyled.core.runtime.ProvideStyledLocals
+import com.michaelflisar.composestyled.theme.material3.Material3Util
 
-internal object StyledButtonImpl {
+internal object StyledButtonImpl : StyledButtonTokenRenderer {
 
     @OptIn(InternalComposeStyledApi::class)
     @Composable
-    fun registerVariantStyles() {
+    override fun registerVariantStyles() {
 
         val colors = StyledTheme.colors
 
@@ -34,7 +38,7 @@ internal object StyledButtonImpl {
                 border = null
             ),
             hovered = BaseColorDef(
-                background = Material3.hoverFromBackground(colors.primary),
+                background = Material3Util.hoverFromBackground(colors.primary),
                 foreground = colors.onPrimary,
                 border = null
             )
@@ -42,24 +46,24 @@ internal object StyledButtonImpl {
         val buttonOutlined = StatefulBaseColorDef(
             normal = BaseColorDef(
                 background = Color.Transparent,
-                foreground = colors.primary,
+                foreground = colors.onBackground,
                 border = colors.outlineVariant
             ),
             hovered = BaseColorDef(
-                background = Material3.hoverFromForeground(colors.onBackground),
-                foreground = colors.primary,
+                background = Material3Util.hoverFromForeground(colors.onBackground),
+                foreground = colors.onBackground,
                 border = colors.outlineVariant
             ),
         )
         val buttonText = StatefulBaseColorDef(
             normal = BaseColorDef(
                 background = Color.Transparent,
-                foreground = colors.primary,
+                foreground = colors.onBackground,
                 border = null
             ),
             hovered = BaseColorDef(
-                background = Material3.hoverFromForeground(colors.onBackground),
-                foreground = colors.primary,
+                background = Material3Util.hoverFromForeground(colors.onBackground),
+                foreground = colors.onBackground,
                 border = null
             )
         )
@@ -76,33 +80,43 @@ internal object StyledButtonImpl {
      * Android/Unstyled-based button.
      */
     @Composable
-    fun Render(
-        colors: BaseColor,
+    override fun Render(
         onClick: () -> Unit,
         modifier: Modifier,
         enabled: Boolean,
         shape: Shape,
+        backgroundColor: Color,
+        contentColor: Color,
+        borderColor: Color?,
         contentPadding: PaddingValues,
         interactionSource: MutableInteractionSource,
-        content: @Composable RowScope.() -> Unit,
+        content: @Composable (RowScope.() -> Unit),
     ) {
-        UnstyledButton(
-            onClick = onClick,
-            modifier = modifier.hoverable(
+        ProvideStyledLocals(
+            contentColor = contentColor,
+            backgroundColor = backgroundColor,
+        ) {
+            UnstyledButton(
+                onClick = onClick,
+                enabled = enabled,
+                shape = shape,
+                backgroundColor = backgroundColor,
+                contentColor = contentColor,
+                contentPadding = contentPadding,
+                borderColor = borderColor ?: Color.Unspecified,
+                borderWidth = if (borderColor != null) 1.dp else 0.dp,
+                modifier = modifier.hoverable(
+                    interactionSource = interactionSource,
+                    enabled = enabled
+                ),
+                role = Role.Button,
+                indication = LocalIndication.current,
                 interactionSource = interactionSource,
-                enabled = enabled
-            ),
-            enabled = enabled,
-            shape = shape,
-            contentPadding = contentPadding,
-            indication = LocalIndication.current,
-            interactionSource = interactionSource,
-            backgroundColor = colors.background,
-            contentColor = colors.foreground,
-            borderColor = colors.border ?: Color.Unspecified,
-            borderWidth = if (colors.border != null) 1.dp else 0.dp,
-            content = content
-        )
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+                content = content
+            )
+        }
     }
 
 }

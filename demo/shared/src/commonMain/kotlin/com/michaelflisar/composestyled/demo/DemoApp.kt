@@ -38,13 +38,14 @@ import com.michaelflisar.composestyled.core.tokens.StyledSpacings
 import com.michaelflisar.composestyled.core.tokens.StyledTypography
 import com.michaelflisar.composestyled.core.tokens.darkStyledColors
 import com.michaelflisar.composestyled.core.tokens.lightStyledColors
+import com.michaelflisar.composestyled.demo.composables.CheckedButton
 import com.michaelflisar.composestyled.demo.screens.ButtonsScreen
 import com.michaelflisar.composestyled.demo.screens.CardsScreen
 import com.michaelflisar.composestyled.demo.screens.InputsScreen
 import com.michaelflisar.composestyled.theme.cupertino.StyledComponentsCupertino
 import com.michaelflisar.composestyled.theme.fluent2.StyledComponentsFluent2
 import com.michaelflisar.composestyled.theme.material3.StyledComponentsMaterial3
-import com.michaelflisar.composestyled.theme.material3.StyledComponentsMaterial3Wrapper
+import com.michaelflisar.composestyled.theme.wrapper.material3.StyledComponentsMaterial3Wrapper
 
 private enum class DemoScreen {
     Buttons,
@@ -60,8 +61,8 @@ fun DemoApp(
     val mode = remember { mutableStateOf<ThemeMode>(ThemeMode.System) }
     val styles = mapOf<String, StyledComponents>(
         "Material3" to StyledComponentsMaterial3,
-        "Cupertino" to StyledComponentsCupertino,
-        "Fluent2" to StyledComponentsFluent2,
+        //"Cupertino" to StyledComponentsCupertino,
+        //"Fluent2" to StyledComponentsFluent2,
         "Material3 (Wrapper)" to StyledComponentsMaterial3Wrapper
     )
     val style = remember { mutableStateOf(styles.entries.first().value) }
@@ -131,31 +132,12 @@ fun DemoPagePane(
                     style = StyledTheme.typography.titleMedium
                 )
                 ThemeMode.entries.forEach { theme ->
-                    StyledButton(
+                    CheckedButton(
                         modifier = Modifier.fillMaxWidth(),
-                        variant = StyledButton.Variant.Text,
-                        enabled = mode.value != theme,
-                        onClick = {
-                            mode.value = theme
-                        }
-                    ) {
-                        Row(
-                            modifier = Modifier.height(StyledTheme.sizes.minimumInteractiveSize),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            StyledText(theme.name, modifier = Modifier.weight(1f))
-                            AnimatedVisibility(
-                                visible = mode.value == theme,
-                                enter = fadeIn(),
-                                exit = fadeOut()
-                            ) {
-                                StyledCheckbox(
-                                    checked = true,
-                                    onCheckedChange = { }
-                                )
-                            }
-                        }
-                    }
+                        text = theme.name,
+                        checked = mode.value == theme,
+                        onClick = { mode.value = theme }
+                    )
                 }
             }
 
@@ -166,16 +148,13 @@ fun DemoPagePane(
                     text = "Styles",
                     style = StyledTheme.typography.titleMedium
                 )
-                styles.forEach {
-                    StyledButton(
-                        variant = StyledButton.Variant.FilledPrimary,
-                        enabled = style.value != it.value,
-                        onClick = {
-                            style.value = it.value
-                        }
-                    ) {
-                        StyledText(it.key)
-                    }
+                styles.forEach { s ->
+                    CheckedButton(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = s.key,
+                        checked = style.value == s.value,
+                        onClick = { style.value = s.value }
+                    )
                 }
             }
         }
@@ -200,7 +179,7 @@ private fun Content() {
             ) {
                 DemoScreen.entries.forEach {
                     StyledButton(
-                        variant = StyledButton.Variant.FilledPrimary,
+                        variant = StyledButton.Variants.FilledPrimary,
                         onClick = { screen = it }
                     ) {
                         StyledText(text = it.name)

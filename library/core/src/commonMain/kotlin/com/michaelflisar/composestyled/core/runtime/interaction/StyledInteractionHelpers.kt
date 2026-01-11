@@ -26,13 +26,13 @@ import com.michaelflisar.composestyled.core.classes.StyledResolveState
  */
 @Composable
 internal fun rememberStyledInteractionState(
-    interactionSource: InteractionSource,
+    interactionSource: InteractionSource?,
     isError: Boolean = false,
 ): StyledInteractionState {
     val isKeyboard = LocalInputModeManager.current.inputMode == InputMode.Keyboard
-    val pressed by interactionSource.collectIsPressedAsState()
-    val focused by interactionSource.collectIsFocusedAsState()
-    val hovered by interactionSource.collectIsHoveredAsState()
+    val pressed = interactionSource?.collectIsPressedAsState()?.value ?: false
+    val focused = interactionSource?.collectIsFocusedAsState()?.value ?: false
+    val hovered = interactionSource?.collectIsHoveredAsState()?.value ?: false
     return when {
         isError -> StyledInteractionState.Error
         pressed -> StyledInteractionState.Pressed
@@ -47,7 +47,7 @@ internal fun rememberStyledInteractionState(
  */
 @Composable
 internal fun rememberStyledResolveState(
-    interactionSource: InteractionSource,
+    interactionSource: InteractionSource?,
     enabled: Boolean,
     isError: Boolean = false,
 ): StyledResolveState {

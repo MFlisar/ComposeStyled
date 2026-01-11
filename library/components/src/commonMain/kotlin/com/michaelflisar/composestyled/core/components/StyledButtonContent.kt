@@ -10,9 +10,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
-import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.core.StyledTheme
 import com.michaelflisar.composestyled.core.runtime.LocalContentColor
 
@@ -28,8 +26,8 @@ fun StyledButtonContent(
     } else {
         val density = LocalDensity.current
 
-        val lineHeight = StyledTextDefaults.style.lineHeight
-        val fallbackIconSizeSp = StyledTextDefaults.style.fontSize
+        val lineHeight = StyledTextDefaults.Style.lineHeight
+        val fallbackIconSizeSp = StyledTextDefaults.Style.fontSize
         val iconSizeSp = if (lineHeight.type == TextUnitType.Sp) lineHeight else fallbackIconSizeSp
         val iconSizeDp = with(density) { iconSizeSp.toDp() }
 

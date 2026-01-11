@@ -14,6 +14,9 @@ import com.composeunstyled.platformtheme.sizeMinimum
 import com.composeunstyled.theme.Theme
 import com.michaelflisar.composestyled.core.renderer.LocalStyledComponents
 import com.michaelflisar.composestyled.core.renderer.StyledComponents
+import com.michaelflisar.composestyled.core.renderer.StyledTokenCompontents
+import com.michaelflisar.composestyled.core.renderer.StyledWrapperComponents
+import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.core.runtime.LocalBackgroundColor
 import com.michaelflisar.composestyled.core.runtime.LocalContentColor
 import com.michaelflisar.composestyled.core.runtime.LocalTextStyle
@@ -52,6 +55,7 @@ object StyledTheme {
         @Composable @ReadOnlyComposable get() = LocalStyledSizes.current
 }
 
+@OptIn(InternalComposeStyledApi::class)
 @Composable
 fun StyledTheme(
     styledComponents: StyledComponents,
@@ -81,12 +85,17 @@ fun StyledTheme(
     ) {
 
         // 1) register all component styles and create a theme
-        val platformTheme = key(styledComponents, colors) {
+        val platformTheme = key(styledComponents, colors, shapes, typography, paddings, spacings) {
             buildPlatformTheme {
                 CompositionLocalProvider(
                     LocalThemeBuilder provides this
                 ) {
-                    styledComponents.registerAllComponents()
+                    when (styledComponents) {
+                        is StyledTokenCompontents -> styledComponents.registerAllComponents()
+                        is StyledWrapperComponents -> {
+                            // no-op
+                        }
+                    }
                 }
             }
         }
@@ -118,7 +127,10 @@ fun StyledTheme(
                 LocalBackgroundColor provides colors.background,
                 LocalTextStyle provides typography.bodyMedium
             ) {
-                styledComponents.Root(content)
+                when (styledComponents) {
+                    is StyledTokenCompontents -> content()
+                    is StyledWrapperComponents -> styledComponents.root(content)
+                }
             }
         }
     }

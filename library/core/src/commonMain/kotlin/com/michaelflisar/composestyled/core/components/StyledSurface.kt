@@ -3,32 +3,98 @@ package com.michaelflisar.composestyled.core.components
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import com.michaelflisar.composestyled.core.StyledTheme
 import com.michaelflisar.composestyled.core.renderer.LocalStyledComponents
+import com.michaelflisar.composestyled.core.renderer.StyledTokenCompontents
+import com.michaelflisar.composestyled.core.renderer.StyledTokenRenderer
+import com.michaelflisar.composestyled.core.renderer.StyledWrapperComponents
 
-/**
- * Styled surface.
- *
- * This is the basic container primitive used by higher level components.
- * Rendering is delegated via `LocalStyledComponents`.
- */
+// ----------------------
+// Renderer
+// ----------------------
+
+interface StyledSurfaceTokenRenderer : StyledTokenRenderer {
+
+    @Composable
+    fun Render(
+        modifier: Modifier,
+        shape: Shape,
+        backgroundColor: Color,
+        contentColor: Color,
+        border: BorderStroke?,
+        content: @Composable () -> Unit,
+    )
+}
+
+interface StyledSurfaceWrapperRenderer {
+
+    @Composable
+    fun Render(
+        request: Request,
+        modifier: Modifier,
+        shape: Shape,
+        backgroundColor: Color,
+        contentColor: Color,
+        border: BorderStroke?,
+        content: @Composable () -> Unit,
+    )
+
+    data object Request
+}
+
+// ----------------------
+// Defaults
+// ----------------------
+
+object StyledSurfaceDefaults {
+    val Shape: Shape = RectangleShape
+
+    @Composable
+    fun backgroundColor(): Color = StyledTheme.colors.background
+
+    @Composable
+    fun contentColor(): Color = StyledTheme.colors.onBackground
+}
+
+// ----------------------
+// Composable
+// ----------------------
+
 @Composable
 fun StyledSurface(
     modifier: Modifier = Modifier,
-    shape: Shape = RectangleShape,
-    backgroundColor: androidx.compose.ui.graphics.Color = StyledTheme.colors.background,
-    contentColor: androidx.compose.ui.graphics.Color = StyledTheme.colors.onBackground,
+    shape: Shape = StyledSurfaceDefaults.Shape,
+    backgroundColor: Color = StyledSurfaceDefaults.backgroundColor(),
+    contentColor: Color = StyledSurfaceDefaults.contentColor(),
     border: BorderStroke? = null,
     content: @Composable () -> Unit,
 ) {
-    LocalStyledComponents.current.Surface(
-        modifier = modifier,
-        shape = shape,
-        color = backgroundColor,
-        contentColor = contentColor,
-        border = border,
-        content = content,
-    )
+    when (val components = LocalStyledComponents.current) {
+        is StyledTokenCompontents -> {
+            components.surface.Render(
+                modifier = modifier,
+                shape = shape,
+                backgroundColor = backgroundColor,
+                contentColor = contentColor,
+                border = border,
+                content = content,
+            )
+        }
+
+        is StyledWrapperComponents -> {
+            components.surface.Render(
+                request = StyledSurfaceWrapperRenderer.Request,
+                modifier = modifier,
+                shape = shape,
+                backgroundColor = backgroundColor,
+                contentColor = contentColor,
+                border = border,
+                content = content,
+            )
+        }
+    }
+
 }

@@ -1,3 +1,0 @@
-package com.michaelflisar.composestyled.core.components
-
-internal interface BaseStyledComponent

@@ -12,70 +12,138 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import com.composeunstyled.theme.ThemeProperty
-import com.composeunstyled.theme.ThemeToken
 import com.michaelflisar.composestyled.core.StyledTheme
+import com.michaelflisar.composestyled.core.classes.IVariantId
+import com.michaelflisar.composestyled.core.classes.TokenMap
+import com.michaelflisar.composestyled.core.classes.Variant
+import com.michaelflisar.composestyled.core.classes.customDataOrNull
 import com.michaelflisar.composestyled.core.renderer.LocalStyledComponents
+import com.michaelflisar.composestyled.core.renderer.StyledTokenCompontents
+import com.michaelflisar.composestyled.core.renderer.StyledTokenRenderer
+import com.michaelflisar.composestyled.core.renderer.StyledWrapperComponents
 import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
-import com.michaelflisar.composestyled.core.runtime.LocalThemeBuilder
+import com.michaelflisar.composestyled.core.runtime.LocalContentColor
 
-object StyledText : BaseStyledComponent {
+typealias StyledTextVariant = Variant<StyledText.VariantId, Color>
 
-    internal val Property = ThemeProperty<Color>("text")
+object StyledText {
 
-    internal val TokenDefault = ThemeToken<Color>("text.default")
+    // properties
+    private val Property = ThemeProperty<Color>("text")
 
-    sealed class Variant {
-        companion object {
-            val Default: Variant = Token(TokenDefault)
-            fun custom(color: Color): Variant = Custom(color)
-        }
-
-        internal data class Token(val token: ThemeToken<Color>) : Variant()
-        internal data class Custom(val color: Color) : Variant()
+    // variant ids
+    enum class VariantId(
+        override val id: String,
+    ) : IVariantId {
+        Default("text.default"),
     }
 
-    /** Register variant styles for theming. */
+    // variants
+    object Variants {
+        val Default: StyledTextVariant = Variant.Token(VariantId.Default)
+        fun custom(color: Color) = Variant.Custom(VariantId.Default, color)
+    }
+
+    // tokens
+    internal val Tokens = TokenMap.create<VariantId, Color>(Property)
+
     @InternalComposeStyledApi
     @Composable
     fun registerVariantStyles(
         default: Color,
     ) {
-        with(LocalThemeBuilder.current) {
-            properties[Property] = mapOf(
-                TokenDefault to default,
+        Tokens.registerStyles(
+            styles = mapOf(
+                VariantId.Default to default,
             )
-        }
+        )
     }
 }
 
-/** Defaults for [StyledText]. */
+// ----------------------
+// Renderer
+// ----------------------
+
+interface StyledTextTokenRenderer : StyledTokenRenderer {
+
+    @Composable
+    fun Render(
+        text: String,
+        modifier: Modifier,
+        style: TextStyle,
+        textAlign: TextAlign,
+        lineHeight: TextUnit,
+        fontSize: TextUnit,
+        letterSpacing: TextUnit,
+        fontWeight: FontWeight?,
+        color: Color,
+        fontFamily: FontFamily?,
+        singleLine: Boolean,
+        minLines: Int,
+        maxLines: Int,
+        onTextLayout: ((TextLayoutResult) -> Unit)?,
+        overflow: TextOverflow,
+        autoSize: TextAutoSize?,
+    )
+}
+
+interface StyledTextWrapperRenderer {
+
+    @Composable
+    fun Render(
+        request: Request,
+        text: String,
+        modifier: Modifier,
+        style: TextStyle,
+        textAlign: TextAlign,
+        lineHeight: TextUnit,
+        fontSize: TextUnit,
+        letterSpacing: TextUnit,
+        fontWeight: FontWeight?,
+        color: Color,
+        fontFamily: FontFamily?,
+        singleLine: Boolean,
+        minLines: Int,
+        maxLines: Int,
+        onTextLayout: ((TextLayoutResult) -> Unit)?,
+        overflow: TextOverflow,
+        autoSize: TextAutoSize?,
+    )
+
+    data class Request(
+        val variant: StyledText.VariantId,
+        val customColor: Color?,
+    )
+}
+
+// ----------------------
+// Defaults
+// ----------------------
+
 object StyledTextDefaults {
 
-    /** Default text color from the current [StyledTheme]. */
-    @Composable
-    fun color(): Color = StyledTheme.colors.onBackground
+    val DefaultVariant: StyledTextVariant = StyledText.Variants.Default
 
-    val style: TextStyle
+    val Style: TextStyle
         @Composable get() = StyledTheme.typography.bodyMedium
 }
 
-/**
- * Styled text.
- *
- * Public API stays renderer-agnostic. Rendering is delegated via `LocalStyledComponents`.
- */
+// ----------------------
+// Composables
+// ----------------------
+
 @Composable
-@Suppress("UNUSED_PARAMETER")
 fun StyledText(
     text: String,
     modifier: Modifier = Modifier,
-    style: TextStyle = StyledTextDefaults.style,
+    variant: StyledTextVariant = StyledTextDefaults.DefaultVariant,
+    style: TextStyle = StyledTextDefaults.Style,
     textAlign: TextAlign = TextAlign.Unspecified,
     lineHeight: TextUnit = TextUnit.Unspecified,
     fontSize: TextUnit = style.fontSize,
     letterSpacing: TextUnit = style.letterSpacing,
     fontWeight: FontWeight? = style.fontWeight,
-    color: Color = Color.Unspecified,
+    color: Color = LocalContentColor.current,
     fontFamily: FontFamily? = style.fontFamily,
     singleLine: Boolean = false,
     minLines: Int = 1,
@@ -84,7 +152,6 @@ fun StyledText(
     overflow: TextOverflow = TextOverflow.Clip,
     autoSize: TextAutoSize? = null,
 ) {
-    // Build the final style from the provided parameters.
     val resolvedStyle = style.copy(
         textAlign = textAlign,
         lineHeight = lineHeight,
@@ -94,24 +161,53 @@ fun StyledText(
         fontFamily = fontFamily,
     )
 
-    val resolvedColor = if (color == Color.Unspecified) StyledTheme.colors.onBackground else color
+    when (val components = LocalStyledComponents.current) {
+        is StyledTokenCompontents -> {
+            val themedColor = StyledText.Tokens.resolveVariantData(variant)
+            val finalColor = if (color != Color.Unspecified) color else themedColor
+            components.text.Render(
+                text = text,
+                modifier = modifier,
+                style = resolvedStyle,
+                textAlign = textAlign,
+                lineHeight = lineHeight,
+                fontSize = fontSize,
+                letterSpacing = letterSpacing,
+                fontWeight = fontWeight,
+                color = finalColor,
+                fontFamily = fontFamily,
+                singleLine = singleLine,
+                minLines = minLines,
+                maxLines = maxLines,
+                onTextLayout = onTextLayout,
+                overflow = overflow,
+                autoSize = autoSize,
+            )
+        }
 
-    LocalStyledComponents.current.Text(
-        text = text,
-        modifier = modifier,
-        style = resolvedStyle,
-        textAlign = textAlign,
-        lineHeight = lineHeight,
-        fontSize = fontSize,
-        letterSpacing = letterSpacing,
-        fontWeight = fontWeight,
-        color = resolvedColor,
-        fontFamily = fontFamily,
-        singleLine = singleLine,
-        minLines = minLines,
-        maxLines = maxLines,
-        onTextLayout = onTextLayout,
-        overflow = overflow,
-        autoSize = autoSize,
-    )
+        is StyledWrapperComponents -> {
+            components.text.Render(
+                request = StyledTextWrapperRenderer.Request(
+                    variant = variant.variantId,
+                    customColor = variant.customDataOrNull(),
+                ),
+                text = text,
+                modifier = modifier,
+                style = resolvedStyle,
+                textAlign = textAlign,
+                lineHeight = lineHeight,
+                fontSize = fontSize,
+                letterSpacing = letterSpacing,
+                fontWeight = fontWeight,
+                color = color,
+                fontFamily = fontFamily,
+                singleLine = singleLine,
+                minLines = minLines,
+                maxLines = maxLines,
+                onTextLayout = onTextLayout,
+                overflow = overflow,
+                autoSize = autoSize,
+            )
+        }
+    }
 }

@@ -12,14 +12,15 @@ import com.michaelflisar.composestyled.core.StyledTheme
 import com.michaelflisar.composestyled.core.classes.colors.BaseColorDef
 import com.michaelflisar.composestyled.core.classes.colors.StatefulBaseColorDef
 import com.michaelflisar.composestyled.core.components.StyledCheckbox
+import com.michaelflisar.composestyled.core.components.StyledCheckboxTokenRenderer
 import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
-import com.michaelflisar.composestyled.core.tokens.StyledColors
+import com.michaelflisar.composestyled.core.runtime.ProvideStyledLocals
 
-internal object StyledCheckboxImpl {
+internal object StyledCheckboxImpl : StyledCheckboxTokenRenderer {
 
     @OptIn(InternalComposeStyledApi::class)
     @Composable
-    fun registerVariantStyles() {
+    override fun registerVariantStyles() {
 
         val colors = StyledTheme.colors
 
@@ -71,7 +72,7 @@ internal object StyledCheckboxImpl {
      *
      */
     @Composable
-    fun Render(
+    override fun Render(
         checked: Boolean,
         modifier: Modifier,
         backgroundColor: Color,
@@ -86,20 +87,25 @@ internal object StyledCheckboxImpl {
         contentDescription: String?,
         checkIcon: @Composable () -> Unit,
     ) {
-        UnstyledCheckbox(
-            checked = checked,
-            modifier = modifier,
-            backgroundColor = backgroundColor,
+        ProvideStyledLocals(
             contentColor = contentColor,
-            enabled = enabled,
-            onCheckedChange = onCheckedChange,
-            shape = shape,
-            borderColor = borderColor,
-            borderWidth = borderWidth,
-            interactionSource = interactionSource,
-            indication = indication,
-            contentDescription = contentDescription,
-            checkIcon = checkIcon,
-        )
+            backgroundColor = backgroundColor,
+        ) {
+            UnstyledCheckbox(
+                checked = checked,
+                modifier = modifier,
+                backgroundColor = backgroundColor,
+                contentColor = contentColor,
+                enabled = enabled,
+                onCheckedChange = onCheckedChange,
+                shape = shape,
+                borderColor = borderColor,
+                borderWidth = borderWidth,
+                interactionSource = interactionSource,
+                indication = indication,
+                contentDescription = contentDescription,
+                checkIcon = checkIcon,
+            )
+        }
     }
 }

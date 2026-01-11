@@ -15,9 +15,9 @@ import com.michaelflisar.composestyled.core.components.StyledButtonContent
 import com.michaelflisar.composestyled.core.components.StyledText
 
 private val ButtonVariants = mapOf(
-    StyledButton.Variant.FilledPrimary to "Filled Primary",
-    StyledButton.Variant.Outlined to "Outlined",
-    StyledButton.Variant.Text to "Text"
+    StyledButton.Variants.FilledPrimary to "Filled Primary",
+    StyledButton.Variants.Outlined to "Outlined",
+    StyledButton.Variants.Text to "Text"
 )
 
 @Composable

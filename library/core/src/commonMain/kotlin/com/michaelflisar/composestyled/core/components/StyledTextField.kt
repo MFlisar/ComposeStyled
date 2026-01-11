@@ -10,40 +10,48 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
-import com.composeunstyled.theme.Theme
 import com.composeunstyled.theme.ThemeProperty
-import com.composeunstyled.theme.ThemeToken
 import com.michaelflisar.composestyled.core.StyledTheme
+import com.michaelflisar.composestyled.core.classes.IVariantId
+import com.michaelflisar.composestyled.core.classes.TokenMap
+import com.michaelflisar.composestyled.core.classes.Variant
+import com.michaelflisar.composestyled.core.classes.colors.BaseColor
 import com.michaelflisar.composestyled.core.classes.colors.StatefulBaseColorDef
+import com.michaelflisar.composestyled.core.classes.customDataOrNull
 import com.michaelflisar.composestyled.core.renderer.LocalStyledComponents
+import com.michaelflisar.composestyled.core.renderer.StyledTokenCompontents
+import com.michaelflisar.composestyled.core.renderer.StyledTokenRenderer
+import com.michaelflisar.composestyled.core.renderer.StyledWrapperComponents
 import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
-import com.michaelflisar.composestyled.core.runtime.LocalThemeBuilder
 import com.michaelflisar.composestyled.core.runtime.interaction.rememberStyledResolveState
 
-object StyledTextField : BaseStyledComponent {
+typealias StyledTextFieldVariant = Variant<StyledTextField.VariantId, StatefulBaseColorDef>
 
-    internal val Property = ThemeProperty<StatefulBaseColorDef>("input")
+object StyledTextField {
 
-    internal val TokenFilled = ThemeToken<StatefulBaseColorDef>("input.filled.default")
-    internal val TokenOutlined = ThemeToken<StatefulBaseColorDef>("input.outlined.default")
+    // properties
+    private val Property = ThemeProperty<StatefulBaseColorDef>("input")
 
-    sealed class Variant {
-
-        companion object {
-            val Filled: Variant = Token(TokenFilled)
-            val Outlined: Variant = Token(TokenOutlined)
-
-            fun custom(colorDef: StatefulBaseColorDef): Variant = Custom(colorDef)
-        }
-
-        internal data class Token(
-            val token: ThemeToken<StatefulBaseColorDef>,
-        ) : Variant()
-
-        internal data class Custom(
-            val colorDef: StatefulBaseColorDef,
-        ) : Variant()
+    // variant ids
+    enum class VariantId(
+        override val id: String,
+    ) : IVariantId {
+        Filled("input.filled.default"),
+        Outlined("input.outlined.default"),
     }
+
+    // variants
+    object Variants {
+        val Filled: StyledTextFieldVariant = Variant.Token(VariantId.Filled)
+        val Outlined: StyledTextFieldVariant = Variant.Token(VariantId.Outlined)
+        fun custom(
+            variantId: VariantId,
+            colorDef: StatefulBaseColorDef,
+        ) = Variant.Custom(variantId, colorDef)
+    }
+
+    // tokens
+    internal val Tokens = TokenMap.create<VariantId, StatefulBaseColorDef>(Property)
 
     @InternalComposeStyledApi
     @Composable
@@ -51,13 +59,84 @@ object StyledTextField : BaseStyledComponent {
         filled: StatefulBaseColorDef,
         outlined: StatefulBaseColorDef,
     ) {
-        with(LocalThemeBuilder.current) {
-            properties[Property] = mapOf(
-                TokenFilled to filled,
-                TokenOutlined to outlined,
+        Tokens.registerStyles(
+            styles = mapOf(
+                VariantId.Filled to filled,
+                VariantId.Outlined to outlined,
             )
-        }
+        )
     }
+}
+
+// ----------------------
+// Renderer
+// ----------------------
+
+interface StyledTextFieldTokenRenderer : StyledTokenRenderer {
+
+    @Composable
+    fun Render(
+        value: String,
+        onValueChange: (String) -> Unit,
+        colors: BaseColor,
+        modifier: Modifier,
+        enabled: Boolean,
+        readOnly: Boolean,
+        textStyle: TextStyle,
+        label: @Composable (() -> Unit)?,
+        placeholder: @Composable (() -> Unit)?,
+        leadingIcon: @Composable (() -> Unit)?,
+        trailingIcon: @Composable (() -> Unit)?,
+        prefix: @Composable (() -> Unit)?,
+        suffix: @Composable (() -> Unit)?,
+        supportingText: @Composable (() -> Unit)?,
+        isError: Boolean,
+        visualTransformation: VisualTransformation,
+        keyboardOptions: KeyboardOptions,
+        keyboardActions: KeyboardActions,
+        singleLine: Boolean,
+        maxLines: Int,
+        minLines: Int,
+        contentPadding: PaddingValues,
+        interactionSource: MutableInteractionSource,
+        shape: Shape,
+    )
+}
+
+interface StyledTextFieldWrapperRenderer {
+
+    @Composable
+    fun Render(
+        request: Request,
+        value: String,
+        onValueChange: (String) -> Unit,
+        modifier: Modifier,
+        enabled: Boolean,
+        readOnly: Boolean,
+        textStyle: TextStyle,
+        label: @Composable (() -> Unit)?,
+        placeholder: @Composable (() -> Unit)?,
+        leadingIcon: @Composable (() -> Unit)?,
+        trailingIcon: @Composable (() -> Unit)?,
+        prefix: @Composable (() -> Unit)?,
+        suffix: @Composable (() -> Unit)?,
+        supportingText: @Composable (() -> Unit)?,
+        isError: Boolean,
+        visualTransformation: VisualTransformation,
+        keyboardOptions: KeyboardOptions,
+        keyboardActions: KeyboardActions,
+        singleLine: Boolean,
+        maxLines: Int,
+        minLines: Int,
+        contentPadding: PaddingValues,
+        interactionSource: MutableInteractionSource,
+        shape: Shape,
+    )
+
+    data class Request(
+        val variant: StyledTextField.VariantId,
+        val customColors: StatefulBaseColorDef?,
+    )
 }
 
 // ----------------------
@@ -65,6 +144,8 @@ object StyledTextField : BaseStyledComponent {
 // ----------------------
 
 object StyledTextFieldDefaults {
+
+    val DefaultVariant: StyledTextFieldVariant = StyledTextField.Variants.Filled
 
     @Composable
     fun contentPadding() = PaddingValues(
@@ -81,8 +162,8 @@ object StyledTextFieldDefaults {
 fun StyledTextField(
     value: String,
     onValueChange: (String) -> Unit,
-    variant: StyledTextField.Variant = StyledTextField.Variant.Filled,
     modifier: Modifier = Modifier,
+    variant: StyledTextFieldVariant = StyledTextFieldDefaults.DefaultVariant,
     enabled: Boolean = true,
     readOnly: Boolean = false,
     textStyle: TextStyle = StyledTheme.typography.bodyMedium,
@@ -103,42 +184,76 @@ fun StyledTextField(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     shape: Shape = StyledTheme.shapes.input,
 ) {
-    val colorDef = when (variant) {
-        is StyledTextField.Variant.Token -> Theme[StyledTextField.Property][variant.token]
-        is StyledTextField.Variant.Custom -> variant.colorDef
+    when (val components = LocalStyledComponents.current) {
+
+        is StyledTokenCompontents -> {
+            val state = rememberStyledResolveState(
+                interactionSource = interactionSource,
+                enabled = enabled,
+                isError = isError,
+            )
+
+            val def = StyledTextField.Tokens.resolveVariantData(variant)
+            val colors = def.resolve(state)
+
+            components.textField.Render(
+                value = value,
+                onValueChange = onValueChange,
+                colors = colors,
+                modifier = modifier,
+                enabled = enabled,
+                readOnly = readOnly,
+                textStyle = textStyle,
+                label = label,
+                placeholder = placeholder,
+                leadingIcon = leadingIcon,
+                trailingIcon = trailingIcon,
+                prefix = prefix,
+                suffix = suffix,
+                supportingText = supportingText,
+                isError = isError,
+                visualTransformation = visualTransformation,
+                keyboardOptions = keyboardOptions,
+                keyboardActions = keyboardActions,
+                singleLine = singleLine,
+                maxLines = maxLines,
+                minLines = minLines,
+                contentPadding = StyledTextFieldDefaults.contentPadding(),
+                interactionSource = interactionSource,
+                shape = shape,
+            )
+        }
+
+        is StyledWrapperComponents -> {
+            components.textField.Render(
+                request = StyledTextFieldWrapperRenderer.Request(
+                    variant = variant.variantId,
+                    customColors = variant.customDataOrNull(),
+                ),
+                value = value,
+                onValueChange = onValueChange,
+                modifier = modifier,
+                enabled = enabled,
+                readOnly = readOnly,
+                textStyle = textStyle,
+                label = label,
+                placeholder = placeholder,
+                leadingIcon = leadingIcon,
+                trailingIcon = trailingIcon,
+                prefix = prefix,
+                suffix = suffix,
+                supportingText = supportingText,
+                isError = isError,
+                visualTransformation = visualTransformation,
+                keyboardOptions = keyboardOptions,
+                keyboardActions = keyboardActions,
+                singleLine = singleLine,
+                maxLines = maxLines,
+                minLines = minLines,
+                contentPadding = StyledTextFieldDefaults.contentPadding(),
+                interactionSource = interactionSource,
+                shape = shape,
+            )
+        }
     }
-
-    val resolveState = rememberStyledResolveState(
-        interactionSource = interactionSource,
-        enabled = enabled,
-        isError = isError
-    )
-    val colors = colorDef.resolve(resolveState)
-
-    LocalStyledComponents.current.TextField(
-        value = value,
-        onValueChange = onValueChange,
-        colors = colors,
-        modifier = modifier,
-        enabled = enabled,
-        readOnly = readOnly,
-        textStyle = textStyle,
-        label = label,
-        placeholder = placeholder,
-        leadingIcon = leadingIcon,
-        trailingIcon = trailingIcon,
-        prefix = prefix,
-        suffix = suffix,
-        supportingText = supportingText,
-        isError = isError,
-        visualTransformation = visualTransformation,
-        keyboardOptions = keyboardOptions,
-        keyboardActions = keyboardActions,
-        singleLine = singleLine,
-        maxLines = maxLines,
-        minLines = minLines,
-        contentPadding = StyledTextFieldDefaults.contentPadding(),
-        interactionSource = interactionSource,
-        shape = shape,
-    )
 }

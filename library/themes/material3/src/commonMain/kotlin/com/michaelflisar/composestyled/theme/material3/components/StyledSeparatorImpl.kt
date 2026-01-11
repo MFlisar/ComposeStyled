@@ -8,14 +8,14 @@ import com.composables.core.HorizontalSeparator
 import com.composables.core.VerticalSeparator
 import com.michaelflisar.composestyled.core.StyledTheme
 import com.michaelflisar.composestyled.core.components.StyledSeparator
+import com.michaelflisar.composestyled.core.components.StyledSeparatorTokenRenderer
 import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
-import com.michaelflisar.composestyled.core.tokens.StyledColors
 
-internal object StyledSeparatorImpl {
+internal object StyledSeparatorImpl : StyledSeparatorTokenRenderer {
 
     @OptIn(InternalComposeStyledApi::class)
     @Composable
-    fun registerVariantStyles() {
+    override fun registerVariantStyles() {
 
         val colors = StyledTheme.colors
 
@@ -26,7 +26,7 @@ internal object StyledSeparatorImpl {
     }
 
     @Composable
-    fun RenderHorizontal(
+    override fun RenderHorizontal(
         modifier: Modifier,
         color: Color,
         thickness: Dp,
@@ -39,7 +39,7 @@ internal object StyledSeparatorImpl {
     }
 
     @Composable
-    fun RenderVertical(
+    override fun RenderVertical(
         modifier: Modifier,
         color: Color,
         thickness: Dp,

@@ -1,26 +1,21 @@
-package com.michaelflisar.composestyled.theme.material3.components
+package com.michaelflisar.composestyled.theme.wrapper.material3.components
 
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
-import com.composeunstyled.Icon
-import com.michaelflisar.composestyled.core.components.StyledIconTokenRenderer
-import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
+import com.michaelflisar.composestyled.core.components.StyledIconWrapperRenderer
+import com.michaelflisar.composestyled.core.components.StyledIconWrapperRenderer.Request
 
-internal object StyledIconImpl : StyledIconTokenRenderer {
-
-    @OptIn(InternalComposeStyledApi::class)
-    @Composable
-    override fun registerVariantStyles() {
-        // No variant for icons
-    }
+internal object StyledIconImpl : StyledIconWrapperRenderer {
 
     @Composable
     override fun Render(
+        request: Request,
         painter: Painter,
         contentDescription: String?,
         modifier: Modifier,
@@ -36,7 +31,8 @@ internal object StyledIconImpl : StyledIconTokenRenderer {
     }
 
     @Composable
-    override fun Render(
+    override  fun Render(
+        request: Request,
         imageVector: ImageVector,
         contentDescription: String?,
         modifier: Modifier,
@@ -51,3 +47,4 @@ internal object StyledIconImpl : StyledIconTokenRenderer {
         )
     }
 }
+

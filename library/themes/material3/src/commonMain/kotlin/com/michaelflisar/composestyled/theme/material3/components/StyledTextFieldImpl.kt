@@ -29,14 +29,15 @@ import com.michaelflisar.composestyled.core.classes.colors.BaseColor
 import com.michaelflisar.composestyled.core.classes.colors.BaseColorDef
 import com.michaelflisar.composestyled.core.classes.colors.StatefulBaseColorDef
 import com.michaelflisar.composestyled.core.components.StyledTextField
+import com.michaelflisar.composestyled.core.components.StyledTextFieldTokenRenderer
 import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.core.tokens.StyledColors
 
-internal object StyledTextFieldImpl {
+internal object StyledTextFieldImpl : StyledTextFieldTokenRenderer {
 
     @OptIn(InternalComposeStyledApi::class)
     @Composable
-    fun registerVariantStyles() {
+    override fun registerVariantStyles() {
 
         val colors = StyledTheme.colors
 
@@ -84,7 +85,7 @@ internal object StyledTextFieldImpl {
 
     /** Android/Unstyled-based text field implementation. */
     @Composable
-    fun Render(
+    override fun Render(
         value: String,
         onValueChange: (String) -> Unit,
         colors: BaseColor,

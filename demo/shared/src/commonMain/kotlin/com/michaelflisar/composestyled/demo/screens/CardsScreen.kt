@@ -25,8 +25,8 @@ fun CardsScreen() {
     ) {
         StyledText("Cards")
         StyledCard(
-            modifier = Modifier.Companion.fillMaxWidth(),
-            outlined = false
+            variant = StyledCard.Variants.Filled,
+            modifier = Modifier.fillMaxWidth()
         ) {
             Column(
                 modifier = Modifier.Companion
@@ -40,18 +40,18 @@ fun CardsScreen() {
                 ) {
                     StyledButton(
                         onClick = { },
-                        variant = StyledButton.Variant.FilledPrimary
+                        variant = StyledButton.Variants.FilledPrimary
                     ) { StyledText("Action") }
                     StyledButton(
                         onClick = { },
-                        variant = StyledButton.Variant.Text
+                        variant = StyledButton.Variants.Text
                     ) { StyledText("Secondary") }
                 }
             }
         }
         StyledCard(
-            modifier = Modifier.Companion.fillMaxWidth(),
-            outlined = true
+            variant = StyledCard.Variants.Outlined,
+            modifier = Modifier.fillMaxWidth()
         ) {
             Column(
                 modifier = Modifier.Companion.padding(StyledTheme.paddings.medium),

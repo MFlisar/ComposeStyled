@@ -1,6 +1,8 @@
-package com.michaelflisar.composestyled.theme.material3.components
+package com.michaelflisar.composestyled.theme.wrapper.material3.components
 
 import androidx.compose.foundation.text.TextAutoSize
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -11,28 +13,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
-import com.composeunstyled.Text
-import com.michaelflisar.composestyled.core.StyledTheme
-import com.michaelflisar.composestyled.core.components.StyledText
-import com.michaelflisar.composestyled.core.components.StyledTextTokenRenderer
-import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
-import com.michaelflisar.composestyled.core.runtime.LocalTextStyle
+import com.michaelflisar.composestyled.core.components.StyledTextWrapperRenderer
+import com.michaelflisar.composestyled.core.components.StyledTextWrapperRenderer.Request
 
-internal object StyledTextImpl : StyledTextTokenRenderer {
+internal object StyledTextImpl : StyledTextWrapperRenderer {
 
-    @OptIn(InternalComposeStyledApi::class)
     @Composable
-    override fun registerVariantStyles() {
-
-        val colors = StyledTheme.colors
-
-        StyledText.registerVariantStyles(default = colors.onBackground)
-    }
-
-    /** Android/Unstyled-based StyledText implementation. */
-    @Composable
-    @Suppress("UNUSED_PARAMETER")
     override fun Render(
+        request: Request,
         text: String,
         modifier: Modifier,
         style: TextStyle,
@@ -50,7 +38,6 @@ internal object StyledTextImpl : StyledTextTokenRenderer {
         overflow: TextOverflow,
         autoSize: TextAutoSize?,
     ) {
-        // merge style overrides (renderer receives both `style` and explicit fields)
         val mergedStyle = LocalTextStyle.current.merge(style).copy(
             textAlign = textAlign,
             lineHeight = lineHeight,
@@ -64,19 +51,14 @@ internal object StyledTextImpl : StyledTextTokenRenderer {
             text = text,
             modifier = modifier,
             style = mergedStyle,
-            textAlign = textAlign,
-            lineHeight = lineHeight,
-            fontSize = fontSize,
-            letterSpacing = letterSpacing,
-            fontWeight = fontWeight,
             color = color,
-            fontFamily = fontFamily,
-            singleLine = singleLine,
-            minLines = minLines,
-            maxLines = maxLines,
+            textAlign = textAlign,
             overflow = overflow,
-            autoSize = autoSize,
+            softWrap = !singleLine,
+            maxLines = maxLines,
+            minLines = minLines,
             onTextLayout = onTextLayout,
+            autoSize = autoSize,
         )
     }
 }

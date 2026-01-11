@@ -1,10 +1,25 @@
 package com.michaelflisar.composestyled.core
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
+import com.michaelflisar.composestyled.core.classes.DisableFactorType
+import com.michaelflisar.composestyled.core.classes.StyledResolveState
 
 val Color.isDark
     get() = luminance() < 0.5
+
+@Composable
+@ReadOnlyComposable
+fun Color.disabled(type: DisableFactorType): Color {
+    return copy(alpha = alpha * StyledTheme.colors.disableFactors.get(type))
+}
+
+@Composable
+@ReadOnlyComposable
+internal fun Color.treat(state: StyledResolveState, disableFactorType: DisableFactorType) = if (state.enabled) this else this.disabled(disableFactorType)
+
 
 val Color.hovered
     get() = if (isDark) lighten(0.1f) else darken(0.1f)

@@ -17,7 +17,7 @@ data class StyledColors(
     val outlineDef: Definition,
     val outlineVariantDef: Definition,
     val errorDef: Definition,
-    val disableFactors: StyledDisableFactors = StyledDisableFactors(),
+    val disableFactors: StyledDisableFactors
 ) {
     @Immutable
     data class Definition(
@@ -74,9 +74,9 @@ data class StyledColors(
 
 @Immutable
 data class StyledDisableFactors(
-    val default: Float = .38f,
-    val outline: Float = .12f,
-    val content: Float = .12f,
+    val default: Float,
+    val outline: Float,
+    val content: Float,
 ) {
     fun get(type: DisableFactorType): Float = when (type) {
         DisableFactorType.Default -> default
@@ -84,6 +84,19 @@ data class StyledDisableFactors(
         DisableFactorType.Content -> content
     }
 }
+
+fun lightDisableFactors() = StyledDisableFactors(
+    default = 0.38f, // Container / Surface
+    outline = 0.38f, // Border / Divider
+    content = 0.38f, // Text / Icon
+)
+
+fun darkDisableFactors() = StyledDisableFactors(
+    default = 0.38f, // Container
+    outline = 0.38f, // Border
+    content = 0.50f, // Text / Icon stärker sichtbar
+)
+
 
 fun lightStyledColors() = StyledColors(
     // Material3 background + onBackground
@@ -121,7 +134,8 @@ fun lightStyledColors() = StyledColors(
     errorDef = StyledColors.Definition(
         Color(0xFFB3261E),
         Color(0xFFFFFFFF)
-    )
+    ),
+    disableFactors = lightDisableFactors()
 )
 
 fun darkStyledColors() = StyledColors(
@@ -159,7 +173,8 @@ fun darkStyledColors() = StyledColors(
     errorDef = StyledColors.Definition(
         Color(0xFFF2B8B5),
         Color(0xFF601410)
-    )
+    ),
+    disableFactors = darkDisableFactors()
 )
 
 internal val LocalStyledColors = staticCompositionLocalOf { lightStyledColors() }

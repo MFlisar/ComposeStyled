@@ -31,34 +31,34 @@ fun InputsScreen() {
         StyledTextField(
             value = text,
             onValueChange = { text = it },
-            variant = StyledTextField.Variant.Filled,
+            variant = StyledTextField.Variants.Filled,
             placeholder = { StyledText("Filled") }
         )
         StyledTextField(
             value = text2,
             onValueChange = { text2 = it },
-            variant = StyledTextField.Variant.Outlined,
+            variant = StyledTextField.Variants.Outlined,
             placeholder = { StyledText("Outlined") }
         )
         StyledTextField(
             value = "Error text",
             onValueChange = { },
             isError = true,
-            variant = StyledTextField.Variant.Outlined,
+            variant = StyledTextField.Variants.Outlined,
             placeholder = { StyledText("Error") }
         )
         StyledTextField(
             value = roText,
             onValueChange = { roText = it },
             readOnly = true,
-            variant = StyledTextField.Variant.Filled,
+            variant = StyledTextField.Variants.Filled,
             placeholder = { StyledText("Read-only") }
         )
         StyledTextField(
             value = "Disabled",
             onValueChange = { },
             enabled = false,
-            variant = StyledTextField.Variant.Filled,
+            variant = StyledTextField.Variants.Filled,
             placeholder = { StyledText("Disabled") }
         )
     }
