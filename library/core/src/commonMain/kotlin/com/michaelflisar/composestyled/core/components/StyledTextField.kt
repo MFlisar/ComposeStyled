@@ -5,53 +5,41 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
 import com.composeunstyled.theme.ThemeProperty
 import com.michaelflisar.composestyled.core.StyledTheme
-import com.michaelflisar.composestyled.core.classes.IVariantId
+import com.michaelflisar.composestyled.core.classes.IVariant
 import com.michaelflisar.composestyled.core.classes.TokenMap
-import com.michaelflisar.composestyled.core.classes.Variant
 import com.michaelflisar.composestyled.core.classes.colors.BaseColor
 import com.michaelflisar.composestyled.core.classes.colors.StatefulBaseColorDef
-import com.michaelflisar.composestyled.core.classes.customDataOrNull
 import com.michaelflisar.composestyled.core.renderer.LocalStyledComponents
-import com.michaelflisar.composestyled.core.renderer.StyledTokenCompontents
+import com.michaelflisar.composestyled.core.renderer.StyledTokenComponents
 import com.michaelflisar.composestyled.core.renderer.StyledTokenRenderer
 import com.michaelflisar.composestyled.core.renderer.StyledWrapperComponents
 import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.core.runtime.interaction.rememberStyledResolveState
-
-typealias StyledTextFieldVariant = Variant<StyledTextField.VariantId, StatefulBaseColorDef>
 
 object StyledTextField {
 
     // properties
     private val Property = ThemeProperty<StatefulBaseColorDef>("input")
 
-    // variant ids
-    enum class VariantId(
+    // tokens
+    internal val Tokens = TokenMap.create(Property, Variant.entries.toSet())
+
+    // variants
+    enum class Variant(
         override val id: String,
-    ) : IVariantId {
+    ) : IVariant {
         Filled("input.filled.default"),
         Outlined("input.outlined.default"),
     }
-
-    // variants
-    object Variants {
-        val Filled: StyledTextFieldVariant = Variant.Token(VariantId.Filled)
-        val Outlined: StyledTextFieldVariant = Variant.Token(VariantId.Outlined)
-        fun custom(
-            variantId: VariantId,
-            colorDef: StatefulBaseColorDef,
-        ) = Variant.Custom(variantId, colorDef)
-    }
-
-    // tokens
-    internal val Tokens = TokenMap.create<VariantId, StatefulBaseColorDef>(Property)
 
     @InternalComposeStyledApi
     @Composable
@@ -61,11 +49,24 @@ object StyledTextField {
     ) {
         Tokens.registerStyles(
             styles = mapOf(
-                VariantId.Filled to filled,
-                VariantId.Outlined to outlined,
+                Variant.Filled to filled,
+                Variant.Outlined to outlined,
             )
         )
     }
+
+    fun customize(
+        background: Color? = null,
+        content: Color? = null,
+        border: Color? = null,
+    ) = Customization(background, content, border)
+
+    @Immutable
+    class Customization internal constructor(
+        val background: Color?,
+        val content: Color?,
+        val border: Color?,
+    )
 }
 
 // ----------------------
@@ -107,7 +108,8 @@ interface StyledTextFieldWrapperRenderer {
 
     @Composable
     fun Render(
-        request: Request,
+        variant: StyledTextField.Variant,
+        customization: StyledTextField.Customization?,
         value: String,
         onValueChange: (String) -> Unit,
         modifier: Modifier,
@@ -132,11 +134,6 @@ interface StyledTextFieldWrapperRenderer {
         interactionSource: MutableInteractionSource,
         shape: Shape,
     )
-
-    data class Request(
-        val variant: StyledTextField.VariantId,
-        val customColors: StatefulBaseColorDef?,
-    )
 }
 
 // ----------------------
@@ -145,7 +142,7 @@ interface StyledTextFieldWrapperRenderer {
 
 object StyledTextFieldDefaults {
 
-    val DefaultVariant: StyledTextFieldVariant = StyledTextField.Variants.Filled
+    val DefaultVariant: StyledTextField.Variant = StyledTextField.Variant.Filled
 
     @Composable
     fun contentPadding() = PaddingValues(
@@ -163,7 +160,8 @@ fun StyledTextField(
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    variant: StyledTextFieldVariant = StyledTextFieldDefaults.DefaultVariant,
+    variant: StyledTextField.Variant = StyledTextFieldDefaults.DefaultVariant,
+    customization: StyledTextField.Customization? = null,
     enabled: Boolean = true,
     readOnly: Boolean = false,
     textStyle: TextStyle = StyledTheme.typography.bodyMedium,
@@ -186,7 +184,7 @@ fun StyledTextField(
 ) {
     when (val components = LocalStyledComponents.current) {
 
-        is StyledTokenCompontents -> {
+        is StyledTokenComponents -> {
             val state = rememberStyledResolveState(
                 interactionSource = interactionSource,
                 enabled = enabled,
@@ -194,7 +192,12 @@ fun StyledTextField(
             )
 
             val def = StyledTextField.Tokens.resolveVariantData(variant)
-            val colors = def.resolve(state)
+            val defCustomised = def.customise(
+                background = customization?.background,
+                foreground = customization?.content,
+                border = customization?.border,
+            )
+            val colors = defCustomised.resolve(state)
 
             components.textField.Render(
                 value = value,
@@ -226,10 +229,8 @@ fun StyledTextField(
 
         is StyledWrapperComponents -> {
             components.textField.Render(
-                request = StyledTextFieldWrapperRenderer.Request(
-                    variant = variant.variantId,
-                    customColors = variant.customDataOrNull(),
-                ),
+                variant = variant,
+                customization = customization,
                 value = value,
                 onValueChange = onValueChange,
                 modifier = modifier,

@@ -8,9 +8,8 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.michaelflisar.composestyled.core.StyledTheme
 import com.michaelflisar.composestyled.core.components.StyledButton
-import com.michaelflisar.composestyled.core.components.StyledButtonVariant
+import com.michaelflisar.composestyled.core.components.StyledButtonDefaults
 import com.michaelflisar.composestyled.core.components.StyledCheckbox
 import com.michaelflisar.composestyled.core.components.StyledText
 
@@ -19,7 +18,7 @@ fun CheckedButton(
     text: String,
     checked: Boolean,
     modifier: Modifier = Modifier,
-    variant: StyledButtonVariant = StyledButton.Variants.Text,
+    variant: StyledButton.Variant = StyledButton.Variant.Text,
     onClick: () -> Unit,
 ) {
     StyledButton(
@@ -29,7 +28,7 @@ fun CheckedButton(
         onClick = onClick
     ) {
         Row(
-            modifier = Modifier.heightIn(min = StyledTheme.sizes.minimumInteractiveSize),
+            modifier = Modifier.heightIn(min = StyledButtonDefaults.MinimumHeight),
             verticalAlignment = Alignment.CenterVertically
         ) {
             StyledText(

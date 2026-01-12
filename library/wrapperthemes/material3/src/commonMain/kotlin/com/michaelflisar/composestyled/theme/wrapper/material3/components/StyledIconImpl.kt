@@ -8,14 +8,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
+import com.michaelflisar.composestyled.core.components.StyledIcon
 import com.michaelflisar.composestyled.core.components.StyledIconWrapperRenderer
-import com.michaelflisar.composestyled.core.components.StyledIconWrapperRenderer.Request
 
 internal object StyledIconImpl : StyledIconWrapperRenderer {
 
     @Composable
     override fun Render(
-        request: Request,
+        variant: StyledIcon.Variant,
         painter: Painter,
         contentDescription: String?,
         modifier: Modifier,
@@ -31,8 +31,8 @@ internal object StyledIconImpl : StyledIconWrapperRenderer {
     }
 
     @Composable
-    override  fun Render(
-        request: Request,
+    override fun Render(
+        variant: StyledIcon.Variant,
         imageVector: ImageVector,
         contentDescription: String?,
         modifier: Modifier,

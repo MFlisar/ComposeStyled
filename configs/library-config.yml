@@ -20,6 +20,9 @@ modules:
   - artifact-id: components
     description: This is module providing various UI components
     path: library/components
+  - artifact-id: theme-shared
+    description: This is shared module - base for all themes
+    path: library/themes/shared
   - artifact-id: theme-material3
     description: The material3 theme module based on compose-unstyled
     path: library/themes/material3

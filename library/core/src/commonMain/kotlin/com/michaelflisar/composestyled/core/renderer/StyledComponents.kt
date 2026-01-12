@@ -30,7 +30,7 @@ interface StyledTokenRenderer {
 
 }
 
-data class StyledTokenCompontents(
+data class StyledTokenComponents(
     val surface: StyledSurfaceTokenRenderer,
     val button: StyledButtonTokenRenderer,
     val card: StyledCardTokenRenderer,

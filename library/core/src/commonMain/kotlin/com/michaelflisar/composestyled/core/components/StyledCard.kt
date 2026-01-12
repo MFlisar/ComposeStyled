@@ -4,7 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -13,45 +13,31 @@ import androidx.compose.ui.unit.dp
 import com.composeunstyled.theme.ThemeProperty
 import com.michaelflisar.composestyled.core.StyledTheme
 import com.michaelflisar.composestyled.core.classes.Emphasis
-import com.michaelflisar.composestyled.core.classes.IVariantId
+import com.michaelflisar.composestyled.core.classes.IVariant
 import com.michaelflisar.composestyled.core.classes.TokenMap
-import com.michaelflisar.composestyled.core.classes.Variant
 import com.michaelflisar.composestyled.core.classes.colors.StatefulBaseColorDef
-import com.michaelflisar.composestyled.core.classes.customDataOrNull
 import com.michaelflisar.composestyled.core.renderer.LocalStyledComponents
-import com.michaelflisar.composestyled.core.renderer.StyledTokenCompontents
+import com.michaelflisar.composestyled.core.renderer.StyledTokenComponents
 import com.michaelflisar.composestyled.core.renderer.StyledTokenRenderer
 import com.michaelflisar.composestyled.core.renderer.StyledWrapperComponents
 import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.core.runtime.interaction.rememberStyledResolveState
-
-typealias StyledCardVariant = Variant<StyledCard.VariantId, StatefulBaseColorDef>
 
 object StyledCard {
 
     // properties
     private val Property = ThemeProperty<StatefulBaseColorDef>("card")
 
-    // variant ids
-    enum class VariantId(
+    // tokens
+    internal val Tokens = TokenMap.create(Property, Variant.entries.toSet())
+
+    // variants
+    enum class Variant(
         override val id: String,
-    ) : IVariantId {
+    ) : IVariant {
         Filled("card.filled.default"),
         Outlined("card.outlined.default"),
     }
-
-    // variants
-    object Variants {
-        val Filled: StyledCardVariant = Variant.Token(VariantId.Filled)
-        val Outlined: StyledCardVariant = Variant.Token(VariantId.Outlined)
-        fun custom(
-            variant: VariantId,
-            colorDef: StatefulBaseColorDef,
-        ) = Variant.Custom(variant, colorDef)
-    }
-
-    // tokens
-    internal val Tokens = TokenMap.create<VariantId, StatefulBaseColorDef>(Property)
 
     @InternalComposeStyledApi
     @Composable
@@ -61,11 +47,24 @@ object StyledCard {
     ) {
         Tokens.registerStyles(
             styles = mapOf(
-                VariantId.Filled to filled,
-                VariantId.Outlined to outlined,
+                Variant.Filled to filled,
+                Variant.Outlined to outlined,
             )
         )
     }
+
+    fun customize(
+        background: Color? = null,
+        content: Color? = null,
+        border: Color? = null,
+    ) = Customization(background, content, border)
+
+    @Immutable
+    class Customization internal constructor(
+        val background: Color?,
+        val content: Color?,
+        val border: Color?,
+    )
 }
 
 // ----------------------
@@ -85,26 +84,20 @@ interface StyledCardTokenRenderer : StyledTokenRenderer {
         contentPadding: PaddingValues,
         content: @Composable ColumnScope.() -> Unit,
     )
-
 }
 
 interface StyledCardWrapperRenderer {
 
     @Composable
     fun Render(
-        request: Request,
+        variant: StyledCard.Variant,
+        customization: StyledCard.Customization?,
         modifier: Modifier,
         emphasis: Emphasis,
         shape: Shape,
         contentPadding: PaddingValues,
         content: @Composable ColumnScope.() -> Unit,
     )
-
-    data class Request(
-        val id: StyledCard.VariantId,
-        val customColors: StatefulBaseColorDef?,
-    )
-
 }
 
 // ----------------------
@@ -113,7 +106,7 @@ interface StyledCardWrapperRenderer {
 
 object StyledCardDefaults {
 
-    val DefaultVariant = StyledCard.Variants.Filled
+    val DefaultVariant = StyledCard.Variant.Filled
 
     val DefaultEmphasis = Emphasis.Low
 
@@ -130,7 +123,8 @@ object StyledCardDefaults {
 @Composable
 fun StyledCard(
     modifier: Modifier = Modifier,
-    variant: StyledCardVariant = StyledCardDefaults.DefaultVariant,
+    variant: StyledCard.Variant = StyledCardDefaults.DefaultVariant,
+    customization: StyledCard.Customization? = null,
     shape: Shape = StyledTheme.shapes.card,
     emphasis: Emphasis = StyledCardDefaults.DefaultEmphasis,
     enabled: Boolean = true,
@@ -138,13 +132,17 @@ fun StyledCard(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     when (val styledComponents = LocalStyledComponents.current) {
-        is StyledTokenCompontents -> {
+        is StyledTokenComponents -> {
             val state = rememberStyledResolveState(
                 interactionSource = null,
                 enabled = enabled,
                 isError = false,
             )
-            val def = StyledCard.Tokens.resolveVariantData(variant)
+            val def = StyledCard.Tokens.resolveVariantData(variant).customise(
+                background = customization?.background,
+                foreground = customization?.content,
+                border = customization?.border,
+            )
             val resolved = def.resolve(state)
             val border = resolved.border?.let { BorderStroke(StyledCardDefaults.BorderWidth, it) }
             styledComponents.card.Render(
@@ -161,10 +159,8 @@ fun StyledCard(
 
         is StyledWrapperComponents -> {
             styledComponents.card.Render(
-                request = StyledCardWrapperRenderer.Request(
-                    id = variant.variantId,
-                    customColors = variant.customDataOrNull()
-                ),
+                variant = variant,
+                customization = customization,
                 modifier = modifier,
                 emphasis = emphasis,
                 shape = shape,

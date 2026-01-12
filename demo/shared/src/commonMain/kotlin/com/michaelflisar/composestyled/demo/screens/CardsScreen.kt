@@ -25,7 +25,7 @@ fun CardsScreen() {
     ) {
         StyledText("Cards")
         StyledCard(
-            variant = StyledCard.Variants.Filled,
+            variant = StyledCard.Variant.Filled,
             modifier = Modifier.fillMaxWidth()
         ) {
             Column(
@@ -40,17 +40,17 @@ fun CardsScreen() {
                 ) {
                     StyledButton(
                         onClick = { },
-                        variant = StyledButton.Variants.FilledPrimary
+                        variant = StyledButton.Variant.Primary
                     ) { StyledText("Action") }
                     StyledButton(
                         onClick = { },
-                        variant = StyledButton.Variants.Text
+                        variant = StyledButton.Variant.Text
                     ) { StyledText("Secondary") }
                 }
             }
         }
         StyledCard(
-            variant = StyledCard.Variants.Outlined,
+            variant = StyledCard.Variant.Outlined,
             modifier = Modifier.fillMaxWidth()
         ) {
             Column(

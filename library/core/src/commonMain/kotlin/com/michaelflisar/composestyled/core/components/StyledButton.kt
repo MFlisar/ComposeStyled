@@ -3,7 +3,10 @@ package com.michaelflisar.composestyled.core.components
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -11,63 +14,64 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import com.composeunstyled.theme.ThemeProperty
 import com.michaelflisar.composestyled.core.StyledTheme
-import com.michaelflisar.composestyled.core.classes.IVariantId
+import com.michaelflisar.composestyled.core.classes.IVariant
 import com.michaelflisar.composestyled.core.classes.TokenMap
-import com.michaelflisar.composestyled.core.classes.Variant
 import com.michaelflisar.composestyled.core.classes.colors.StatefulBaseColorDef
-import com.michaelflisar.composestyled.core.classes.customDataOrNull
 import com.michaelflisar.composestyled.core.renderer.LocalStyledComponents
-import com.michaelflisar.composestyled.core.renderer.StyledTokenCompontents
+import com.michaelflisar.composestyled.core.renderer.StyledTokenComponents
 import com.michaelflisar.composestyled.core.renderer.StyledTokenRenderer
 import com.michaelflisar.composestyled.core.renderer.StyledWrapperComponents
 import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.core.runtime.interaction.rememberStyledResolveState
-
-typealias StyledButtonVariant = Variant<StyledButton.VariantId, StatefulBaseColorDef>
 
 object StyledButton {
 
     // properties
     private val Property = ThemeProperty<StatefulBaseColorDef>("button")
 
-    // variant ids
-    enum class VariantId(
-        override val id: String,
-    ) : IVariantId {
-        FilledPrimary("button.filled.primary"),
-        Outlined("button.outlined.default"),
-        Text("button.text.default"),
-    }
+    // tokens
+    internal val Tokens = TokenMap.create(Property, Variant.entries.toSet())
 
     // variants
-    object Variants {
-        val FilledPrimary: StyledButtonVariant = Variant.Token(VariantId.FilledPrimary)
-        val Outlined: StyledButtonVariant = Variant.Token(VariantId.Outlined)
-        val Text: StyledButtonVariant = Variant.Token(VariantId.Text)
-        fun custom(
-            variantId: VariantId,
-            colorDef: StatefulBaseColorDef,
-        ) = Variant.Custom(variantId, colorDef)
+    enum class Variant(
+        override val id: String,
+    ) : IVariant {
+        Primary("button.primary"),
+        Secondary("button.secondary"),
+        Outlined("button.outlined"),
+        Text("button.text"),
     }
-
-    // tokens
-    internal val Tokens = TokenMap.create<VariantId, StatefulBaseColorDef>(Property)
 
     @InternalComposeStyledApi
     @Composable
     fun registerVariantStyles(
         primary: StatefulBaseColorDef,
+        secondary: StatefulBaseColorDef,
         outlined: StatefulBaseColorDef,
         text: StatefulBaseColorDef,
     ) {
         Tokens.registerStyles(
             styles = mapOf(
-                VariantId.FilledPrimary to primary,
-                VariantId.Outlined to outlined,
-                VariantId.Text to text,
+                Variant.Primary to primary,
+                Variant.Secondary to secondary,
+                Variant.Outlined to outlined,
+                Variant.Text to text,
             )
         )
     }
+
+    fun customize(
+        background: Color? = null,
+        content: Color? = null,
+        border: Color? = null,
+    ) = Customization(background, content, border)
+
+    @Immutable
+    class Customization internal constructor(
+        val background: Color?,
+        val content: Color?,
+        val border: Color?,
+    )
 }
 
 // ----------------------
@@ -95,7 +99,8 @@ interface StyledButtonWrapperRenderer {
 
     @Composable
     fun Render(
-        request: Request,
+        variant: StyledButton.Variant,
+        customization: StyledButton.Customization?,
         onClick: () -> Unit,
         modifier: Modifier,
         enabled: Boolean,
@@ -104,12 +109,6 @@ interface StyledButtonWrapperRenderer {
         interactionSource: MutableInteractionSource,
         content: @Composable RowScope.() -> Unit,
     )
-
-    data class Request(
-        val variant: StyledButton.VariantId,
-        val customColors: StatefulBaseColorDef?,
-    )
-
 }
 
 // ----------------------
@@ -118,7 +117,10 @@ interface StyledButtonWrapperRenderer {
 
 object StyledButtonDefaults {
 
-    val DefaultVariant = StyledButton.Variants.FilledPrimary
+    val DefaultVariant = StyledButton.Variant.Primary
+
+    val MinimumHeight: Dp
+        @Composable @ReadOnlyComposable get() = StyledTheme.sizes.minimumInteractiveSize
 
     @Composable
     fun contentPadding(
@@ -136,7 +138,8 @@ object StyledButtonDefaults {
 fun StyledButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    variant: StyledButtonVariant = StyledButtonDefaults.DefaultVariant,
+    variant: StyledButton.Variant = StyledButtonDefaults.DefaultVariant,
+    customization: StyledButton.Customization? = null,
     enabled: Boolean = true,
     shape: Shape = StyledTheme.shapes.button,
     contentPadding: PaddingValues = StyledButtonDefaults.contentPadding(),
@@ -144,22 +147,27 @@ fun StyledButton(
     content: @Composable RowScope.() -> Unit,
 ) {
     when (val styledComponents = LocalStyledComponents.current) {
-        is StyledTokenCompontents -> {
+        is StyledTokenComponents -> {
             val state = rememberStyledResolveState(
                 interactionSource = interactionSource,
                 enabled = enabled,
                 isError = false,
             )
-            val def = StyledButton.Tokens.resolveVariantData(variant)
+            val def = StyledButton.Tokens.resolveVariantData(variant).customise(
+                background = customization?.background,
+                foreground = customization?.content,
+                border = customization?.border,
+            )
             val resolved = def.resolve(state)
+
             styledComponents.button.Render(
                 onClick = onClick,
-                modifier = modifier,
+                modifier = modifier.heightIn(min = StyledButtonDefaults.MinimumHeight),
                 enabled = enabled,
                 shape = shape,
                 backgroundColor = resolved.background,
                 contentColor = resolved.foreground,
-                borderColor = resolved.border ?: Color.Unspecified,
+                borderColor = resolved.border,
                 contentPadding = contentPadding,
                 interactionSource = interactionSource,
                 content = content
@@ -168,10 +176,8 @@ fun StyledButton(
 
         is StyledWrapperComponents -> {
             styledComponents.button.Render(
-                request = StyledButtonWrapperRenderer.Request(
-                    variant = variant.variantId,
-                    customColors = variant.customDataOrNull()
-                ),
+                variant = variant,
+                customization = customization,
                 onClick = onClick,
                 modifier = modifier,
                 enabled = enabled,

@@ -16,8 +16,8 @@ fun main() {
             onCloseRequest = ::exitApplication,
             state = rememberWindowState(
                 position = WindowPosition(Alignment.Center),
-                width = 800.dp,
-                height = 600.dp
+                width = 1024.dp,
+                height = 800.dp
             )
         ) {
             DemoApp("Windows")

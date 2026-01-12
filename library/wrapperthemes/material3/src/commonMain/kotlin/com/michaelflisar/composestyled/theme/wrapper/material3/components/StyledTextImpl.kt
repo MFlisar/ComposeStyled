@@ -13,14 +13,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
+import com.michaelflisar.composestyled.core.components.StyledText
 import com.michaelflisar.composestyled.core.components.StyledTextWrapperRenderer
-import com.michaelflisar.composestyled.core.components.StyledTextWrapperRenderer.Request
 
 internal object StyledTextImpl : StyledTextWrapperRenderer {
 
     @Composable
     override fun Render(
-        request: Request,
+        variant: StyledText.Variant,
         text: String,
         modifier: Modifier,
         style: TextStyle,

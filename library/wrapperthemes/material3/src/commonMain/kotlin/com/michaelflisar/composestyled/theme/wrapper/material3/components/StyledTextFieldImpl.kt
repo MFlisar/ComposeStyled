@@ -12,8 +12,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
+import com.michaelflisar.composestyled.core.components.StyledTextField
 import com.michaelflisar.composestyled.core.components.StyledTextFieldWrapperRenderer
-import com.michaelflisar.composestyled.core.components.StyledTextFieldWrapperRenderer.Request
 import com.michaelflisar.composestyled.core.runtime.ProvideStyledLocals
 import com.michaelflisar.composestyled.theme.wrapper.material3.disabled
 
@@ -22,7 +22,8 @@ internal object StyledTextFieldImpl : StyledTextFieldWrapperRenderer {
     @Composable
     @Suppress("UNUSED_PARAMETER")
     override fun Render(
-        request: Request,
+        variant: StyledTextField.Variant,
+        customization: StyledTextField.Customization?,
         value: String,
         onValueChange: (String) -> Unit,
         modifier: Modifier,
@@ -47,12 +48,10 @@ internal object StyledTextFieldImpl : StyledTextFieldWrapperRenderer {
         interactionSource: MutableInteractionSource,
         shape: Shape,
     ) {
-        val containerColor = request.customColors?.normal?.background ?: Color.Unspecified
-        val contentColor = request.customColors?.normal?.foreground ?: Color.Unspecified
-        val disabledContainerColor =
-            request.customColors?.normal?.background?.disabled() ?: Color.Unspecified
-        val disabledContentColor =
-            request.customColors?.normal?.foreground?.disabled() ?: Color.Unspecified
+        val containerColor = customization?.background ?: Color.Unspecified
+        val contentColor = customization?.content ?: Color.Unspecified
+        val disabledContainerColor = customization?.background?.disabled() ?: Color.Unspecified
+        val disabledContentColor = customization?.content?.disabled() ?: Color.Unspecified
 
         // M3 TextField doesn't allow full background/border customization via a BaseColor directly.
         // We map what we can via TextFieldDefaults.colors.

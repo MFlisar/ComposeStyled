@@ -87,6 +87,7 @@ kotlin {
         commonMain.dependencies {
 
             api(project(":composestyled:core"))
+            implementation(project(":composestyled:themes:shared"))
 
             implementation(deps.composeunstyled.primitives)
 

@@ -7,10 +7,35 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import com.michaelflisar.composestyled.core.StyledTheme
+import com.michaelflisar.composestyled.core.classes.IVariant
 import com.michaelflisar.composestyled.core.renderer.LocalStyledComponents
-import com.michaelflisar.composestyled.core.renderer.StyledTokenCompontents
+import com.michaelflisar.composestyled.core.renderer.StyledTokenComponents
 import com.michaelflisar.composestyled.core.renderer.StyledTokenRenderer
 import com.michaelflisar.composestyled.core.renderer.StyledWrapperComponents
+import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
+
+object StyledSurface {
+
+    // variants
+    enum class Variant(
+        override val id: String,
+    ) : IVariant {
+        Default("surface.default"),
+    }
+
+    data class Colors(
+        val background: Color,
+        val content: Color,
+    )
+
+    @InternalComposeStyledApi
+    @Composable
+    fun registerVariantStyles(
+        default: Colors,
+    ) {
+        // --
+    }
+}
 
 // ----------------------
 // Renderer
@@ -33,7 +58,7 @@ interface StyledSurfaceWrapperRenderer {
 
     @Composable
     fun Render(
-        request: Request,
+        variant: StyledSurface.Variant,
         modifier: Modifier,
         shape: Shape,
         backgroundColor: Color,
@@ -41,8 +66,6 @@ interface StyledSurfaceWrapperRenderer {
         border: BorderStroke?,
         content: @Composable () -> Unit,
     )
-
-    data object Request
 }
 
 // ----------------------
@@ -57,6 +80,8 @@ object StyledSurfaceDefaults {
 
     @Composable
     fun contentColor(): Color = StyledTheme.colors.onBackground
+
+    val DefaultVariant: StyledSurface.Variant = StyledSurface.Variant.Default
 }
 
 // ----------------------
@@ -66,6 +91,7 @@ object StyledSurfaceDefaults {
 @Composable
 fun StyledSurface(
     modifier: Modifier = Modifier,
+    variant: StyledSurface.Variant = StyledSurfaceDefaults.DefaultVariant,
     shape: Shape = StyledSurfaceDefaults.Shape,
     backgroundColor: Color = StyledSurfaceDefaults.backgroundColor(),
     contentColor: Color = StyledSurfaceDefaults.contentColor(),
@@ -73,7 +99,7 @@ fun StyledSurface(
     content: @Composable () -> Unit,
 ) {
     when (val components = LocalStyledComponents.current) {
-        is StyledTokenCompontents -> {
+        is StyledTokenComponents -> {
             components.surface.Render(
                 modifier = modifier,
                 shape = shape,
@@ -86,7 +112,7 @@ fun StyledSurface(
 
         is StyledWrapperComponents -> {
             components.surface.Render(
-                request = StyledSurfaceWrapperRenderer.Request,
+                variant = variant,
                 modifier = modifier,
                 shape = shape,
                 backgroundColor = backgroundColor,
@@ -96,5 +122,4 @@ fun StyledSurface(
             )
         }
     }
-
 }

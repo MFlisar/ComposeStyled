@@ -5,15 +5,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import com.michaelflisar.composestyled.core.components.StyledSurface
 import com.michaelflisar.composestyled.core.components.StyledSurfaceWrapperRenderer
-import com.michaelflisar.composestyled.core.components.StyledSurfaceWrapperRenderer.Request
 import com.michaelflisar.composestyled.core.runtime.ProvideStyledLocals
 
 internal object StyledSurfaceImpl : StyledSurfaceWrapperRenderer {
 
     @Composable
     override fun Render(
-        request: Request,
+        variant: StyledSurface.Variant,
         modifier: Modifier,
         shape: Shape,
         backgroundColor: Color,

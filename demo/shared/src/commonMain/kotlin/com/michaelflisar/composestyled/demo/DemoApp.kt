@@ -1,10 +1,6 @@
 package com.michaelflisar.composestyled.demo
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,7 +8,10 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -25,12 +24,13 @@ import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.core.StyledTheme
 import com.michaelflisar.composestyled.core.classes.ThemeMode
 import com.michaelflisar.composestyled.core.components.StyledButton
-import com.michaelflisar.composestyled.core.components.StyledCheckbox
 import com.michaelflisar.composestyled.core.components.StyledHorizontalSeparator
+import com.michaelflisar.composestyled.core.components.StyledIcon
 import com.michaelflisar.composestyled.core.components.StyledSurface
 import com.michaelflisar.composestyled.core.components.StyledText
 import com.michaelflisar.composestyled.core.components.StyledVerticalSeparator
 import com.michaelflisar.composestyled.core.layout.ContentColumn
+import com.michaelflisar.composestyled.core.layout.ContentRow
 import com.michaelflisar.composestyled.core.renderer.StyledComponents
 import com.michaelflisar.composestyled.core.tokens.StyledPaddings
 import com.michaelflisar.composestyled.core.tokens.StyledShapes
@@ -58,11 +58,11 @@ fun DemoApp(
     platform: String,
 ) {
     val isDarkMode = isSystemInDarkTheme()
-    val mode = remember { mutableStateOf<ThemeMode>(ThemeMode.System) }
-    val styles = mapOf<String, StyledComponents>(
+    val mode = remember { mutableStateOf(ThemeMode.System) }
+    val styles = mapOf(
         "Material3" to StyledComponentsMaterial3,
-        //"Cupertino" to StyledComponentsCupertino,
-        //"Fluent2" to StyledComponentsFluent2,
+        "Cupertino" to StyledComponentsCupertino,
+        "Fluent2" to StyledComponentsFluent2,
         "Material3 (Wrapper)" to StyledComponentsMaterial3Wrapper
     )
     val style = remember { mutableStateOf(styles.entries.first().value) }
@@ -107,6 +107,8 @@ fun DemoPagePane(
     style: MutableState<StyledComponents>,
     styles: Map<String, StyledComponents>,
 ) {
+    var screen by remember { mutableStateOf(DemoScreen.Buttons) }
+    val topRowHeight = 64.dp
     Row {
 
         Column(
@@ -114,8 +116,8 @@ fun DemoPagePane(
         ) {
             // 1) Platform Info
             ContentColumn(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
+                modifier = Modifier.fillMaxWidth().height(topRowHeight),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 StyledText(
                     text = platform,
@@ -159,48 +161,45 @@ fun DemoPagePane(
             }
         }
         StyledVerticalSeparator()
-        ContentColumn {
-            Content()
-        }
-    }
-}
-
-@Composable
-private fun Content() {
-
-    var screen by remember { mutableStateOf(DemoScreen.Buttons) }
-    StyledSurface {
-        Column(
-            modifier = Modifier.padding(all = StyledTheme.paddings.content),
-            verticalArrangement = Arrangement.spacedBy(StyledTheme.spacings.medium)
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacings.medium)
+        Column {
+            ContentRow(
+                modifier = Modifier.fillMaxWidth().height(topRowHeight),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 DemoScreen.entries.forEach {
                     StyledButton(
-                        variant = StyledButton.Variants.FilledPrimary,
+                        variant = if (screen == it) StyledButton.Variant.Primary else StyledButton.Variant.Outlined,
                         onClick = { screen = it }
                     ) {
+                        if (screen == it) {
+                            StyledIcon(
+                                Icons.Default.Check,
+                                null,
+                                modifier = Modifier.size(20.dp).padding(end = 4.dp)
+                            )
+                        }
                         StyledText(text = it.name)
                     }
                 }
             }
-            StyledText(
-                text = "Demo Screen: ${screen.name}",
-                style = StyledTheme.typography.titleMedium
-            )
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-            ) {
-                when (screen) {
-                    DemoScreen.Buttons -> ButtonsScreen()
-                    DemoScreen.Cards -> CardsScreen()
-                    DemoScreen.Inputs -> InputsScreen()
-                }
-            }
+            StyledHorizontalSeparator()
+            Content(screen)
+        }
+
+    }
+}
+
+@Composable
+private fun Content(screen: DemoScreen) {
+    Box(
+        modifier = Modifier
+            .padding(all = StyledTheme.paddings.content)
+            .fillMaxWidth(),
+    ) {
+        when (screen) {
+            DemoScreen.Buttons -> ButtonsScreen()
+            DemoScreen.Cards -> CardsScreen()
+            DemoScreen.Inputs -> InputsScreen()
         }
     }
 }

@@ -13,39 +13,29 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import com.composeunstyled.theme.ThemeProperty
 import com.michaelflisar.composestyled.core.StyledTheme
-import com.michaelflisar.composestyled.core.classes.IVariantId
+import com.michaelflisar.composestyled.core.classes.IVariant
 import com.michaelflisar.composestyled.core.classes.TokenMap
-import com.michaelflisar.composestyled.core.classes.Variant
-import com.michaelflisar.composestyled.core.classes.customDataOrNull
 import com.michaelflisar.composestyled.core.renderer.LocalStyledComponents
-import com.michaelflisar.composestyled.core.renderer.StyledTokenCompontents
+import com.michaelflisar.composestyled.core.renderer.StyledTokenComponents
 import com.michaelflisar.composestyled.core.renderer.StyledTokenRenderer
 import com.michaelflisar.composestyled.core.renderer.StyledWrapperComponents
 import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.core.runtime.LocalContentColor
-
-typealias StyledTextVariant = Variant<StyledText.VariantId, Color>
 
 object StyledText {
 
     // properties
     private val Property = ThemeProperty<Color>("text")
 
-    // variant ids
-    enum class VariantId(
-        override val id: String,
-    ) : IVariantId {
-        Default("text.default"),
-    }
+    // tokens
+    internal val Tokens = TokenMap.create(Property, Variant.entries.toSet())
 
     // variants
-    object Variants {
-        val Default: StyledTextVariant = Variant.Token(VariantId.Default)
-        fun custom(color: Color) = Variant.Custom(VariantId.Default, color)
+    enum class Variant(
+        override val id: String,
+    ) : IVariant {
+        Default("text.default"),
     }
-
-    // tokens
-    internal val Tokens = TokenMap.create<VariantId, Color>(Property)
 
     @InternalComposeStyledApi
     @Composable
@@ -54,7 +44,7 @@ object StyledText {
     ) {
         Tokens.registerStyles(
             styles = mapOf(
-                VariantId.Default to default,
+                Variant.Default to default,
             )
         )
     }
@@ -91,7 +81,7 @@ interface StyledTextWrapperRenderer {
 
     @Composable
     fun Render(
-        request: Request,
+        variant: StyledText.Variant,
         text: String,
         modifier: Modifier,
         style: TextStyle,
@@ -109,11 +99,6 @@ interface StyledTextWrapperRenderer {
         overflow: TextOverflow,
         autoSize: TextAutoSize?,
     )
-
-    data class Request(
-        val variant: StyledText.VariantId,
-        val customColor: Color?,
-    )
 }
 
 // ----------------------
@@ -122,7 +107,7 @@ interface StyledTextWrapperRenderer {
 
 object StyledTextDefaults {
 
-    val DefaultVariant: StyledTextVariant = StyledText.Variants.Default
+    val DefaultVariant: StyledText.Variant = StyledText.Variant.Default
 
     val Style: TextStyle
         @Composable get() = StyledTheme.typography.bodyMedium
@@ -136,7 +121,7 @@ object StyledTextDefaults {
 fun StyledText(
     text: String,
     modifier: Modifier = Modifier,
-    variant: StyledTextVariant = StyledTextDefaults.DefaultVariant,
+    variant: StyledText.Variant = StyledTextDefaults.DefaultVariant,
     style: TextStyle = StyledTextDefaults.Style,
     textAlign: TextAlign = TextAlign.Unspecified,
     lineHeight: TextUnit = TextUnit.Unspecified,
@@ -162,7 +147,7 @@ fun StyledText(
     )
 
     when (val components = LocalStyledComponents.current) {
-        is StyledTokenCompontents -> {
+        is StyledTokenComponents -> {
             val themedColor = StyledText.Tokens.resolveVariantData(variant)
             val finalColor = if (color != Color.Unspecified) color else themedColor
             components.text.Render(
@@ -187,10 +172,7 @@ fun StyledText(
 
         is StyledWrapperComponents -> {
             components.text.Render(
-                request = StyledTextWrapperRenderer.Request(
-                    variant = variant.variantId,
-                    customColor = variant.customDataOrNull(),
-                ),
+                variant = variant,
                 text = text,
                 modifier = modifier,
                 style = resolvedStyle,

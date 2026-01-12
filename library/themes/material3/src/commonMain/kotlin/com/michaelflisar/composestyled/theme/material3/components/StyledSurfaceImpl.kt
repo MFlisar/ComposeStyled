@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import com.michaelflisar.composestyled.core.components.StyledSurface
 import com.michaelflisar.composestyled.core.components.StyledSurfaceTokenRenderer
 import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.core.runtime.LocalBackgroundColor
@@ -21,6 +22,12 @@ internal object StyledSurfaceImpl : StyledSurfaceTokenRenderer {
     @Composable
     override fun registerVariantStyles() {
         // No variant for surfaces
+        StyledSurface.registerVariantStyles(
+            default = StyledSurface.Colors(
+                background = Color.Transparent,
+                content = Color.Unspecified
+            )
+        )
     }
 
     @Composable

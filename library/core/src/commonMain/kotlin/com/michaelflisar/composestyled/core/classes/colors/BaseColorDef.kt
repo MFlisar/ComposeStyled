@@ -10,4 +10,13 @@ data class BaseColorDef(
     val background: Color,
     val foreground: Color,
     val border: Color? = null,
-)
+) {
+    fun customise(
+        background: Color? = null,
+        foreground: Color? = null,
+        border: Color? = null,
+    ) = BaseColorDef(
+        background = background ?: this.background,
+        foreground = foreground ?: this.foreground,
+        border = border ?: this.border,
+    )}

@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -14,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
+import com.michaelflisar.composestyled.core.StyledTheme
 import com.michaelflisar.composestyled.core.components.StyledButton
 import com.michaelflisar.composestyled.core.components.StyledButtonWrapperRenderer
 import com.michaelflisar.composestyled.theme.wrapper.material3.disabled
@@ -22,7 +24,8 @@ internal object StyledButtonImpl : StyledButtonWrapperRenderer {
 
     @Composable
     override fun Render(
-        request: StyledButtonWrapperRenderer.Request,
+        variant: StyledButton.Variant,
+        customization: StyledButton.Customization?,
         onClick: () -> Unit,
         modifier: Modifier,
         enabled: Boolean,
@@ -31,7 +34,7 @@ internal object StyledButtonImpl : StyledButtonWrapperRenderer {
         interactionSource: MutableInteractionSource,
         content: @Composable RowScope.() -> Unit,
     ) {
-        val borderColor = request.customColors?.normal?.border// ?: MaterialTheme.colorScheme.outlineVariant
+        val borderColor = customization?.border// ?: MaterialTheme.colorScheme.outlineVariant
         val borderStroke = borderColor?.let { BorderStroke(width = Dp.Hairline, color = it) }
 
         var containerColor: Color
@@ -39,26 +42,39 @@ internal object StyledButtonImpl : StyledButtonWrapperRenderer {
         var disabledContainerColor: Color
         var disabledContentColor: Color
 
-        if (request.customColors != null) {
-            containerColor = request.customColors?.normal?.background ?: MaterialTheme.colorScheme.background
-            contentColor = request.customColors?.normal?.foreground ?: MaterialTheme.colorScheme.onBackground
-            disabledContainerColor = request.customColors?.normal?.background?.disabled() ?: Color.Unspecified
-            disabledContentColor = request.customColors?.normal?.foreground?.disabled() ?: Color.Unspecified
+        if (customization != null) {
+            containerColor =
+                customization.background ?: MaterialTheme.colorScheme.background
+            contentColor =
+                customization.content ?: MaterialTheme.colorScheme.onBackground
+            disabledContainerColor =
+                customization.background?.disabled() ?: Color.Unspecified
+            disabledContentColor =
+                customization.content?.disabled() ?: Color.Unspecified
         } else {
-            when (request.variant) {
-                StyledButton.VariantId.FilledPrimary -> {
+            when (variant) {
+                StyledButton.Variant.Primary -> {
                     containerColor = MaterialTheme.colorScheme.primary
                     contentColor = MaterialTheme.colorScheme.onPrimary
                     disabledContainerColor = MaterialTheme.colorScheme.primary.disabled()
                     disabledContentColor = MaterialTheme.colorScheme.onPrimary.disabled()
                 }
-                StyledButton.VariantId.Outlined -> {
+
+                StyledButton.Variant.Secondary -> {
+                    containerColor = MaterialTheme.colorScheme.secondary
+                    contentColor = MaterialTheme.colorScheme.onSecondary
+                    disabledContainerColor = MaterialTheme.colorScheme.secondary.disabled()
+                    disabledContentColor = MaterialTheme.colorScheme.onSecondary.disabled()
+                }
+
+                StyledButton.Variant.Outlined -> {
                     containerColor = MaterialTheme.colorScheme.background
                     contentColor = MaterialTheme.colorScheme.onBackground
                     disabledContainerColor = MaterialTheme.colorScheme.background.disabled()
                     disabledContentColor = MaterialTheme.colorScheme.onBackground.disabled()
                 }
-                StyledButton.VariantId.Text -> {
+
+                StyledButton.Variant.Text -> {
                     containerColor = Color.Unspecified
                     contentColor = MaterialTheme.colorScheme.onBackground
                     disabledContainerColor = Color.Unspecified
@@ -67,8 +83,10 @@ internal object StyledButtonImpl : StyledButtonWrapperRenderer {
             }
         }
 
-        when (request.variant) {
-            StyledButton.VariantId.FilledPrimary -> {
+        when (variant) {
+            StyledButton.Variant.Primary,
+            StyledButton.Variant.Secondary,
+                -> {
                 Button(
                     onClick = onClick,
                     modifier = modifier,
@@ -88,7 +106,8 @@ internal object StyledButtonImpl : StyledButtonWrapperRenderer {
                     content()
                 }
             }
-            StyledButton.VariantId.Outlined -> {
+
+            StyledButton.Variant.Outlined -> {
                 OutlinedButton(
                     onClick = onClick,
                     modifier = modifier,
@@ -106,7 +125,8 @@ internal object StyledButtonImpl : StyledButtonWrapperRenderer {
                     content()
                 }
             }
-            StyledButton.VariantId.Text -> {
+
+            StyledButton.Variant.Text -> {
                 TextButton(
                     onClick = onClick,
                     modifier = modifier,

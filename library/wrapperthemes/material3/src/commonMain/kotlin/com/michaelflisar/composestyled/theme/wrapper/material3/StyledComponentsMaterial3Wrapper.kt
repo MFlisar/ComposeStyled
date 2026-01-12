@@ -4,6 +4,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
 import androidx.compose.material3.Typography
+import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import com.michaelflisar.composestyled.core.StyledTheme
 import com.michaelflisar.composestyled.core.renderer.StyledWrapperComponents
@@ -25,7 +26,7 @@ val StyledComponentsMaterial3Wrapper = StyledWrapperComponents(
         val colors = StyledTheme.colors
         val shapes = StyledTheme.shapes
         val typography = StyledTheme.typography
-        val cs = colors.toMaterial3ColorScheme()
+        val cs = colors.toMaterial3ColorScheme(colors.isDarkTheme)
         val t = typography.toMaterial3Typography()
         val s = shapes.toMaterial3Shapes()
 
@@ -54,16 +55,43 @@ val StyledComponentsMaterial3Wrapper = StyledWrapperComponents(
 )
 
 
-private fun StyledColors.toMaterial3ColorScheme() =
-    lightColorScheme(
-        background = this.background,
-        onBackground = this.onBackground,
-        primary = this.primary,
-        onPrimary = this.onPrimary,
-        outline = this.outline,
-        surface = this.background,
-        onSurface = this.onBackground,
+private fun StyledColors.toMaterial3ColorScheme(
+    isDarkTheme: Boolean,
+) = if (isDarkTheme) {
+    darkColorScheme(
+        background = background,
+        onBackground = onBackground,
+        surface = surface,
+        onSurface = onSurface,
+        surfaceVariant = surfaceVariant,
+        onSurfaceVariant = onSurfaceVariant,
+        primary = primary,
+        onPrimary = onPrimary,
+        secondary = seondary,
+        onSecondary = onSecondary,
+        outline = outline,
+        outlineVariant = outlineVariant,
+        error = error,
+        onError = onError,
     )
+} else {
+    lightColorScheme(
+        background = background,
+        onBackground = onBackground,
+        surface = surface,
+        onSurface = onSurface,
+        surfaceVariant = surfaceVariant,
+        onSurfaceVariant = onSurfaceVariant,
+        primary = primary,
+        onPrimary = onPrimary,
+        secondary = seondary,
+        onSecondary = onSecondary,
+        outline = outline,
+        outlineVariant = outlineVariant,
+        error = error,
+        onError = onError,
+    )
+}
 
 private fun StyledTypography.toMaterial3Typography(): Typography =
     Typography(

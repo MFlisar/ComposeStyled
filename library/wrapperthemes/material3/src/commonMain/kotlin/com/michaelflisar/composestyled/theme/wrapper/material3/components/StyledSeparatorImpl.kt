@@ -8,14 +8,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
+import com.michaelflisar.composestyled.core.components.StyledSeparator
 import com.michaelflisar.composestyled.core.components.StyledSeparatorWrapperRenderer
-import com.michaelflisar.composestyled.core.components.StyledSeparatorWrapperRenderer.Request
 
 internal object StyledSeparatorImpl : StyledSeparatorWrapperRenderer {
 
     @Composable
     override fun RenderHorizontal(
-        request: Request,
+        variant: StyledSeparator.Variant,
         modifier: Modifier,
         color: Color,
         thickness: Dp,
@@ -30,7 +30,7 @@ internal object StyledSeparatorImpl : StyledSeparatorWrapperRenderer {
 
     @Composable
     override fun RenderVertical(
-        request: Request,
+        variant: StyledSeparator.Variant,
         modifier: Modifier,
         color: Color,
         thickness: Dp,

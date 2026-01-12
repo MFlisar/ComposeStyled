@@ -16,21 +16,21 @@ import androidx.compose.ui.graphics.Shape
 import com.michaelflisar.composestyled.core.classes.Emphasis
 import com.michaelflisar.composestyled.core.components.StyledCard
 import com.michaelflisar.composestyled.core.components.StyledCardWrapperRenderer
-import com.michaelflisar.composestyled.core.components.StyledCardWrapperRenderer.Request
 
 internal object StyledCardImpl : StyledCardWrapperRenderer {
 
     @Composable
     override fun Render(
-        request: Request,
+        variant: StyledCard.Variant,
+        customization: StyledCard.Customization?,
         modifier: Modifier,
         emphasis: Emphasis,
         shape: Shape,
         contentPadding: PaddingValues,
         content: @Composable ColumnScope.() -> Unit,
     ) {
-        val background = request.customColors?.normal?.background
-        val onBackground = request.customColors?.normal?.foreground
+        val background = customization?.background
+        val onBackground = customization?.content
 
         val backgroundFilled = when (emphasis) {
             Emphasis.Low -> MaterialTheme.colorScheme.surface
@@ -50,8 +50,8 @@ internal object StyledCardImpl : StyledCardWrapperRenderer {
 
         when (emphasis) {
             Emphasis.Low -> {
-                when (request.id) {
-                    StyledCard.VariantId.Filled -> {
+                when (variant) {
+                    StyledCard.Variant.Filled -> {
                         Card(
                             modifier = modifier,
                             shape = shape,
@@ -65,7 +65,7 @@ internal object StyledCardImpl : StyledCardWrapperRenderer {
                         }
                     }
 
-                    StyledCard.VariantId.Outlined -> {
+                    StyledCard.Variant.Outlined -> {
                         OutlinedCard(
                             modifier = modifier,
                             shape = shape,
@@ -81,8 +81,8 @@ internal object StyledCardImpl : StyledCardWrapperRenderer {
             }
 
             Emphasis.Medium -> {
-                when (request.id) {
-                    StyledCard.VariantId.Filled -> {
+                when (variant) {
+                    StyledCard.Variant.Filled -> {
                         ElevatedCard(
                             modifier = modifier,
                             shape = shape,
@@ -95,7 +95,7 @@ internal object StyledCardImpl : StyledCardWrapperRenderer {
                         }
                     }
 
-                    StyledCard.VariantId.Outlined -> {
+                    StyledCard.Variant.Outlined -> {
                         OutlinedCard(
                             modifier = modifier,
                             shape = shape,
@@ -111,8 +111,8 @@ internal object StyledCardImpl : StyledCardWrapperRenderer {
             }
 
             Emphasis.High -> {
-                when (request.id) {
-                    StyledCard.VariantId.Filled -> {
+                when (variant) {
+                    StyledCard.Variant.Filled -> {
                         ElevatedCard(
                             modifier = modifier,
                             shape = shape,
@@ -125,7 +125,7 @@ internal object StyledCardImpl : StyledCardWrapperRenderer {
                         }
                     }
 
-                    StyledCard.VariantId.Outlined -> {
+                    StyledCard.Variant.Outlined -> {
                         OutlinedCard(
                             modifier = modifier,
                             shape = shape,

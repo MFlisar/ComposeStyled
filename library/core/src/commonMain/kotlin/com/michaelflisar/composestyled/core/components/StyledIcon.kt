@@ -7,11 +7,29 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.michaelflisar.composestyled.core.classes.IVariant
 import com.michaelflisar.composestyled.core.renderer.LocalStyledComponents
-import com.michaelflisar.composestyled.core.renderer.StyledTokenCompontents
+import com.michaelflisar.composestyled.core.renderer.StyledTokenComponents
 import com.michaelflisar.composestyled.core.renderer.StyledTokenRenderer
 import com.michaelflisar.composestyled.core.renderer.StyledWrapperComponents
+import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.core.runtime.LocalContentColor
+
+object StyledIcon {
+
+    // variants
+    enum class Variant(
+        override val id: String,
+    ) : IVariant {
+        Default("icon.default")
+    }
+
+    @InternalComposeStyledApi
+    @Composable
+    fun registerVariantStyles() {
+        // --
+    }
+}
 
 // ----------------------
 // Renderer
@@ -42,7 +60,7 @@ interface StyledIconWrapperRenderer {
 
     @Composable
     fun Render(
-        request: Request,
+        variant: StyledIcon.Variant,
         painter: Painter,
         contentDescription: String?,
         modifier: Modifier,
@@ -52,15 +70,13 @@ interface StyledIconWrapperRenderer {
 
     @Composable
     fun Render(
-        request: Request,
+        variant: StyledIcon.Variant,
         imageVector: ImageVector,
         contentDescription: String?,
         modifier: Modifier,
         tint: Color,
         size: Dp,
     )
-
-    data object Request
 }
 
 // ----------------------
@@ -69,6 +85,7 @@ interface StyledIconWrapperRenderer {
 
 object StyledIconDefaults {
     val Size: Dp = 24.dp
+    val DefaultVariant: StyledIcon.Variant = StyledIcon.Variant.Default
 }
 
 // ----------------------
@@ -82,9 +99,10 @@ fun StyledIcon(
     modifier: Modifier = Modifier,
     tint: Color = LocalContentColor.current,
     size: Dp = StyledIconDefaults.Size,
+    variant: StyledIcon.Variant = StyledIconDefaults.DefaultVariant,
 ) {
     when (val components = LocalStyledComponents.current) {
-        is StyledTokenCompontents -> {
+        is StyledTokenComponents -> {
             components.icon.Render(
                 painter = painter,
                 contentDescription = contentDescription,
@@ -96,7 +114,7 @@ fun StyledIcon(
 
         is StyledWrapperComponents -> {
             components.icon.Render(
-                request = StyledIconWrapperRenderer.Request,
+                variant = variant,
                 painter = painter,
                 contentDescription = contentDescription,
                 modifier = modifier,
@@ -114,9 +132,10 @@ fun StyledIcon(
     modifier: Modifier = Modifier,
     tint: Color = LocalContentColor.current,
     size: Dp = StyledIconDefaults.Size,
+    variant: StyledIcon.Variant = StyledIconDefaults.DefaultVariant,
 ) {
     when (val components = LocalStyledComponents.current) {
-        is StyledTokenCompontents -> {
+        is StyledTokenComponents -> {
             components.icon.Render(
                 imageVector = imageVector,
                 contentDescription = contentDescription,
@@ -128,7 +147,7 @@ fun StyledIcon(
 
         is StyledWrapperComponents -> {
             components.icon.Render(
-                request = StyledIconWrapperRenderer.Request,
+                variant = variant,
                 imageVector = imageVector,
                 contentDescription = contentDescription,
                 modifier = modifier,

@@ -14,7 +14,7 @@ import com.composeunstyled.platformtheme.sizeMinimum
 import com.composeunstyled.theme.Theme
 import com.michaelflisar.composestyled.core.renderer.LocalStyledComponents
 import com.michaelflisar.composestyled.core.renderer.StyledComponents
-import com.michaelflisar.composestyled.core.renderer.StyledTokenCompontents
+import com.michaelflisar.composestyled.core.renderer.StyledTokenComponents
 import com.michaelflisar.composestyled.core.renderer.StyledWrapperComponents
 import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.core.runtime.LocalBackgroundColor
@@ -91,7 +91,9 @@ fun StyledTheme(
                     LocalThemeBuilder provides this
                 ) {
                     when (styledComponents) {
-                        is StyledTokenCompontents -> styledComponents.registerAllComponents()
+                        is StyledTokenComponents -> {
+                            styledComponents.registerAllComponents()
+                        }
                         is StyledWrapperComponents -> {
                             // no-op
                         }
@@ -128,7 +130,7 @@ fun StyledTheme(
                 LocalTextStyle provides typography.bodyMedium
             ) {
                 when (styledComponents) {
-                    is StyledTokenCompontents -> content()
+                    is StyledTokenComponents -> content()
                     is StyledWrapperComponents -> styledComponents.root(content)
                 }
             }

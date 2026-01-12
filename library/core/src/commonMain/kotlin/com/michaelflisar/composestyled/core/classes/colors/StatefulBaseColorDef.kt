@@ -3,6 +3,7 @@ package com.michaelflisar.composestyled.core.classes.colors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.ui.graphics.Color
 import com.michaelflisar.composestyled.core.classes.DisableFactorType
 import com.michaelflisar.composestyled.core.classes.StyledInteractionState
 import com.michaelflisar.composestyled.core.classes.StyledResolveState
@@ -18,6 +19,19 @@ data class StatefulBaseColorDef(
     val pressed: BaseColorDef? = null,
     val error: BaseColorDef? = null,
 ) {
+    fun customise(
+        background: Color? = null,
+        foreground: Color? = null,
+        border: Color? = null,
+    ) = StatefulBaseColorDef(
+        normal = normal.customise(background, foreground, border),
+        hovered = hovered?.customise(background, foreground, border),
+        focused = focused?.customise(background, foreground, border),
+        pressed = pressed?.customise(background, foreground, border),
+        error = error?.customise(background, foreground, border),
+    )
+
+
     // Verantwortung: wählt Zustand nach Priorität, wendet Disabled-Treatment an, liefert finale Farben
     @Composable
     @ReadOnlyComposable

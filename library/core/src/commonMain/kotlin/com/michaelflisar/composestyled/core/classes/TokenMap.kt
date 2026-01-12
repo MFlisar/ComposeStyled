@@ -6,40 +6,38 @@ import com.composeunstyled.theme.ThemeProperty
 import com.composeunstyled.theme.ThemeToken
 import com.michaelflisar.composestyled.core.runtime.LocalThemeBuilder
 
-internal class TokenMap<ID, Data>(
+internal class TokenMap<V : IVariant, Data>(
     private val property: ThemeProperty<Data>,
-    private val map: Map<ID, ThemeToken<Data>>,
-    private val allIds: Set<ID>,
-) where ID : Enum<ID>, ID : IVariantId {
+    private val map: Map<V, ThemeToken<Data>>,
+    private val variants: Set<V>,
+) {
 
     companion object {
-        inline fun <reified ID, Data> create(property: ThemeProperty<Data>): TokenMap<ID, Data> where ID : Enum<ID>, ID : IVariantId {
-            val keys = enumValues<ID>()
-            val map = keys.associateWith { id -> ThemeToken<Data>(id.id) }
-            return TokenMap(property, map, keys.toSet())
+        fun <V : IVariant, Data> create(
+            property: ThemeProperty<Data>,
+            variants: Set<V>,
+        ): TokenMap<V, Data> {
+            val map = variants.associateWith { id -> ThemeToken<Data>(id.id) }
+            return TokenMap(property, map, variants)
         }
     }
 
-    fun tokenOf(id: ID) = map.getValue(id)
+    private fun tokenOf(id: V) = map.getValue(id)
 
     @Composable
     fun resolveVariantData(
-        variant: Variant<ID, Data>,
+        variant: V,
     ): Data {
-        return when (variant) {
-            is Variant.Token -> Theme[property][tokenOf(variant.variantId)]
-            is Variant.Custom -> variant.data
-        }
+        return Theme[property][tokenOf(variant)]
     }
 
     @Composable
     fun registerStyles(
-        styles: Map<ID, Data>,
+        styles: Map<V, Data>,
     ) {
-        require(styles.keys == allIds) { "Missing styles for: ${allIds - styles.keys}" }
+        require(styles.keys == variants) { "Missing styles for: ${variants - styles.keys}" }
         with(LocalThemeBuilder.current) {
             properties[property] = styles.entries.associate { (id, value) -> tokenOf(id) to value }
-            properties[property] = styles.mapKeys { tokenOf(it.key) }
         }
     }
 }
