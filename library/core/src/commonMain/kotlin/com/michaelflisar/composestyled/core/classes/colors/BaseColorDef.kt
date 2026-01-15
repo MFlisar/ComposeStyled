@@ -7,16 +7,26 @@ import androidx.compose.ui.graphics.Color
 // keine Zustände, keine Disabled-Logik
 @Immutable
 data class BaseColorDef(
-    val background: Color,
-    val foreground: Color,
-    val border: Color? = null,
+    val background: ColorRef,
+    val foreground: ColorRef,
+    val border: ColorRef? = null,
 ) {
-    fun customise(
-        background: Color? = null,
-        foreground: Color? = null,
+    constructor(
+        background: Color,
+        foreground: Color,
         border: Color? = null,
+    ) : this(
+        background = background.asColorRef(),
+        foreground = foreground.asColorRef(),
+        border = border?.asColorRef(),
+    )
+    fun customise(
+        background: ColorRef? = null,
+        foreground: ColorRef? = null,
+        border: ColorRef? = null,
     ) = BaseColorDef(
         background = background ?: this.background,
         foreground = foreground ?: this.foreground,
         border = border ?: this.border,
-    )}
+    )
+}

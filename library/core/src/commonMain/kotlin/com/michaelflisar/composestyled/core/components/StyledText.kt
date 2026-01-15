@@ -148,7 +148,7 @@ fun StyledText(
 
     when (val components = LocalStyledComponents.current) {
         is StyledTokenComponents -> {
-            val themedColor = StyledText.Tokens.resolveVariantData(variant)
+            val themedColor = StyledText.Tokens.resolveToken(variant)
             val finalColor = if (color != Color.Unspecified) color else themedColor
             components.text.Render(
                 text = text,

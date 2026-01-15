@@ -107,7 +107,7 @@ fun StyledHorizontalSeparator(
 ) {
     when (val components = LocalStyledComponents.current) {
         is StyledTokenComponents -> {
-            val themed = StyledSeparator.Tokens.resolveVariantData(variant)
+            val themed = StyledSeparator.Tokens.resolveToken(variant)
             val finalColor = if (color != Color.Unspecified) color else themed
             components.separator.RenderHorizontal(
                 modifier = modifier,
@@ -136,7 +136,7 @@ fun StyledVerticalSeparator(
 ) {
     when (val components = LocalStyledComponents.current) {
         is StyledTokenComponents -> {
-            val themed = StyledSeparator.Tokens.resolveVariantData(variant)
+            val themed = StyledSeparator.Tokens.resolveToken(variant)
             val finalColor = if (color != Color.Unspecified) color else themed
             components.separator.RenderVertical(
                 modifier = modifier,

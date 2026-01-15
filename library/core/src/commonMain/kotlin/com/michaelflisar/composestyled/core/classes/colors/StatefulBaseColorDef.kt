@@ -3,7 +3,6 @@ package com.michaelflisar.composestyled.core.classes.colors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.ReadOnlyComposable
-import androidx.compose.ui.graphics.Color
 import com.michaelflisar.composestyled.core.classes.DisableFactorType
 import com.michaelflisar.composestyled.core.classes.StyledInteractionState
 import com.michaelflisar.composestyled.core.classes.StyledResolveState
@@ -20,9 +19,9 @@ data class StatefulBaseColorDef(
     val error: BaseColorDef? = null,
 ) {
     fun customise(
-        background: Color? = null,
-        foreground: Color? = null,
-        border: Color? = null,
+        background: ColorRef? = null,
+        foreground: ColorRef? = null,
+        border: ColorRef? = null,
     ) = StatefulBaseColorDef(
         normal = normal.customise(background, foreground, border),
         hovered = hovered?.customise(background, foreground, border),
@@ -46,9 +45,9 @@ data class StatefulBaseColorDef(
             StyledInteractionState.Normal -> normal
         }
         return BaseColor(
-            background = base.background.treat(state, DisableFactorType.Default),
-            foreground = base.foreground.treat(state, DisableFactorType.Content),
-            border = base.border?.treat(state, DisableFactorType.Outline)
+            background = base.background.resolve().treat(state, DisableFactorType.Default),
+            foreground = base.foreground.resolve().treat(state, DisableFactorType.Content),
+            border = base.border?.resolve()?.treat(state, DisableFactorType.Outline)
         )
     }
 
@@ -57,7 +56,7 @@ data class StatefulBaseColorDef(
     internal fun resolve(
         state: StyledInteractionState,
     ): BaseColor {
-        val colorRef = when (state) {
+        val colorDefinition = when (state) {
             StyledInteractionState.Error -> error ?: normal
             StyledInteractionState.Focused -> focused ?: normal
             StyledInteractionState.Hovered -> hovered ?: normal
@@ -65,9 +64,9 @@ data class StatefulBaseColorDef(
             StyledInteractionState.Normal -> normal
         }
         return BaseColor(
-            background = colorRef.background,
-            foreground = colorRef.foreground,
-            border = colorRef.border
+            background = colorDefinition.background.resolve(),
+            foreground = colorDefinition.foreground.resolve(),
+            border = colorDefinition.border?.resolve()
         )
     }
 }

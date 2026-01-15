@@ -6,7 +6,7 @@ import com.composeunstyled.theme.ThemeProperty
 import com.composeunstyled.theme.ThemeToken
 import com.michaelflisar.composestyled.core.runtime.LocalThemeBuilder
 
-internal class TokenMap<V : IVariant, Data>(
+class TokenMap<V : IVariant, Data>(
     private val property: ThemeProperty<Data>,
     private val map: Map<V, ThemeToken<Data>>,
     private val variants: Set<V>,
@@ -25,7 +25,7 @@ internal class TokenMap<V : IVariant, Data>(
     private fun tokenOf(id: V) = map.getValue(id)
 
     @Composable
-    fun resolveVariantData(
+    fun resolveToken(
         variant: V,
     ): Data {
         return Theme[property][tokenOf(variant)]

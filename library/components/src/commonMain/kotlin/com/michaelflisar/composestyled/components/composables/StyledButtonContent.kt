@@ -1,4 +1,4 @@
-package com.michaelflisar.composestyled.core.components
+package com.michaelflisar.composestyled.components.composables
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -12,6 +12,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.TextUnitType
 import com.michaelflisar.composestyled.core.StyledTheme
+import com.michaelflisar.composestyled.core.components.StyledIcon
+import com.michaelflisar.composestyled.core.components.StyledText
+import com.michaelflisar.composestyled.core.components.StyledTextDefaults
 import com.michaelflisar.composestyled.core.runtime.LocalContentColor
 
 @Composable

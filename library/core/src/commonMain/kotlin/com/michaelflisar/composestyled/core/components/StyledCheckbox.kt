@@ -4,6 +4,7 @@ import androidx.compose.foundation.Indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -14,6 +15,7 @@ import com.composeunstyled.theme.ThemeProperty
 import com.michaelflisar.composestyled.core.StyledTheme
 import com.michaelflisar.composestyled.core.classes.IVariant
 import com.michaelflisar.composestyled.core.classes.TokenMap
+import com.michaelflisar.composestyled.core.classes.colors.ColorRef
 import com.michaelflisar.composestyled.core.classes.colors.StatefulBaseColorDef
 import com.michaelflisar.composestyled.core.icons.Check
 import com.michaelflisar.composestyled.core.renderer.LocalStyledComponents
@@ -53,8 +55,8 @@ object StyledCheckbox {
     }
 
     fun customize(
-        unchecked: Color? = null,
-        checked: Color? = null,
+        unchecked: ColorRef? = null,
+        checked: ColorRef? = null,
     ) = Customization(
         unchecked = unchecked,
         checked = checked,
@@ -67,8 +69,8 @@ object StyledCheckbox {
 
     @Immutable
     class Customization internal constructor(
-        val unchecked: Color?,
-        val checked: Color?,
+        val unchecked: ColorRef?,
+        val checked: ColorRef?,
     )
 }
 
@@ -125,6 +127,9 @@ object StyledCheckboxDefaults {
 
     val BorderWidth: Dp = 1.dp
 
+    val shape: Shape
+        @Composable @ReadOnlyComposable get() = StyledTheme.shapes.control
+
     @Composable
     fun CheckIcon(
         color: Color = LocalContentColor.current,
@@ -149,7 +154,7 @@ fun StyledCheckbox(
     variant: StyledCheckbox.Variant = StyledCheckboxDefaults.DefaultVariant,
     customization: StyledCheckbox.Customization? = null,
     enabled: Boolean = true,
-    shape: Shape = StyledTheme.shapes.checkbox,
+    shape: Shape = StyledCheckboxDefaults.shape,
     borderWidth: Dp = StyledCheckboxDefaults.BorderWidth,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     indication: Indication? = null,
@@ -165,7 +170,7 @@ fun StyledCheckbox(
                 isError = isError,
             )
 
-            val set = StyledCheckbox.Tokens.resolveVariantData(variant)
+            val set = StyledCheckbox.Tokens.resolveToken(variant)
             val def = if (checked) set.checked else set.unchecked
             val o = if (checked) customization?.checked else customization?.unchecked
 

@@ -88,7 +88,11 @@ kotlin {
 
         commonMain.dependencies {
 
+            implementation(deps.composeunstyled.theming)
+
             implementation(project(":composestyled:core"))
+
+            implementation(deps.composeunstyled.primitives)
 
         }
     }

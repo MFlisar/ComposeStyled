@@ -46,7 +46,7 @@ internal fun rememberStyledInteractionState(
  * Convenience helper to build a [StyledResolveState] from an [InteractionSource].
  */
 @Composable
-internal fun rememberStyledResolveState(
+fun rememberStyledResolveState(
     interactionSource: InteractionSource?,
     enabled: Boolean,
     isError: Boolean = false,

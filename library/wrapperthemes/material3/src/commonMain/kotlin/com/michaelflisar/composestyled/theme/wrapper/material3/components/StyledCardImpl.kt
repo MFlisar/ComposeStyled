@@ -57,8 +57,8 @@ internal object StyledCardImpl : StyledCardWrapperRenderer {
                             shape = shape,
                             border = null,
                             colors = CardDefaults.cardColors(
-                                containerColor = background ?: backgroundFilled,
-                                contentColor = onBackground ?: onBackgroundFilled,
+                                containerColor = background?.resolve() ?: backgroundFilled,
+                                contentColor = onBackground?.resolve() ?: onBackgroundFilled,
                             )
                         ) {
                             Content(contentPadding, content)
@@ -70,8 +70,8 @@ internal object StyledCardImpl : StyledCardWrapperRenderer {
                             modifier = modifier,
                             shape = shape,
                             colors = CardDefaults.outlinedCardColors(
-                                containerColor = background ?: Color.Unspecified,
-                                contentColor = onBackground ?: Color.Unspecified,
+                                containerColor = background?.resolve() ?: Color.Unspecified,
+                                contentColor = onBackground?.resolve() ?: Color.Unspecified,
                             )
                         ) {
                             Content(contentPadding, content)
@@ -87,8 +87,8 @@ internal object StyledCardImpl : StyledCardWrapperRenderer {
                             modifier = modifier,
                             shape = shape,
                             colors = CardDefaults.elevatedCardColors(
-                                containerColor = background ?: backgroundFilled,
-                                contentColor = onBackground ?: onBackgroundFilled,
+                                containerColor = background?.resolve() ?: backgroundFilled,
+                                contentColor = onBackground?.resolve() ?: onBackgroundFilled,
                             )
                         ) {
                             Content(contentPadding, content)
@@ -100,8 +100,8 @@ internal object StyledCardImpl : StyledCardWrapperRenderer {
                             modifier = modifier,
                             shape = shape,
                             colors = CardDefaults.outlinedCardColors(
-                                containerColor = background ?: Color.Unspecified,
-                                contentColor = onBackground ?: Color.Unspecified,
+                                containerColor = background?.resolve() ?: Color.Unspecified,
+                                contentColor = onBackground?.resolve() ?: Color.Unspecified,
                             )
                         ) {
                             Content(contentPadding, content)
@@ -117,8 +117,8 @@ internal object StyledCardImpl : StyledCardWrapperRenderer {
                             modifier = modifier,
                             shape = shape,
                             colors = CardDefaults.elevatedCardColors(
-                                containerColor = background ?: backgroundFilled,
-                                contentColor = onBackground ?: onBackgroundFilled,
+                                containerColor = background?.resolve() ?: backgroundFilled,
+                                contentColor = onBackground?.resolve() ?: onBackgroundFilled,
                             )
                         ) {
                             Content(contentPadding, content)
@@ -130,8 +130,8 @@ internal object StyledCardImpl : StyledCardWrapperRenderer {
                             modifier = modifier,
                             shape = shape,
                             colors = CardDefaults.outlinedCardColors(
-                                containerColor = background ?: Color.Unspecified,
-                                contentColor = onBackground ?: Color.Unspecified,
+                                containerColor = background?.resolve() ?: Color.Unspecified,
+                                contentColor = onBackground?.resolve() ?: Color.Unspecified,
                             )
                         ) {
                             Content(contentPadding, content)

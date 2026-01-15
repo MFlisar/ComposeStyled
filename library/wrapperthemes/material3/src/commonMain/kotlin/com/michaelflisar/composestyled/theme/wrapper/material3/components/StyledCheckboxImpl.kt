@@ -39,10 +39,10 @@ internal object StyledCheckboxImpl : StyledCheckboxWrapperRenderer {
         // We render a stylable container and place the M3 checkbox inside for correct semantics.
         val click = onCheckedChange
 
-        val checkedColor = customization?.checked ?: Color.Unspecified
-        val uncheckedColor = customization?.unchecked ?: Color.Unspecified
-        val disabledCheckedColor = customization?.checked?.disabled() ?: Color.Unspecified
-        val disabledUncheckedColor = customization?.unchecked?.disabled() ?: Color.Unspecified
+        val checkedColor = customization?.checked?.resolve() ?: Color.Unspecified
+        val uncheckedColor = customization?.unchecked?.resolve() ?: Color.Unspecified
+        val disabledCheckedColor = customization?.checked?.resolve()?.disabled() ?: Color.Unspecified
+        val disabledUncheckedColor = customization?.unchecked?.resolve()?.disabled() ?: Color.Unspecified
 
         Box(
             modifier = modifier

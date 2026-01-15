@@ -35,7 +35,7 @@ internal object StyledButtonImpl : StyledButtonWrapperRenderer {
         content: @Composable RowScope.() -> Unit,
     ) {
         val borderColor = customization?.border// ?: MaterialTheme.colorScheme.outlineVariant
-        val borderStroke = borderColor?.let { BorderStroke(width = Dp.Hairline, color = it) }
+        val borderStroke = borderColor?.let { BorderStroke(width = Dp.Hairline, color = it.resolve()) }
 
         var containerColor: Color
         var contentColor: Color
@@ -44,13 +44,13 @@ internal object StyledButtonImpl : StyledButtonWrapperRenderer {
 
         if (customization != null) {
             containerColor =
-                customization.background ?: MaterialTheme.colorScheme.background
+                customization.background?.resolve() ?: MaterialTheme.colorScheme.background
             contentColor =
-                customization.content ?: MaterialTheme.colorScheme.onBackground
+                customization.content?.resolve() ?: MaterialTheme.colorScheme.onBackground
             disabledContainerColor =
-                customization.background?.disabled() ?: Color.Unspecified
+                customization.background?.resolve()?.disabled() ?: Color.Unspecified
             disabledContentColor =
-                customization.content?.disabled() ?: Color.Unspecified
+                customization.content?.resolve()?.disabled() ?: Color.Unspecified
         } else {
             when (variant) {
                 StyledButton.Variant.Primary -> {
@@ -68,17 +68,17 @@ internal object StyledButtonImpl : StyledButtonWrapperRenderer {
                 }
 
                 StyledButton.Variant.Outlined -> {
-                    containerColor = MaterialTheme.colorScheme.background
-                    contentColor = MaterialTheme.colorScheme.onBackground
-                    disabledContainerColor = MaterialTheme.colorScheme.background.disabled()
-                    disabledContentColor = MaterialTheme.colorScheme.onBackground.disabled()
+                    containerColor = MaterialTheme.colorScheme.surface
+                    contentColor = MaterialTheme.colorScheme.onSurface
+                    disabledContainerColor = MaterialTheme.colorScheme.surface.disabled()
+                    disabledContentColor = MaterialTheme.colorScheme.onSurface.disabled()
                 }
 
                 StyledButton.Variant.Text -> {
                     containerColor = Color.Unspecified
-                    contentColor = MaterialTheme.colorScheme.onBackground
+                    contentColor = MaterialTheme.colorScheme.onSurface
                     disabledContainerColor = Color.Unspecified
-                    disabledContentColor = MaterialTheme.colorScheme.onBackground.disabled()
+                    disabledContentColor = MaterialTheme.colorScheme.onSurface.disabled()
                 }
             }
         }

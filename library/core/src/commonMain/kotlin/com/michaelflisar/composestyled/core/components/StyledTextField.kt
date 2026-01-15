@@ -6,6 +6,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -17,6 +18,7 @@ import com.michaelflisar.composestyled.core.StyledTheme
 import com.michaelflisar.composestyled.core.classes.IVariant
 import com.michaelflisar.composestyled.core.classes.TokenMap
 import com.michaelflisar.composestyled.core.classes.colors.BaseColor
+import com.michaelflisar.composestyled.core.classes.colors.ColorRef
 import com.michaelflisar.composestyled.core.classes.colors.StatefulBaseColorDef
 import com.michaelflisar.composestyled.core.renderer.LocalStyledComponents
 import com.michaelflisar.composestyled.core.renderer.StyledTokenComponents
@@ -56,16 +58,16 @@ object StyledTextField {
     }
 
     fun customize(
-        background: Color? = null,
-        content: Color? = null,
-        border: Color? = null,
+        background: ColorRef? = null,
+        content: ColorRef? = null,
+        border: ColorRef? = null,
     ) = Customization(background, content, border)
 
     @Immutable
     class Customization internal constructor(
-        val background: Color?,
-        val content: Color?,
-        val border: Color?,
+        val background: ColorRef?,
+        val content: ColorRef?,
+        val border: ColorRef?,
     )
 }
 
@@ -144,6 +146,9 @@ object StyledTextFieldDefaults {
 
     val DefaultVariant: StyledTextField.Variant = StyledTextField.Variant.Filled
 
+    val shape: Shape
+        @Composable @ReadOnlyComposable get() = StyledTheme.shapes.input
+
     @Composable
     fun contentPadding() = PaddingValues(
         horizontal = StyledTheme.paddings.medium,
@@ -180,7 +185,7 @@ fun StyledTextField(
     maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
     minLines: Int = 1,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    shape: Shape = StyledTheme.shapes.input,
+    shape: Shape = StyledTextFieldDefaults.shape,
 ) {
     when (val components = LocalStyledComponents.current) {
 
@@ -191,7 +196,7 @@ fun StyledTextField(
                 isError = isError,
             )
 
-            val def = StyledTextField.Tokens.resolveVariantData(variant)
+            val def = StyledTextField.Tokens.resolveToken(variant)
             val defCustomised = def.customise(
                 background = customization?.background,
                 foreground = customization?.content,

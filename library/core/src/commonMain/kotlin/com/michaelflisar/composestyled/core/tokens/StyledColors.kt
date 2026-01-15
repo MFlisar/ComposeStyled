@@ -4,7 +4,6 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import com.michaelflisar.composestyled.core.classes.DisableFactorType
-import com.michaelflisar.composestyled.core.classes.ThemeMode
 
 /**
  * Definiert die Standardfarben für das Designsystem.
@@ -57,7 +56,7 @@ data class StyledColors(
     val onPrimary: Color
         get() = primaryDef.onColor
 
-    val seondary: Color
+    val secondary: Color
         get() = secondaryDef.color
 
     val onSecondary: Color

@@ -48,10 +48,10 @@ internal object StyledTextFieldImpl : StyledTextFieldWrapperRenderer {
         interactionSource: MutableInteractionSource,
         shape: Shape,
     ) {
-        val containerColor = customization?.background ?: Color.Unspecified
-        val contentColor = customization?.content ?: Color.Unspecified
-        val disabledContainerColor = customization?.background?.disabled() ?: Color.Unspecified
-        val disabledContentColor = customization?.content?.disabled() ?: Color.Unspecified
+        val containerColor = customization?.background?.resolve() ?: Color.Unspecified
+        val contentColor = customization?.content?.resolve() ?: Color.Unspecified
+        val disabledContainerColor = customization?.background?.resolve()?.disabled() ?: Color.Unspecified
+        val disabledContentColor = customization?.content?.resolve()?.disabled() ?: Color.Unspecified
 
         // M3 TextField doesn't allow full background/border customization via a BaseColor directly.
         // We map what we can via TextFieldDefaults.colors.

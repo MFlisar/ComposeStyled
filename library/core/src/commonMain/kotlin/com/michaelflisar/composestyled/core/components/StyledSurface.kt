@@ -73,7 +73,7 @@ interface StyledSurfaceWrapperRenderer {
 // ----------------------
 
 object StyledSurfaceDefaults {
-    val Shape: Shape = RectangleShape
+    val shape: Shape = RectangleShape
 
     @Composable
     fun backgroundColor(): Color = StyledTheme.colors.background
@@ -92,7 +92,7 @@ object StyledSurfaceDefaults {
 fun StyledSurface(
     modifier: Modifier = Modifier,
     variant: StyledSurface.Variant = StyledSurfaceDefaults.DefaultVariant,
-    shape: Shape = StyledSurfaceDefaults.Shape,
+    shape: Shape = StyledSurfaceDefaults.shape,
     backgroundColor: Color = StyledSurfaceDefaults.backgroundColor(),
     contentColor: Color = StyledSurfaceDefaults.contentColor(),
     border: BorderStroke? = null,

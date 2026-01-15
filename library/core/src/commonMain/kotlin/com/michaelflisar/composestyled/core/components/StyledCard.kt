@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -15,6 +16,7 @@ import com.michaelflisar.composestyled.core.StyledTheme
 import com.michaelflisar.composestyled.core.classes.Emphasis
 import com.michaelflisar.composestyled.core.classes.IVariant
 import com.michaelflisar.composestyled.core.classes.TokenMap
+import com.michaelflisar.composestyled.core.classes.colors.ColorRef
 import com.michaelflisar.composestyled.core.classes.colors.StatefulBaseColorDef
 import com.michaelflisar.composestyled.core.renderer.LocalStyledComponents
 import com.michaelflisar.composestyled.core.renderer.StyledTokenComponents
@@ -54,16 +56,16 @@ object StyledCard {
     }
 
     fun customize(
-        background: Color? = null,
-        content: Color? = null,
-        border: Color? = null,
+        background: ColorRef? = null,
+        content: ColorRef? = null,
+        border: ColorRef? = null,
     ) = Customization(background, content, border)
 
     @Immutable
     class Customization internal constructor(
-        val background: Color?,
-        val content: Color?,
-        val border: Color?,
+        val background: ColorRef?,
+        val content: ColorRef?,
+        val border: ColorRef?,
     )
 }
 
@@ -110,6 +112,9 @@ object StyledCardDefaults {
 
     val DefaultEmphasis = Emphasis.Low
 
+    val shape: Shape
+        @Composable @ReadOnlyComposable get() = StyledTheme.shapes.container
+
     @Composable
     fun contentPadding(): PaddingValues = PaddingValues(0.dp)
 
@@ -125,7 +130,7 @@ fun StyledCard(
     modifier: Modifier = Modifier,
     variant: StyledCard.Variant = StyledCardDefaults.DefaultVariant,
     customization: StyledCard.Customization? = null,
-    shape: Shape = StyledTheme.shapes.card,
+    shape: Shape = StyledCardDefaults.shape,
     emphasis: Emphasis = StyledCardDefaults.DefaultEmphasis,
     enabled: Boolean = true,
     contentPadding: PaddingValues = StyledCardDefaults.contentPadding(),
@@ -138,7 +143,7 @@ fun StyledCard(
                 enabled = enabled,
                 isError = false,
             )
-            val def = StyledCard.Tokens.resolveVariantData(variant).customise(
+            val def = StyledCard.Tokens.resolveToken(variant).customise(
                 background = customization?.background,
                 foreground = customization?.content,
                 border = customization?.border,

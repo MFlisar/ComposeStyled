@@ -1,4 +1,4 @@
-package com.michaelflisar.composestyled.core.layout
+package com.michaelflisar.composestyled.components.layout
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.FlowColumn
@@ -25,11 +25,12 @@ fun ContentFlowColumn(
     itemHorizontalAlignment: Alignment.Horizontal = Alignment.Start,
     maxItemsInEachColumn: Int = Int.MAX_VALUE,
     maxLines: Int = Int.MAX_VALUE,
+    padding: Dp = StyledTheme.paddings.medium,
     spacing: Dp = StyledTheme.spacings.medium,
     content: @Composable FlowColumnScope.() -> Unit,
 ) {
     FlowColumn(
-        modifier = modifier.padding(StyledTheme.paddings.medium),
+        modifier = modifier.padding(padding),
         verticalArrangement = Arrangement.spacedBy(spacing, verticalAlignment),
         horizontalArrangement = Arrangement.spacedBy(spacing, horizontalAlignment),
         itemHorizontalAlignment = itemHorizontalAlignment,

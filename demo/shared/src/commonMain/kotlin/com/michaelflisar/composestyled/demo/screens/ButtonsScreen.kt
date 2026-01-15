@@ -10,14 +10,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import com.michaelflisar.composestyled.core.StyledTheme
 import com.michaelflisar.composestyled.core.components.StyledButton
-import com.michaelflisar.composestyled.core.components.StyledButtonContent
+import com.michaelflisar.composestyled.components.composables.StyledButtonContent
 import com.michaelflisar.composestyled.core.components.StyledText
-import com.michaelflisar.composestyled.core.layout.ContentColumn
-import com.michaelflisar.composestyled.core.layout.ContentFlowRow
+import com.michaelflisar.composestyled.components.layout.ContentColumn
+import com.michaelflisar.composestyled.components.layout.ContentFlowRow
 
 @Composable
 fun ButtonsScreen() {
-    ContentColumn(
+    com.michaelflisar.composestyled.components.layout.ContentColumn(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState()),
@@ -38,7 +38,7 @@ fun ButtonsScreen() {
 
 @Composable
 private fun CoreButtons() {
-    ContentFlowRow {
+    com.michaelflisar.composestyled.components.layout.ContentFlowRow {
         StyledButton.Variant.entries.forEach { variant ->
             StyledButton(
                 onClick = { },
@@ -50,13 +50,13 @@ private fun CoreButtons() {
 
 @Composable
 private fun ComponentButtons() {
-    ContentFlowRow {
+    com.michaelflisar.composestyled.components.layout.ContentFlowRow {
         StyledButton.Variant.entries.forEach { variant ->
             StyledButton(
                 variant = variant,
                 onClick = { }
             ) {
-                StyledButtonContent(
+                com.michaelflisar.composestyled.components.composables.StyledButtonContent(
                     icon = Icons.Default.Home,
                     text = variant.name
                 )
@@ -67,7 +67,7 @@ private fun ComponentButtons() {
 
 @Composable
 private fun CustomButtons() {
-    ContentFlowRow {
+    com.michaelflisar.composestyled.components.layout.ContentFlowRow {
         StyledButton(
             onClick = { },
             variant = StyledButton.Variant.Primary,

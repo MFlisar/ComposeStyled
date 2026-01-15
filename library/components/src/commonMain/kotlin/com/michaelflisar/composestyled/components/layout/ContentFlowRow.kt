@@ -1,4 +1,4 @@
-package com.michaelflisar.composestyled.core.layout
+package com.michaelflisar.composestyled.components.layout
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.FlowRow
@@ -25,11 +25,12 @@ fun ContentFlowRow(
     itemVerticalAlignment: Alignment.Vertical = Alignment.Top,
     maxItemsInEachRow: Int = Int.MAX_VALUE,
     maxLines: Int = Int.MAX_VALUE,
+    padding: Dp = StyledTheme.paddings.medium,
     spacing: Dp = StyledTheme.spacings.medium,
     content: @Composable FlowRowScope.() -> Unit,
 ) {
     FlowRow(
-        modifier = modifier.padding(StyledTheme.paddings.medium),
+        modifier = modifier.padding(padding),
         horizontalArrangement = Arrangement.spacedBy(spacing, horizontalAlignment),
         verticalArrangement = Arrangement.spacedBy(spacing, verticalAlignment),
         itemVerticalAlignment = itemVerticalAlignment,
