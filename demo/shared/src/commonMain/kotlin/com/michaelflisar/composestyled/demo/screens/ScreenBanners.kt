@@ -20,7 +20,8 @@ fun ScreenBanners() {
     ContentColumn(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
+            //.verticalScroll(rememberScrollState())
+        ,
     ) {
         StyledText("Banner", style = StyledTheme.typography.titleMedium)
         StyledBanner(

@@ -6,22 +6,27 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.components.icons.IconMoreVert
 import com.michaelflisar.composestyled.core.StyledTheme
 import com.michaelflisar.composestyled.core.components.StyledIcon
+import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.core.runtime.ProvideStyledLocals
 
+@OptIn(InternalComposeStyledApi::class)
 @Composable
 fun StyledBottomBar(
     items: List<StyledNavigationItem>,
@@ -30,13 +35,21 @@ fun StyledBottomBar(
     containerColor: Color = StyledTheme.colors.surfaceVariant,
     contentColor: Color = StyledTheme.contentColorFor(containerColor),
 ) {
+    val density = LocalDensity.current
+    val navBarBottomDp = with(density) { WindowInsets.navigationBars.getBottom(this).toDp() }
+
     ProvideStyledLocals(
         backgroundColor = containerColor,
         contentColor = contentColor
     ) {
+        // Background should draw to the very bottom.
+        // Only the *content* should be inset above the navigation bar.
         Row(
             modifier = modifier
+                .fillMaxWidth()
                 .background(containerColor)
+                // Content padding includes the nav-bar inset; background does not.
+                .padding(bottom = navBarBottomDp)
                 .padding(horizontal = 8.dp, vertical = 6.dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically,
@@ -47,7 +60,7 @@ fun StyledBottomBar(
                 items
             }
             val itemMore = if (items.size > maxItemsInBottomNavigation) {
-                val itemsInPopup = items.drop(maxItemsInBottomNavigation - 1)
+                // TODO popup
                 StyledNavigationItem(
                     selected = false,
                     onClick = {

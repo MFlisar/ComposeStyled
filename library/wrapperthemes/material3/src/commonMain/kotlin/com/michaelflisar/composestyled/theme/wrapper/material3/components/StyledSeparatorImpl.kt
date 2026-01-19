@@ -9,9 +9,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import com.michaelflisar.composestyled.core.components.StyledSeparator
-import com.michaelflisar.composestyled.core.components.StyledSeparatorWrapperRenderer
+import com.michaelflisar.composestyled.core.components.StyledSeparatorRenderer
 
-internal object StyledSeparatorImpl : StyledSeparatorWrapperRenderer {
+internal object StyledSeparatorImpl : StyledSeparatorRenderer.WrapperRenderer {
 
     @Composable
     override fun RenderHorizontal(

@@ -7,33 +7,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import com.michaelflisar.composestyled.core.StyledTheme
-import com.michaelflisar.composestyled.core.classes.IVariant
 import com.michaelflisar.composestyled.core.renderer.LocalStyledComponents
-import com.michaelflisar.composestyled.core.renderer.StyledTokenComponents
-import com.michaelflisar.composestyled.core.renderer.StyledTokenRenderer
-import com.michaelflisar.composestyled.core.renderer.StyledWrapperComponents
-import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
 
 object StyledSurface {
 
     // variants
-    enum class Variant(
-        override val id: String,
-    ) : IVariant {
-        Default("surface.default"),
-    }
-
-    data class Colors(
-        val background: Color,
-        val content: Color,
-    )
-
-    @InternalComposeStyledApi
-    @Composable
-    fun registerVariantStyles(
-        default: Colors,
-    ) {
-        // --
+    enum class Variant {
+        Default
     }
 }
 
@@ -41,31 +21,34 @@ object StyledSurface {
 // Renderer
 // ----------------------
 
-interface StyledSurfaceTokenRenderer : StyledTokenRenderer {
+sealed interface StyledSurfaceRenderer {
 
-    @Composable
-    fun Render(
-        modifier: Modifier,
-        shape: Shape,
-        backgroundColor: Color,
-        contentColor: Color,
-        border: BorderStroke?,
-        content: @Composable () -> Unit,
-    )
-}
+    interface TokenRenderer : StyledSurfaceRenderer {
 
-interface StyledSurfaceWrapperRenderer {
+        @Composable
+        fun render(
+            modifier: Modifier,
+            shape: Shape,
+            backgroundColor: Color,
+            contentColor: Color,
+            border: BorderStroke?,
+            content: @Composable () -> Unit,
+        )
+    }
 
-    @Composable
-    fun Render(
-        variant: StyledSurface.Variant,
-        modifier: Modifier,
-        shape: Shape,
-        backgroundColor: Color,
-        contentColor: Color,
-        border: BorderStroke?,
-        content: @Composable () -> Unit,
-    )
+    interface WrapperRenderer : StyledSurfaceRenderer {
+
+        @Composable
+        fun render(
+            variant: StyledSurface.Variant,
+            modifier: Modifier,
+            shape: Shape,
+            backgroundColor: Color,
+            contentColor: Color,
+            border: BorderStroke?,
+            content: @Composable () -> Unit,
+        )
+    }
 }
 
 // ----------------------
@@ -81,7 +64,7 @@ object StyledSurfaceDefaults {
     @Composable
     fun contentColor(): Color = StyledTheme.colors.onBackground
 
-    val DefaultVariant: StyledSurface.Variant = StyledSurface.Variant.Default
+    val variant: StyledSurface.Variant = StyledSurface.Variant.Default
 }
 
 // ----------------------
@@ -91,16 +74,16 @@ object StyledSurfaceDefaults {
 @Composable
 fun StyledSurface(
     modifier: Modifier = Modifier,
-    variant: StyledSurface.Variant = StyledSurfaceDefaults.DefaultVariant,
+    variant: StyledSurface.Variant = StyledSurfaceDefaults.variant,
     shape: Shape = StyledSurfaceDefaults.shape,
     backgroundColor: Color = StyledSurfaceDefaults.backgroundColor(),
     contentColor: Color = StyledSurfaceDefaults.contentColor(),
     border: BorderStroke? = null,
     content: @Composable () -> Unit,
 ) {
-    when (val components = LocalStyledComponents.current) {
-        is StyledTokenComponents -> {
-            components.surface.Render(
+    when (val renderer = LocalStyledComponents.current.surface) {
+        is StyledSurfaceRenderer.TokenRenderer -> {
+            renderer.render(
                 modifier = modifier,
                 shape = shape,
                 backgroundColor = backgroundColor,
@@ -110,8 +93,8 @@ fun StyledSurface(
             )
         }
 
-        is StyledWrapperComponents -> {
-            components.surface.Render(
+        is StyledSurfaceRenderer.WrapperRenderer -> {
+            renderer.render(
                 variant = variant,
                 modifier = modifier,
                 shape = shape,

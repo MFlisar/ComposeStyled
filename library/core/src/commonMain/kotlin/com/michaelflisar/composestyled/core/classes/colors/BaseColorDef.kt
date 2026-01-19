@@ -3,8 +3,6 @@ package com.michaelflisar.composestyled.core.classes.colors
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 
-// Verantwortung: kombiniert mehrere Color zu Rollen,
-// keine Zustände, keine Disabled-Logik
 @Immutable
 data class BaseColorDef(
     val background: ColorRef,
@@ -20,6 +18,13 @@ data class BaseColorDef(
         foreground = foreground.asColorRef(),
         border = border?.asColorRef(),
     )
+
+    constructor(colors: BaseColor) : this(
+        background = colors.background.asColorRef(),
+        foreground = colors.foreground.asColorRef(),
+        border = colors.border?.asColorRef(),
+    )
+
     fun customise(
         background: ColorRef? = null,
         foreground: ColorRef? = null,

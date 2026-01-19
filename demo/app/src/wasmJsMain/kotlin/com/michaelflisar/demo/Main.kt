@@ -10,6 +10,6 @@ fun main() {
     ComposeViewport(
         viewportContainer = document.body!!//getElementById("ComposeTarget")!!
     ) {
-        DemoApp("WASM")
+        DemoApp("WASM", BuildKonfig.appName)
     }
 }

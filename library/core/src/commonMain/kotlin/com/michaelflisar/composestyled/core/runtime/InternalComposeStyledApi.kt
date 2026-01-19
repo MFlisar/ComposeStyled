@@ -13,4 +13,4 @@ package com.michaelflisar.composestyled.core.runtime
     AnnotationTarget.PROPERTY_SETTER,
 )
 @Retention(AnnotationRetention.BINARY)
-public annotation class InternalComposeStyledApi
+annotation class InternalComposeStyledApi

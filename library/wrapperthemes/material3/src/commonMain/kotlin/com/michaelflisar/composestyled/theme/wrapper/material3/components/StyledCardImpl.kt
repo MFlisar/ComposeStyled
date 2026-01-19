@@ -15,12 +15,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import com.michaelflisar.composestyled.core.classes.Emphasis
 import com.michaelflisar.composestyled.core.components.StyledCard
-import com.michaelflisar.composestyled.core.components.StyledCardWrapperRenderer
+import com.michaelflisar.composestyled.core.components.StyledCardRenderer
 
-internal object StyledCardImpl : StyledCardWrapperRenderer {
+internal object StyledCardImpl : StyledCardRenderer.WrapperRenderer {
 
     @Composable
-    override fun Render(
+    override fun render(
         variant: StyledCard.Variant,
         customization: StyledCard.Customization?,
         modifier: Modifier,

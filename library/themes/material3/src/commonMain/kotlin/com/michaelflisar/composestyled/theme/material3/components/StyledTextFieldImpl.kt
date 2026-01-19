@@ -1,165 +1,51 @@
 package com.michaelflisar.composestyled.theme.material3.components
 
-import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshotFlow
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.TextUnit
-import com.composeunstyled.LocalContentColor
-import com.composeunstyled.LocalTextStyle
-import com.composeunstyled.TextField
-import com.composeunstyled.TextInput
 import com.michaelflisar.composestyled.core.StyledTheme
-import com.michaelflisar.composestyled.core.classes.colors.BaseColor
 import com.michaelflisar.composestyled.core.classes.colors.BaseColorDef
 import com.michaelflisar.composestyled.core.classes.colors.StatefulBaseColorDef
 import com.michaelflisar.composestyled.core.components.StyledTextField
-import com.michaelflisar.composestyled.core.components.StyledTextFieldTokenRenderer
 import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
-import com.michaelflisar.composestyled.core.tokens.StyledColors
+import com.michaelflisar.composestyled.shared.UnstyledTextFieldRenderer
 
-internal object StyledTextFieldImpl : StyledTextFieldTokenRenderer {
+@OptIn(InternalComposeStyledApi::class)
+internal object StyledTextFieldImpl : UnstyledTextFieldRenderer() {
 
-    @OptIn(InternalComposeStyledApi::class)
     @Composable
-    override fun registerVariantStyles() {
-
+    override fun resolveColors(
+        variant: StyledTextField.Variant,
+        customization: StyledTextField.Customization?,
+    ): StatefulBaseColorDef {
+        val background = customization?.background?.resolve()
+        val foreground = customization?.content?.resolve()
+        val border = customization?.border?.resolve()
         val colors = StyledTheme.colors
-
-        val filled = StatefulBaseColorDef(
-            normal = BaseColorDef(
-                background = colors.surface,
-                foreground = colors.onSurface,
-                border = null,
-            ),
-            focused = BaseColorDef(
-                background = colors.surface,
-                foreground = colors.onSurface,
-                border = colors.primary,
-            ),
-            error = BaseColorDef(
-                background = colors.surface,
-                foreground = colors.onSurface,
-                border = colors.error,
-            )
-        )
-
-        val outlined = StatefulBaseColorDef(
-            normal = BaseColorDef(
-                background = Color.Transparent,
-                foreground = colors.onSurface,
-                border = colors.outlineVariant,
-            ),
-            focused = BaseColorDef(
-                background = Color.Transparent,
-                foreground = colors.onSurface,
-                border = colors.primary,
-            ),
-            error = BaseColorDef(
-                background = Color.Transparent,
-                foreground = colors.onSurface,
-                border = colors.error,
-            )
-        )
-
-        StyledTextField.registerVariantStyles(
-            filled = filled,
-            outlined = outlined,
-        )
-    }
-
-    /** Android/Unstyled-based text field implementation. */
-    @Composable
-    override fun Render(
-        value: String,
-        onValueChange: (String) -> Unit,
-        colors: BaseColor,
-        modifier: Modifier,
-        enabled: Boolean,
-        readOnly: Boolean,
-        textStyle: TextStyle,
-        label: @Composable (() -> Unit)?,
-        placeholder: @Composable (() -> Unit)?,
-        leadingIcon: @Composable (() -> Unit)?,
-        trailingIcon: @Composable (() -> Unit)?,
-        prefix: @Composable (() -> Unit)?,
-        suffix: @Composable (() -> Unit)?,
-        supportingText: @Composable (() -> Unit)?,
-        isError: Boolean,
-        visualTransformation: VisualTransformation,
-        keyboardOptions: KeyboardOptions,
-        keyboardActions: KeyboardActions,
-        singleLine: Boolean,
-        maxLines: Int,
-        minLines: Int,
-        contentPadding: PaddingValues,
-        interactionSource: MutableInteractionSource,
-        shape: Shape,
-    ) {
-        val state = remember { TextFieldState(value) }
-
-        // Internal -> external sync (only when user edits)
-        LaunchedEffect(state) {
-            snapshotFlow { state.text }
-                .collect { newText ->
-                    val newValue = newText.toString()
-                    if (newValue != value) {
-                        onValueChange(newValue)
-                    }
+        return remember(variant, background, foreground, border, colors) {
+            when (variant) {
+                StyledTextField.Variant.Filled -> {
+                    val bg = background ?: colors.surface
+                    val fg = foreground ?: colors.onSurface
+                    val b = border
+                    StatefulBaseColorDef(
+                        normal = BaseColorDef(bg, fg, b),
+                        focused = BaseColorDef(bg, fg, border ?: colors.primary),
+                        error = BaseColorDef(bg, fg, border ?: colors.error),
+                    )
                 }
-        }
 
-        val scrollState: ScrollState = rememberScrollState()
-
-        TextField(
-            state = state,
-            modifier = modifier,
-            editable = enabled && !readOnly,
-            cursorBrush = SolidColor(colors.foreground),
-            textStyle = LocalTextStyle.current.merge(textStyle),
-            textAlign = TextAlign.Unspecified,
-            lineHeight = TextUnit.Unspecified,
-            fontSize = TextUnit.Unspecified,
-            letterSpacing = TextUnit.Unspecified,
-            fontWeight = null,
-            fontFamily = null,
-            singleLine = singleLine,
-            minLines = minLines,
-            maxLines = maxLines,
-            onKeyboardAction = null,
-            keyboardOptions = keyboardOptions,
-            visualTransformation = visualTransformation,
-            interactionSource = interactionSource,
-            textColor = colors.foreground,
-            scrollState = scrollState,
-        ) {
-            TextInput(
-                modifier = Modifier,
-                shape = shape,
-                backgroundColor = Color.Unspecified,
-                contentPadding = contentPadding,
-                contentColor = LocalContentColor.current,
-                label = null,
-                placeholder = placeholder,
-                leading = leadingIcon,
-                trailing = trailingIcon,
-                verticalAlignment = Alignment.CenterVertically,
-            )
+                StyledTextField.Variant.Outlined -> {
+                    val bg = background ?: Color.Transparent
+                    val fg = foreground ?: colors.onSurface
+                    val b = border ?: colors.outlineVariant
+                    StatefulBaseColorDef(
+                        normal = BaseColorDef(bg, fg, b),
+                        focused = BaseColorDef(bg, fg, border ?: colors.primary),
+                        error = BaseColorDef(bg, fg, border ?: colors.error),
+                    )
+                }
+            }
         }
     }
 }

@@ -7,7 +7,9 @@ import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import com.michaelflisar.composestyled.core.StyledTheme
-import com.michaelflisar.composestyled.core.renderer.StyledWrapperComponents
+import com.michaelflisar.composestyled.core.classes.StyledThemeDefinition
+import com.michaelflisar.composestyled.core.renderer.StyledComponents
+import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.core.runtime.ProvideStyledLocals
 import com.michaelflisar.composestyled.core.tokens.StyledColors
 import com.michaelflisar.composestyled.core.tokens.StyledElevations
@@ -24,9 +26,10 @@ import com.michaelflisar.composestyled.theme.wrapper.material3.components.Styled
 import com.michaelflisar.composestyled.theme.wrapper.material3.components.StyledTextFieldImpl
 import com.michaelflisar.composestyled.theme.wrapper.material3.components.StyledTextImpl
 
-object StyleMaterial3Wrapper {
+internal object Definitions {
 
-    val components = StyledWrapperComponents(
+    @OptIn(InternalComposeStyledApi::class)
+    val components = StyledComponents.WrapperComponents(
         root = { content ->
             val colors = StyledTheme.colors
             val shapes = StyledTheme.shapes
@@ -64,16 +67,16 @@ object StyleMaterial3Wrapper {
     val paddings = StyledPaddings()
     val spacings = StyledSpacings()
     val elevations = StyledElevations()
-
-    val setup = StyledTheme.Setup(
-        shapes = shapes,
-        typography = typography,
-        paddings = paddings,
-        elevations = elevations,
-        spacings = spacings,
-    )
 }
 
+val StyleMaterial3Wrapper = StyledThemeDefinition(
+    components = Definitions.components,
+    shapes = Definitions.shapes,
+    typography = Definitions.typography,
+    paddings = Definitions.paddings,
+    elevations = Definitions.elevations,
+    spacings = Definitions.spacings
+)
 
 private fun StyledColors.toMaterial3ColorScheme(
     isDarkTheme: Boolean,

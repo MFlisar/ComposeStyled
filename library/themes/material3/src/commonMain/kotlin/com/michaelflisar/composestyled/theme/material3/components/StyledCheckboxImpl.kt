@@ -1,111 +1,47 @@
 package com.michaelflisar.composestyled.theme.material3.components
 
-import androidx.compose.foundation.Indication
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.unit.Dp
-import com.composeunstyled.UnstyledCheckbox
 import com.michaelflisar.composestyled.core.StyledTheme
 import com.michaelflisar.composestyled.core.classes.colors.BaseColorDef
 import com.michaelflisar.composestyled.core.classes.colors.StatefulBaseColorDef
 import com.michaelflisar.composestyled.core.components.StyledCheckbox
-import com.michaelflisar.composestyled.core.components.StyledCheckboxTokenRenderer
 import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
-import com.michaelflisar.composestyled.core.runtime.ProvideStyledLocals
+import com.michaelflisar.composestyled.shared.UnstyledCheckboxRenderer
 
-internal object StyledCheckboxImpl : StyledCheckboxTokenRenderer {
+@OptIn(InternalComposeStyledApi::class)
+internal object StyledCheckboxImpl : UnstyledCheckboxRenderer() {
 
-    @OptIn(InternalComposeStyledApi::class)
     @Composable
-    override fun registerVariantStyles() {
-
-        val colors = StyledTheme.colors
-
-        val unchecked = StatefulBaseColorDef(
-            normal = BaseColorDef(
-                background = Color.Transparent,
-                foreground = colors.onSurface,
-                border = colors.outline,
-            ),
-            focused = BaseColorDef(
-                background = Color.Transparent,
-                foreground = colors.onSurface,
-                border = colors.primary,
-            ),
-            error = BaseColorDef(
-                background = Color.Transparent,
-                foreground = colors.onSurface,
-                border = colors.error,
-            )
-        )
-
-        val checked = StatefulBaseColorDef(
-            normal = BaseColorDef(
-                background = colors.primary,
-                foreground = colors.onPrimary,
-                border = colors.primary,
-            ),
-            focused = BaseColorDef(
-                background = colors.primary,
-                foreground = colors.onPrimary,
-                border = colors.primary,
-            ),
-            error = BaseColorDef(
-                background = colors.primary,
-                foreground = colors.onPrimary,
-                border = colors.error,
-            )
-        )
-
-        StyledCheckbox.registerVariantStyles(
-            unchecked = unchecked,
-            checked = checked,
-        )
-    }
-
-
-    /**
-     * Android/Unstyled-based checkbox implementation.
-     *
-     */
-    @Composable
-    override fun Render(
+    override fun resolveColors(
+        variant: StyledCheckbox.Variant,
         checked: Boolean,
-        modifier: Modifier,
-        backgroundColor: Color,
-        contentColor: Color,
-        enabled: Boolean,
-        onCheckedChange: ((Boolean) -> Unit)?,
-        shape: Shape,
-        borderColor: Color?,
-        borderWidth: Dp,
-        interactionSource: MutableInteractionSource,
-        indication: Indication?,
-        contentDescription: String?,
-        checkIcon: @Composable () -> Unit,
-    ) {
-        ProvideStyledLocals(
-            contentColor = contentColor,
-            backgroundColor = backgroundColor,
-        ) {
-            UnstyledCheckbox(
-                checked = checked,
-                modifier = modifier,
-                backgroundColor = backgroundColor,
-                contentColor = contentColor,
-                enabled = enabled,
-                onCheckedChange = onCheckedChange,
-                shape = shape,
-                borderColor = borderColor ?: Color.Unspecified,
-                borderWidth = borderWidth,
-                interactionSource = interactionSource,
-                indication = indication,
-                contentDescription = contentDescription,
-                checkIcon = checkIcon,
-            )
+        customization: StyledCheckbox.Customization?,
+    ): StatefulBaseColorDef {
+
+        val colorChecked = customization?.checked?.resolve()
+        val colorUnchecked = customization?.unchecked?.resolve()
+        val colors = StyledTheme.colors
+        return remember(variant, checked, colorChecked, colorUnchecked, colors, checked) {
+            if (checked) {
+                val bg = colors.primary
+                val fg = colors.onPrimary
+                val b = colors.primary
+                StatefulBaseColorDef(
+                    normal = BaseColorDef(bg, fg, b),
+                    focused = BaseColorDef(bg, fg, b),
+                    error = BaseColorDef(bg, fg, colors.error)
+                )
+            } else {
+                val bg = Color.Transparent
+                val fg = colors.onSurface
+                StatefulBaseColorDef(
+                    normal = BaseColorDef(bg, fg, colors.outline),
+                    focused = BaseColorDef(bg, fg, colors.primary),
+                    error = BaseColorDef(bg, fg, colors.error)
+                )
+            }
         }
     }
 }

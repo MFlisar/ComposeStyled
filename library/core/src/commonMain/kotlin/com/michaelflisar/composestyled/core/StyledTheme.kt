@@ -4,7 +4,6 @@ import androidx.compose.foundation.LocalIndication
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
-import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import com.composeunstyled.platformtheme.bright
@@ -14,18 +13,16 @@ import com.composeunstyled.platformtheme.interactiveSizes
 import com.composeunstyled.platformtheme.sizeDefault
 import com.composeunstyled.platformtheme.sizeMinimum
 import com.composeunstyled.theme.Theme
+import com.michaelflisar.composestyled.core.classes.StyledThemeDefinition
 import com.michaelflisar.composestyled.core.renderer.ExtensionRenderer
 import com.michaelflisar.composestyled.core.renderer.LocalStyledComponents
 import com.michaelflisar.composestyled.core.renderer.LocalStyledExtensions
 import com.michaelflisar.composestyled.core.renderer.StyledComponents
 import com.michaelflisar.composestyled.core.renderer.StyledExtensionsRegistry
-import com.michaelflisar.composestyled.core.renderer.StyledTokenComponents
-import com.michaelflisar.composestyled.core.renderer.StyledWrapperComponents
 import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.core.runtime.LocalBackgroundColor
 import com.michaelflisar.composestyled.core.runtime.LocalContentColor
 import com.michaelflisar.composestyled.core.runtime.LocalTextStyle
-import com.michaelflisar.composestyled.core.runtime.LocalThemeBuilder
 import com.michaelflisar.composestyled.core.tokens.LocalStyledColors
 import com.michaelflisar.composestyled.core.tokens.LocalStyledElevations
 import com.michaelflisar.composestyled.core.tokens.LocalStyledPaddings
@@ -47,14 +44,6 @@ object StyledTheme {
         BlackWhite,
         LocalContentColor
     }
-
-    class Setup(
-        val shapes: StyledShapes,
-        val typography: StyledTypography,
-        val paddings: StyledPaddings,
-        val elevations: StyledElevations,
-        val spacings: StyledSpacings,
-    )
 
     val colors: StyledColors
         @Composable @ReadOnlyComposable get() = LocalStyledColors.current
@@ -124,24 +113,26 @@ object StyledTheme {
     }
 }
 
+/**
+ * the main entry point to apply a StyledTheme to your app
+ */
 @OptIn(InternalComposeStyledApi::class)
 @Composable
 fun StyledTheme(
-    components: StyledComponents,
+    theme: StyledThemeDefinition<*>,
     colors: StyledColors,
-    setup: StyledTheme.Setup,
-    extensionRenderers: List<ExtensionRenderer<*>>,
+    renderers: List<ExtensionRenderer<*>> = emptyList(),
     content: @Composable () -> Unit,
 ) {
     StyledTheme(
-        components = components,
+        components = theme.components,
         colors = colors,
-        shapes = setup.shapes,
-        typography = setup.typography,
-        paddings = setup.paddings,
-        elevations = setup.elevations,
-        spacings = setup.spacings,
-        extensionRenderers = extensionRenderers,
+        shapes = theme.shapes,
+        typography = theme.typography,
+        paddings = theme.paddings,
+        elevations = theme.elevations,
+        spacings = theme.spacings,
+        renderers = renderers,
         content = content
     )
 }
@@ -149,14 +140,14 @@ fun StyledTheme(
 @OptIn(InternalComposeStyledApi::class)
 @Composable
 private fun StyledTheme(
-    components: StyledComponents,
+    components: StyledComponents = LocalStyledComponents.current,
     colors: StyledColors = StyledTheme.colors,
     shapes: StyledShapes = StyledTheme.shapes,
     typography: StyledTypography = StyledTheme.typography,
     paddings: StyledPaddings = StyledTheme.paddings,
     elevations: StyledElevations = StyledTheme.elevations,
     spacings: StyledSpacings = StyledTheme.spacings,
-    extensionRenderers: List<ExtensionRenderer<*>>,
+    renderers: List<ExtensionRenderer<*>> = emptyList(),
     content: @Composable () -> Unit,
 ) {
     // this provides platform specific defaults for:
@@ -177,27 +168,7 @@ private fun StyledTheme(
         LocalStyledElevations provides elevations,
         LocalStyledSpacings provides spacings
     ) {
-        // 1) register all component styles and create a theme
-        val platformTheme =
-            key(components, colors, shapes, typography, paddings, elevations, spacings) {
-                buildPlatformTheme {
-                    CompositionLocalProvider(
-                        LocalThemeBuilder provides this
-                    ) {
-                        when (components) {
-                            is StyledTokenComponents -> {
-                                components.registerAllComponents()
-                            }
-
-                            is StyledWrapperComponents -> {
-                                // no-op
-                            }
-                        }
-
-                        extensionRenderers.forEach { it.registerVariantStyles() }
-                    }
-                }
-            }
+        val platformTheme = buildPlatformTheme {}
 
         platformTheme {
 
@@ -217,9 +188,9 @@ private fun StyledTheme(
                 minimumInteractiveSizeSmall = interactiveSizeSmall
             )
 
-            val registry = remember(*extensionRenderers.toTypedArray()) {
+            val registry = remember(*renderers.toTypedArray()) {
                 StyledExtensionsRegistry(
-                    extensionRenderers.associateBy { it.key }
+                    renderers.associateBy { it.key }
                 )
             }
 
@@ -235,10 +206,74 @@ private fun StyledTheme(
                 LocalTextStyle provides typography.bodyMedium
             ) {
                 when (components) {
-                    is StyledTokenComponents -> content()
-                    is StyledWrapperComponents -> components.root(content)
+                    is StyledComponents.Components -> content()
+                    is StyledComponents.WrapperComponents -> components.root(content)
                 }
             }
+        }
+    }
+}
+
+/**
+ * provides the ability to locally override parts of the StyledTheme
+ *
+ * [StyledTheme] must have been applied higher up in the compose tree!
+ */
+@OptIn(InternalComposeStyledApi::class)
+@Composable
+fun ProvideStyledTheme(
+    theme: StyledThemeDefinition<*>,
+    colors: StyledColors = LocalStyledColors.current,
+    content: @Composable () -> Unit,
+) {
+    ProvideStyledTheme(
+        components = theme.components,
+        colors = colors,
+        shapes = theme.shapes,
+        typography = theme.typography,
+        paddings = theme.paddings,
+        elevations = theme.elevations,
+        spacings = theme.spacings,
+        content = content
+    )
+}
+
+
+/**
+ * provides the ability to locally override parts of the StyledTheme
+ *
+ * [StyledTheme] must have been applied higher up in the compose tree!
+ */
+@OptIn(InternalComposeStyledApi::class)
+@Composable
+fun ProvideStyledTheme(
+    components: StyledComponents = LocalStyledComponents.current,
+    colors: StyledColors = StyledTheme.colors,
+    shapes: StyledShapes = StyledTheme.shapes,
+    typography: StyledTypography = StyledTheme.typography,
+    paddings: StyledPaddings = StyledTheme.paddings,
+    elevations: StyledElevations = StyledTheme.elevations,
+    spacings: StyledSpacings = StyledTheme.spacings,
+    content: @Composable () -> Unit,
+) {
+    val localComponentsChanged = components != LocalStyledComponents.current
+    CompositionLocalProvider(
+        LocalStyledComponents provides components,
+        // styled locals
+        LocalStyledColors provides colors,
+        LocalStyledShapes provides shapes,
+        LocalStyledTypography provides typography,
+        LocalStyledPaddings provides paddings,
+        LocalStyledElevations provides elevations,
+        LocalStyledSpacings provides spacings
+    ) {
+        if (localComponentsChanged) {
+            when (components) {
+                is StyledComponents.Components -> content()
+                is StyledComponents.WrapperComponents -> throw IllegalStateException("WrapperComponents cannot be used inside ProvideStyledTheme, they can just be used at the root StyledTheme!")
+            }
+        } else {
+            content()
         }
     }
 }

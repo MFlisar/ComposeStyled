@@ -80,7 +80,9 @@ kotlin {
         // custom source sets
         // ---------------------
 
-        // --
+        val nonAndroidMain by creating { dependsOn(commonMain.get()) }
+
+        buildTargets.setupDependencies(nonAndroidMain, this, buildTargets, listOf(Platform.ANDROID), true)
 
         // ---------------------
         // dependencies
@@ -88,12 +90,19 @@ kotlin {
 
         commonMain.dependencies {
 
-            implementation(deps.composeunstyled.theming)
-
             implementation(project(":composestyled:core"))
 
             implementation(deps.composeunstyled.primitives)
 
+            // themes (core is included transitively)
+            implementation(project(":composestyled:themes:material3"))
+            implementation(project(":composestyled:themes:cupertino"))
+            implementation(project(":composestyled:themes:fluent2"))
+
+        }
+
+        androidMain.dependencies {
+            implementation(libs.androidx.core)
         }
     }
 }

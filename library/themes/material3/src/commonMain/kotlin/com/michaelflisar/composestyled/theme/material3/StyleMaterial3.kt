@@ -1,7 +1,7 @@
 package com.michaelflisar.composestyled.theme.material3
 
-import com.michaelflisar.composestyled.core.StyledTheme
-import com.michaelflisar.composestyled.core.renderer.StyledTokenComponents
+import com.michaelflisar.composestyled.core.classes.StyledThemeDefinition
+import com.michaelflisar.composestyled.core.renderer.StyledComponents
 import com.michaelflisar.composestyled.core.tokens.StyledElevations
 import com.michaelflisar.composestyled.core.tokens.StyledPaddings
 import com.michaelflisar.composestyled.core.tokens.StyledShapes
@@ -16,9 +16,9 @@ import com.michaelflisar.composestyled.theme.material3.components.StyledSurfaceI
 import com.michaelflisar.composestyled.theme.material3.components.StyledTextFieldImpl
 import com.michaelflisar.composestyled.theme.material3.components.StyledTextImpl
 
-object StyleMaterial3 {
+object Definitions {
 
-    val components = StyledTokenComponents(
+    val components = StyledComponents.Components(
         surface = StyledSurfaceImpl,
         button = StyledButtonImpl,
         card = StyledCardImpl,
@@ -34,13 +34,13 @@ object StyleMaterial3 {
     val paddings = StyledPaddings()
     val spacings = StyledSpacings()
     val elevations = StyledElevations()
-
-    val setup = StyledTheme.Setup(
-        shapes = shapes,
-        typography = typography,
-        paddings = paddings,
-        elevations = elevations,
-        spacings = spacings,
-    )
-
 }
+
+val StyleMaterial3 = StyledThemeDefinition(
+    components = Definitions.components,
+    shapes = Definitions.shapes,
+    typography = Definitions.typography,
+    paddings = Definitions.paddings,
+    elevations = Definitions.elevations,
+    spacings = Definitions.spacings
+)

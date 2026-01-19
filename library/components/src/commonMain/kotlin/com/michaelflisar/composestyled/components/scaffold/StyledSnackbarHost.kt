@@ -295,10 +295,6 @@ class StyledSnackbarHostLayoutInfo internal constructor() {
         get() = snackbarHeightPx * visibilityFraction
 }
 
-@Composable
-fun rememberStyledSnackbarHostLayoutInfo(): StyledSnackbarHostLayoutInfo =
-    remember { StyledSnackbarHostLayoutInfo() }
-
 @Stable
 data class StyledSnackbarHostAnimationSpec(
     val enter: EnterTransition,

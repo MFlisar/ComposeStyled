@@ -8,7 +8,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 /**
- * Definiert die Standard-Shapes für das Designsystem.
+ * defines reusable sizes/shapes for various component types
  *
  * control...  buttons, chips, menus, checkbox
  * input... textfields, inputs
@@ -35,7 +35,7 @@ data class StyledShapes(
         val large: Dp = 16.dp,
         val extraLarge: Dp = 24.dp,
     ) {
-        fun next(size: Dp) : Dp {
+        fun next(size: Dp): Dp {
             return when (size) {
                 extraSmall -> small
                 small -> medium
@@ -45,7 +45,7 @@ data class StyledShapes(
             }
         }
 
-        fun previous(size: Dp) : Dp {
+        fun previous(size: Dp): Dp {
             return when (size) {
                 extraLarge -> large
                 large -> medium

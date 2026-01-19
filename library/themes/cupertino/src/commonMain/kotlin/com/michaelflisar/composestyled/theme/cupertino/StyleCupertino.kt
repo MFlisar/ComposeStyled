@@ -2,8 +2,8 @@ package com.michaelflisar.composestyled.theme.cupertino
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.dp
-import com.michaelflisar.composestyled.core.StyledTheme
-import com.michaelflisar.composestyled.core.renderer.StyledTokenComponents
+import com.michaelflisar.composestyled.core.classes.StyledThemeDefinition
+import com.michaelflisar.composestyled.core.renderer.StyledComponents
 import com.michaelflisar.composestyled.core.tokens.StyledElevations
 import com.michaelflisar.composestyled.core.tokens.StyledPaddings
 import com.michaelflisar.composestyled.core.tokens.StyledShapes
@@ -18,9 +18,9 @@ import com.michaelflisar.composestyled.theme.cupertino.components.StyledSurfaceI
 import com.michaelflisar.composestyled.theme.cupertino.components.StyledTextFieldImpl
 import com.michaelflisar.composestyled.theme.cupertino.components.StyledTextImpl
 
-object StyleCupertino {
+internal object Definitions {
 
-    val components = StyledTokenComponents(
+    val components = StyledComponents.Components(
         surface = StyledSurfaceImpl,
         button = StyledButtonImpl,
         card = StyledCardImpl,
@@ -58,13 +58,13 @@ object StyleCupertino {
         medium = 0.dp,
         large = 0.dp,
     )
-
-    val setup = StyledTheme.Setup(
-        shapes = shapes,
-        typography = typography,
-        paddings = paddings,
-        elevations = elevations,
-        spacings = spacings,
-    )
 }
 
+val StyleCupertino = StyledThemeDefinition(
+    components = Definitions.components,
+    shapes = Definitions.shapes,
+    typography = Definitions.typography,
+    paddings = Definitions.paddings,
+    elevations = Definitions.elevations,
+    spacings = Definitions.spacings
+)

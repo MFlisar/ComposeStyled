@@ -11,48 +11,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.composeunstyled.theme.ThemeProperty
 import com.michaelflisar.composestyled.core.StyledTheme
 import com.michaelflisar.composestyled.core.classes.Emphasis
-import com.michaelflisar.composestyled.core.classes.IVariant
-import com.michaelflisar.composestyled.core.classes.TokenMap
 import com.michaelflisar.composestyled.core.classes.colors.ColorRef
 import com.michaelflisar.composestyled.core.classes.colors.StatefulBaseColorDef
 import com.michaelflisar.composestyled.core.renderer.LocalStyledComponents
-import com.michaelflisar.composestyled.core.renderer.StyledTokenComponents
-import com.michaelflisar.composestyled.core.renderer.StyledTokenRenderer
-import com.michaelflisar.composestyled.core.renderer.StyledWrapperComponents
-import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.core.runtime.interaction.rememberStyledResolveState
 
 object StyledCard {
 
-    // properties
-    private val Property = ThemeProperty<StatefulBaseColorDef>("card")
-
-    // tokens
-    internal val Tokens = TokenMap.create(Property, Variant.entries.toSet())
-
-    // variants
-    enum class Variant(
-        override val id: String,
-    ) : IVariant {
-        Filled("card.filled.default"),
-        Outlined("card.outlined.default"),
-    }
-
-    @InternalComposeStyledApi
-    @Composable
-    fun registerVariantStyles(
-        filled: StatefulBaseColorDef,
-        outlined: StatefulBaseColorDef,
-    ) {
-        Tokens.registerStyles(
-            styles = mapOf(
-                Variant.Filled to filled,
-                Variant.Outlined to outlined,
-            )
-        )
+    // variants - TODO: namen neutraler machen?
+    enum class Variant {
+        Filled,
+        Outlined
     }
 
     fun customize(
@@ -73,33 +44,42 @@ object StyledCard {
 // Renderer
 // ----------------------
 
-interface StyledCardTokenRenderer : StyledTokenRenderer {
+sealed interface StyledCardRenderer {
 
-    @Composable
-    fun Render(
-        modifier: Modifier,
-        shape: Shape,
-        emphasis: Emphasis,
-        backgroundColor: Color,
-        contentColor: Color,
-        border: BorderStroke?,
-        contentPadding: PaddingValues,
-        content: @Composable ColumnScope.() -> Unit,
-    )
-}
+    interface TokenRenderer : StyledCardRenderer {
 
-interface StyledCardWrapperRenderer {
+        @Composable
+        fun resolveColors(
+            variant: StyledCard.Variant,
+            customization: StyledCard.Customization?,
+        ): StatefulBaseColorDef
 
-    @Composable
-    fun Render(
-        variant: StyledCard.Variant,
-        customization: StyledCard.Customization?,
-        modifier: Modifier,
-        emphasis: Emphasis,
-        shape: Shape,
-        contentPadding: PaddingValues,
-        content: @Composable ColumnScope.() -> Unit,
-    )
+        @Composable
+        fun render(
+            modifier: Modifier,
+            shape: Shape,
+            emphasis: Emphasis,
+            backgroundColor: Color,
+            contentColor: Color,
+            border: BorderStroke?,
+            contentPadding: PaddingValues,
+            content: @Composable ColumnScope.() -> Unit,
+        )
+    }
+
+    interface WrapperRenderer : StyledCardRenderer {
+
+        @Composable
+        fun render(
+            variant: StyledCard.Variant,
+            customization: StyledCard.Customization?,
+            modifier: Modifier,
+            emphasis: Emphasis,
+            shape: Shape,
+            contentPadding: PaddingValues,
+            content: @Composable ColumnScope.() -> Unit,
+        )
+    }
 }
 
 // ----------------------
@@ -108,7 +88,7 @@ interface StyledCardWrapperRenderer {
 
 object StyledCardDefaults {
 
-    val DefaultVariant = StyledCard.Variant.Filled
+    val variant = StyledCard.Variant.Filled
 
     val DefaultEmphasis = Emphasis.Low
 
@@ -128,7 +108,7 @@ object StyledCardDefaults {
 @Composable
 fun StyledCard(
     modifier: Modifier = Modifier,
-    variant: StyledCard.Variant = StyledCardDefaults.DefaultVariant,
+    variant: StyledCard.Variant = StyledCardDefaults.variant,
     customization: StyledCard.Customization? = null,
     shape: Shape = StyledCardDefaults.shape,
     emphasis: Emphasis = StyledCardDefaults.DefaultEmphasis,
@@ -136,34 +116,31 @@ fun StyledCard(
     contentPadding: PaddingValues = StyledCardDefaults.contentPadding(),
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    when (val styledComponents = LocalStyledComponents.current) {
-        is StyledTokenComponents -> {
+    when (val renderer = LocalStyledComponents.current.card) {
+        is StyledCardRenderer.TokenRenderer -> {
             val state = rememberStyledResolveState(
                 interactionSource = null,
                 enabled = enabled,
                 isError = false,
             )
-            val def = StyledCard.Tokens.resolveToken(variant).customise(
-                background = customization?.background,
-                foreground = customization?.content,
-                border = customization?.border,
-            )
-            val resolved = def.resolve(state)
-            val border = resolved.border?.let { BorderStroke(StyledCardDefaults.BorderWidth, it) }
-            styledComponents.card.Render(
+            val colors = renderer
+                .resolveColors(variant, customization)
+                .resolve(state)
+            val border = colors.border?.let { BorderStroke(StyledCardDefaults.BorderWidth, it) }
+            renderer.render(
                 modifier = modifier,
                 shape = shape,
                 emphasis = emphasis,
-                backgroundColor = resolved.background,
-                contentColor = resolved.foreground,
+                backgroundColor = colors.background,
+                contentColor = colors.foreground,
                 border = border,
                 contentPadding = contentPadding,
                 content = content,
             )
         }
 
-        is StyledWrapperComponents -> {
-            styledComponents.card.Render(
+        is StyledCardRenderer.WrapperRenderer -> {
+            renderer.render(
                 variant = variant,
                 customization = customization,
                 modifier = modifier,

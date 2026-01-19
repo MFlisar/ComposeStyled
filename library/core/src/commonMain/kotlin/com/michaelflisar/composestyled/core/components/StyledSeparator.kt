@@ -1,47 +1,19 @@
 package com.michaelflisar.composestyled.core.components
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.composeunstyled.theme.ThemeProperty
-import com.michaelflisar.composestyled.core.classes.IVariant
-import com.michaelflisar.composestyled.core.classes.TokenMap
+import com.michaelflisar.composestyled.core.StyledTheme
 import com.michaelflisar.composestyled.core.renderer.LocalStyledComponents
-import com.michaelflisar.composestyled.core.renderer.StyledTokenComponents
-import com.michaelflisar.composestyled.core.renderer.StyledTokenRenderer
-import com.michaelflisar.composestyled.core.renderer.StyledWrapperComponents
-import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
 
 object StyledSeparator {
 
-    // properties
-    private val Property = ThemeProperty<Color>("separator")
-
-    // tokens
-    internal val Tokens = TokenMap.create(Property, Variant.entries.toSet())
-
     // variants
-    enum class Variant(
-        override val id: String,
-    ) : IVariant {
-        Default("separator.default"),
-        Strong("separator.strong"),
-    }
-
-    @InternalComposeStyledApi
-    @Composable
-    fun registerVariantStyles(
-        default: Color,
-        strong: Color,
-    ) {
-        Tokens.registerStyles(
-            styles = mapOf(
-                Variant.Default to default,
-                Variant.Strong to strong,
-            )
-        )
+    enum class Variant {
+        Default
     }
 }
 
@@ -49,40 +21,44 @@ object StyledSeparator {
 // Renderer
 // ----------------------
 
-interface StyledSeparatorTokenRenderer : StyledTokenRenderer {
+sealed interface StyledSeparatorRenderer {
 
-    @Composable
-    fun RenderHorizontal(
-        modifier: Modifier,
-        color: Color,
-        thickness: Dp,
-    )
+    interface TokenRenderer : StyledSeparatorRenderer {
 
-    @Composable
-    fun RenderVertical(
-        modifier: Modifier,
-        color: Color,
-        thickness: Dp,
-    )
-}
+        @Composable
+        fun RenderHorizontal(
+            modifier: Modifier,
+            color: Color,
+            thickness: Dp,
+        )
 
-interface StyledSeparatorWrapperRenderer {
+        @Composable
+        fun RenderVertical(
+            modifier: Modifier,
+            color: Color,
+            thickness: Dp,
+        )
+    }
 
-    @Composable
-    fun RenderHorizontal(
-        variant: StyledSeparator.Variant,
-        modifier: Modifier,
-        color: Color,
-        thickness: Dp,
-    )
+    interface WrapperRenderer : StyledSeparatorRenderer {
 
-    @Composable
-    fun RenderVertical(
-        variant: StyledSeparator.Variant,
-        modifier: Modifier,
-        color: Color,
-        thickness: Dp,
-    )
+        @Composable
+        fun RenderHorizontal(
+            variant: StyledSeparator.Variant,
+            modifier: Modifier,
+            color: Color,
+            thickness: Dp,
+        )
+
+        @Composable
+        fun RenderVertical(
+            variant: StyledSeparator.Variant,
+            modifier: Modifier,
+            color: Color,
+            thickness: Dp,
+        )
+    }
+
 }
 
 // ----------------------
@@ -90,8 +66,11 @@ interface StyledSeparatorWrapperRenderer {
 // ----------------------
 
 object StyledSeparatorDefaults {
-    val Thickness: Dp = 1.dp
-    val DefaultVariant: StyledSeparator.Variant = StyledSeparator.Variant.Default
+    val thickness: Dp = 1.dp
+    val variant: StyledSeparator.Variant = StyledSeparator.Variant.Default
+    val color: Color
+        @Composable @ReadOnlyComposable
+        get() = StyledTheme.colors.outline
 }
 
 // ----------------------
@@ -101,23 +80,21 @@ object StyledSeparatorDefaults {
 @Composable
 fun StyledHorizontalSeparator(
     modifier: Modifier = Modifier,
-    variant: StyledSeparator.Variant = StyledSeparatorDefaults.DefaultVariant,
-    color: Color = Color.Unspecified,
-    thickness: Dp = StyledSeparatorDefaults.Thickness,
+    variant: StyledSeparator.Variant = StyledSeparatorDefaults.variant,
+    color: Color = StyledSeparatorDefaults.color,
+    thickness: Dp = StyledSeparatorDefaults.thickness,
 ) {
-    when (val components = LocalStyledComponents.current) {
-        is StyledTokenComponents -> {
-            val themed = StyledSeparator.Tokens.resolveToken(variant)
-            val finalColor = if (color != Color.Unspecified) color else themed
-            components.separator.RenderHorizontal(
+    when (val renderer = LocalStyledComponents.current.separator) {
+        is StyledSeparatorRenderer.TokenRenderer -> {
+            renderer.RenderHorizontal(
                 modifier = modifier,
-                color = finalColor,
+                color = color,
                 thickness = thickness,
             )
         }
 
-        is StyledWrapperComponents -> {
-            components.separator.RenderHorizontal(
+        is StyledSeparatorRenderer.WrapperRenderer -> {
+            renderer.RenderHorizontal(
                 variant = variant,
                 modifier = modifier,
                 color = color,
@@ -130,23 +107,21 @@ fun StyledHorizontalSeparator(
 @Composable
 fun StyledVerticalSeparator(
     modifier: Modifier = Modifier,
-    variant: StyledSeparator.Variant = StyledSeparatorDefaults.DefaultVariant,
-    color: Color = Color.Unspecified,
-    thickness: Dp = StyledSeparatorDefaults.Thickness,
+    variant: StyledSeparator.Variant = StyledSeparatorDefaults.variant,
+    color: Color = StyledSeparatorDefaults.color,
+    thickness: Dp = StyledSeparatorDefaults.thickness,
 ) {
-    when (val components = LocalStyledComponents.current) {
-        is StyledTokenComponents -> {
-            val themed = StyledSeparator.Tokens.resolveToken(variant)
-            val finalColor = if (color != Color.Unspecified) color else themed
-            components.separator.RenderVertical(
+    when (val renderer = LocalStyledComponents.current.separator) {
+        is StyledSeparatorRenderer.TokenRenderer -> {
+            renderer.RenderVertical(
                 modifier = modifier,
-                color = finalColor,
+                color = color,
                 thickness = thickness,
             )
         }
 
-        is StyledWrapperComponents -> {
-            components.separator.RenderVertical(
+        is StyledSeparatorRenderer.WrapperRenderer -> {
+            renderer.RenderVertical(
                 variant = variant,
                 modifier = modifier,
                 color = color,

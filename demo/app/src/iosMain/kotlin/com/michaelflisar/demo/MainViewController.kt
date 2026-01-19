@@ -7,5 +7,5 @@ import com.michaelflisar.composestyled.demo.DemoApp
  * iOS entry point used by the Xcode demo project (demo/xcode).
  */
 fun MainViewController() = ComposeUIViewController {
-    DemoApp("iOS")
+    DemoApp("iOS", BuildKonfig.appName)
 }

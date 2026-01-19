@@ -14,12 +14,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import com.michaelflisar.composestyled.core.components.StyledText
-import com.michaelflisar.composestyled.core.components.StyledTextWrapperRenderer
+import com.michaelflisar.composestyled.core.components.StyledTextRenderer
 
-internal object StyledTextImpl : StyledTextWrapperRenderer {
+internal object StyledTextImpl : StyledTextRenderer.WrapperRenderer {
 
     @Composable
-    override fun Render(
+    override fun render(
         variant: StyledText.Variant,
         text: String,
         modifier: Modifier,

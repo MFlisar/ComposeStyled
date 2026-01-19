@@ -12,84 +12,71 @@ import com.michaelflisar.composestyled.core.runtime.LocalContentColor
 fun Color.asColorRef(): ColorRef = ColorRef.Fixed(this)
 
 @Stable
-data class ColorRefTransformer(
-    val alpha: Float? = null,
-    val adjustWithAlpha: Boolean = false,
-    val factorDarken: Float? = null
-)
-
-@Stable
 sealed interface ColorRef {
 
     @Composable
     @ReadOnlyComposable
     fun resolve(): Color
 
-    @Stable
+    @Immutable
     data class Fixed(
         val color: Color,
-        val alpha: Float? = null
+        val alpha: Float? = null,
     ) : ColorRef {
+
         @Composable
         @ReadOnlyComposable
         override fun resolve(): Color = if (alpha != null) color.copy(alpha = alpha) else color
+
     }
 
-    @Stable
-    data class Token(
-        val token: ColorToken,
-    ) : ColorRef {
+    enum class Token : ColorRef {
+        Primary,
+        OnPrimary,
+        Secondary,
+        OnSecondary,
+        Background,
+        OnBackground,
+        Surface,
+        OnSurface,
+        Error,
+        OnError,
+        Outline,
+        OutlineVariant
+        ;
+
         @Composable
+        @ReadOnlyComposable
         override fun resolve(): Color {
-            // Placeholder implementation, replace with actual theme color resolution
-            return when (token) {
-                ColorToken.Primary -> StyledTheme.colors.primary
-                ColorToken.OnPrimary -> StyledTheme.colors.onPrimary
-                ColorToken.Secondary -> StyledTheme.colors.secondary
-                ColorToken.OnSecondary -> StyledTheme.colors.onSecondary
-                ColorToken.Background -> StyledTheme.colors.background
-                ColorToken.OnBackground -> StyledTheme.colors.onBackground
-                ColorToken.Surface -> StyledTheme.colors.surface
-                ColorToken.OnSurface -> StyledTheme.colors.onSurface
-                ColorToken.Error -> StyledTheme.colors.error
-                ColorToken.OnError -> StyledTheme.colors.onError
-                ColorToken.Outline -> StyledTheme.colors.outline
-                ColorToken.OutlineVariant -> StyledTheme.colors.outlineVariant
+            return when (this) {
+                Primary -> StyledTheme.colors.primary
+                OnPrimary -> StyledTheme.colors.onPrimary
+                Secondary -> StyledTheme.colors.secondary
+                OnSecondary -> StyledTheme.colors.onSecondary
+                Background -> StyledTheme.colors.background
+                OnBackground -> StyledTheme.colors.onBackground
+                Surface -> StyledTheme.colors.surface
+                OnSurface -> StyledTheme.colors.onSurface
+                Error -> StyledTheme.colors.error
+                OnError -> StyledTheme.colors.onError
+                Outline -> StyledTheme.colors.outline
+                OutlineVariant -> StyledTheme.colors.outlineVariant
             }
         }
     }
 
-    @Stable
-    data class Local(
-        val token: ColorLocalToken,
-    ) : ColorRef {
+    enum class Local : ColorRef {
+        Content,
+        Container
+        ;
+
         @Composable
+        @ReadOnlyComposable
         override fun resolve(): Color {
-            // Placeholder implementation, replace with actual local color resolution
-            return when (token) {
-                ColorLocalToken.Content -> LocalContentColor.current
-                ColorLocalToken.Container -> LocalBackgroundColor.current
+            return when (this) {
+                Content -> LocalContentColor.current
+                Container -> LocalBackgroundColor.current
             }
         }
     }
-}
-
-enum class ColorToken {
-    Primary,
-    OnPrimary,
-    Secondary,
-    OnSecondary,
-    Background,
-    OnBackground,
-    Surface,
-    OnSurface,
-    Error,
-    OnError,
-    Outline,
-    OutlineVariant
-}
-
-enum class ColorLocalToken {
-    Content,
-    Container
 }

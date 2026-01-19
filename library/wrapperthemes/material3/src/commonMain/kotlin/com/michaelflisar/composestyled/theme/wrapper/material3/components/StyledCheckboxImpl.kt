@@ -15,13 +15,13 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.core.components.StyledCheckbox
-import com.michaelflisar.composestyled.core.components.StyledCheckboxWrapperRenderer
+import com.michaelflisar.composestyled.core.components.StyledCheckboxRenderer
 import com.michaelflisar.composestyled.theme.wrapper.material3.disabled
 
-internal object StyledCheckboxImpl : StyledCheckboxWrapperRenderer {
+internal object StyledCheckboxImpl : StyledCheckboxRenderer.WrapperRenderer {
 
     @Composable
-    override fun Render(
+    override fun render(
         variant: StyledCheckbox.Variant,
         customization: StyledCheckbox.Customization?,
         checked: Boolean,
@@ -41,8 +41,10 @@ internal object StyledCheckboxImpl : StyledCheckboxWrapperRenderer {
 
         val checkedColor = customization?.checked?.resolve() ?: Color.Unspecified
         val uncheckedColor = customization?.unchecked?.resolve() ?: Color.Unspecified
-        val disabledCheckedColor = customization?.checked?.resolve()?.disabled() ?: Color.Unspecified
-        val disabledUncheckedColor = customization?.unchecked?.resolve()?.disabled() ?: Color.Unspecified
+        val disabledCheckedColor =
+            customization?.checked?.resolve()?.disabled() ?: Color.Unspecified
+        val disabledUncheckedColor =
+            customization?.unchecked?.resolve()?.disabled() ?: Color.Unspecified
 
         Box(
             modifier = modifier

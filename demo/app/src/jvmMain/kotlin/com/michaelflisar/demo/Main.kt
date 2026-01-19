@@ -20,7 +20,7 @@ fun main() {
                 height = 800.dp
             )
         ) {
-            DemoApp("Windows")
+            DemoApp("Windows", BuildKonfig.appName)
         }
     }
 }

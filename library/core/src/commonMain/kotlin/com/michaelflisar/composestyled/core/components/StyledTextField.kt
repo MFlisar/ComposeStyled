@@ -9,52 +9,22 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
-import com.composeunstyled.theme.ThemeProperty
 import com.michaelflisar.composestyled.core.StyledTheme
-import com.michaelflisar.composestyled.core.classes.IVariant
-import com.michaelflisar.composestyled.core.classes.TokenMap
 import com.michaelflisar.composestyled.core.classes.colors.BaseColor
 import com.michaelflisar.composestyled.core.classes.colors.ColorRef
 import com.michaelflisar.composestyled.core.classes.colors.StatefulBaseColorDef
 import com.michaelflisar.composestyled.core.renderer.LocalStyledComponents
-import com.michaelflisar.composestyled.core.renderer.StyledTokenComponents
-import com.michaelflisar.composestyled.core.renderer.StyledTokenRenderer
-import com.michaelflisar.composestyled.core.renderer.StyledWrapperComponents
-import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.core.runtime.interaction.rememberStyledResolveState
 
 object StyledTextField {
 
-    // properties
-    private val Property = ThemeProperty<StatefulBaseColorDef>("input")
-
-    // tokens
-    internal val Tokens = TokenMap.create(Property, Variant.entries.toSet())
-
     // variants
-    enum class Variant(
-        override val id: String,
-    ) : IVariant {
-        Filled("input.filled.default"),
-        Outlined("input.outlined.default"),
-    }
-
-    @InternalComposeStyledApi
-    @Composable
-    fun registerVariantStyles(
-        filled: StatefulBaseColorDef,
-        outlined: StatefulBaseColorDef,
-    ) {
-        Tokens.registerStyles(
-            styles = mapOf(
-                Variant.Filled to filled,
-                Variant.Outlined to outlined,
-            )
-        )
+    enum class Variant {
+        Filled,
+        Outlined
     }
 
     fun customize(
@@ -75,67 +45,77 @@ object StyledTextField {
 // Renderer
 // ----------------------
 
-interface StyledTextFieldTokenRenderer : StyledTokenRenderer {
+sealed interface StyledTextFieldRenderer {
 
-    @Composable
-    fun Render(
-        value: String,
-        onValueChange: (String) -> Unit,
-        colors: BaseColor,
-        modifier: Modifier,
-        enabled: Boolean,
-        readOnly: Boolean,
-        textStyle: TextStyle,
-        label: @Composable (() -> Unit)?,
-        placeholder: @Composable (() -> Unit)?,
-        leadingIcon: @Composable (() -> Unit)?,
-        trailingIcon: @Composable (() -> Unit)?,
-        prefix: @Composable (() -> Unit)?,
-        suffix: @Composable (() -> Unit)?,
-        supportingText: @Composable (() -> Unit)?,
-        isError: Boolean,
-        visualTransformation: VisualTransformation,
-        keyboardOptions: KeyboardOptions,
-        keyboardActions: KeyboardActions,
-        singleLine: Boolean,
-        maxLines: Int,
-        minLines: Int,
-        contentPadding: PaddingValues,
-        interactionSource: MutableInteractionSource,
-        shape: Shape,
-    )
-}
+    interface TokenRenderer : StyledTextFieldRenderer {
 
-interface StyledTextFieldWrapperRenderer {
+        @Composable
+        fun resolveColors(
+            variant: StyledTextField.Variant,
+            customization: StyledTextField.Customization?,
+        ): StatefulBaseColorDef
 
-    @Composable
-    fun Render(
-        variant: StyledTextField.Variant,
-        customization: StyledTextField.Customization?,
-        value: String,
-        onValueChange: (String) -> Unit,
-        modifier: Modifier,
-        enabled: Boolean,
-        readOnly: Boolean,
-        textStyle: TextStyle,
-        label: @Composable (() -> Unit)?,
-        placeholder: @Composable (() -> Unit)?,
-        leadingIcon: @Composable (() -> Unit)?,
-        trailingIcon: @Composable (() -> Unit)?,
-        prefix: @Composable (() -> Unit)?,
-        suffix: @Composable (() -> Unit)?,
-        supportingText: @Composable (() -> Unit)?,
-        isError: Boolean,
-        visualTransformation: VisualTransformation,
-        keyboardOptions: KeyboardOptions,
-        keyboardActions: KeyboardActions,
-        singleLine: Boolean,
-        maxLines: Int,
-        minLines: Int,
-        contentPadding: PaddingValues,
-        interactionSource: MutableInteractionSource,
-        shape: Shape,
-    )
+        @Composable
+        fun render(
+            value: String,
+            onValueChange: (String) -> Unit,
+            colors: BaseColor,
+            modifier: Modifier,
+            enabled: Boolean,
+            readOnly: Boolean,
+            textStyle: TextStyle,
+            label: @Composable (() -> Unit)?,
+            placeholder: @Composable (() -> Unit)?,
+            leadingIcon: @Composable (() -> Unit)?,
+            trailingIcon: @Composable (() -> Unit)?,
+            prefix: @Composable (() -> Unit)?,
+            suffix: @Composable (() -> Unit)?,
+            supportingText: @Composable (() -> Unit)?,
+            isError: Boolean,
+            visualTransformation: VisualTransformation,
+            keyboardOptions: KeyboardOptions,
+            keyboardActions: KeyboardActions,
+            singleLine: Boolean,
+            maxLines: Int,
+            minLines: Int,
+            contentPadding: PaddingValues,
+            interactionSource: MutableInteractionSource,
+            shape: Shape,
+        )
+    }
+
+    interface WrapperRenderer : StyledTextFieldRenderer {
+
+        @Composable
+        fun render(
+            variant: StyledTextField.Variant,
+            customization: StyledTextField.Customization?,
+            value: String,
+            onValueChange: (String) -> Unit,
+            modifier: Modifier,
+            enabled: Boolean,
+            readOnly: Boolean,
+            textStyle: TextStyle,
+            label: @Composable (() -> Unit)?,
+            placeholder: @Composable (() -> Unit)?,
+            leadingIcon: @Composable (() -> Unit)?,
+            trailingIcon: @Composable (() -> Unit)?,
+            prefix: @Composable (() -> Unit)?,
+            suffix: @Composable (() -> Unit)?,
+            supportingText: @Composable (() -> Unit)?,
+            isError: Boolean,
+            visualTransformation: VisualTransformation,
+            keyboardOptions: KeyboardOptions,
+            keyboardActions: KeyboardActions,
+            singleLine: Boolean,
+            maxLines: Int,
+            minLines: Int,
+            contentPadding: PaddingValues,
+            interactionSource: MutableInteractionSource,
+            shape: Shape,
+        )
+    }
+
 }
 
 // ----------------------
@@ -144,12 +124,13 @@ interface StyledTextFieldWrapperRenderer {
 
 object StyledTextFieldDefaults {
 
-    val DefaultVariant: StyledTextField.Variant = StyledTextField.Variant.Filled
+    val variant: StyledTextField.Variant = StyledTextField.Variant.Filled
 
     val shape: Shape
         @Composable @ReadOnlyComposable get() = StyledTheme.shapes.input
 
     @Composable
+    @ReadOnlyComposable
     fun contentPadding() = PaddingValues(
         horizontal = StyledTheme.paddings.medium,
         vertical = StyledTheme.paddings.small,
@@ -165,7 +146,7 @@ fun StyledTextField(
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    variant: StyledTextField.Variant = StyledTextFieldDefaults.DefaultVariant,
+    variant: StyledTextField.Variant = StyledTextFieldDefaults.variant,
     customization: StyledTextField.Customization? = null,
     enabled: Boolean = true,
     readOnly: Boolean = false,
@@ -187,24 +168,19 @@ fun StyledTextField(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     shape: Shape = StyledTextFieldDefaults.shape,
 ) {
-    when (val components = LocalStyledComponents.current) {
+    when (val renderer = LocalStyledComponents.current.textField) {
 
-        is StyledTokenComponents -> {
+        is StyledTextFieldRenderer.TokenRenderer -> {
             val state = rememberStyledResolveState(
                 interactionSource = interactionSource,
                 enabled = enabled,
                 isError = isError,
             )
+            val colors = renderer
+                .resolveColors(variant, customization)
+                .resolve(state)
 
-            val def = StyledTextField.Tokens.resolveToken(variant)
-            val defCustomised = def.customise(
-                background = customization?.background,
-                foreground = customization?.content,
-                border = customization?.border,
-            )
-            val colors = defCustomised.resolve(state)
-
-            components.textField.Render(
+            renderer.render(
                 value = value,
                 onValueChange = onValueChange,
                 colors = colors,
@@ -232,8 +208,8 @@ fun StyledTextField(
             )
         }
 
-        is StyledWrapperComponents -> {
-            components.textField.Render(
+        is StyledTextFieldRenderer.WrapperRenderer -> {
+            renderer.render(
                 variant = variant,
                 customization = customization,
                 value = value,

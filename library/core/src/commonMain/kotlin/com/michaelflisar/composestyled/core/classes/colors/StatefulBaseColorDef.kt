@@ -3,13 +3,12 @@ package com.michaelflisar.composestyled.core.classes.colors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.ui.graphics.Color
 import com.michaelflisar.composestyled.core.classes.DisableFactorType
 import com.michaelflisar.composestyled.core.classes.StyledInteractionState
 import com.michaelflisar.composestyled.core.classes.StyledResolveState
-import com.michaelflisar.composestyled.core.treat
+import com.michaelflisar.composestyled.core.disabled
 
-// Verantwortung: kombiniert BaseColorDef über Interaktionszustände,
-// keine Enabled-Variante (Disabled = Treatment)
 @Immutable
 data class StatefulBaseColorDef(
     val normal: BaseColorDef,
@@ -30,31 +29,19 @@ data class StatefulBaseColorDef(
         error = error?.customise(background, foreground, border),
     )
 
-
-    // Verantwortung: wählt Zustand nach Priorität, wendet Disabled-Treatment an, liefert finale Farben
     @Composable
     @ReadOnlyComposable
     fun resolve(
         state: StyledResolveState,
     ): BaseColor {
-        val base = when (state.interaction) {
-            StyledInteractionState.Error -> error ?: normal
-            StyledInteractionState.Focused -> focused ?: normal
-            StyledInteractionState.Hovered -> hovered ?: normal
-            StyledInteractionState.Pressed -> pressed ?: focused ?: hovered ?: normal
-            StyledInteractionState.Normal -> normal
-        }
-        return BaseColor(
-            background = base.background.resolve().treat(state, DisableFactorType.Default),
-            foreground = base.foreground.resolve().treat(state, DisableFactorType.Content),
-            border = base.border?.resolve()?.treat(state, DisableFactorType.Outline)
-        )
+        return resolve(state.interaction, state.enabled)
     }
 
     @Composable
     @ReadOnlyComposable
-    internal fun resolve(
+    private fun resolve(
         state: StyledInteractionState,
+        enabled: Boolean = true,
     ): BaseColor {
         val colorDefinition = when (state) {
             StyledInteractionState.Error -> error ?: normal
@@ -63,10 +50,18 @@ data class StatefulBaseColorDef(
             StyledInteractionState.Pressed -> pressed ?: focused ?: hovered ?: normal
             StyledInteractionState.Normal -> normal
         }
+
         return BaseColor(
-            background = colorDefinition.background.resolve(),
-            foreground = colorDefinition.foreground.resolve(),
-            border = colorDefinition.border?.resolve()
+            background = colorDefinition.background.resolve()
+                .treat(enabled, DisableFactorType.Default),
+            foreground = colorDefinition.foreground.resolve()
+                .treat(enabled, DisableFactorType.Content),
+            border = colorDefinition.border?.resolve()?.treat(enabled, DisableFactorType.Outline),
         )
     }
+
+    @Composable
+    @ReadOnlyComposable
+    private fun Color.treat(enabled: Boolean, disableFactorType: DisableFactorType) =
+        if (enabled) this else this.disabled(disableFactorType)
 }

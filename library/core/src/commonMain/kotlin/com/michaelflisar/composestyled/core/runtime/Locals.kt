@@ -31,13 +31,13 @@ fun ProvideTextStyle(style: TextStyle, content: @Composable () -> Unit) =
  * @param contentColor The content color to provide. If null, the current content color is used.
  * @param backgroundColor The background color to provide. If null, the current background color is used.
  * @param textStyle The text style to provide. If null, the current text style is used.
- * @param indication The indication to provide. If null, the current indication is used.
  * @param applyTransparentBackgroundColor If true, allows providing a transparent background color.
  * @param content The composable content that will have access to the provided locals.
  *
  * only public because of usage in other modules, should not be used directly elsewhere
  *
  */
+@InternalComposeStyledApi
 @Composable
 fun ProvideStyledLocals(
     contentColor: Color? = null,

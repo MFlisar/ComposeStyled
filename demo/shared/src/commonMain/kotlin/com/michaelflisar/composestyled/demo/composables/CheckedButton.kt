@@ -28,7 +28,7 @@ fun CheckedButton(
         onClick = onClick
     ) {
         Row(
-            modifier = Modifier.heightIn(min = StyledButtonDefaults.MinimumHeight),
+            modifier = Modifier.heightIn(min = StyledButtonDefaults.minimumHeight),
             verticalAlignment = Alignment.CenterVertically
         ) {
             StyledText(

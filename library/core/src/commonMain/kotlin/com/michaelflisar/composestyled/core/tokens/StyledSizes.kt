@@ -10,9 +10,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.core.StyledTheme
 
-/**
- * Definiert die Standard-Sizes für das Designsystem.
- */
 @Immutable
 data class StyledSizes(
     val minimumInteractiveSize: Dp = 48.dp,

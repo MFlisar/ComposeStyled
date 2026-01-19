@@ -20,7 +20,8 @@ fun CardsScreen() {
     Column(
         modifier = Modifier.Companion
             .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
+            //.verticalScroll(rememberScrollState())
+        ,
         verticalArrangement = Arrangement.spacedBy(StyledTheme.spacings.medium)
     ) {
         StyledText("Cards")

@@ -22,9 +22,10 @@ fun InputsScreen() {
     var roText by remember { mutableStateOf("Read-only value") }
 
     Column(
-        modifier = Modifier.Companion
+        modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
+            //.verticalScroll(rememberScrollState())
+        ,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         StyledText("Inputs")

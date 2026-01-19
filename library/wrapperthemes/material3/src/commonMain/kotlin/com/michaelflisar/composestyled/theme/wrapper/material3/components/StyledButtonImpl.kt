@@ -4,7 +4,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -15,15 +14,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
-import com.michaelflisar.composestyled.core.StyledTheme
 import com.michaelflisar.composestyled.core.components.StyledButton
-import com.michaelflisar.composestyled.core.components.StyledButtonWrapperRenderer
+import com.michaelflisar.composestyled.core.components.StyledButtonRenderer
 import com.michaelflisar.composestyled.theme.wrapper.material3.disabled
 
-internal object StyledButtonImpl : StyledButtonWrapperRenderer {
+internal object StyledButtonImpl : StyledButtonRenderer.WrapperRenderer {
 
     @Composable
-    override fun Render(
+    override fun render(
         variant: StyledButton.Variant,
         customization: StyledButton.Customization?,
         onClick: () -> Unit,
@@ -35,7 +33,8 @@ internal object StyledButtonImpl : StyledButtonWrapperRenderer {
         content: @Composable RowScope.() -> Unit,
     ) {
         val borderColor = customization?.border// ?: MaterialTheme.colorScheme.outlineVariant
-        val borderStroke = borderColor?.let { BorderStroke(width = Dp.Hairline, color = it.resolve()) }
+        val borderStroke =
+            borderColor?.let { BorderStroke(width = Dp.Hairline, color = it.resolve()) }
 
         var containerColor: Color
         var contentColor: Color

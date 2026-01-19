@@ -5,9 +5,6 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-/**
- * Definiert die Standard-Elevations für das Designsystem.
- */
 @Immutable
 data class StyledElevations(
     val small: Dp = 4.dp,

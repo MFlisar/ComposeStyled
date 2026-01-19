@@ -7,33 +7,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
-import com.michaelflisar.composestyled.core.components.StyledCheckboxTokenRenderer
+import com.michaelflisar.composestyled.core.classes.colors.StatefulBaseColorDef
+import com.michaelflisar.composestyled.core.components.StyledCard
+import com.michaelflisar.composestyled.core.components.StyledCheckbox
+import com.michaelflisar.composestyled.core.components.StyledCheckboxRenderer
 import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
+import com.michaelflisar.composestyled.shared.UnstyledCheckboxRenderer
 
-internal object StyledCheckboxImpl : StyledCheckboxTokenRenderer {
-
-    @OptIn(InternalComposeStyledApi::class)
-    @Composable
-    override fun registerVariantStyles() {
-        // TODO
-    }
+@OptIn(InternalComposeStyledApi::class)
+internal object StyledCheckboxImpl : UnstyledCheckboxRenderer() {
 
     @Composable
-    override fun Render(
+    override fun resolveColors(
+        variant: StyledCheckbox.Variant,
         checked: Boolean,
-        modifier: Modifier,
-        backgroundColor: Color,
-        contentColor: Color,
-        enabled: Boolean,
-        onCheckedChange: ((Boolean) -> Unit)?,
-        shape: Shape,
-        borderColor: Color?,
-        borderWidth: Dp,
-        interactionSource: MutableInteractionSource,
-        indication: Indication?,
-        contentDescription: String?,
-        checkIcon: @Composable () -> Unit,
-    ) {
+        customization: StyledCheckbox.Customization?
+    ): StatefulBaseColorDef {
         // TODO
+        throw NotImplementedError("StyledCheckboxImpl.resolveColors is not implemented yet")
     }
 }

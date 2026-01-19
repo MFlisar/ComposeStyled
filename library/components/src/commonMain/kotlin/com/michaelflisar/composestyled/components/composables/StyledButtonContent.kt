@@ -29,8 +29,8 @@ fun StyledButtonContent(
     } else {
         val density = LocalDensity.current
 
-        val lineHeight = StyledTextDefaults.Style.lineHeight
-        val fallbackIconSizeSp = StyledTextDefaults.Style.fontSize
+        val lineHeight = StyledTextDefaults.style.lineHeight
+        val fallbackIconSizeSp = StyledTextDefaults.style.fontSize
         val iconSizeSp = if (lineHeight.type == TextUnitType.Sp) lineHeight else fallbackIconSizeSp
         val iconSizeDp = with(density) { iconSizeSp.toDp() }
 

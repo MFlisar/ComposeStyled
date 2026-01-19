@@ -15,6 +15,6 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT)
         )
-        setContent { DemoApp("Android") }
+        setContent { DemoApp("Android", BuildKonfig.appName) }
     }
 }

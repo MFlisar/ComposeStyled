@@ -11,47 +11,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.composeunstyled.theme.ThemeProperty
 import com.michaelflisar.composestyled.core.StyledTheme
-import com.michaelflisar.composestyled.core.classes.IVariant
-import com.michaelflisar.composestyled.core.classes.TokenMap
 import com.michaelflisar.composestyled.core.classes.colors.ColorRef
 import com.michaelflisar.composestyled.core.classes.colors.StatefulBaseColorDef
 import com.michaelflisar.composestyled.core.icons.Check
 import com.michaelflisar.composestyled.core.renderer.LocalStyledComponents
-import com.michaelflisar.composestyled.core.renderer.StyledTokenComponents
-import com.michaelflisar.composestyled.core.renderer.StyledTokenRenderer
-import com.michaelflisar.composestyled.core.renderer.StyledWrapperComponents
-import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.core.runtime.LocalContentColor
 import com.michaelflisar.composestyled.core.runtime.interaction.rememberStyledResolveState
 
 object StyledCheckbox {
 
-    // properties
-    private val Property = ThemeProperty<ColorSet>("checkbox")
-
-    // tokens
-    internal val Tokens = TokenMap.create(Property, Variant.entries.toSet())
-
     // variants
-    enum class Variant(
-        override val id: String,
-    ) : IVariant {
-        Default("checkbox.default"),
-    }
-
-    @InternalComposeStyledApi
-    @Composable
-    fun registerVariantStyles(
-        unchecked: StatefulBaseColorDef,
-        checked: StatefulBaseColorDef,
-    ) {
-        Tokens.registerStyles(
-            styles = mapOf(
-                Variant.Default to ColorSet(unchecked = unchecked, checked = checked),
-            )
-        )
+    enum class Variant {
+        Default
     }
 
     fun customize(
@@ -60,11 +32,6 @@ object StyledCheckbox {
     ) = Customization(
         unchecked = unchecked,
         checked = checked,
-    )
-
-    data class ColorSet(
-        val unchecked: StatefulBaseColorDef,
-        val checked: StatefulBaseColorDef,
     )
 
     @Immutable
@@ -78,43 +45,54 @@ object StyledCheckbox {
 // Renderer
 // ----------------------
 
-interface StyledCheckboxTokenRenderer : StyledTokenRenderer {
+sealed interface StyledCheckboxRenderer {
 
-    @Composable
-    fun Render(
-        checked: Boolean,
-        modifier: Modifier,
-        backgroundColor: Color,
-        contentColor: Color,
-        enabled: Boolean,
-        onCheckedChange: ((Boolean) -> Unit)?,
-        shape: Shape,
-        borderColor: Color?,
-        borderWidth: Dp,
-        interactionSource: MutableInteractionSource,
-        indication: Indication?,
-        contentDescription: String?,
-        checkIcon: @Composable () -> Unit,
-    )
-}
+    interface TokenRenderer : StyledCheckboxRenderer {
 
-interface StyledCheckboxWrapperRenderer {
+        @Composable
+        fun resolveColors(
+            variant: StyledCheckbox.Variant,
+            checked: Boolean,
+            customization: StyledCheckbox.Customization?,
+        ): StatefulBaseColorDef
 
-    @Composable
-    fun Render(
-        variant: StyledCheckbox.Variant,
-        customization: StyledCheckbox.Customization?,
-        checked: Boolean,
-        onCheckedChange: ((Boolean) -> Unit)?,
-        modifier: Modifier,
-        enabled: Boolean,
-        shape: Shape,
-        borderWidth: Dp,
-        interactionSource: MutableInteractionSource,
-        indication: Indication?,
-        contentDescription: String?,
-        checkIcon: @Composable () -> Unit,
-    )
+        @Composable
+        fun render(
+            checked: Boolean,
+            modifier: Modifier,
+            backgroundColor: Color,
+            contentColor: Color,
+            enabled: Boolean,
+            onCheckedChange: ((Boolean) -> Unit)?,
+            shape: Shape,
+            borderColor: Color?,
+            borderWidth: Dp,
+            interactionSource: MutableInteractionSource,
+            indication: Indication?,
+            contentDescription: String?,
+            checkIcon: @Composable () -> Unit,
+        )
+    }
+
+    interface WrapperRenderer : StyledCheckboxRenderer {
+
+        @Composable
+        fun render(
+            variant: StyledCheckbox.Variant,
+            customization: StyledCheckbox.Customization?,
+            checked: Boolean,
+            onCheckedChange: ((Boolean) -> Unit)?,
+            modifier: Modifier,
+            enabled: Boolean,
+            shape: Shape,
+            borderWidth: Dp,
+            interactionSource: MutableInteractionSource,
+            indication: Indication?,
+            contentDescription: String?,
+            checkIcon: @Composable () -> Unit,
+        )
+    }
+
 }
 
 // ----------------------
@@ -123,7 +101,7 @@ interface StyledCheckboxWrapperRenderer {
 
 object StyledCheckboxDefaults {
 
-    val DefaultVariant = StyledCheckbox.Variant.Default
+    val variant = StyledCheckbox.Variant.Default
 
     val BorderWidth: Dp = 1.dp
 
@@ -151,7 +129,7 @@ fun StyledCheckbox(
     checked: Boolean,
     onCheckedChange: ((Boolean) -> Unit)?,
     modifier: Modifier = Modifier,
-    variant: StyledCheckbox.Variant = StyledCheckboxDefaults.DefaultVariant,
+    variant: StyledCheckbox.Variant = StyledCheckboxDefaults.variant,
     customization: StyledCheckbox.Customization? = null,
     enabled: Boolean = true,
     shape: Shape = StyledCheckboxDefaults.shape,
@@ -162,31 +140,25 @@ fun StyledCheckbox(
     checkIcon: @Composable () -> Unit = { StyledCheckboxDefaults.CheckIcon() },
     isError: Boolean = false,
 ) {
-    when (val components = LocalStyledComponents.current) {
-        is StyledTokenComponents -> {
+    when (val renderer = LocalStyledComponents.current.checkbox) {
+        is StyledCheckboxRenderer.TokenRenderer -> {
             val state = rememberStyledResolveState(
                 interactionSource = interactionSource,
                 enabled = enabled,
                 isError = isError,
             )
+            val colors = renderer
+                .resolveColors(variant, checked, customization)
+                .resolve(state)
 
-            val set = StyledCheckbox.Tokens.resolveToken(variant)
-            val def = if (checked) set.checked else set.unchecked
-            val o = if (checked) customization?.checked else customization?.unchecked
-
-            val defCustomised = def.customise(
-                foreground = o
-            )
-            val resolved = defCustomised.resolve(state)
-
-            components.checkbox.Render(
+            renderer.render(
                 checked = checked,
                 modifier = modifier,
                 enabled = enabled,
                 shape = shape,
-                backgroundColor = resolved.background,
-                contentColor = resolved.foreground,
-                borderColor = resolved.border,
+                backgroundColor = colors.background,
+                contentColor = colors.foreground,
+                borderColor = colors.border,
                 borderWidth = borderWidth,
                 interactionSource = interactionSource,
                 indication = indication,
@@ -196,8 +168,8 @@ fun StyledCheckbox(
             )
         }
 
-        is StyledWrapperComponents -> {
-            components.checkbox.Render(
+        is StyledCheckboxRenderer.WrapperRenderer -> {
+            renderer.render(
                 variant = variant,
                 customization = customization,
                 checked = checked,

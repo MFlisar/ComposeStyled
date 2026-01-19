@@ -13,15 +13,17 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
 import com.michaelflisar.composestyled.core.components.StyledTextField
-import com.michaelflisar.composestyled.core.components.StyledTextFieldWrapperRenderer
+import com.michaelflisar.composestyled.core.components.StyledTextFieldRenderer
+import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.core.runtime.ProvideStyledLocals
 import com.michaelflisar.composestyled.theme.wrapper.material3.disabled
 
-internal object StyledTextFieldImpl : StyledTextFieldWrapperRenderer {
+internal object StyledTextFieldImpl : StyledTextFieldRenderer.WrapperRenderer {
 
+    @OptIn(InternalComposeStyledApi::class)
     @Composable
     @Suppress("UNUSED_PARAMETER")
-    override fun Render(
+    override fun render(
         variant: StyledTextField.Variant,
         customization: StyledTextField.Customization?,
         value: String,
@@ -50,8 +52,10 @@ internal object StyledTextFieldImpl : StyledTextFieldWrapperRenderer {
     ) {
         val containerColor = customization?.background?.resolve() ?: Color.Unspecified
         val contentColor = customization?.content?.resolve() ?: Color.Unspecified
-        val disabledContainerColor = customization?.background?.resolve()?.disabled() ?: Color.Unspecified
-        val disabledContentColor = customization?.content?.resolve()?.disabled() ?: Color.Unspecified
+        val disabledContainerColor =
+            customization?.background?.resolve()?.disabled() ?: Color.Unspecified
+        val disabledContentColor =
+            customization?.content?.resolve()?.disabled() ?: Color.Unspecified
 
         // M3 TextField doesn't allow full background/border customization via a BaseColor directly.
         // We map what we can via TextFieldDefaults.colors.

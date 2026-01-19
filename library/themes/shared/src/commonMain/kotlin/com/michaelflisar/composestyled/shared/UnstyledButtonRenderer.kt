@@ -16,15 +16,15 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.composeunstyled.UnstyledButton
 import com.michaelflisar.composestyled.core.components.StyledButtonDefaults
-import com.michaelflisar.composestyled.core.components.StyledButtonTokenRenderer
+import com.michaelflisar.composestyled.core.components.StyledButtonRenderer
 import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.core.runtime.ProvideStyledLocals
 
 @InternalComposeStyledApi
-abstract class UnstyledButtonTokenDefaultRenderer : StyledButtonTokenRenderer {
+abstract class UnstyledButtonRenderer : StyledButtonRenderer.TokenRenderer {
 
     @Composable
-    override fun Render(
+    override fun render(
         onClick: () -> Unit,
         modifier: Modifier,
         enabled: Boolean,
@@ -41,7 +41,7 @@ abstract class UnstyledButtonTokenDefaultRenderer : StyledButtonTokenRenderer {
             backgroundColor = backgroundColor,
         ) {
             val modifier = modifier.heightIn(
-                min = StyledButtonDefaults.MinimumHeight
+                min = StyledButtonDefaults.minimumHeight
             ).hoverable(
                 interactionSource = interactionSource,
                 enabled = enabled
@@ -65,5 +65,4 @@ abstract class UnstyledButtonTokenDefaultRenderer : StyledButtonTokenRenderer {
             )
         }
     }
-
 }

@@ -1,93 +1,68 @@
 package com.michaelflisar.composestyled.theme.material3.components
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.unit.Dp
 import com.michaelflisar.composestyled.core.StyledTheme
 import com.michaelflisar.composestyled.core.classes.Emphasis
 import com.michaelflisar.composestyled.core.classes.colors.BaseColorDef
 import com.michaelflisar.composestyled.core.classes.colors.StatefulBaseColorDef
 import com.michaelflisar.composestyled.core.components.StyledCard
-import com.michaelflisar.composestyled.core.components.StyledCardTokenRenderer
 import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
-import com.michaelflisar.composestyled.core.runtime.ProvideStyledLocals
+import com.michaelflisar.composestyled.shared.UnstyledCardRenderer
 import com.michaelflisar.composestyled.theme.material3.Material3Util
 
-internal object StyledCardImpl : StyledCardTokenRenderer {
+@OptIn(InternalComposeStyledApi::class)
+internal object StyledCardImpl : UnstyledCardRenderer() {
 
-    @OptIn(InternalComposeStyledApi::class)
     @Composable
-    override fun registerVariantStyles() {
-
+    override fun resolveColors(
+        variant: StyledCard.Variant,
+        customization: StyledCard.Customization?,
+    ): StatefulBaseColorDef {
+        val background = customization?.background?.resolve()
+        val foreground = customization?.content?.resolve()
+        val border = customization?.border?.resolve()
         val colors = StyledTheme.colors
+        return remember(variant, background, foreground, border, colors) {
+            when (variant) {
+                StyledCard.Variant.Filled -> {
+                    val bg = background ?: colors.surface
+                    val fg = foreground ?: colors.onSurface
+                    val b = border
+                    StatefulBaseColorDef(
+                        normal = BaseColorDef(bg, fg, b),
+                    )
+                }
 
-        val filled = StatefulBaseColorDef(
-            normal = BaseColorDef(
-                background = colors.surface,
-                foreground = colors.onSurface,
-                border = null,
-            )
-        )
-
-        val outlined = StatefulBaseColorDef(
-            normal = BaseColorDef(
-                background = Color.Transparent,
-                foreground = colors.onSurface,
-                border = colors.outlineVariant,
-            )
-        )
-
-        StyledCard.registerVariantStyles(
-            filled = filled,
-            outlined = outlined,
-        )
+                StyledCard.Variant.Outlined -> {
+                    val bg = background ?: Color.Transparent
+                    val fg = foreground ?: colors.onSurface
+                    val b = border ?: colors.outlineVariant
+                    StatefulBaseColorDef(
+                        normal = BaseColorDef(bg, fg, b),
+                    )
+                }
+            }
+        }
     }
 
-    /** Android/Unstyled-based card implementation. */
     @Composable
-    override fun Render(
-        modifier: Modifier,
-        shape: Shape,
-        emphasis: Emphasis,
-        backgroundColor: Color,
-        contentColor: Color,
-        border: BorderStroke?,
-        contentPadding: PaddingValues,
-        content: @Composable ColumnScope.() -> Unit,
-    ) {
+    override fun calcBackgroundColor(backgroundColor: Color, emphasis: Emphasis): Color {
         val surface = StyledTheme.colors.surface
         val bg by remember(backgroundColor, surface, emphasis) {
             derivedStateOf {
                 Material3Util.emphasizedColor(backgroundColor, surface, emphasis)
             }
         }
-        val elevation = Material3Util.emphasisElevation(emphasis)
-        ProvideStyledLocals(
-            contentColor = contentColor,
-            backgroundColor = bg,
-        ) {
-            Column(
-                modifier = modifier
-                    .shadow(elevation = elevation, shape = shape, clip = false)
-                    .clip(shape)
-                    .background(bg)
-                    .then(if (border != null) Modifier.border(border, shape) else Modifier)
-                    .padding(contentPadding),
-                content = content,
-            )
-        }
+        return bg
+    }
+
+    @Composable
+    override fun calcElevation(emphasis: Emphasis): Dp {
+        return Material3Util.emphasisElevation(emphasis)
     }
 }

@@ -5,9 +5,6 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-/**
- * Definiert die Standard-Shapes für das Designsystem.
- */
 @Immutable
 data class StyledSpacings(
     val small: Dp = 4.dp,

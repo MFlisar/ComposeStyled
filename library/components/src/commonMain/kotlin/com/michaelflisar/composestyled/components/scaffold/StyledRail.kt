@@ -3,6 +3,7 @@ package com.michaelflisar.composestyled.components.scaffold
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -16,7 +17,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -31,22 +31,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.composeunstyled.theme.ThemeProperty
 import com.michaelflisar.composestyled.core.StyledTheme
-import com.michaelflisar.composestyled.core.classes.IVariant
-import com.michaelflisar.composestyled.core.classes.TokenMap
-import com.michaelflisar.composestyled.core.classes.colors.BaseColorDef
-import com.michaelflisar.composestyled.core.classes.colors.ColorLocalToken
+import com.michaelflisar.composestyled.core.classes.colors.ColorRef
 import com.michaelflisar.composestyled.core.classes.colors.StatefulBaseColorDef
+import com.michaelflisar.composestyled.core.classes.colors.asColorRef
 import com.michaelflisar.composestyled.core.components.StyledButton
-import com.michaelflisar.composestyled.core.components.StyledButtonDefaults
 import com.michaelflisar.composestyled.core.components.StyledVerticalSeparator
 import com.michaelflisar.composestyled.core.renderer.ExtensionKey
 import com.michaelflisar.composestyled.core.renderer.ExtensionRenderer
 import com.michaelflisar.composestyled.core.renderer.getStyledExtensionRenderer
 import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
+import com.michaelflisar.composestyled.core.runtime.LocalBackgroundColor
+import com.michaelflisar.composestyled.core.runtime.LocalContentColor
 import com.michaelflisar.composestyled.core.runtime.ProvideStyledLocals
 import com.michaelflisar.composestyled.core.runtime.interaction.rememberStyledResolveState
+import com.michaelflisar.composestyled.theme.cupertino.CupertinoUtil
+import com.michaelflisar.composestyled.theme.fluent2.Fluent2Util
+import com.michaelflisar.composestyled.theme.material3.Material3Util
 
 // ----------------------
 // Key + Interface
@@ -60,7 +61,7 @@ interface StyledRailRenderer : ExtensionRenderer<StyledRailRenderer> {
         get() = StyledRailKey
 
     @Composable
-    fun Render(
+    fun render(
         items: List<StyledNavigationItem>,
         modifier: Modifier,
         header: @Composable (() -> Unit)?,
@@ -84,7 +85,7 @@ fun StyledRail(
     customization: StyledRail.Customization? = null,
 ) {
     val renderer = getStyledExtensionRenderer(StyledRailKey)
-    renderer.Render(items, modifier, header, footer, customization)
+    renderer.render(items, modifier, header, footer, customization)
 }
 
 // ----------------------
@@ -99,34 +100,31 @@ fun StyledRail(
 
 object StyledRail {
 
-    // properties
-    private val Property = ThemeProperty<StatefulBaseColorDef>("rail")
-
-    // tokens
-    internal val Tokens = TokenMap.create(Property, Variant.entries.toSet())
-
     // variants
-    enum class Variant(
-        override val id: String,
-    ) : IVariant {
-        Default("rail.default")
+    enum class Variant {
+        Default
     }
 
-    val width: Dp = 200.dp
+    val width: Dp = 150.dp
 
     // ----------------------
     // Customization
     // ----------------------
 
     fun customize(
+        background: ColorRef? = null,
+        content: ColorRef? = null,
+    ) = Customization(background, content)
+
+    fun customize(
         background: Color? = null,
         content: Color? = null,
-    ) = Customization(background, content)
+    ) = customize(background?.asColorRef(), content?.asColorRef())
 
     @Immutable
     class Customization internal constructor(
-        val background: Color?,
-        val content: Color?,
+        val background: ColorRef?,
+        val content: ColorRef?,
     )
 
     // ----------------------
@@ -135,14 +133,8 @@ object StyledRail {
 
     object Material3 : StyledRailRenderer {
 
-        @InternalComposeStyledApi
         @Composable
-        override fun registerVariantStyles() {
-            // ...
-        }
-
-        @Composable
-        override fun Render(
+        override fun render(
             items: List<StyledNavigationItem>,
             modifier: Modifier,
             header: @Composable (() -> Unit)?,
@@ -150,8 +142,10 @@ object StyledRail {
             customization: Customization?,
         ) {
             // TODO: just an example
-            val contentColor = customization?.content ?: StyledTheme.colors.onSurfaceVariant
-            val containerColor = customization?.background ?: StyledTheme.colors.surfaceVariant
+            val contentColor =
+                customization?.content?.resolve() ?: StyledTheme.colors.onSurfaceVariant
+            val containerColor =
+                customization?.background?.resolve() ?: StyledTheme.colors.surfaceVariant
             Content(items, modifier, header, footer, containerColor, contentColor, ::RenderItem)
         }
 
@@ -161,21 +155,28 @@ object StyledRail {
         ) {
             val foreground =
                 if (item.selected) StyledTheme.colors.onPrimary else StyledTheme.colors.secondary
-            val background = if (item.selected) StyledTheme.colors.primary else Color.Unspecified
-            ItemContent(item, foreground, background, false)
+            val background =
+                if (item.selected) StyledTheme.colors.primary else LocalBackgroundColor.current
+            val colors = if (item.selected) {
+                Material3Util.resolveButtonColors(
+                    StyledButton.Variant.Primary,
+                    StyledButton.customize(background, foreground, null)
+                )
+            } else {
+                Material3Util.resolveButtonColors(
+                    StyledButton.Variant.Text,
+                    StyledButton.customize(background, foreground, null)
+                )
+            }
+            ItemContent(item, colors, false)
+
         }
     }
 
     object Cupertino : StyledRailRenderer {
 
-        @InternalComposeStyledApi
         @Composable
-        override fun registerVariantStyles() {
-            // TODO: register styles if needed
-        }
-
-        @Composable
-        override fun Render(
+        override fun render(
             items: List<StyledNavigationItem>,
             modifier: Modifier,
             header: @Composable (() -> Unit)?,
@@ -183,8 +184,10 @@ object StyledRail {
             customization: Customization?,
         ) {
             // TODO: just an example
-            val contentColor = customization?.content ?: StyledTheme.colors.onSecondary
-            val containerColor = customization?.background ?: StyledTheme.colors.secondary
+            val contentColor =
+                customization?.content?.resolve() ?: StyledTheme.colors.onSurfaceVariant
+            val containerColor =
+                customization?.background?.resolve() ?: StyledTheme.colors.surfaceVariant
             Content(items, modifier, header, footer, containerColor, contentColor, ::RenderItem)
         }
 
@@ -193,22 +196,21 @@ object StyledRail {
             item: StyledNavigationItem,
         ) {
             val foreground =
-                if (item.selected) StyledTheme.colors.onPrimary else StyledTheme.colors.secondary
-            val background = if (item.selected) StyledTheme.colors.primary else Color.Unspecified
-            ItemContent(item, foreground, background, false)
+                if (item.selected) StyledTheme.colors.primary else LocalContentColor.current
+            val border = if (item.selected) StyledTheme.colors.primary else null
+            val colors = CupertinoUtil.resolveButtonColors(
+                StyledButton.Variant.Text,
+                StyledButton.customize(content = foreground, border = border)
+            )
+            //val colors = remember(item.selected, foreground) { CupertinoUtil.buttonColors(foreground, border) }
+            ItemContent(item, colors, false)
         }
     }
 
     object Fluent2 : StyledRailRenderer {
 
-        @InternalComposeStyledApi
         @Composable
-        override fun registerVariantStyles() {
-            // TODO: register styles if needed
-        }
-
-        @Composable
-        override fun Render(
+        override fun render(
             items: List<StyledNavigationItem>,
             modifier: Modifier,
             header: @Composable (() -> Unit)?,
@@ -216,8 +218,9 @@ object StyledRail {
             customization: Customization?,
         ) {
             // TODO: just an example
-            val contentColor = customization?.content ?: StyledTheme.colors.onBackground
-            val containerColor = customization?.background ?: StyledTheme.colors.background
+            val contentColor = customization?.content?.resolve() ?: StyledTheme.colors.onBackground
+            val containerColor =
+                customization?.background?.resolve() ?: StyledTheme.colors.background
             Content(items, modifier, header, footer, containerColor, contentColor, ::RenderItem)
         }
 
@@ -225,9 +228,12 @@ object StyledRail {
         private fun RenderItem(
             item: StyledNavigationItem,
         ) {
-            val foreground: Color? = null
-            val background: Color? = null
-            ItemContent(item, foreground, background, true)
+            val foreground = LocalContentColor.current
+            val colors = Fluent2Util.resolveButtonColors(
+                StyledButton.Variant.Text,
+                StyledButton.customize(content = foreground)
+            )
+            ItemContent(item, colors, true)
         }
     }
 
@@ -237,6 +243,7 @@ object StyledRail {
 // private composables
 // ----------------------
 
+@OptIn(InternalComposeStyledApi::class)
 @Composable
 private fun Content(
     items: List<StyledNavigationItem>,
@@ -278,28 +285,20 @@ private fun Content(
     }
 }
 
+@OptIn(InternalComposeStyledApi::class)
 @Composable
 private fun ItemContent(
     item: StyledNavigationItem,
-    foreground: Color?,
-    background: Color?,
+    colors: StatefulBaseColorDef,
     showLineIndicator: Boolean,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
-
-    /*
     val state = rememberStyledResolveState(
         interactionSource = interactionSource,
         enabled = item.enabled,
         isError = false,
     )
-    val def = StyledButton.Tokens.resolveToken(variant).customise(
-        background = customization?.background,
-        foreground = customization?.content,
-        border = customization?.border,
-    )
-    val resolved = def.resolve(state)
-*/
+    val colors = colors.resolve(state)
 
     val modifier = Modifier
         .fillMaxWidth()
@@ -308,10 +307,17 @@ private fun ItemContent(
             minWidth = StyledTheme.sizes.minimumInteractiveSize
         )
         .clip(StyledTheme.shapes.control)
-        .then(if (background != null) Modifier.background(background) else Modifier)
+        .then(if (colors.background != Color.Transparent) Modifier.background(colors.background) else Modifier)
+        .then(
+            if (colors.border != null) Modifier.border(
+                1.dp,
+                colors.border!!,
+                StyledTheme.shapes.control
+            ) else Modifier
+        )
         .hoverable(
             interactionSource = interactionSource,
-            enabled =  item.enabled
+            enabled = item.enabled
         )
         .clickable(
             enabled = item.enabled,
@@ -321,8 +327,8 @@ private fun ItemContent(
         .padding(horizontal = StyledTheme.paddings.medium, vertical = StyledTheme.paddings.medium)
 
     ProvideStyledLocals(
-        contentColor = foreground,
-        backgroundColor = background
+        contentColor = colors.foreground,
+        backgroundColor = colors.background
     ) {
         Row(
             modifier = modifier.height(IntrinsicSize.Min),

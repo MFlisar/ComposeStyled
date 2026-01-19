@@ -50,6 +50,7 @@ import com.michaelflisar.composestyled.core.components.StyledHorizontalSeparator
 import com.michaelflisar.composestyled.core.components.StyledIcon
 import com.michaelflisar.composestyled.core.components.StyledText
 import com.michaelflisar.composestyled.core.disabled
+import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.core.runtime.LocalContentColor
 import com.michaelflisar.composestyled.core.runtime.LocalTextStyle
 import com.michaelflisar.composestyled.core.runtime.ProvideStyledLocals
@@ -479,6 +480,7 @@ fun MenuScope.MenuSubMenu(
     )
 }
 
+@OptIn(InternalComposeStyledApi::class)
 @Composable
 private fun MenuScope.MenuBack(
     text: @Composable () -> Unit,

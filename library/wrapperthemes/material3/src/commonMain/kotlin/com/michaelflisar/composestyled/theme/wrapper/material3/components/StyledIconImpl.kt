@@ -9,12 +9,12 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
 import com.michaelflisar.composestyled.core.components.StyledIcon
-import com.michaelflisar.composestyled.core.components.StyledIconWrapperRenderer
+import com.michaelflisar.composestyled.core.components.StyledIconRenderer
 
-internal object StyledIconImpl : StyledIconWrapperRenderer {
+internal object StyledIconImpl : StyledIconRenderer.WrapperRenderer {
 
     @Composable
-    override fun Render(
+    override fun render(
         variant: StyledIcon.Variant,
         painter: Painter,
         contentDescription: String?,
@@ -31,7 +31,7 @@ internal object StyledIconImpl : StyledIconWrapperRenderer {
     }
 
     @Composable
-    override fun Render(
+    override fun render(
         variant: StyledIcon.Variant,
         imageVector: ImageVector,
         contentDescription: String?,

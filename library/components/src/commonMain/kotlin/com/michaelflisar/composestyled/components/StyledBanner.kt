@@ -32,7 +32,7 @@ interface StyledBannerRenderer : ExtensionRenderer<StyledBannerRenderer> {
         get() = StyledBannerKey
 
     @Composable
-    fun Render(
+    fun render(
         text: String,
         imageVector: ImageVector?,
         modifier: Modifier,
@@ -56,7 +56,7 @@ fun StyledBanner(
     customization: StyledBanner.Customization? = null,
 ) {
     val renderer = getStyledExtensionRenderer(StyledBannerKey)
-    renderer.Render(text, imageVector, modifier, title, customization)
+    renderer.render(text, imageVector, modifier, title, customization)
 }
 
 // ----------------------
@@ -97,14 +97,8 @@ object StyledBanner {
 
     object Material3 : StyledBannerRenderer {
 
-        @InternalComposeStyledApi
         @Composable
-        override fun registerVariantStyles() {
-            // TODO: register styles if needed
-        }
-
-        @Composable
-        override fun Render(
+        override fun render(
             text: String,
             imageVector: ImageVector?,
             modifier: Modifier,
@@ -112,22 +106,18 @@ object StyledBanner {
             customization: Customization?,
         ) {
             // TODO: just an example
-            val contentColor = customization?.content?.resolve() ?: StyledTheme.colors.surfaceVariant
-            val containerColor = customization?.background?.resolve() ?: StyledTheme.colors.onSurfaceVariant
+            val contentColor =
+                customization?.content?.resolve() ?: StyledTheme.colors.surfaceVariant
+            val containerColor =
+                customization?.background?.resolve() ?: StyledTheme.colors.onSurfaceVariant
             Content(text, imageVector, modifier, title, containerColor, contentColor)
         }
     }
 
     object Cupertino : StyledBannerRenderer {
 
-        @InternalComposeStyledApi
         @Composable
-        override fun registerVariantStyles() {
-            // TODO: register styles if needed
-        }
-
-        @Composable
-        override fun Render(
+        override fun render(
             text: String,
             imageVector: ImageVector?,
             modifier: Modifier,
@@ -136,21 +126,16 @@ object StyledBanner {
         ) {
             // TODO: just an example
             val contentColor = customization?.content?.resolve() ?: StyledTheme.colors.secondary
-            val containerColor = customization?.background?.resolve() ?: StyledTheme.colors.onSecondary
+            val containerColor =
+                customization?.background?.resolve() ?: StyledTheme.colors.onSecondary
             Content(text, imageVector, modifier, title, containerColor, contentColor)
         }
     }
 
     object Fluent2 : StyledBannerRenderer {
 
-        @InternalComposeStyledApi
         @Composable
-        override fun registerVariantStyles() {
-            // TODO: register styles if needed
-        }
-
-        @Composable
-        override fun Render(
+        override fun render(
             text: String,
             imageVector: ImageVector?,
             modifier: Modifier,
@@ -159,7 +144,8 @@ object StyledBanner {
         ) {
             // TODO: just an example
             val contentColor = customization?.content?.resolve() ?: StyledTheme.colors.background
-            val containerColor = customization?.background?.resolve() ?: StyledTheme.colors.onBackground
+            val containerColor =
+                customization?.background?.resolve() ?: StyledTheme.colors.onBackground
             Content(text, imageVector, modifier, title, containerColor, contentColor)
         }
     }
