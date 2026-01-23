@@ -6,24 +6,12 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 
-val LocalBackgroundColor = compositionLocalOf<Color> { error("No background color provided") }
-val LocalContentColor = compositionLocalOf<Color> { error("No content color provided") }
-val LocalTextStyle = compositionLocalOf<TextStyle> { error("No text style provided") }
-
-@Composable
-fun ProvideContentColor(color: Color, content: @Composable () -> Unit) =
-    CompositionLocalProvider(LocalContentColor provides color, content = content)
-
-@Composable
-fun ProvideBackgroundColor(color: Color, content: @Composable () -> Unit) =
-    CompositionLocalProvider(LocalBackgroundColor provides color, content = content)
-
-@Composable
-fun ProvideTextStyle(style: TextStyle, content: @Composable () -> Unit) =
-    CompositionLocalProvider(
-        LocalTextStyle provides LocalTextStyle.current.merge(style),
-        content = content
-    )
+internal val LocalStyledBackgroundColor =
+    compositionLocalOf<Color> { error("No background color provided") }
+internal val LocalStyledContentColor =
+    compositionLocalOf<Color> { error("No content color provided") }
+internal val LocalStyledTextStyle =
+    compositionLocalOf<TextStyle> { error("No text style provided") }
 
 /**
  * Provides multiple styled locals at once.
@@ -47,10 +35,10 @@ fun ProvideStyledLocals(
     content: @Composable () -> Unit,
 ) {
     CompositionLocalProvider(
-        LocalContentColor provides (contentColor ?: LocalContentColor.current),
-        LocalBackgroundColor provides (backgroundColor.takeIf { it != Color.Transparent || applyTransparentBackgroundColor }
-            ?: LocalBackgroundColor.current),
-        LocalTextStyle provides (textStyle ?: LocalTextStyle.current),
+        LocalStyledContentColor provides (contentColor ?: LocalStyledContentColor.current),
+        LocalStyledBackgroundColor provides (backgroundColor.takeIf { it != Color.Transparent || applyTransparentBackgroundColor }
+            ?: LocalStyledBackgroundColor.current),
+        LocalStyledTextStyle provides (textStyle ?: LocalStyledTextStyle.current),
         content = content
     )
 }

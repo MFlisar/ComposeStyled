@@ -5,12 +5,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.HdrAuto
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -21,6 +25,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import com.michaelflisar.composestyled.components.layout.ContentRow
 import com.michaelflisar.composestyled.components.menu.MenuItem
 import com.michaelflisar.composestyled.components.menu.MenuSubMenu
 import com.michaelflisar.composestyled.components.menu.PopupMenu
@@ -38,8 +44,11 @@ import com.michaelflisar.composestyled.components.scaffold.styledExitUntilCollap
 import com.michaelflisar.composestyled.core.StyledTheme
 import com.michaelflisar.composestyled.core.classes.ThemeMode
 import com.michaelflisar.composestyled.core.components.StyledButton
+import com.michaelflisar.composestyled.core.components.StyledHorizontalSeparator
 import com.michaelflisar.composestyled.core.components.StyledIcon
 import com.michaelflisar.composestyled.core.components.StyledText
+import com.michaelflisar.composestyled.demo.composables.CheckedImageButton
+import com.michaelflisar.composestyled.demo.composables.CheckedTextButton
 import com.michaelflisar.composestyled.demo.screens.ButtonsScreen
 import com.michaelflisar.composestyled.demo.screens.CardsScreen
 import com.michaelflisar.composestyled.demo.screens.GeneralScreen
@@ -120,7 +129,7 @@ fun DemoApp(
                         containerColor = StyledTheme.colors.primarySurface,
                         contentColor = StyledTheme.colors.onPrimarySurface,
                         collapsedFraction = collapsedFraction,
-                        title = appName,
+                        title = "$appName - $platform",
                         navigationIcon = {
                             StyledButton(
                                 variant = StyledButton.Variant.Text,
@@ -180,13 +189,34 @@ fun DemoApp(
                 rail = {
                     if (showRail) {
                         StyledRail(
+                            modifier = Modifier.width(250.dp),
                             items = navigationItems(false),
-                            footer = { FAB(snackbarHostState, true) },
+                            footer = { FAB(snackbarHostState, true, modifier = Modifier.padding(StyledTheme.paddings.medium)) },
                             header = {
-                                StyledText(
-                                    platform,
-                                    style = StyledTheme.typography.titleMedium
-                                )
+                                ContentRow {
+                                    val data = mapOf(
+                                        Icons.Default.LightMode to ThemeMode.Light,
+                                        Icons.Default.DarkMode to ThemeMode.Dark,
+                                        Icons.Default.HdrAuto to ThemeMode.System,
+                                    )
+                                    for ((icon, theme) in data) {
+                                        CheckedImageButton(
+                                            imageVector = icon,
+                                            checked = mode.value == theme,
+                                            onClick = {  mode.value = theme }
+                                        )
+                                    }
+                                }
+                                ContentRow {
+                                    DemoThemes.mainThemes.forEach {
+                                        CheckedTextButton(
+                                            text = it.shortName,
+                                            checked = theme.value == it,
+                                            onClick = { themeIndex.value = themes.indexOf(it) }
+                                        )
+                                    }
+                                }
+                                StyledHorizontalSeparator()
                             }
                         )
                     }
@@ -224,10 +254,12 @@ fun DemoApp(
 private fun FAB(
     snackbarHostState: StyledSnackbarHostState,
     inRail: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     val scope = rememberCoroutineScope()
     val counter = remember { mutableIntStateOf(0) }
     StyledFloatingActionButton(
+        modifier = modifier,
         imageVector = Icons.Default.Add,
         text = "Test".takeIf { inRail },
         fillWidth = inRail,

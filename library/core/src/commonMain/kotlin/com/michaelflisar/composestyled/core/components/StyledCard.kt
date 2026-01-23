@@ -1,18 +1,20 @@
 package com.michaelflisar.composestyled.core.components
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.core.StyledTheme
 import com.michaelflisar.composestyled.core.classes.Emphasis
+import com.michaelflisar.composestyled.core.classes.colors.BaseColor
 import com.michaelflisar.composestyled.core.classes.colors.ColorRef
 import com.michaelflisar.composestyled.core.classes.colors.StatefulBaseColorDef
 import com.michaelflisar.composestyled.core.renderer.LocalStyledComponents
@@ -20,7 +22,6 @@ import com.michaelflisar.composestyled.core.runtime.interaction.rememberStyledRe
 
 object StyledCard {
 
-    // variants - TODO: namen neutraler machen?
     enum class Variant {
         Filled,
         Outlined
@@ -51,18 +52,36 @@ sealed interface StyledCardRenderer {
         @Composable
         fun resolveColors(
             variant: StyledCard.Variant,
+            emphasis: Emphasis,
             customization: StyledCard.Customization?,
         ): StatefulBaseColorDef
 
         @Composable
+        fun resolveElevation(
+            variant: StyledCard.Variant,
+            emphasis: Emphasis,
+            customization: StyledCard.Customization?,
+        ): Dp
+
+        @Composable
+        fun resolveBorderStroke(
+            variant: StyledCard.Variant,
+            emphasis: Emphasis,
+            colors: BaseColor,
+            customization: StyledCard.Customization?,
+        ): BorderStroke?
+
+        @Composable
         fun render(
             modifier: Modifier,
+            onClick: (() -> Unit)?,
             shape: Shape,
-            emphasis: Emphasis,
             backgroundColor: Color,
             contentColor: Color,
-            border: BorderStroke?,
+            borderStroke: BorderStroke?,
+            elevation: Dp,
             contentPadding: PaddingValues,
+            interactionSource: MutableInteractionSource,
             content: @Composable ColumnScope.() -> Unit,
         )
     }
@@ -72,11 +91,13 @@ sealed interface StyledCardRenderer {
         @Composable
         fun render(
             variant: StyledCard.Variant,
+            emphasis: Emphasis,
             customization: StyledCard.Customization?,
             modifier: Modifier,
-            emphasis: Emphasis,
+            onClick: (() -> Unit)?,
             shape: Shape,
             contentPadding: PaddingValues,
+            interactionSource: MutableInteractionSource,
             content: @Composable ColumnScope.() -> Unit,
         )
     }
@@ -90,15 +111,17 @@ object StyledCardDefaults {
 
     val variant = StyledCard.Variant.Filled
 
-    val DefaultEmphasis = Emphasis.Low
+    val emphasis = Emphasis.Low
 
     val shape: Shape
         @Composable @ReadOnlyComposable get() = StyledTheme.shapes.container
 
     @Composable
-    fun contentPadding(): PaddingValues = PaddingValues(0.dp)
+    fun contentPadding(
+        horizontal: Dp = StyledTheme.paddings.medium,
+        vertical: Dp = StyledTheme.paddings.medium,
+    ) = PaddingValues(horizontal = horizontal, vertical = vertical)
 
-    val BorderWidth: Dp = Dp.Hairline
 }
 
 // ----------------------
@@ -108,46 +131,56 @@ object StyledCardDefaults {
 @Composable
 fun StyledCard(
     modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
     variant: StyledCard.Variant = StyledCardDefaults.variant,
+    emphasis: Emphasis = StyledCardDefaults.emphasis,
     customization: StyledCard.Customization? = null,
     shape: Shape = StyledCardDefaults.shape,
-    emphasis: Emphasis = StyledCardDefaults.DefaultEmphasis,
-    enabled: Boolean = true,
     contentPadding: PaddingValues = StyledCardDefaults.contentPadding(),
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable ColumnScope.() -> Unit,
 ) {
     when (val renderer = LocalStyledComponents.current.card) {
         is StyledCardRenderer.TokenRenderer -> {
             val state = rememberStyledResolveState(
-                interactionSource = null,
-                enabled = enabled,
+                interactionSource = interactionSource,
+                enabled = true,
                 isError = false,
             )
+
             val colors = renderer
-                .resolveColors(variant, customization)
+                .resolveColors(variant, emphasis, customization)
                 .resolve(state)
-            val border = colors.border?.let { BorderStroke(StyledCardDefaults.BorderWidth, it) }
+
+            val resolvedElevation = renderer.resolveElevation(variant, emphasis, customization)
+            val borderStroke =
+                renderer.resolveBorderStroke(variant, emphasis, colors, customization)
+
             renderer.render(
                 modifier = modifier,
+                onClick = onClick,
                 shape = shape,
-                emphasis = emphasis,
                 backgroundColor = colors.background,
                 contentColor = colors.foreground,
-                border = border,
+                borderStroke = borderStroke,
+                elevation = resolvedElevation,
                 contentPadding = contentPadding,
-                content = content,
+                interactionSource = interactionSource,
+                content = content
             )
         }
 
         is StyledCardRenderer.WrapperRenderer -> {
             renderer.render(
                 variant = variant,
+                emphasis = emphasis,
                 customization = customization,
                 modifier = modifier,
-                emphasis = emphasis,
+                onClick = onClick,
                 shape = shape,
                 contentPadding = contentPadding,
-                content = content,
+                interactionSource = interactionSource,
+                content = content
             )
         }
     }

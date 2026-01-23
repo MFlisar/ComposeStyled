@@ -13,7 +13,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import com.michaelflisar.composestyled.core.StyledTheme
 import com.michaelflisar.composestyled.core.renderer.LocalStyledComponents
-import com.michaelflisar.composestyled.core.runtime.LocalContentColor
+import com.michaelflisar.composestyled.core.runtime.LocalStyledContentColor
 
 object StyledText {
 
@@ -86,8 +86,6 @@ object StyledTextDefaults {
 
     val variant: StyledText.Variant = StyledText.Variant.Default
 
-    val style: TextStyle
-        @Composable get() = StyledTheme.typography.bodyMedium
 }
 
 // ----------------------
@@ -99,13 +97,13 @@ fun StyledText(
     text: String,
     modifier: Modifier = Modifier,
     variant: StyledText.Variant = StyledTextDefaults.variant,
-    style: TextStyle = StyledTextDefaults.style,
+    style: TextStyle = StyledTheme.currentTextStyle,
     textAlign: TextAlign = TextAlign.Unspecified,
     lineHeight: TextUnit = TextUnit.Unspecified,
     fontSize: TextUnit = style.fontSize,
     letterSpacing: TextUnit = style.letterSpacing,
     fontWeight: FontWeight? = style.fontWeight,
-    color: Color = LocalContentColor.current,
+    color: Color = LocalStyledContentColor.current,
     fontFamily: FontFamily? = style.fontFamily,
     singleLine: Boolean = false,
     minLines: Int = 1,

@@ -15,7 +15,6 @@ import com.michaelflisar.composestyled.core.StyledTheme
 import com.michaelflisar.composestyled.core.components.StyledIcon
 import com.michaelflisar.composestyled.core.components.StyledText
 import com.michaelflisar.composestyled.core.components.StyledTextDefaults
-import com.michaelflisar.composestyled.core.runtime.LocalContentColor
 
 @Composable
 fun StyledButtonContent(
@@ -29,8 +28,8 @@ fun StyledButtonContent(
     } else {
         val density = LocalDensity.current
 
-        val lineHeight = StyledTextDefaults.style.lineHeight
-        val fallbackIconSizeSp = StyledTextDefaults.style.fontSize
+        val lineHeight = StyledTheme.currentTextStyle.lineHeight
+        val fallbackIconSizeSp = StyledTheme.currentTextStyle.fontSize
         val iconSizeSp = if (lineHeight.type == TextUnitType.Sp) lineHeight else fallbackIconSizeSp
         val iconSizeDp = with(density) { iconSizeSp.toDp() }
 
@@ -39,7 +38,7 @@ fun StyledButtonContent(
                 imageVector = icon,
                 contentDescription = null,
                 modifier = Modifier.size(iconSizeDp).rotate(iconRotation),
-                tint = iconTint ?: LocalContentColor.current
+                tint = iconTint ?: StyledTheme.currentContentColor
             )
         } else {
             Row(
@@ -50,7 +49,7 @@ fun StyledButtonContent(
                     imageVector = icon,
                     contentDescription = null,
                     modifier = Modifier.size(iconSizeDp).rotate(iconRotation),
-                    tint = iconTint ?: LocalContentColor.current
+                    tint = iconTint ?: StyledTheme.currentContentColor
                 )
                 StyledText(text)
             }

@@ -16,7 +16,7 @@ import com.michaelflisar.composestyled.core.classes.colors.ColorRef
 import com.michaelflisar.composestyled.core.classes.colors.StatefulBaseColorDef
 import com.michaelflisar.composestyled.core.icons.Check
 import com.michaelflisar.composestyled.core.renderer.LocalStyledComponents
-import com.michaelflisar.composestyled.core.runtime.LocalContentColor
+import com.michaelflisar.composestyled.core.runtime.LocalStyledContentColor
 import com.michaelflisar.composestyled.core.runtime.interaction.rememberStyledResolveState
 
 object StyledCheckbox {
@@ -110,7 +110,7 @@ object StyledCheckboxDefaults {
 
     @Composable
     fun CheckIcon(
-        color: Color = LocalContentColor.current,
+        color: Color = LocalStyledContentColor.current,
     ) {
         StyledIcon(
             imageVector = Check,

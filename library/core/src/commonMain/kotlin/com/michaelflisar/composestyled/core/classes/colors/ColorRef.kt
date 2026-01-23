@@ -6,8 +6,8 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 import com.michaelflisar.composestyled.core.StyledTheme
-import com.michaelflisar.composestyled.core.runtime.LocalBackgroundColor
-import com.michaelflisar.composestyled.core.runtime.LocalContentColor
+import com.michaelflisar.composestyled.core.runtime.LocalStyledBackgroundColor
+import com.michaelflisar.composestyled.core.runtime.LocalStyledContentColor
 
 fun Color.asColorRef(): ColorRef = ColorRef.Fixed(this)
 
@@ -74,8 +74,8 @@ sealed interface ColorRef {
         @ReadOnlyComposable
         override fun resolve(): Color {
             return when (this) {
-                Content -> LocalContentColor.current
-                Container -> LocalBackgroundColor.current
+                Content -> LocalStyledContentColor.current
+                Container -> LocalStyledBackgroundColor.current
             }
         }
     }

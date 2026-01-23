@@ -3,7 +3,7 @@ package com.michaelflisar.composestyled.core.tokens
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
-import com.michaelflisar.composestyled.core.classes.DisableFactorType
+import com.michaelflisar.composestyled.core.classes.StyledDisableFactor
 
 @Immutable
 data class StyledColors(
@@ -98,10 +98,10 @@ data class StyledDisableFactors(
     val outline: Float,
     val content: Float,
 ) {
-    fun get(type: DisableFactorType): Float = when (type) {
-        DisableFactorType.Default -> default
-        DisableFactorType.Outline -> outline
-        DisableFactorType.Content -> content
+    fun get(type: StyledDisableFactor): Float = when (type) {
+        StyledDisableFactor.Default -> default
+        StyledDisableFactor.Outline -> outline
+        StyledDisableFactor.Content -> content
     }
 }
 

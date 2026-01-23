@@ -15,22 +15,26 @@ object DemoThemes {
 
     val themeM3 = ThemeWithExtensions(
         name = "Material3",
+        shortName = "M3",
         theme = StyleMaterial3,
         extensions = listOf(StyledBanner.Material3, StyledRail.Material3)
     )
     val themeCupertino = ThemeWithExtensions(
         name = "Cupertino",
+        shortName = "C",
         theme = StyleCupertino,
         extensions = listOf(StyledBanner.Cupertino, StyledRail.Cupertino)
     )
     val themeFluent2 = ThemeWithExtensions(
         name = "Fluent2",
+        shortName = "F2",
         theme = StyleFluent2,
         extensions = listOf(StyledBanner.Fluent2, StyledRail.Fluent2)
     )
 
     val themeM3Wrapper = ThemeWithExtensions(
         name = "Material3 (Wrapper)",
+        shortName = "M3W",
         theme = StyleMaterial3Wrapper,
         extensions = listOf(StyledBanner.Material3, StyledRail.Material3)
     )
@@ -38,6 +42,7 @@ object DemoThemes {
     // custom style combining M3 with Cupertino buttons - just for demonstration
     val themeCustom1 = ThemeWithExtensions(
         name = "Custom (M3 + Cupertino Buttons/Extensions)",
+        shortName = "C1",
         theme = StyleMaterial3.copy(
             components = StyleMaterial3.components.copy(
                 button = StyleCupertino.components.button,
@@ -49,6 +54,7 @@ object DemoThemes {
     // custom style combining M3 with Fluent2 buttons - just for demonstration
     val themeCustom2 = ThemeWithExtensions(
         name = "Custom (M3 + Fluent2 Buttons/Extensions)",
+        shortName = "C2",
         theme = StyleMaterial3.copy(
             components = StyleMaterial3.components.copy(
                 button = StyleFluent2.components.button,
@@ -64,6 +70,12 @@ object DemoThemes {
         themeM3Wrapper,
         themeCustom1,
         themeCustom2
+    )
+
+    val mainThemes = listOf(
+        themeM3,
+        themeCupertino,
+        themeFluent2,
     )
 
     val light = lightStyledColors()

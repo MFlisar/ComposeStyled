@@ -43,23 +43,23 @@ internal object StyledButtonImpl : StyledButtonRenderer.WrapperRenderer {
 
         if (customization != null) {
             containerColor =
-                customization.background?.resolve() ?: MaterialTheme.colorScheme.background
+                customization.tint?.resolve() ?: MaterialTheme.colorScheme.background
             contentColor =
-                customization.content?.resolve() ?: MaterialTheme.colorScheme.onBackground
+                customization.onTint?.resolve() ?: MaterialTheme.colorScheme.onBackground
             disabledContainerColor =
-                customization.background?.resolve()?.disabled() ?: Color.Unspecified
+                customization.tint?.resolve()?.disabled() ?: Color.Unspecified
             disabledContentColor =
-                customization.content?.resolve()?.disabled() ?: Color.Unspecified
+                customization.onTint?.resolve()?.disabled() ?: Color.Unspecified
         } else {
             when (variant) {
-                StyledButton.Variant.Primary -> {
+                StyledButton.Variant.Prominent -> {
                     containerColor = MaterialTheme.colorScheme.primary
                     contentColor = MaterialTheme.colorScheme.onPrimary
                     disabledContainerColor = MaterialTheme.colorScheme.primary.disabled()
                     disabledContentColor = MaterialTheme.colorScheme.onPrimary.disabled()
                 }
 
-                StyledButton.Variant.Secondary -> {
+                StyledButton.Variant.Normal -> {
                     containerColor = MaterialTheme.colorScheme.secondary
                     contentColor = MaterialTheme.colorScheme.onSecondary
                     disabledContainerColor = MaterialTheme.colorScheme.secondary.disabled()
@@ -83,8 +83,8 @@ internal object StyledButtonImpl : StyledButtonRenderer.WrapperRenderer {
         }
 
         when (variant) {
-            StyledButton.Variant.Primary,
-            StyledButton.Variant.Secondary,
+            StyledButton.Variant.Prominent,
+            StyledButton.Variant.Normal,
                 -> {
                 Button(
                     onClick = onClick,

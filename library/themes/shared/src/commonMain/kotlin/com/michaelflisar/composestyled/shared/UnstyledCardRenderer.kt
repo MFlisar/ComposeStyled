@@ -3,6 +3,9 @@ package com.michaelflisar.composestyled.shared
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -14,7 +17,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
-import com.michaelflisar.composestyled.core.classes.Emphasis
+import com.michaelflisar.composestyled.core.StyledTheme
 import com.michaelflisar.composestyled.core.components.StyledCardRenderer
 import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.core.runtime.ProvideStyledLocals
@@ -23,37 +26,49 @@ import com.michaelflisar.composestyled.core.runtime.ProvideStyledLocals
 abstract class UnstyledCardRenderer : StyledCardRenderer.TokenRenderer {
 
     @Composable
-    abstract fun calcBackgroundColor(backgroundColor: Color, emphasis: Emphasis): Color
-
-    @Composable
-    abstract fun calcElevation(emphasis: Emphasis): Dp
-
-    @Composable
     override fun render(
         modifier: Modifier,
+        onClick: (() -> Unit)?,
         shape: Shape,
-        emphasis: Emphasis,
         backgroundColor: Color,
         contentColor: Color,
-        border: BorderStroke?,
+        borderStroke: BorderStroke?,
+        elevation: Dp,
         contentPadding: PaddingValues,
+        interactionSource: MutableInteractionSource,
         content: @Composable ColumnScope.() -> Unit,
     ) {
-        val bg = calcBackgroundColor(backgroundColor, emphasis)
-        val elevation = calcElevation(emphasis)
         ProvideStyledLocals(
             contentColor = contentColor,
-            backgroundColor = bg,
+            backgroundColor = backgroundColor,
         ) {
-            Column(
+            Box(
                 modifier = modifier
-                    .shadow(elevation = elevation, shape = shape, clip = false)
+                    .shadow(elevation = elevation, shape = shape)
+                    .then(
+                        if (borderStroke != null) Modifier.border(
+                            borderStroke,
+                            shape
+                        ) else Modifier
+                    )
                     .clip(shape)
-                    .background(bg)
-                    .then(if (border != null) Modifier.border(border, shape) else Modifier)
-                    .padding(contentPadding),
-                content = content,
-            )
+                    .background(backgroundColor)
+                    .then(
+                        if (onClick == null)
+                            Modifier
+                        else Modifier.clickable(
+                            interactionSource = interactionSource,
+                            indication = StyledTheme.indications.select(backgroundColor),
+                            onClick = onClick
+                        )
+                    )
+            ) {
+                Column(
+                    modifier = Modifier.padding(contentPadding)
+                ) {
+                    content()
+                }
+            }
         }
     }
 }

@@ -97,6 +97,9 @@ kotlin {
             api(libs.jetbrains.compose.foundation)
             api(libs.jetbrains.compose.ui)
 
+            // TODO
+            implementation("com.composables:ripple-indication:1.1.0")
+
         }
     }
 }

@@ -8,7 +8,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.core.renderer.LocalStyledComponents
-import com.michaelflisar.composestyled.core.runtime.LocalContentColor
+import com.michaelflisar.composestyled.core.runtime.LocalStyledContentColor
 
 object StyledIcon {
 
@@ -88,7 +88,7 @@ fun StyledIcon(
     painter: Painter,
     contentDescription: String?,
     modifier: Modifier = Modifier,
-    tint: Color = LocalContentColor.current,
+    tint: Color = LocalStyledContentColor.current,
     size: Dp = StyledIconDefaults.Size,
     variant: StyledIcon.Variant = StyledIconDefaults.variant,
 ) {
@@ -121,7 +121,7 @@ fun StyledIcon(
     imageVector: ImageVector,
     contentDescription: String?,
     modifier: Modifier = Modifier,
-    tint: Color = LocalContentColor.current,
+    tint: Color = LocalStyledContentColor.current,
     size: Dp = StyledIconDefaults.Size,
     variant: StyledIcon.Variant = StyledIconDefaults.variant,
 ) {

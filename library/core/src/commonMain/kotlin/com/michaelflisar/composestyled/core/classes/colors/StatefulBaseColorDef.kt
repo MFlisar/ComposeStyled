@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.graphics.Color
-import com.michaelflisar.composestyled.core.classes.DisableFactorType
+import com.michaelflisar.composestyled.core.classes.StyledDisableFactor
 import com.michaelflisar.composestyled.core.classes.StyledInteractionState
 import com.michaelflisar.composestyled.core.classes.StyledResolveState
 import com.michaelflisar.composestyled.core.disabled
@@ -53,15 +53,15 @@ data class StatefulBaseColorDef(
 
         return BaseColor(
             background = colorDefinition.background.resolve()
-                .treat(enabled, DisableFactorType.Default),
+                .treat(enabled, StyledDisableFactor.Default),
             foreground = colorDefinition.foreground.resolve()
-                .treat(enabled, DisableFactorType.Content),
-            border = colorDefinition.border?.resolve()?.treat(enabled, DisableFactorType.Outline),
+                .treat(enabled, StyledDisableFactor.Content),
+            border = colorDefinition.border?.resolve()?.treat(enabled, StyledDisableFactor.Outline),
         )
     }
 
     @Composable
     @ReadOnlyComposable
-    private fun Color.treat(enabled: Boolean, disableFactorType: DisableFactorType) =
+    private fun Color.treat(enabled: Boolean, disableFactorType: StyledDisableFactor) =
         if (enabled) this else this.disabled(disableFactorType)
 }

@@ -11,8 +11,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import com.michaelflisar.composestyled.core.StyledTheme
+import com.michaelflisar.composestyled.core.classes.Density
+import com.michaelflisar.composestyled.core.classes.Size
+import com.michaelflisar.composestyled.core.classes.StyledResolveState
 import com.michaelflisar.composestyled.core.classes.colors.ColorRef
 import com.michaelflisar.composestyled.core.classes.colors.StatefulBaseColorDef
 import com.michaelflisar.composestyled.core.classes.colors.asColorRef
@@ -23,28 +27,28 @@ object StyledButton {
 
     // variants
     enum class Variant {
-        Primary,
-        Secondary,
+        Prominent,
+        Normal,
         Outlined,
         Text
     }
 
     fun customize(
-        background: ColorRef? = null,
-        content: ColorRef? = null,
+        tint: ColorRef? = null,
+        onTint: ColorRef? = null,
         border: ColorRef? = null,
-    ) = Customization(background, content, border)
+    ) = Customization(tint, onTint, border)
 
     fun customize(
-        background: Color? = null,
-        content: Color? = null,
+        tint: Color? = null,
+        onTint: Color? = null,
         border: Color? = null,
-    ) = customize(background?.asColorRef(), content?.asColorRef(), border?.asColorRef())
+    ) = customize(tint?.asColorRef(), onTint?.asColorRef(), border?.asColorRef())
 
     @Immutable
     class Customization internal constructor(
-        val background: ColorRef?,
-        val content: ColorRef?,
+        val tint: ColorRef?,
+        val onTint: ColorRef?,
         val border: ColorRef?,
     )
 }
@@ -64,14 +68,23 @@ sealed interface StyledButtonRenderer {
         ): StatefulBaseColorDef
 
         @Composable
+        fun resolveBorderWidth(
+            variant: StyledButton.Variant,
+            customization: StyledButton.Customization?,
+            state: StyledResolveState,
+        ): Dp?
+
+        @Composable
         fun render(
             onClick: () -> Unit,
             modifier: Modifier,
+            textStyle: TextStyle,
             enabled: Boolean,
             shape: Shape,
             backgroundColor: Color,
             contentColor: Color,
             borderColor: Color?,
+            borderWidth: Dp?,
             contentPadding: PaddingValues,
             interactionSource: MutableInteractionSource,
             content: @Composable RowScope.() -> Unit,
@@ -102,19 +115,28 @@ sealed interface StyledButtonRenderer {
 
 object StyledButtonDefaults {
 
-    val variant = StyledButton.Variant.Primary
+    val variant = StyledButton.Variant.Prominent
 
-    val minimumHeight: Dp
-        @Composable @ReadOnlyComposable get() = StyledTheme.sizes.minimumInteractiveSize
+    @Composable
+    @ReadOnlyComposable
+    fun minimumHeight(
+        size: Size = Size.Normal,
+    ): Dp {
+        return size.minimumInteractiveSize()
+    }
 
     val shape: Shape
         @Composable @ReadOnlyComposable get() = StyledTheme.shapes.control
 
     @Composable
     fun contentPadding(
-        horizontal: Dp = StyledTheme.paddings.large,
-        vertical: Dp = StyledTheme.paddings.small,
-    ) = PaddingValues(horizontal = horizontal, vertical = vertical)
+        density: Density,
+    ): PaddingValues {
+        return PaddingValues(
+            horizontal = density.dp(StyledTheme.paddings.large),
+            vertical = density.dp(StyledTheme.paddings.medium),
+        )
+    }
 }
 
 // ----------------------
@@ -126,10 +148,12 @@ fun StyledButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     variant: StyledButton.Variant = StyledButtonDefaults.variant,
+    size: Size = Size.Normal,
+    density: Density = Density.Normal,
     customization: StyledButton.Customization? = null,
     enabled: Boolean = true,
     shape: Shape = StyledButtonDefaults.shape,
-    contentPadding: PaddingValues = StyledButtonDefaults.contentPadding(),
+    contentPadding: PaddingValues = StyledButtonDefaults.contentPadding(density),
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable RowScope.() -> Unit,
 ) {
@@ -144,14 +168,24 @@ fun StyledButton(
                 .resolveColors(variant, customization)
                 .resolve(state)
 
+            val borderWidth = renderer.resolveBorderWidth(variant, customization, state)
+
+            val textStyle = when (size) {
+                Size.Small -> StyledTheme.typography.labelSmall
+                Size.Normal -> StyledTheme.typography.labelMedium
+                Size.Large -> StyledTheme.typography.labelLarge
+            }
+
             renderer.render(
                 onClick = onClick,
-                modifier = modifier.heightIn(min = StyledButtonDefaults.minimumHeight),
+                modifier = modifier.heightIn(min = StyledButtonDefaults.minimumHeight(size)),
+                textStyle = textStyle,
                 enabled = enabled,
                 shape = shape,
                 backgroundColor = colors.background,
                 contentColor = colors.foreground,
                 borderColor = colors.border,
+                borderWidth = borderWidth,
                 contentPadding = contentPadding,
                 interactionSource = interactionSource,
                 content = content

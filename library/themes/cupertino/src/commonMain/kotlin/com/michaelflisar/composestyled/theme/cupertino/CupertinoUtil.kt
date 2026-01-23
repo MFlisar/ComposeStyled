@@ -3,7 +3,9 @@ package com.michaelflisar.composestyled.theme.cupertino
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
 import com.michaelflisar.composestyled.core.StyledTheme
+import com.michaelflisar.composestyled.core.classes.Emphasis
 import com.michaelflisar.composestyled.core.classes.colors.BaseColor
 import com.michaelflisar.composestyled.core.classes.colors.BaseColorDef
 import com.michaelflisar.composestyled.core.classes.colors.StatefulBaseColorDef
@@ -23,10 +25,10 @@ object CupertinoUtil {
         return when (variant) {
 
             // iOS primary: tinted text
-            StyledButton.Variant.Primary -> plain(c.primary, customization)
+            StyledButton.Variant.Prominent -> plain(c.primary, customization)
 
             // iOS secondary: label-like / less emphasis
-            StyledButton.Variant.Secondary -> plain(c.onSurfaceVariant, customization)
+            StyledButton.Variant.Normal -> plain(c.onSurfaceVariant, customization)
 
             // bordered style
             StyledButton.Variant.Outlined -> bordered(c.primary, c.outlineVariant, customization)
@@ -45,8 +47,8 @@ object CupertinoUtil {
         customization: StyledButton.Customization?,
     ): StatefulBaseColorDef {
         val colors = BaseColor(
-            background = customization?.background?.resolve() ?: Color.Transparent,
-            foreground = customization?.content?.resolve() ?: foreground,
+            background = Color.Transparent,
+            foreground = customization?.tint?.resolve() ?: foreground,
             border = customization?.border?.resolve()
         )
         val normal = BaseColorDef(colors)
@@ -68,8 +70,8 @@ object CupertinoUtil {
         customization: StyledButton.Customization?,
     ): StatefulBaseColorDef {
         val colors = BaseColor(
-            background = customization?.background?.resolve() ?: Color.Transparent,
-            foreground = customization?.content?.resolve() ?: foreground,
+            background = Color.Transparent,
+            foreground = customization?.tint?.resolve() ?: foreground,
             border = customization?.border?.resolve() ?: border
         )
         val normal = BaseColorDef(colors)
@@ -120,5 +122,32 @@ object CupertinoUtil {
         )
         // keep the dimming for pressed
         return highlighted
+    }
+
+    @Composable
+    fun emphasizedColor(
+        base: Color,
+        surfaceTint: Color,
+        emphasis: Emphasis,
+        isDark: Boolean,
+    ): Color {
+        // Sehr subtile Werte, iOS-like
+        return if (!isDark) {
+            val a = when (emphasis) {
+                Emphasis.Low -> 0.02f
+                Emphasis.Medium -> 0.03f
+                Emphasis.High -> 0.04f
+            }
+            surfaceTint.copy(alpha = a).compositeOver(base)
+        } else {
+            val lift = when (emphasis) {
+                Emphasis.Low -> 0.02f
+                Emphasis.Medium -> 0.035f
+                Emphasis.High -> 0.05f
+            }
+            val lifted = androidx.compose.ui.graphics.lerp(base, Color.White, lift)
+            // minimal tint, sonst wird’s „androidy“
+            surfaceTint.copy(alpha = 0.015f).compositeOver(lifted)
+        }
     }
 }

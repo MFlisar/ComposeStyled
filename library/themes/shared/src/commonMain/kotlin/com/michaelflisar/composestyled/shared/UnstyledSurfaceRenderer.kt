@@ -5,15 +5,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import com.michaelflisar.composestyled.core.components.StyledSurfaceRenderer
 import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
-import com.michaelflisar.composestyled.core.runtime.LocalBackgroundColor
-import com.michaelflisar.composestyled.core.runtime.LocalContentColor
+import com.michaelflisar.composestyled.core.runtime.ProvideStyledLocals
 
 @InternalComposeStyledApi
 abstract class UnstyledSurfaceRenderer : StyledSurfaceRenderer.TokenRenderer {
@@ -38,9 +36,9 @@ abstract class UnstyledSurfaceRenderer : StyledSurfaceRenderer.TokenRenderer {
                 }
             )
 
-        CompositionLocalProvider(
-            LocalContentColor provides contentColor,
-            LocalBackgroundColor provides backgroundColor
+        ProvideStyledLocals(
+            contentColor = contentColor,
+            backgroundColor = backgroundColor
         ) {
             Box(modifier = m) {
                 content()

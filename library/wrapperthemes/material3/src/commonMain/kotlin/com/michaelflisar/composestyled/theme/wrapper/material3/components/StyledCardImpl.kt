@@ -1,5 +1,6 @@
 package com.michaelflisar.composestyled.theme.wrapper.material3.components
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -22,11 +23,13 @@ internal object StyledCardImpl : StyledCardRenderer.WrapperRenderer {
     @Composable
     override fun render(
         variant: StyledCard.Variant,
+        emphasis: Emphasis,
         customization: StyledCard.Customization?,
         modifier: Modifier,
-        emphasis: Emphasis,
+        onClick: (() -> Unit)?,
         shape: Shape,
         contentPadding: PaddingValues,
+        interactionSource: MutableInteractionSource,
         content: @Composable ColumnScope.() -> Unit,
     ) {
         val background = customization?.background

@@ -12,9 +12,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import com.composeunstyled.Text
+import com.michaelflisar.composestyled.core.StyledTheme
 import com.michaelflisar.composestyled.core.components.StyledTextRenderer
 import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
-import com.michaelflisar.composestyled.core.runtime.LocalTextStyle
 
 @InternalComposeStyledApi
 abstract class UnstyledTextRenderer : StyledTextRenderer.TokenRenderer {
@@ -36,10 +36,10 @@ abstract class UnstyledTextRenderer : StyledTextRenderer.TokenRenderer {
         maxLines: Int,
         onTextLayout: ((TextLayoutResult) -> Unit)?,
         overflow: TextOverflow,
-        autoSize: TextAutoSize?
+        autoSize: TextAutoSize?,
     ) {
         // merge style overrides (renderer receives both `style` and explicit fields)
-        val mergedStyle = LocalTextStyle.current.merge(style).copy(
+        val mergedStyle = StyledTheme.currentTextStyle.merge(style).copy(
             textAlign = textAlign,
             lineHeight = lineHeight,
             fontSize = fontSize,

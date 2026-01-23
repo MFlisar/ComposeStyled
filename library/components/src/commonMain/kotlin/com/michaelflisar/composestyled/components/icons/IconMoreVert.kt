@@ -6,7 +6,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-val IconMoreVert: ImageVector
+internal val IconMoreVert: ImageVector
     get() {
         if (_root_ide_package_.com.michaelflisar.composestyled.components.icons._IconMoreVert != null) return _root_ide_package_.com.michaelflisar.composestyled.components.icons._IconMoreVert!!
 

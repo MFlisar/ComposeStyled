@@ -1,6 +1,6 @@
 package com.michaelflisar.composestyled.core.classes
 
-enum class DisableFactorType {
+enum class StyledDisableFactor {
     /**
      * used for colors that are not an outline/border nor content (text/icon/...)
      */

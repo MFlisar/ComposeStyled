@@ -6,7 +6,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-val KeyboardArrowLeft: ImageVector
+internal val KeyboardArrowLeft: ImageVector
     get() {
         if (_KeyboardArrowLeft != null) {
             return _KeyboardArrowLeft!!

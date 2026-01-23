@@ -4,17 +4,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
-import com.michaelflisar.composestyled.core.classes.DisableFactorType
+import com.michaelflisar.composestyled.core.classes.StyledDisableFactor
 
 val Color.isDark
     get() = luminance() <= 0.5
 
 val Color.isLight
-    get() = luminance() > 0.5
+    get() = !isDark
 
 @Composable
 @ReadOnlyComposable
-fun Color.disabled(type: DisableFactorType): Color {
+fun Color.disabled(type: StyledDisableFactor = StyledDisableFactor.Default): Color {
     return copy(alpha = alpha * StyledTheme.colors.disableFactors.get(type))
 }
 

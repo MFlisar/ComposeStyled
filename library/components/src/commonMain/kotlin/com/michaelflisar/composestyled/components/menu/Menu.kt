@@ -13,8 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.sizeIn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
@@ -45,14 +43,12 @@ import com.michaelflisar.composestyled.components.icons.IconCheckBoxOutline
 import com.michaelflisar.composestyled.components.icons.KeyboardArrowLeft
 import com.michaelflisar.composestyled.components.icons.KeyboardArrowRight
 import com.michaelflisar.composestyled.core.StyledTheme
-import com.michaelflisar.composestyled.core.classes.DisableFactorType
+import com.michaelflisar.composestyled.core.classes.StyledDisableFactor
 import com.michaelflisar.composestyled.core.components.StyledHorizontalSeparator
 import com.michaelflisar.composestyled.core.components.StyledIcon
 import com.michaelflisar.composestyled.core.components.StyledText
 import com.michaelflisar.composestyled.core.disabled
 import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
-import com.michaelflisar.composestyled.core.runtime.LocalContentColor
-import com.michaelflisar.composestyled.core.runtime.LocalTextStyle
 import com.michaelflisar.composestyled.core.runtime.ProvideStyledLocals
 import com.michaelflisar.composestyled.core.tokens.minimumInteractiveComponentSize
 
@@ -74,10 +70,14 @@ interface MenuIconRowScope {
 
 internal class MenuIconRowScopeInstance(override val rowScope: RowScope) : MenuIconRowScope
 
-private val LocalMenuSetup = staticCompositionLocalOf<MenuSetup> { error("MenuSetup not initialised!") }
-private val LocalMenuState = staticCompositionLocalOf<MenuState> { error("MenuState not initialised!") }
-private val LocalMenuIndex = staticCompositionLocalOf<MutableIntState> { error("MenuIndex not initialised!") }
-private val LocalMenuLevels = staticCompositionLocalOf<List<Int>> { error("MenuLevel not initialised!") }
+private val LocalMenuSetup =
+    staticCompositionLocalOf<MenuSetup> { error("MenuSetup not initialised!") }
+private val LocalMenuState =
+    staticCompositionLocalOf<MenuState> { error("MenuState not initialised!") }
+private val LocalMenuIndex =
+    staticCompositionLocalOf<MutableIntState> { error("MenuIndex not initialised!") }
+private val LocalMenuLevels =
+    staticCompositionLocalOf<List<Int>> { error("MenuLevel not initialised!") }
 
 object Menu {
 
@@ -256,7 +256,15 @@ fun MenuScope.MenuItem(
                 modifier = Menu.modifier(),
                 text = if (hideLabels) (@Composable {}) else text,
                 enabled = enabled,
-                leadingIcon = imageVector?.let { { StyledIcon(it, null, modifier = Modifier.size(24.dp)) } },
+                leadingIcon = imageVector?.let {
+                    {
+                        StyledIcon(
+                            it,
+                            null,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                },
                 trailingIcon = endIcon,
                 onClick = {
                     onClick()
@@ -339,7 +347,15 @@ fun MenuScope.MenuCheckbox(
                 }
             },
             enabled = enabled,
-            leadingIcon = imageVector?.let { { StyledIcon(it, null, modifier = Modifier.size(24.dp)) } },
+            leadingIcon = imageVector?.let {
+                {
+                    StyledIcon(
+                        it,
+                        null,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+            },
             trailingIcon = null,
             onClick = {
                 onCheckChange(!checked)
@@ -360,7 +376,7 @@ fun MenuScope.MenuSeparator(
             if (text.isEmpty()) {
                 StyledHorizontalSeparator(
                     modifier = Modifier.padding(vertical = StyledTheme.paddings.medium),
-                    color = LocalContentColor.current
+                    color = StyledTheme.currentContentColor
                 )
             } else {
                 StyledText(
@@ -368,7 +384,8 @@ fun MenuScope.MenuSeparator(
                     text = text,
                     style = StyledTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
-                    color = textColor ?: LocalContentColor.current.disabled(DisableFactorType.Content),
+                    color = textColor
+                        ?: StyledTheme.currentContentColor.disabled(StyledDisableFactor.Content),
                     textAlign = textAlign
                 )
             }
@@ -434,7 +451,7 @@ fun MenuIconRowScope.MenuIcon(
         //    tooltip = tooltip,
         //    offset = state.offset.value
         //) {
-            imageVector()
+        imageVector()
         //}
     }
 }
@@ -454,7 +471,15 @@ fun MenuScope.MenuSubMenu(
                 modifier = Menu.modifier(),
                 text = text,
                 enabled = enabled,
-                leadingIcon = imageVector?.let { { StyledIcon(it, null, modifier = Modifier.size(24.dp)) } },
+                leadingIcon = imageVector?.let {
+                    {
+                        StyledIcon(
+                            it,
+                            null,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                },
                 onClick = {
                     state.open(index.value)
                 },
@@ -489,7 +514,7 @@ private fun MenuScope.MenuBack(
         content = {
             val state = LocalMenuState.current
             Column {
-                val color = LocalContentColor.current.copy(alpha = .7f)
+                val color = StyledTheme.currentContentColor.copy(alpha = .7f)
                 CompositionLocalProvider(
                     //LocalMinimumInteractiveComponentSize provides 0.dp
                 ) {
@@ -520,7 +545,7 @@ private fun MenuScope.MenuBack(
                         )
                         ProvideStyledLocals(
                             contentColor = color,
-                            textStyle = LocalTextStyle.current.merge(style)
+                            textStyle = StyledTheme.currentTextStyle.merge(style)
                         ) {
                             text()
                         }

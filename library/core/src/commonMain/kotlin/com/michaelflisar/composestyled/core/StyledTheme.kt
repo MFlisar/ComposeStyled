@@ -1,13 +1,14 @@
 package com.michaelflisar.composestyled.core
 
-import androidx.compose.foundation.LocalIndication
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
+import com.composables.compose.ripple.rememberRippleIndication
 import com.composeunstyled.platformtheme.bright
 import com.composeunstyled.platformtheme.buildPlatformTheme
+import com.composeunstyled.platformtheme.dimmed
 import com.composeunstyled.platformtheme.indications
 import com.composeunstyled.platformtheme.interactiveSizes
 import com.composeunstyled.platformtheme.sizeDefault
@@ -20,11 +21,12 @@ import com.michaelflisar.composestyled.core.renderer.LocalStyledExtensions
 import com.michaelflisar.composestyled.core.renderer.StyledComponents
 import com.michaelflisar.composestyled.core.renderer.StyledExtensionsRegistry
 import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
-import com.michaelflisar.composestyled.core.runtime.LocalBackgroundColor
-import com.michaelflisar.composestyled.core.runtime.LocalContentColor
-import com.michaelflisar.composestyled.core.runtime.LocalTextStyle
+import com.michaelflisar.composestyled.core.runtime.LocalStyledBackgroundColor
+import com.michaelflisar.composestyled.core.runtime.LocalStyledContentColor
+import com.michaelflisar.composestyled.core.runtime.LocalStyledTextStyle
 import com.michaelflisar.composestyled.core.tokens.LocalStyledColors
 import com.michaelflisar.composestyled.core.tokens.LocalStyledElevations
+import com.michaelflisar.composestyled.core.tokens.LocalStyledIndications
 import com.michaelflisar.composestyled.core.tokens.LocalStyledPaddings
 import com.michaelflisar.composestyled.core.tokens.LocalStyledShapes
 import com.michaelflisar.composestyled.core.tokens.LocalStyledSizes
@@ -32,6 +34,7 @@ import com.michaelflisar.composestyled.core.tokens.LocalStyledSpacings
 import com.michaelflisar.composestyled.core.tokens.LocalStyledTypography
 import com.michaelflisar.composestyled.core.tokens.StyledColors
 import com.michaelflisar.composestyled.core.tokens.StyledElevations
+import com.michaelflisar.composestyled.core.tokens.StyledIndications
 import com.michaelflisar.composestyled.core.tokens.StyledPaddings
 import com.michaelflisar.composestyled.core.tokens.StyledShapes
 import com.michaelflisar.composestyled.core.tokens.StyledSizes
@@ -44,6 +47,10 @@ object StyledTheme {
         BlackWhite,
         LocalContentColor
     }
+
+    // ----------------------
+    // theme properties (locals that typically to no change locally)
+    // ----------------------
 
     val colors: StyledColors
         @Composable @ReadOnlyComposable get() = LocalStyledColors.current
@@ -65,6 +72,26 @@ object StyledTheme {
 
     val sizes: StyledSizes
         @Composable @ReadOnlyComposable get() = LocalStyledSizes.current
+
+    val indications: StyledIndications
+        @Composable @ReadOnlyComposable get() = LocalStyledIndications.current
+
+    // ----------------------
+    // theme properties (locals, often times overridden locally inside components)
+    // ----------------------
+
+    val currentBackgroundColor: Color
+        @Composable @ReadOnlyComposable get() = LocalStyledBackgroundColor.current
+
+    val currentContentColor: Color
+        @Composable @ReadOnlyComposable get() = LocalStyledContentColor.current
+
+    val currentTextStyle: androidx.compose.ui.text.TextStyle
+        @Composable @ReadOnlyComposable get() = LocalStyledTextStyle.current
+
+    // ----------------------
+    // functions
+    // ----------------------
 
     @Composable
     @ReadOnlyComposable
@@ -108,7 +135,7 @@ object StyledTheme {
                 Color.Black
             }
 
-            ContentColorFallback.LocalContentColor -> LocalContentColor.current
+            ContentColorFallback.LocalContentColor -> LocalStyledContentColor.current
         }
     }
 }
@@ -168,7 +195,13 @@ private fun StyledTheme(
         LocalStyledElevations provides elevations,
         LocalStyledSpacings provides spacings
     ) {
-        val platformTheme = buildPlatformTheme {}
+        // TODO: https://github.com/composablehorizons/compose-unstyled/discussions/191
+        val platformTheme = buildPlatformTheme {
+            properties[indications] = mapOf(
+                bright to rememberRippleIndication(Color.White),
+                dimmed to rememberRippleIndication(Color.Black),
+            )
+        }
 
         platformTheme {
 
@@ -180,13 +213,22 @@ private fun StyledTheme(
             // val roundNone = Theme[com.composeunstyled.platformtheme.shapes][roundedNone]
             // val size = Theme[interactiveSizes][sizeDefault]
 
-            val indication = Theme[indications][bright]
+            val indicationBright = Theme[indications][bright]
+            val indicationDimmed = Theme[indications][dimmed]
+
             val interactiveSizeDefault = Theme[interactiveSizes][sizeDefault]
             val interactiveSizeSmall = Theme[interactiveSizes][sizeMinimum]
             val interactiveSizes = StyledSizes(
                 minimumInteractiveSize = interactiveSizeDefault,
-                minimumInteractiveSizeSmall = interactiveSizeSmall
+                minimumInteractiveSizeSmall = interactiveSizeSmall,
+                minimumInteractiveSizeLarge = interactiveSizeDefault + (interactiveSizeDefault - interactiveSizeSmall)
             )
+            val indications = remember {
+                StyledIndications(
+                    onDark = indicationBright,
+                    onLight = indicationDimmed
+                )
+            }
 
             val registry = remember(*renderers.toTypedArray()) {
                 StyledExtensionsRegistry(
@@ -197,13 +239,12 @@ private fun StyledTheme(
             CompositionLocalProvider(
                 // extensions
                 LocalStyledExtensions provides registry,
-                // foundaton
-                LocalIndication provides indication,
                 // styled locals
+                LocalStyledIndications provides indications,
                 LocalStyledSizes provides interactiveSizes,
-                LocalContentColor provides colors.onBackground,
-                LocalBackgroundColor provides colors.background,
-                LocalTextStyle provides typography.bodyMedium
+                LocalStyledContentColor provides colors.onBackground,
+                LocalStyledBackgroundColor provides colors.background,
+                LocalStyledTextStyle provides typography.bodyMedium
             ) {
                 when (components) {
                     is StyledComponents.Components -> content()

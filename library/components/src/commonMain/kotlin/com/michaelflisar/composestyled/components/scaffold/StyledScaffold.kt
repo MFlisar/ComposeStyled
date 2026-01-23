@@ -46,7 +46,8 @@ import com.michaelflisar.composestyled.components.classes.InsetsPx
 import com.michaelflisar.composestyled.components.classes.PaddingValuesDp
 import com.michaelflisar.composestyled.core.StyledTheme
 import com.michaelflisar.composestyled.core.components.StyledSurface
-import com.michaelflisar.composestyled.core.runtime.LocalContentColor
+import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
+import com.michaelflisar.composestyled.core.runtime.ProvideStyledLocals
 import kotlin.math.roundToInt
 
 /* ---------- Public API ---------- */
@@ -133,7 +134,7 @@ fun styledExitUntilCollapsedScrollBehavior() = remember {
 /* ---------- Internals ---------- */
 
 @Composable
-fun rememberSystemBarsInsetsPx(
+internal fun rememberSystemBarsInsetsPx(
     enabled: Boolean,
     contentWindowInsets: WindowInsets = WindowInsets.systemBars,
 ): InsetsPx {
@@ -233,6 +234,7 @@ private fun rememberTopBarScrollState(kind: StyledTopBarScrollBehavior.Kind): To
 
 /* ---------- Scaffold ---------- */
 
+@OptIn(InternalComposeStyledApi::class)
 @Composable
 fun StyledScaffold(
     modifier: Modifier = Modifier,
@@ -316,7 +318,6 @@ fun StyledScaffold(
         contentWindowInsets.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
 
 
-
     // FAB-Animation
     val animatedFabY = remember { Animatable(0f) }
     var fabTargetY by remember { mutableStateOf(0) }
@@ -347,11 +348,11 @@ fun StyledScaffold(
                 val loose = constraints.copy(minWidth = 0, minHeight = 0)
 
 
-
                 /* -------- PHASE 1: ermittele expanded/collapsed stabil -------- */
 
                 // Wenn die TopBar bereits gesetzt hat, nutze das; sonst einmalig messen bei cf=0f
-                val needFallbackMeasure = topBarHeights.expanded == null || topBarHeights.expandableExtra == null
+                val needFallbackMeasure =
+                    topBarHeights.expanded == null || topBarHeights.expandableExtra == null
 
                 if (needFallbackMeasure) {
                     val measureExpanded = subcompose("top-measure-expanded") {
@@ -485,7 +486,9 @@ fun StyledScaffold(
                 )
 
                 val contentPlaceables = subcompose("content") {
-                    CompositionLocalProvider(LocalContentColor provides contentColor) {
+                    ProvideStyledLocals(
+                        contentColor = contentColor,
+                    ) {
                         Box(Modifier.fillMaxSize()) { content(pad.asPaddingValues()) }
                     }
                 }.map {

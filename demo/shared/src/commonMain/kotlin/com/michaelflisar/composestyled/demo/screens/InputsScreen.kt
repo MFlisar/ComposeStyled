@@ -28,6 +28,9 @@ fun InputsScreen() {
         ,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+
+        StyledText("TODO")
+
         StyledText("Inputs")
         StyledTextField(
             value = text,

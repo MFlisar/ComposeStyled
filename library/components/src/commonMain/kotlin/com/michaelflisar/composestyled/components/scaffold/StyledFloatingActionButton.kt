@@ -36,13 +36,14 @@ object StyledFloatingActionButtonDefaults {
 fun StyledFloatingActionButton(
     onClick: () -> Unit,
     imageVector: ImageVector,
+    modifier : Modifier = Modifier,
     text: String? = null,
     fillWidth: Boolean = false,
     size: Dp = StyledFloatingActionButtonDefaults.SizeRegular,
     shape: Shape = StyledFloatingActionButtonDefaults.shape,
 ) {
     StyledButton(
-        modifier = if (fillWidth) Modifier.height(size).fillMaxWidth() else Modifier.size(size),
+        modifier = (if (fillWidth) Modifier.height(size).fillMaxWidth() else Modifier.size(size)).then(modifier),
         shape = shape,
         contentPadding = PaddingValues(),
         onClick = onClick

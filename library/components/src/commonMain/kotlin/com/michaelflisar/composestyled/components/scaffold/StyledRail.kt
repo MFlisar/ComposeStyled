@@ -41,8 +41,6 @@ import com.michaelflisar.composestyled.core.renderer.ExtensionKey
 import com.michaelflisar.composestyled.core.renderer.ExtensionRenderer
 import com.michaelflisar.composestyled.core.renderer.getStyledExtensionRenderer
 import com.michaelflisar.composestyled.core.runtime.InternalComposeStyledApi
-import com.michaelflisar.composestyled.core.runtime.LocalBackgroundColor
-import com.michaelflisar.composestyled.core.runtime.LocalContentColor
 import com.michaelflisar.composestyled.core.runtime.ProvideStyledLocals
 import com.michaelflisar.composestyled.core.runtime.interaction.rememberStyledResolveState
 import com.michaelflisar.composestyled.theme.cupertino.CupertinoUtil
@@ -153,19 +151,23 @@ object StyledRail {
         private fun RenderItem(
             item: StyledNavigationItem,
         ) {
-            val foreground =
-                if (item.selected) StyledTheme.colors.onPrimary else StyledTheme.colors.secondary
-            val background =
-                if (item.selected) StyledTheme.colors.primary else LocalBackgroundColor.current
             val colors = if (item.selected) {
                 Material3Util.resolveButtonColors(
-                    StyledButton.Variant.Primary,
-                    StyledButton.customize(background, foreground, null)
+                    StyledButton.Variant.Prominent,
+                    StyledButton.customize(
+                        StyledTheme.colors.primary,
+                        StyledTheme.colors.onPrimary,
+                        null
+                    )
                 )
             } else {
                 Material3Util.resolveButtonColors(
                     StyledButton.Variant.Text,
-                    StyledButton.customize(background, foreground, null)
+                    StyledButton.customize(
+                        StyledTheme.currentContentColor,
+                        StyledTheme.currentBackgroundColor,
+                        null
+                    )
                 )
             }
             ItemContent(item, colors, false)
@@ -196,11 +198,12 @@ object StyledRail {
             item: StyledNavigationItem,
         ) {
             val foreground =
-                if (item.selected) StyledTheme.colors.primary else LocalContentColor.current
+                if (item.selected) StyledTheme.colors.primary else StyledTheme.currentContentColor
+            val background = StyledTheme.currentBackgroundColor
             val border = if (item.selected) StyledTheme.colors.primary else null
             val colors = CupertinoUtil.resolveButtonColors(
                 StyledButton.Variant.Text,
-                StyledButton.customize(content = foreground, border = border)
+                StyledButton.customize(tint = foreground, onTint = background, border = border)
             )
             //val colors = remember(item.selected, foreground) { CupertinoUtil.buttonColors(foreground, border) }
             ItemContent(item, colors, false)
@@ -228,10 +231,11 @@ object StyledRail {
         private fun RenderItem(
             item: StyledNavigationItem,
         ) {
-            val foreground = LocalContentColor.current
+            val foreground = StyledTheme.currentContentColor
+            val background = StyledTheme.currentBackgroundColor
             val colors = Fluent2Util.resolveButtonColors(
                 StyledButton.Variant.Text,
-                StyledButton.customize(content = foreground)
+                StyledButton.customize(tint = foreground, onTint = background)
             )
             ItemContent(item, colors, true)
         }
@@ -263,10 +267,7 @@ private fun Content(
                 .width(StyledRail.width)
                 .fillMaxHeight()
                 .background(containerColor)
-                .padding(
-                    horizontal = StyledTheme.paddings.medium,
-                    vertical = StyledTheme.paddings.medium
-                ),
+                .padding(vertical = StyledTheme.paddings.medium),
             verticalArrangement = Arrangement.spacedBy(StyledTheme.spacings.small),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -274,6 +275,9 @@ private fun Content(
             Column(
                 modifier = Modifier
                     .weight(1f)
+                    .padding(
+                        horizontal = StyledTheme.paddings.medium
+                    )
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(StyledTheme.spacings.small),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -300,6 +304,8 @@ private fun ItemContent(
     )
     val colors = colors.resolve(state)
 
+    val background = colors.background.takeIf { it != Color.Transparent }
+
     val modifier = Modifier
         .fillMaxWidth()
         .defaultMinSize(
@@ -307,7 +313,7 @@ private fun ItemContent(
             minWidth = StyledTheme.sizes.minimumInteractiveSize
         )
         .clip(StyledTheme.shapes.control)
-        .then(if (colors.background != Color.Transparent) Modifier.background(colors.background) else Modifier)
+        .then(background?.let { Modifier.background(it) } ?: Modifier)
         .then(
             if (colors.border != null) Modifier.border(
                 1.dp,
@@ -322,7 +328,9 @@ private fun ItemContent(
         .clickable(
             enabled = item.enabled,
             role = Role.Tab,
-            onClick = item.onClick
+            onClick = item.onClick,
+            interactionSource = interactionSource,
+            indication = StyledTheme.indications.select(background ?: StyledTheme.currentBackgroundColor)
         )
         .padding(horizontal = StyledTheme.paddings.medium, vertical = StyledTheme.paddings.medium)
 
