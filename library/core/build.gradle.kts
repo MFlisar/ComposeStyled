@@ -1,15 +1,12 @@
 import com.michaelflisar.kmpdevtools.BuildFileUtil
 import com.michaelflisar.kmpdevtools.Targets
-import com.michaelflisar.kmpdevtools.config.LibraryModuleData
-import com.michaelflisar.kmpdevtools.config.sub.AndroidLibraryConfig
-import com.michaelflisar.kmpdevtools.core.Platform
-import com.michaelflisar.kmpdevtools.core.configs.Config
-import com.michaelflisar.kmpdevtools.core.configs.LibraryConfig
+import com.michaelflisar.kmpdevtools.configs.AndroidLibraryConfig
+import com.michaelflisar.kmpdevtools.configs.LibraryModuleConfig
 
 plugins {
     // kmp + app/library
     alias(libs.plugins.jetbrains.kotlin.multiplatform)
-    alias(libs.plugins.android.library)
+    alias(libs.plugins.android.library.kmp)
     // org.jetbrains.kotlin
     alias(libs.plugins.jetbrains.kotlin.compose)
     // org.jetbrains.compose
@@ -19,7 +16,7 @@ plugins {
     alias(libs.plugins.vanniktech.maven.publish.base)
     alias(libs.plugins.binary.compatibility.validator)
     // build tools
-    alias(deps.plugins.kmpdevtools.buildplugin)
+    alias(mflisar.plugins.kmpdevtools.buildplugin)
     // others
     // ...
 }
@@ -28,8 +25,7 @@ plugins {
 // Setup
 // ------------------------
 
-val config = Config.read(rootProject)
-val libraryConfig = LibraryConfig.read(rootProject)
+val module = LibraryModuleConfig.read(project)
 
 val buildTargets = Targets(
     // mobile
@@ -37,21 +33,16 @@ val buildTargets = Targets(
     iOS = true,
     // desktop
     windows = true,
-    macOS = false, // because compose-unstyled does not support macOS yet
+    macOS = true,
     // web
     wasm = true
 )
 
-val androidConfig = AndroidLibraryConfig(
+val androidConfig = AndroidLibraryConfig.create(
+    libraryModuleConfig = module,
     compileSdk = app.versions.compileSdk,
-    minSdk = app.versions.minSdk
-)
-
-val libraryModuleData = LibraryModuleData(
-    project = project,
-    config = config,
-    libraryConfig = libraryConfig,
-    androidConfig = androidConfig
+    minSdk = app.versions.minSdk,
+    enableAndroidResources = false
 )
 
 // ------------------------
@@ -68,7 +59,10 @@ kotlin {
     // Targets
     //-------------
 
-    buildTargets.setupTargetsLibrary(libraryModuleData)
+    buildTargets.setupTargetsLibrary(module)
+    android {
+        buildTargets.setupTargetsAndroidLibrary(module, androidConfig, this)
+    }
 
     // -------
     // Sources
@@ -88,19 +82,16 @@ kotlin {
 
         commonMain.dependencies {
 
-            implementation(libs.jetbrains.kotlinx.coroutines.core)
-
-            implementation(deps.composeunstyled.theming)
-            implementation(deps.composeunstyled.platformtheme)
-
-            api(libs.jetbrains.compose.runtime)
+            // Compose + AndroidX
+            api(libs.jetbrains.compose.components.resources)
             api(libs.jetbrains.compose.foundation)
-            api(libs.jetbrains.compose.ui)
-
-            // TODO
-            implementation("com.composables:ripple-indication:1.1.0")
+            api(libs.jetbrains.kotlinx.coroutines.core)
+            implementation(libs.jetbrains.compose.material.icons.core)
+            implementation(libs.jetbrains.compose.material.icons.extended)
+            //implementation(libs.jetbrains.compose.ui.backhandler)
 
         }
+
     }
 }
 
@@ -109,5 +100,10 @@ kotlin {
 // -------------------
 
 // maven publish configuration
+// if (BuildFileUtil.checkGradleProperty(project, "publishToMaven") != false)
+//    BuildFileUtil.setupMavenPublish(module)
+
+// local publish configuration
+// task name: publishAllPublicationsToGitHubRepository
 if (BuildFileUtil.checkGradleProperty(project, "publishToMaven") != false)
-    BuildFileUtil.setupMavenPublish(project, config, libraryConfig)
+    BuildFileUtil.setupLocalMavenPublish(module)

@@ -1,10 +1,17 @@
-dependencyResolutionManagement {
+import com.michaelflisar.kmpdevtools.SettingsFileUtil
+import com.michaelflisar.kmpdevtools.core.configs.LibraryConfig
+
+dependencyResolutionManagement    {
 
     repositories {
         mavenCentral()
         google()
         gradlePluginPortal()
         maven("https://jitpack.io")
+        maven("https://oss.sonatype.org/content/repositories/snapshots")
+        // jewel + skiko
+        maven("https://www.jetbrains.com/intellij-repository/releases")
+        maven("https://packages.jetbrains.team/maven/p/ij/intellij-dependencies/")
         mavenLocal()
     }
 
@@ -14,6 +21,9 @@ dependencyResolutionManagement {
         }
         create("deps") {
             from(files("gradle/deps.versions.toml"))
+        }
+        create("mflisar") {
+            from(files("gradle/mflisar.versions.toml"))
         }
     }
 }
@@ -35,23 +45,24 @@ pluginManagement {
 
 plugins {
     // version catalogue does not work here!
-    id("io.github.mflisar.kmpdevtools.plugins-settings-gradle") version "6.4.2"
+    id("io.github.mflisar.kmpdevtools.plugins-settings-gradle") version "8.5.1"
 }
-val settingsPlugin = plugins.getPlugin(com.michaelflisar.kmpdevtools.SettingsFilePlugin::class.java)
 
 // --------------
 // Library
 // --------------
 
-val libraryConfig = com.michaelflisar.kmpdevtools.core.configs.LibraryConfig.read(rootProject)
-val libraryId = libraryConfig.library.name.lowercase()
+val libraryConfig = LibraryConfig.read(rootDir)
+val libraryName = libraryConfig.libraryName()
 
 // Library Modules
-settingsPlugin.includeModules(libraryId, libraryConfig, includeDokka = true)
+SettingsFileUtil.includeModules(settings, libraryName, libraryConfig)
+SettingsFileUtil.includeDokkaModule(settings)
 
 // --------------
 // App
 // --------------
 
-include(":demo:shared")
-include(":demo:app")
+if (System.getenv("CI") != "true") {
+    SettingsFileUtil.includeModulesInFolder(settings, "demo")
+}

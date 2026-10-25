@@ -1,21 +1,26 @@
 import com.michaelflisar.kmpdevtools.Targets
-import com.michaelflisar.kmpdevtools.config.LibraryModuleData
-import com.michaelflisar.kmpdevtools.config.sub.AndroidLibraryConfig
-import com.michaelflisar.kmpdevtools.core.configs.Config
-import com.michaelflisar.kmpdevtools.core.configs.LibraryConfig
+import com.michaelflisar.kmpdevtools.BuildFileUtil
+import com.michaelflisar.kmpdevtools.core.Platform
+import com.michaelflisar.kmpdevtools.configs.*
+import com.michaelflisar.kmpdevtools.setupDependencies
+import com.michaelflisar.kmpdevtools.setupBuildKonfig
+import com.michaelflisar.kmpdevtools.isDebug
+import com.michaelflisar.kmpdevtools.isExe
 
 plugins {
     // kmp + app/library
     alias(libs.plugins.jetbrains.kotlin.multiplatform)
-    alias(libs.plugins.android.library)
+    alias(libs.plugins.android.library.kmp)
     // org.jetbrains.kotlin
     alias(libs.plugins.jetbrains.kotlin.compose)
+    alias(libs.plugins.jetbrains.kotlin.parcelize)
     // org.jetbrains.compose
     alias(libs.plugins.jetbrains.compose)
     // docs, publishing, validation
     // --
     // build tools
-    alias(deps.plugins.kmpdevtools.buildplugin)
+    alias(mflisar.plugins.kmpdevtools.buildplugin)
+    alias(libs.plugins.buildkonfig)
     // others
     // ...
 }
@@ -24,52 +29,61 @@ plugins {
 // Setup
 // ------------------------
 
-val config = Config.read(rootProject)
-val libraryConfig = LibraryConfig.read(rootProject)
+val module = LibraryModuleConfig.readManual(project)
 
 val buildTargets = Targets(
     // mobile
     android = true,
-    iOS = true,
+    //iOS = true,
     // desktop
     windows = true,
-    macOS = false, // because compose-unstyled does not support macOS yet
+    //macOS = true,
     // web
     wasm = true
 )
-val androidConfig = AndroidLibraryConfig(
+
+val androidConfig = AndroidLibraryConfig.createFromPath(
+    libraryModuleConfig = module,
     compileSdk = app.versions.compileSdk,
     minSdk = app.versions.minSdk,
     enableAndroidResources = true
-)
-
-val libraryModuleData = LibraryModuleData(
-    project = project,
-    config = config,
-    libraryConfig = libraryConfig,
-    androidConfig = androidConfig
 )
 
 // ------------------------
 // Kotlin
 // ------------------------
 
+buildkonfig {
+    setupBuildKonfig(
+        appConfig = module.appConfig,
+        isDebug = isDebug(project),
+        isExe = isExe(project),
+    )
+}
+
 compose.resources {
-    packageOfResClass = "${libraryConfig.library.namespace}.shared.resources"
+    packageOfResClass = "${module.projectNamespace}.demo.shared.resources"
     publicResClass = true
 }
 
 kotlin {
 
+    compilerOptions {
+        freeCompilerArgs.add("-Xexpect-actual-classes")
+    }
+
     //-------------
     // Targets
     //-------------
 
-    buildTargets.setupTargetsLibrary(libraryModuleData)
+    buildTargets.setupTargetsLibrary(module)
+    android {
+        buildTargets.setupTargetsAndroidLibrary(module, androidConfig, this)
+    }
 
-    // ------------------------
-    // Source Sets
-    // ------------------------
+    // -------
+    // Sources
+    // -------
 
     sourceSets {
 
@@ -85,31 +99,24 @@ kotlin {
 
         commonMain.dependencies {
 
-            // resources
-            api(compose.components.resources)
+            // compose
+            api(libs.jetbrains.compose.components.resources)
+            api(libs.jetbrains.compose.runtime)
+            api(libs.jetbrains.compose.material3)
+            api(libs.jetbrains.compose.material.icons.core)
+            api(libs.jetbrains.compose.material.icons.extended)
 
-            // Kotlin
-            // ..
-
-            // Compose
-            implementation(libs.jetbrains.compose.material.icons.core)
-            implementation(libs.jetbrains.compose.material.icons.extended)
-
-            // ------------------------
-            // Library
-            // ------------------------
-
-            // themes (core is included transitively)
-            implementation(project(":composestyled:themes:material3"))
-            implementation(project(":composestyled:themes:cupertino"))
-            implementation(project(":composestyled:themes:fluent2"))
-
-            // wrapper themes
-            implementation(project(":composestyled:wrapperthemes:material3"))
-
-            // optional components (provide some useful additional components)
-            implementation(project(":composestyled:components"))
+            // modules
+            api(project(":composestylecomponents:core"))
+            api(project(":composestylecomponents:implementations:cupertino"))
+            api(project(":composestylecomponents:implementations:fluent2"))
+            api(project(":composestylecomponents:implementations:material3"))
 
         }
+
     }
+}
+
+dependencies {
+    coreLibraryDesugaring(libs.desugar)
 }

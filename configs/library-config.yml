@@ -1,40 +1,33 @@
 # Github Library
 github:
-  name: ComposeStyled
-  release: 2025
-  namespace: com.michaelflisar.composestyled
+  name: ComposeStyleComponents
+  release: 2026
   license:
     name: Apache License 2.0
     path: blob/main/LICENSE
 
 # Maven
 maven:
-  group-id: io.github.mflisar.composestyled
+  group-id: io.github.mflisar.composestylecomponents
   primary-artifact-id: core # used to detect latest release version of the library (dynamically on the published homepage)
 
-# Modules - list of modules [artifact-id, description, path]
+# Modules - list of modules [artifact-id, description, path, (plugin)]
 modules:
   - artifact-id: core
-    description: This is the core module
+    description: the core module
     path: library/core
-  - artifact-id: components
-    description: This is module providing various UI components
-    path: library/components
-  - artifact-id: theme-shared
-    description: This is shared module - base for all themes
-    path: library/themes/shared
-  - artifact-id: theme-material3
-    description: The material3 theme module based on compose-unstyled
-    path: library/themes/material3
-  - artifact-id: theme-cupertino
-    description: The cupertino theme module based on compose-unstyled
-    path: library/themes/cupertino
-  - artifact-id: theme-fluent2
-    description: The fluent2 theme module based on compose-unstyled
-    path: library/themes/fluent2
-  - artifact-id: themewrapper-material3
-    description: The wrapper theme around androidx.compose.material3
-    path: library/wrapperthemes/material3
+  - artifact-id: foundation
+    description: a foundation implementation (can be used as a base for other implementations)
+    path: library/implementations/foundation
+  - artifact-id: cupertino
+    description: a cupertino implementation
+    path: library/implementations/cupertino
+  - artifact-id: fluent2
+    description: a fluent2 implementation
+    path: library/implementations/fluent2
+  - artifact-id: material3
+    description: a material3 implementation
+    path: library/implementations/material3
 
 # XCFrameworks [name, path, targets (ios, macos)]
-xcframeworks: []
+xcframeworks: [ ]
