@@ -1,0 +1,261 @@
+# -----------------------
+# Publish to GitHub Maven Repository
+# - publishes only when publishToGithub=true in gradle.properties
+# - skips publishing when publishToGithub is missing or not true
+# - writes the Maven repository layout to the configured target repository and path
+# - selects macos-latest when iOS/macOS targets are configured, otherwise ubuntu-latest
+# - requires TARGET_REPOSITORY_TOKEN with write access to the target repository
+# -----------------------
+
+name: Publish to GitHub Maven Repository
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: Version to publish
+        required: false
+        type: string
+        default: ""
+
+      targetRepositoryUrl:
+        description: GitHub repository URL that hosts the Maven repository
+        required: false
+        type: string
+        default: https://github.com/MFlisar/maven-repository
+
+      targetBranch:
+        description: Branch in the target repository
+        required: false
+        type: string
+        default: main
+
+      targetPath:
+        description: Relative path in the target repository (empty means repository root)
+        required: false
+        type: string
+        default: artifacts
+
+    secrets:
+      TARGET_REPOSITORY_TOKEN:
+        required: false
+
+env:
+  RELEASE_VERSION: ${{ inputs.version }}
+  TARGET_REPOSITORY_URL: ${{ inputs.targetRepositoryUrl }}
+  TARGET_BRANCH: ${{ inputs.targetBranch }}
+  TARGET_PATH: ${{ inputs.targetPath }}
+  JAVA_VERSION: "17"
+  JAVA_DISTRIBUTION: "temurin"
+  PUBLISH_TASK: "publishAllPublicationsToGitHubRepository"
+
+permissions:
+  contents: read
+
+jobs:
+  check-publishing:
+    name: Check publish configuration
+    runs-on: ubuntu-latest
+    outputs:
+      publish-enabled: ${{ steps.read-config.outputs.publish-enabled }}
+      publish-runner: ${{ steps.read-config.outputs.publish-runner }}
+      target-repository: ${{ steps.read-config.outputs.target-repository }}
+    steps:
+      - name: Checkout source repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          cache: gradle
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Check publish configuration
+        id: read-config
+        shell: bash
+        env:
+          TARGET_REPOSITORY_TOKEN: ${{ secrets.TARGET_REPOSITORY_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          value=""
+          if [[ -f gradle.properties ]]; then
+            value="$(sed -nE 's/^[[:space:]]*publishToGithub[[:space:]]*=[[:space:]]*([^[:space:]#]*)[[:space:]]*(#.*)?$/\1/p' gradle.properties | tail -n 1)"
+          fi
+          publish_enabled=false
+          runner=ubuntu-latest
+          target_repository=""
+
+          if [[ "$value" == "true" ]]; then
+            publish_enabled=true
+
+            if [[ -z "$TARGET_REPOSITORY_TOKEN" ]]; then
+              echo "::error::TARGET_REPOSITORY_TOKEN is required when GitHub publishing is enabled."
+              exit 1
+            fi
+
+            if [[ -z "$RELEASE_VERSION" ]]; then
+              echo "::error::A release version is required."
+              exit 1
+            fi
+
+            repository_url="${TARGET_REPOSITORY_URL%/}"
+            repository_url="${repository_url%.git}"
+            if [[ ! "$repository_url" =~ ^https://github\.com/([[:alnum:]_.-]+)/([[:alnum:]_.-]+)$ ]]; then
+              echo "::error::TARGET_REPOSITORY_URL must be a GitHub repository URL, for example https://github.com/MFlisar/maven-repository."
+              exit 1
+            fi
+            target_repository="${BASH_REMATCH[1]}/${BASH_REMATCH[2]}"
+
+            if [[ "$TARGET_PATH" == /* || "$TARGET_PATH" == *\\* ]]; then
+              echo "::error::TARGET_PATH must be a relative path."
+              exit 1
+            fi
+            if [[ -n "$TARGET_PATH" ]]; then
+              IFS='/' read -r -a path_parts <<< "$TARGET_PATH"
+              for path_part in "${path_parts[@]}"; do
+                if [[ -z "$path_part" || "$path_part" == "." || "$path_part" == ".." ]]; then
+                  echo "::error::TARGET_PATH must not contain empty, '.' or '..' path segments."
+                  exit 1
+                fi
+              done
+            fi
+
+            chmod +x gradlew
+            tasks="$(CI=true ./gradlew -q tasks --all)"
+            if grep -Eiq '(^|:)compileKotlin(ios|macos)[[:alnum:]]*[[:space:]]+-' <<< "$tasks"; then
+              runner=macos-latest
+            fi
+          fi
+
+          echo "publish-enabled=$publish_enabled" >> "$GITHUB_OUTPUT"
+          echo "publish-runner=$runner" >> "$GITHUB_OUTPUT"
+          echo "target-repository=$target_repository" >> "$GITHUB_OUTPUT"
+          echo "GitHub publishing enabled: $publish_enabled"
+          if [[ "$publish_enabled" == "true" ]]; then
+            echo "Publish runner: $runner"
+            echo "Target repository: $target_repository"
+            echo "Target path: ${TARGET_PATH:-.}"
+          else
+            echo "Publishing skipped: publishToGithub is missing or not true."
+          fi
+
+  publish-library:
+    name: Publish Maven artifacts
+    needs: check-publishing
+    if: ${{ needs.check-publishing.outputs.publish-enabled == 'true' }}
+    runs-on: ${{ needs.check-publishing.outputs.publish-runner }}
+    steps:
+      - name: Checkout source repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          cache: gradle
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x gradlew
+
+      - name: Publish to local Maven repository
+        run: CI=true ./gradlew "$PUBLISH_TASK" --no-daemon --no-parallel
+        env:
+          VERSION: ${{ env.RELEASE_VERSION }}
+          ORG_GRADLE_PROJECT_publishToGithub: "true"
+
+      - name: Collect Maven artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          artifact_directory="$RUNNER_TEMP/maven-artifacts"
+          mkdir -p "$artifact_directory"
+
+          while IFS= read -r -d '' repository; do
+            echo "Collecting artifacts from $repository"
+            rsync -a "$repository/" "$artifact_directory/"
+          done < <(find . -type d -name maven-repo -not -path './.git/*' -print0)
+
+          if ! find "$artifact_directory" -type f -name '*.pom' -print -quit | grep -q .; then
+            echo "::error::No Maven POM files were generated."
+            exit 1
+          fi
+
+      - name: Checkout target repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ needs.check-publishing.outputs.target-repository }}
+          ref: ${{ env.TARGET_BRANCH }}
+          token: ${{ secrets.TARGET_REPOSITORY_TOKEN }}
+          path: target-repository
+          fetch-depth: 0
+
+      - name: Copy artifacts to target repository
+        shell: bash
+        env:
+          TARGET_REPOSITORY_PATH: ${{ env.TARGET_PATH }}
+          RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
+        run: |
+          set -euo pipefail
+          target_directory="$GITHUB_WORKSPACE/target-repository"
+          if [[ -n "$TARGET_REPOSITORY_PATH" ]]; then
+            target_directory="$target_directory/$TARGET_REPOSITORY_PATH"
+          fi
+          mkdir -p "$target_directory"
+          export target_directory
+
+          python3 - <<'PY'
+          import os
+          import sys
+          from pathlib import Path
+
+          artifacts = Path(os.environ["RUNNER_TEMP"]) / "maven-artifacts"
+          target = Path(os.environ["target_directory"])
+          existing = [
+              str(pom.relative_to(artifacts))
+              for pom in artifacts.rglob("*.pom")
+              if (target / pom.relative_to(artifacts)).exists()
+          ]
+          if existing:
+              print(
+                  "::error::This version already exists in the target Maven repository: "
+                  + ", ".join(existing)
+              )
+              sys.exit(1)
+          PY
+
+          # Preserve existing repository metadata while adding new versioned artifacts.
+          rsync -a --ignore-existing "$RUNNER_TEMP/maven-artifacts/" "$target_directory/"
+
+      - name: Commit and push artifacts
+        working-directory: target-repository
+        env:
+          TARGET_REPOSITORY_PATH: ${{ env.TARGET_PATH }}
+          RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
+          TARGET_BRANCH: ${{ env.TARGET_BRANCH }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if [[ -n "$TARGET_REPOSITORY_PATH" ]]; then
+            git add -A -- "$TARGET_REPOSITORY_PATH"
+          else
+            git add -A
+          fi
+
+          if git diff --cached --quiet; then
+            echo "No new artifact files to commit."
+            exit 0
+          fi
+
+          git commit -m "Publish $RELEASE_VERSION"
+          git push origin "$TARGET_BRANCH"

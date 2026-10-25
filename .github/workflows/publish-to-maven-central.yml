@@ -1,0 +1,112 @@
+# -----------------------
+# Publish to Maven Central
+# - runs when a GitHub release is published
+# - publishes only when publishToMaven=true in gradle.properties
+# - skips publishing when publishToMaven is missing or not true
+# - selects macos-latest when iOS/macOS targets are configured, otherwise ubuntu-latest
+# - requires GPG_KEY, GPG_PASSWORD, MAVEN_CENTRAL_USERNAME and
+#   MAVEN_CENTRAL_PASSWORD secrets
+# -----------------------
+
+name: Publish to Maven Central
+on:
+  release:
+    types: [published]
+
+env:
+  RELEASE_TAG: ${{ github.event.release.tag_name }} # tag of the published release
+  JAVA_VERSION: "17" # Java runtime used to publish
+  JAVA_DISTRIBUTION: "temurin"
+  PUBLISH_TASK: "publish" # Gradle task that publishes configured publications
+
+permissions:
+  contents: read
+
+jobs:
+  check-publishing:
+    name: Check publish configuration
+    runs-on: ubuntu-latest
+    outputs:
+      publish-enabled: ${{ steps.read-property.outputs.publish-enabled }}
+      publish-runner: ${{ steps.read-property.outputs.publish-runner }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          cache: 'gradle'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Read publishToMaven from gradle.properties
+        id: read-property
+        shell: bash
+        run: |
+          set -euo pipefail
+          value=""
+          if [[ -f gradle.properties ]]; then
+            value="$(sed -nE 's/^[[:space:]]*publishToMaven[[:space:]]*=[[:space:]]*([^[:space:]#]*)[[:space:]]*(#.*)?$/\1/p' gradle.properties | tail -n 1)"
+          fi
+          publish_enabled=false
+          runner=ubuntu-latest
+          if [[ "$value" == "true" ]]; then
+            publish_enabled=true
+            chmod +x gradlew
+            tasks="$(CI=true ./gradlew -q tasks --all)"
+            if grep -Eiq '(^|:)compileKotlin(ios|macos)[[:alnum:]]*[[:space:]]+-' <<< "$tasks"; then
+              runner=macos-latest
+            fi
+          fi
+          echo "publish-enabled=$publish_enabled" >> "$GITHUB_OUTPUT"
+          echo "publish-runner=$runner" >> "$GITHUB_OUTPUT"
+          echo "Maven publishing enabled: $publish_enabled"
+          if [[ "$publish_enabled" == "false" ]]; then
+            echo "Publishing skipped: publishToMaven is missing or not true."
+          else
+            echo "Publish runner: $runner"
+          fi
+
+  publish-library:
+    name: Publish to Maven Central
+    needs: check-publishing
+    if: ${{ needs.check-publishing.outputs.publish-enabled == 'true' }}
+    runs-on: ${{ needs.check-publishing.outputs.publish-runner }}
+    env:
+      PUBLISH_TO_MAVEN: ${{ needs.check-publishing.outputs.publish-enabled }} # from gradle.properties
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          cache: 'gradle'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Publish Library
+        run: |
+          echo "Release tag: $RELEASE_TAG"
+          echo "Publishing library 🚀"
+          echo ""
+          ./gradlew "$PUBLISH_TASK" --no-daemon --no-parallel
+          echo "Published✅"
+
+        env:
+          ORG_GRADLE_PROJECT_publishToMaven: ${{ env.PUBLISH_TO_MAVEN }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.GPG_PASSWORD }}
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}

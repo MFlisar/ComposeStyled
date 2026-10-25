@@ -18,12 +18,14 @@ env:
   DOKKA_HTML_PATH: "library/dokka/build/dokka/html"     # required
   DEMO_TASK: ":demo:app:compose:wasmJsBrowserDistribution" # optional; empty disables the demo
   DEMO_HTML_PATH: "demo/app/compose/build/dist/wasmJs/productionExecutable"
+  PAGE_TITLE: "Compose Styled Components"
 
 permissions:
   contents: read
 
 jobs:
   build-dokka:
+    name: Build Dokka
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -51,6 +53,7 @@ jobs:
           if-no-files-found: error
 
   build-demo:
+    name: Build Wasm demo
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -86,6 +89,7 @@ jobs:
           if-no-files-found: error
 
   publish-pages:
+    name: Publish GitHub Pages
     runs-on: ubuntu-latest
     needs:
       - build-dokka
@@ -133,107 +137,195 @@ jobs:
             mkdir -p "$PAGES_PATH/api" "$PAGES_PATH/demo"
             cp -a "$DOKKA_INPUT_PATH/." "$PAGES_PATH/api/"
             cp -a "$DEMO_INPUT_PATH/." "$PAGES_PATH/demo/"
-            cat > "$PAGES_PATH/index.html" <<'HTML'
+            cat > "$PAGES_PATH/index.html" <<HTML
           <!doctype html>
           <html lang="en">
-          <head>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1">
-              <meta name="color-scheme" content="light dark">
-              <title>Compose Styled Components</title>
+            <head>
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1">
+              <meta name="color-scheme" content="dark">
+              <title>${PAGE_TITLE}</title>
+
+              <link rel="preconnect" href="https://fonts.googleapis.com">
+              <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+              <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&family=Material+Symbols+Rounded" rel="stylesheet">
+
               <style>
                 :root {
-                  color-scheme: light dark;
-                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-                  background: #f3f6fb;
-                  color: #172033;
+                  --bg: #202124;
+                  --card: #0f1115;
+                  --border: #303134;
+                  --border-hover: #5f6368;
+                  --text: #e8eaed;
+                  --text-secondary: #9aa0a6;
+                  --accent: #8ab4f8;
                 }
-                * { box-sizing: border-box; }
+
+                * {
+                  box-sizing: border-box;
+                }
+
                 body {
-                  min-height: 100vh;
                   margin: 0;
-                  display: grid;
-                  place-items: center;
-                  padding: 2rem 1rem;
-                  background:
-                    radial-gradient(ellipse at 15% 10%, #dce8ff 0, transparent 38%),
-                    radial-gradient(ellipse at 90% 90%, #e6e2ff 0, transparent 36%),
-                    #f3f6fb;
-                }
-                main {
-                  width: min(100%, 42rem);
-                  padding: clamp(2rem, 7vw, 3.5rem);
-                  border: 1px solid #ffffffb8;
-                  border-radius: 1.5rem;
-                  background: #ffffffde;
-                  box-shadow: 0 1.5rem 5rem #263b641a, 0 0.2rem 0.8rem #263b640d;
-                  backdrop-filter: blur(16px);
-                }
-                h1 {
-                  margin: 0 0 1.75rem;
-                  font-size: clamp(1.8rem, 7vw, 2.8rem);
-                  letter-spacing: -0.045em;
-                  line-height: 1.08;
-                }
-                nav { display: grid; gap: 0.85rem; }
-                nav a {
+                  min-height: 100vh;
+                  background: var(--bg);
+                  color: var(--text);
+                  font-family: Roboto, Arial, sans-serif;
                   display: flex;
                   align-items: center;
-                  justify-content: space-between;
-                  gap: 1rem;
-                  padding: 1.1rem 1.25rem;
-                  border: 1px solid #dce3ef;
-                  border-radius: 1rem;
-                  background: #fff;
+                  justify-content: center;
+                  padding: 24px;
+                }
+
+                .card {
+                  width: min(900px, 100%);
+                  background: var(--card);
+                  border: 1px solid var(--border);
+                  border-radius: 28px;
+                  overflow: hidden;
+                  box-shadow: 0 8px 32px rgba(0, 0, 0, .35);
+                }
+
+                .content {
+                  display: grid;
+                  grid-template-columns: 1fr 440px;
+                  gap: 48px;
+                  padding: 48px;
+                }
+
+                .title {
+                  margin: 0;
+                  font-size: 3rem;
+                  font-weight: 400;
+                  line-height: 1.1;
+                  letter-spacing: -.02em;
+                }
+
+                .subtitle {
+                  margin-top: 24px;
+                  color: var(--accent);
+                  font-size: 1.1rem;
+                }
+
+                .menu {
+                  display: flex;
+                  flex-direction: column;
+                }
+
+                .menu-item {
+                  display: flex;
+                  align-items: center;
+                  gap: 16px;
+                  min-height: 84px;
+                  padding: 16px 20px;
                   color: inherit;
                   text-decoration: none;
-                  transition: border-color 150ms ease, transform 150ms ease, box-shadow 150ms ease;
+                  border: 1px solid transparent;
+                  border-radius: 999px;
+                  transition:
+                    background-color .15s ease,
+                    border-color .15s ease,
+                    transform .15s ease;
                 }
-                nav a:hover {
-                  transform: translateY(-2px);
-                  border-color: #8ca9e8;
-                  box-shadow: 0 0.5rem 1.5rem #263b6414;
+
+                .menu-item:hover {
+                  background: rgba(255, 255, 255, .035);
+                  border-color: var(--border-hover);
+                  transform: translateX(4px);
                 }
-                nav a:focus-visible {
-                  outline: 3px solid #527de0;
-                  outline-offset: 3px;
+
+                .menu-item + .menu-item {
+                  margin-top: 12px;
                 }
-                nav b { color: #456bc3; font-size: 1.25rem; }
-                @media (prefers-color-scheme: dark) {
-                  :root { background: #101522; color: #eef2fb; }
-                  body {
-                    background:
-                      radial-gradient(ellipse at 15% 10%, #1d3157 0, transparent 38%),
-                      radial-gradient(ellipse at 90% 90%, #30264e 0, transparent 36%),
-                      #101522;
+
+                .icon {
+                  width: 48px;
+                  height: 48px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  border-radius: 50%;
+                  background: #1d2128;
+                  color: var(--accent);
+                  flex-shrink: 0;
+                }
+
+                .material-symbols-rounded {
+                  font-size: 24px;
+                }
+
+                .item-content {
+                  flex: 1;
+                  min-width: 0;
+                }
+
+                .item-title {
+                  font-size: 1.1rem;
+                  font-weight: 500;
+                  color: var(--text);
+                }
+
+                .item-description {
+                  margin-top: 4px;
+                  font-size: .9rem;
+                  color: var(--text-secondary);
+                }
+
+                .arrow {
+                  color: var(--text-secondary);
+                }
+
+                @media (max-width: 900px) {
+                  .content {
+                    grid-template-columns: 1fr;
                   }
-                  main { border-color: #ffffff14; background: #1b2230e8; }
-                  nav a { border-color: #384255; background: #242d3d; }
-                  nav a:hover { border-color: #829fe0; }
-                  nav b { color: #a9c0ff; }
-                }
-                @media (prefers-reduced-motion: reduce) {
-                  nav a { transition: none; }
-                  nav a:hover { transform: none; }
+
+                  .title {
+                    font-size: 2.25rem;
+                  }
                 }
               </style>
             </head>
+
             <body>
-              <main>
-                <h1>Compose Styled Components</h1>
-                <nav aria-label="Project resources">
-                  <a href="./api/">
-                    <strong>API documentation</strong>
-                    <b aria-hidden="true">→</b>
-                  </a>
-                  <a href="./demo/">
-                    <strong>Demo</strong>
-                    <b aria-hidden="true">→</b>
-                  </a>
-                </nav>
+              <main class="card">
+                <div class="content">
+                  <section>
+                    <h1 class="title">${PAGE_TITLE}</h1>
+                    <div class="subtitle">Select a sub page</div>
+                  </section>
+
+                  <nav class="menu" aria-label="Project resources">
+                    <a class="menu-item" href="./api/">
+                      <span class="icon">
+                        <span class="material-symbols-rounded">menu_book</span>
+                      </span>
+                      <span class="item-content">
+                        <div class="item-title">API Documentation</div>
+                        <div class="item-description">
+                          Browse the generated Dokka reference
+                        </div>
+                      </span>
+                      <span class="material-symbols-rounded arrow">chevron_right</span>
+                    </a>
+
+                    <a class="menu-item" href="./demo/">
+                      <span class="icon">
+                        <span class="material-symbols-rounded">palette</span>
+                      </span>
+                      <span class="item-content">
+                        <div class="item-title">Live Demo</div>
+                        <div class="item-description">
+                          Open the interactive Wasm showcase
+                        </div>
+                      </span>
+                      <span class="material-symbols-rounded arrow">chevron_right</span>
+                    </a>
+                  </nav>
+                </div>
               </main>
             </body>
-            </html>
+          </html>
           HTML
           else
             cp -a "$DOKKA_INPUT_PATH/." "$PAGES_PATH/"
