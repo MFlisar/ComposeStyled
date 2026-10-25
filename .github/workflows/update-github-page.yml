@@ -1,0 +1,105 @@
+# -----------------------
+# Update GitHub Pages
+# - builds Dokka and optionally the Wasm demo
+# - demo enabled: landing page, Dokka at /api/, demo at /demo/
+# - demo disabled: Dokka directly at the site root
+# - deploys the artifact to GitHub Pages
+# -----------------------
+
+name: Update GitHub Pages
+
+on:
+  push:
+    branches: [ main, master ]
+
+env:
+  JAVA_VERSION: "17"                                    # required
+  DOKKA_GRADLE_TASK: ":dokka:dokkaGenerate"             # required
+  DOKKA_HTML_PATH: "library/dokka/build/dokka/html"     # required
+  DEMO_TASK: ":demo:app:compose:wasmJsBrowserDistribution" # optional; empty disables the demo
+  DEMO_HTML_PATH: "demo/app/compose/build/dist/wasmJs/productionExecutable"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  dokka-pages:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Grant Permission to Execute Gradle
+        run: chmod +x gradlew
+
+      - uses: gradle/actions/setup-gradle@v3
+
+      - name: Build Dokka HTML
+        run: ./gradlew "$DOKKA_GRADLE_TASK"
+
+      - name: Build Wasm demo
+        if: ${{ env.DEMO_TASK != '' }}
+        env:
+          INCLUDE_DEMO_MODULES: "true"
+        run: ./gradlew "$DEMO_TASK"
+
+      - name: Prepare GitHub Pages
+        shell: bash
+        env:
+          PAGES_PATH: ${{ runner.temp }}/github-pages
+        run: |
+          set -euo pipefail
+          test -f "$DOKKA_HTML_PATH/index.html"
+          mkdir -p "$PAGES_PATH"
+
+          if [[ -n "$DEMO_TASK" ]]; then
+            test -f "$DEMO_HTML_PATH/index.html"
+            mkdir -p "$PAGES_PATH/api" "$PAGES_PATH/demo"
+            cp -a "$DOKKA_HTML_PATH/." "$PAGES_PATH/api/"
+            cp -a "$DEMO_HTML_PATH/." "$PAGES_PATH/demo/"
+            cat > "$PAGES_PATH/index.html" <<'HTML'
+          <!doctype html>
+          <html lang="en">
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>Documentation and Demo</title>
+            <style>
+              body { font-family: system-ui, sans-serif; max-width: 48rem; margin: 4rem auto; padding: 0 1rem; }
+              a { display: block; margin: 1rem 0; }
+            </style>
+          </head>
+          <body>
+            <h1>Documentation and Demo</h1>
+            <a href="./api/">API documentation</a>
+            <a href="./demo/">Wasm demo</a>
+          </body>
+          </html>
+          HTML
+          else
+            cp -a "$DOKKA_HTML_PATH/." "$PAGES_PATH/"
+          fi
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ${{ runner.temp }}/github-pages
+
+  deploy-pages:
+    runs-on: ubuntu-latest
+    needs: dokka-pages
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

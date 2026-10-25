@@ -1,10 +1,27 @@
-# This workflow uses MFlisar/kmp-devtools to handle documentation, release notes and publishing to Maven Central.
-# Link: https://github.com/MFlisar/kmp-devtools/
-name: devtools-on-push
+# -----------------------
+# job 1: update-docs
+#        - generates documentation
+#        - updates code snippets in README files via MarkdownSnippets
+#        - validates links via Lychee
+#        - commits changes if necessary
+#
+# job 2: dokka-pages
+#        - generates Dokka documentation
+#        - uploads the GitHub Pages artifact
+#
+# job 3: deploy-pages
+#        - deploys the artifact to GitHub Pages
+# -----------------------
+
+name: [On Push] Documentation & Dokka
+
+#on:
+#  push:
+#    branches: [ main, master ]
 
 on:
-  push:
-    branches: [ main, master ]
+  workflow_dispatch:
+
 
 permissions:
   contents: write
