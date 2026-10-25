@@ -2,6 +2,8 @@ import com.michaelflisar.kmpdevtools.BuildFileUtil
 import com.michaelflisar.kmpdevtools.Targets
 import com.michaelflisar.kmpdevtools.configs.AndroidLibraryConfig
 import com.michaelflisar.kmpdevtools.configs.LibraryModuleConfig
+import com.michaelflisar.kmpdevtools.setupDependencies
+import com.michaelflisar.kmpdevtools.core.Platform
 
 plugins {
     // kmp + app/library
@@ -74,8 +76,15 @@ kotlin {
         // custom source sets
         // ---------------------
 
-        // --
+        val featureCustomScrollbarMain = create("featureCustomScrollbarMain") { dependsOn(commonMain.get()) }
+        val featureFoundationScrollbarMain = create("featureFoundationScrollbarMain") { dependsOn(commonMain.get()) }
 
+        setupDependencies(module, buildTargets, sourceSets) {
+
+            featureCustomScrollbarMain supportedBy Platform.ANDROID
+            featureFoundationScrollbarMain supportedBy !Platform.ANDROID
+
+        }
         // ---------------------
         // dependencies
         // ---------------------
@@ -86,9 +95,6 @@ kotlin {
             api(libs.jetbrains.compose.components.resources)
             api(libs.jetbrains.compose.foundation)
             api(libs.jetbrains.kotlinx.coroutines.core)
-            implementation(libs.jetbrains.compose.material.icons.core)
-            implementation(libs.jetbrains.compose.material.icons.extended)
-            //implementation(libs.jetbrains.compose.ui.backhandler)
 
         }
 
@@ -100,10 +106,10 @@ kotlin {
 // -------------------
 
 // maven publish configuration
-// if (BuildFileUtil.checkGradleProperty(project, "publishToMaven") != false)
-//    BuildFileUtil.setupMavenPublish(module)
+if (BuildFileUtil.checkGradleProperty(project, "publishToMaven") == true)
+    BuildFileUtil.setupMavenPublish(module)
 
 // local publish configuration
 // task name: publishAllPublicationsToGitHubRepository
-if (BuildFileUtil.checkGradleProperty(project, "publishToMaven") != false)
+if (BuildFileUtil.checkGradleProperty(project, "publishToGithub") == true)
     BuildFileUtil.setupLocalMavenPublish(module)

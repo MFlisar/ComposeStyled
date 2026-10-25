@@ -5,8 +5,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -28,6 +26,7 @@ import com.michaelflisar.composestyledcomponents.classes.IconComposable
 import com.michaelflisar.composestyledcomponents.classes.toIconComposable
 import com.michaelflisar.composestyledcomponents.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyledcomponents.runtime.LocalStyledContext
+import com.michaelflisar.composestyledcomponents.ui.icons.MaterialIconsAdd
 import com.michaelflisar.composestyledcomponents.ui.icons.MaterialIconsRemove
 import com.michaelflisar.composestyledcomponents.ui.primitives.StyledInputAction
 import com.michaelflisar.composestyledcomponents.ui.primitives.StyledText
@@ -305,7 +304,7 @@ private fun <T : Number> StyledNumberPickerImpl(
                                             canChange(parser.increment(currentValue))
                                     ),
                             label = "Increase",
-                            icon = Icons.Default.Add.toIconComposable(),
+                            icon = MaterialIconsAdd.toIconComposable(),
                         )
                     }
                 }

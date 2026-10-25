@@ -11,8 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -40,14 +38,15 @@ import com.michaelflisar.composestyledcomponents.runtime.InternalComposeStyledAp
 import com.michaelflisar.composestyledcomponents.tokens.LocalStyledContentColor
 import com.michaelflisar.composestyledcomponents.ui.components.StyledButton
 import com.michaelflisar.composestyledcomponents.ui.components.StyledDropdown
-import com.michaelflisar.composestyledcomponents.ui.components.StyledPopupMenu
 import com.michaelflisar.composestyledcomponents.ui.components.StyledDropdownMenuItem
 import com.michaelflisar.composestyledcomponents.ui.components.StyledDropdownMenuItemDefaults
 import com.michaelflisar.composestyledcomponents.ui.components.StyledIcon
 import com.michaelflisar.composestyledcomponents.ui.components.StyledInput
+import com.michaelflisar.composestyledcomponents.ui.components.StyledPopupMenu
 import com.michaelflisar.composestyledcomponents.ui.components.StyledPrimaryButton
 import com.michaelflisar.composestyledcomponents.ui.components.StyledSecondaryButton
 import com.michaelflisar.composestyledcomponents.ui.components.StyledTertiaryButton
+import com.michaelflisar.composestyledcomponents.ui.icons.MaterialIconsArrowDropDown
 import com.michaelflisar.composestyledcomponents.ui.layout.StyledSpacedColumn
 import com.michaelflisar.composestyledcomponents.ui.overlay.StyledPopupContainer
 import com.michaelflisar.composestyledcomponents.ui.primitives.StyledText
@@ -186,7 +185,7 @@ private fun DropdownAnchor(
             )
         }
         StyledIcon(
-            icon = Icons.Default.ArrowDropDown.toIconComposable(),
+            icon = MaterialIconsArrowDropDown.toIconComposable(),
             modifier = Modifier.rotate(rotation),
             tint = LocalStyledContentColor.current,
         )

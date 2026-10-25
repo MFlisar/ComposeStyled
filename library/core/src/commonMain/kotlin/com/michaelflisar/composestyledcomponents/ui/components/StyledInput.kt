@@ -4,8 +4,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
@@ -34,6 +32,7 @@ import com.michaelflisar.composestyledcomponents.runtime.StyledContext
 import com.michaelflisar.composestyledcomponents.registry.LocalStyledRegistry
 import com.michaelflisar.composestyledcomponents.registry.StyledComponent
 import com.michaelflisar.composestyledcomponents.registry.StyledKey
+import com.michaelflisar.composestyledcomponents.ui.icons.MaterialIconsClear
 import com.michaelflisar.composestyledcomponents.ui.primitives.StyledInputAction
 import com.michaelflisar.composestyledcomponents.utils.number.NumberUtil
 
@@ -170,7 +169,7 @@ object StyledInputDefaults {
         return if (showConditionalClearIcon && value.isNotEmpty()) {
             {
                 StyledInputAction(
-                    icon = Icons.Default.Clear.toIconComposable(),
+                    icon = MaterialIconsClear.toIconComposable(),
                     onClick = { onValueChange("") }
                 )
             }
@@ -186,7 +185,7 @@ object StyledInputDefaults {
         return if (showConditionalClearIconForNumericOptionalInputs && value != null) {
             {
                 StyledInputAction(
-                    icon = Icons.Default.Clear.toIconComposable(),
+                    icon = MaterialIconsClear.toIconComposable(),
                     onClick = { onValueChange(null) }
                 )
             }
@@ -201,7 +200,7 @@ object StyledInputDefaults {
         return if (showConditionalClearIconForNumericInputs && value != NumberUtil.zero(value)) {
             {
                 StyledInputAction(
-                    icon = Icons.Default.Clear.toIconComposable(),
+                    icon = MaterialIconsClear.toIconComposable(),
                     onClick = { onValueChange(NumberUtil.zero(value)) }
                 )
             }

@@ -1,7 +1,5 @@
 package com.michaelflisar.composestyledcomponents.ui.components
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -11,12 +9,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import com.michaelflisar.composestyledcomponents.StyledTheme
-import com.michaelflisar.composestyledcomponents.classes.toIconComposable
 import com.michaelflisar.composestyledcomponents.classes.CustomColors
-import com.michaelflisar.composestyledcomponents.ui.primitives.StyledText
+import com.michaelflisar.composestyledcomponents.classes.toIconComposable
 import com.michaelflisar.composestyledcomponents.registry.LocalStyledRegistry
 import com.michaelflisar.composestyledcomponents.registry.StyledComponent
 import com.michaelflisar.composestyledcomponents.registry.StyledKey
+import com.michaelflisar.composestyledcomponents.ui.icons.MaterialIconsClose
+import com.michaelflisar.composestyledcomponents.ui.primitives.StyledText
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
@@ -150,7 +149,7 @@ fun StyledSnackbar(
     dismissActionContentDescription: String = "Dismiss",
     shape: Shape = StyledSnackbarDefaults.shape,
     containerColor: Color = StyledTheme.colorScheme.onSurface,
-    contentColor: Color = StyledTheme.contentColorFor(containerColor, checkInversely = true)
+    contentColor: Color = StyledTheme.contentColorFor(containerColor, checkInversely = true),
 ) {
     val buttonCustomization = StyledButtonDefaults.customize(
         colors = CustomColors(
@@ -183,7 +182,7 @@ fun StyledSnackbar(
                 ),
             ) {
                 StyledIcon(
-                    icon = Icons.Default.Close.toIconComposable(),
+                    icon = MaterialIconsClose.toIconComposable(),
                     contentDescription = dismissActionContentDescription,
                 )
             }

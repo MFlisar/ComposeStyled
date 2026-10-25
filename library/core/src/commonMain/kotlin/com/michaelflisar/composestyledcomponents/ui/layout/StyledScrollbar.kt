@@ -4,9 +4,8 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.HorizontalScrollbar
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.VerticalScrollbar
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
@@ -18,7 +17,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
@@ -32,11 +30,13 @@ import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyledcomponents.StyledTheme
 
 object StyledScrollbar {
+
     val scrollbarSize: Dp
         @Composable get() = StyledTheme.padding.medium // TODO: use a proper size for the scrollbar
     val spaceToScrollbar: Dp
         @Composable get() = StyledTheme.padding.small // TODO: use a proper size for the scrollbar
     val overlapScrollbar: Boolean = false
+
 }
 
 @Composable
@@ -107,6 +107,13 @@ private enum class ScrollbarAlign {
 }
 
 @Composable
+internal expect fun ScrollbarIndicator(
+    modifier: Modifier,
+    scrollState: ScrollState,
+    orientation: Orientation,
+)
+
+@Composable
 private fun ScrollbarContainer(
     modifier: Modifier = Modifier,
     alignment: ScrollbarAlign,
@@ -144,11 +151,12 @@ private fun ScrollbarContainer(
                     enter = fadeIn(),
                     exit = fadeOut()
                 ) {
-                    VerticalScrollbar(
+                    ScrollbarIndicator(
                         modifier = Modifier
                             .fillMaxHeight()
                             .width(StyledScrollbar.scrollbarSize),
-                        adapter = rememberScrollbarAdapter(scrollState)
+                        scrollState = scrollState,
+                        orientation = Orientation.Vertical,
                     )
                 }
             }
@@ -178,11 +186,12 @@ private fun ScrollbarContainer(
                     enter = fadeIn(),
                     exit = fadeOut()
                 ) {
-                    HorizontalScrollbar(
+                    ScrollbarIndicator(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(StyledScrollbar.scrollbarSize),
-                        adapter = rememberScrollbarAdapter(scrollState)
+                        scrollState = scrollState,
+                        orientation = Orientation.Horizontal,
                     )
                 }
             }
