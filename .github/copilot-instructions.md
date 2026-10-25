@@ -8,8 +8,8 @@ Use the Gradle wrapper from the repository root:
 
 - Build all included projects: `./gradlew build` (`.\gradlew.bat build` in PowerShell).
 - Run configured checks: `./gradlew check`.
-- Run JVM tests for a module: `./gradlew :composestylecomponents:core:jvmTest`.
-- Run one JVM test: `./gradlew :composestylecomponents:core:jvmTest --tests "*TestClassName"`.
+- Run JVM tests for a module: `./gradlew :composestyledcomponents:core:jvmTest`.
+- Run one JVM test: `./gradlew :composestyledcomponents:core:jvmTest --tests "*TestClassName"`.
 
 Replace `core` with `implementations:foundation`, `implementations:cupertino`,
 `implementations:fluent2` or `implementations:material3` to target another library
@@ -39,7 +39,7 @@ with component changes.
 
 `settings.gradle.kts` uses `configs/library-config.yml` and the kmp-devtools
 settings plugin to include library modules. Project paths follow the configured
-library name (`:composestylecomponents:...` here). Demo projects are included
+library name (`:composestyledcomponents:...` here). Demo projects are included
 only when `CI` is not `"true"`.
 
 ## Repository-specific conventions

@@ -107,10 +107,10 @@ kotlin {
             api(libs.jetbrains.compose.material.icons.extended)
 
             // modules
-            api(project(":composestylecomponents:core"))
-            api(project(":composestylecomponents:implementations:cupertino"))
-            api(project(":composestylecomponents:implementations:fluent2"))
-            api(project(":composestylecomponents:implementations:material3"))
+            api(project(":composestyledcomponents:core"))
+            api(project(":composestyledcomponents:implementations:cupertino"))
+            api(project(":composestyledcomponents:implementations:fluent2"))
+            api(project(":composestyledcomponents:implementations:material3"))
 
         }
 

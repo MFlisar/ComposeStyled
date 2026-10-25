@@ -1,6 +1,6 @@
 # Github Library
 github:
-  name: ComposeStyleComponents
+  name: ComposeStyledComponents
   release: 2026
   license:
     name: Apache License 2.0
@@ -8,7 +8,7 @@ github:
 
 # Maven
 maven:
-  group-id: io.github.mflisar.composestylecomponents
+  group-id: io.github.mflisar.composestyledcomponents
   primary-artifact-id: core # used to detect latest release version of the library (dynamically on the published homepage)
 
 # Modules - list of modules [artifact-id, description, path, (plugin)]

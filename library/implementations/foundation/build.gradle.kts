@@ -83,7 +83,7 @@ kotlin {
 
         commonMain.dependencies {
 
-            api(project(":composestylecomponents:core"))
+            api(project(":composestyledcomponents:core"))
 
         }
     }

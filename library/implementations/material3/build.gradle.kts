@@ -83,8 +83,8 @@ kotlin {
 
         commonMain.dependencies {
 
-            api(project(":composestylecomponents:core"))
-            implementation(project(":composestylecomponents:implementations:foundation"))
+            api(project(":composestyledcomponents:core"))
+            implementation(project(":composestyledcomponents:implementations:foundation"))
 
             implementation(libs.jetbrains.compose.material3)
 
