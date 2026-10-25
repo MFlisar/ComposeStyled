@@ -1,0 +1,85 @@
+# ---------------------
+# Publishing configuration
+# ---------------------
+
+publish:
+  group-id: io.github.mflisar.composestyledcomponents
+  github:
+    user: MFlisar
+    repo: maven-repository
+    branch: main
+    path: artifacts
+  target: github # [none, maven-central, github]
+
+# ---------------------
+# General configuration
+# ---------------------
+
+config:
+  java-version: 17
+  developer:
+    name: Michael Flisar
+    mail: mflisar.development@gmail.com
+    maven-id: mflisar
+    github-user-name: MFlisar
+
+# ---------------------
+# Project
+# ---------------------
+
+project:
+  namespace: com.michaelflisar.composestyledcomponents
+  repo-name: ComposeStyledComponents
+  release: 2026
+  license:
+    name: Apache License 2.0
+    path: blob/main/LICENSE
+
+# ---------------------
+# APP / DEMO (optional)
+# ---------------------
+
+app:
+  name: Toolbox Demo
+  namespace: com.michaelflisar.composestyledcomponents.demo
+  version-name: 1.0.0
+  path: demo/app
+  live-demo: true
+
+# ---------------------
+# Modules
+# ---------------------
+
+modules:
+  # used to detect latest release version of the library (dynamically on the published homepage)
+  primary-artifact-id: core
+  # Modules - list of modules [artifact-id, description, path, (plugin)]
+  modules:
+    - artifact-id: core
+      description: the core module
+      path: library/core
+    - artifact-id: foundation
+      description: a foundation implementation (can be used as a base for other implementations)
+      path: library/implementations/foundation
+    - artifact-id: cupertino
+      description: a cupertino implementation
+      path: library/implementations/cupertino
+    - artifact-id: fluent2
+      description: a fluent2 implementation
+      path: library/implementations/fluent2
+    - artifact-id: material3
+      description: a material3 implementation
+      path: library/implementations/material3
+  # XCFrameworks [name, path, targets (ios, macos)]
+  xcframeworks: []
+
+# ---------------------
+# Readme Generation
+# ---------------------
+
+readme:
+  screenshots:
+    exclude-root: true
+    group-by-folder: true
+    excluded-folders: []
+    excluded-images: []

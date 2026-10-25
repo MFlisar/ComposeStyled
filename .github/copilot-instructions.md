@@ -34,8 +34,8 @@ provides the active theme, tokens and registry through CompositionLocals;
 public `Styled*` composables resolve their renderer from that registry.
 `demo/shared` is a multiplatform consumer and usage reference, while
 `demo/app/compose` contains the platform launchers. Keep public API examples and
-behavior descriptions in `documentation/_partials/usage.md.partial` aligned
-with component changes.
+behavior descriptions in the corresponding `documentation/Components/` files;
+use `documentation/_partials/usage.md.partial` for the general usage overview.
 
 `settings.gradle.kts` uses `configs/library-config.yml` and the kmp-devtools
 settings plugin to include library modules. Project paths follow the configured

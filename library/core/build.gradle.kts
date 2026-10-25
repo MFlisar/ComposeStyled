@@ -105,11 +105,4 @@ kotlin {
 // Publish
 // -------------------
 
-// maven publish configuration
-if (BuildFileUtil.checkGradleProperty(project, "publishToMaven") == true)
-    BuildFileUtil.setupMavenPublish(module)
-
-// local publish configuration
-// task name: publishAllPublicationsToGitHubRepository
-if (BuildFileUtil.checkGradleProperty(project, "publishToGithub") == true)
-    BuildFileUtil.setupLocalMavenPublish(module)
+BuildFileUtil.setupMavenPublish(module)

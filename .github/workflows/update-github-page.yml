@@ -140,191 +140,275 @@ jobs:
             cat > "$PAGES_PATH/index.html" <<HTML
           <!doctype html>
           <html lang="en">
-            <head>
-              <meta charset="utf-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1">
-              <meta name="color-scheme" content="dark">
-              <title>${PAGE_TITLE}</title>
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <meta name="color-scheme" content="dark">
+            <title>${PAGE_TITLE}</title>
 
-              <link rel="preconnect" href="https://fonts.googleapis.com">
-              <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-              <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&family=Material+Symbols+Rounded" rel="stylesheet">
+            <style>
+              :root {
+                --bg: #202124;
+                --card: #0f1115;
+                --border: #303134;
+                --border-hover: #5f6368;
+                --text: #e8eaed;
+                --text-secondary: #9aa0a6;
+                --accent: #8ab4f8;
+              }
 
-              <style>
-                :root {
-                  --bg: #202124;
-                  --card: #0f1115;
-                  --border: #303134;
-                  --border-hover: #5f6368;
-                  --text: #e8eaed;
-                  --text-secondary: #9aa0a6;
-                  --accent: #8ab4f8;
-                }
+              * {
+                box-sizing: border-box;
+              }
 
-                * {
-                  box-sizing: border-box;
-                }
+              body {
+                margin: 0;
+                min-height: 100vh;
 
-                body {
-                  margin: 0;
-                  min-height: 100vh;
-                  background: var(--bg);
-                  color: var(--text);
-                  font-family: Roboto, Arial, sans-serif;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  padding: 24px;
-                }
+                display: flex;
+                align-items: center;
+                justify-content: center;
 
-                .card {
-                  width: min(900px, 100%);
-                  background: var(--card);
-                  border: 1px solid var(--border);
-                  border-radius: 28px;
-                  overflow: hidden;
-                  box-shadow: 0 8px 32px rgba(0, 0, 0, .35);
-                }
+                padding: 24px;
 
+                background: var(--bg);
+                color: var(--text);
+                font-family:
+                  Inter,
+                  Roboto,
+                  "Segoe UI",
+                  Arial,
+                  sans-serif;
+              }
+
+              .card {
+                width: min(900px, 100%);
+
+                background: var(--card);
+                border: 1px solid var(--border);
+                border-radius: 28px;
+
+                overflow: hidden;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, .35);
+              }
+
+              .content {
+                display: grid;
+                grid-template-columns: 1fr 420px;
+                gap: 56px;
+
+                padding: 48px;
+              }
+
+              .title {
+                margin: 0;
+
+                font-size: 3rem;
+                font-weight: 400;
+                line-height: 1.1;
+                letter-spacing: -.02em;
+              }
+
+              .subtitle {
+                margin-top: 20px;
+
+                color: var(--accent);
+                font-size: 1.1rem;
+              }
+
+              .menu {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+              }
+
+              .menu-item {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+
+                min-height: 88px;
+
+                padding: 16px 18px;
+
+                color: inherit;
+                text-decoration: none;
+
+                border: 1px solid var(--border);
+                border-radius: 16px;
+
+                background: rgba(255, 255, 255, .015);
+
+                transition:
+                  background-color .15s ease,
+                  border-color .15s ease,
+                  transform .15s ease,
+                  box-shadow .15s ease;
+              }
+
+              .menu-item:hover {
+                background: rgba(255, 255, 255, .04);
+                border-color: var(--border-hover);
+
+                transform: translateY(-1px);
+
+                box-shadow: 0 4px 16px rgba(0, 0, 0, .25);
+              }
+
+              .icon {
+                width: 42px;
+                height: 42px;
+
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                flex-shrink: 0;
+
+                border-radius: 12px;
+
+                background: #1b2330;
+                color: var(--accent);
+              }
+
+              .icon svg,
+              .arrow svg {
+                display: block;
+              }
+
+              .item-content {
+                flex: 1;
+                min-width: 0;
+              }
+
+              .item-title {
+                font-size: 1rem;
+                font-weight: 500;
+                color: var(--text);
+              }
+
+              .item-description {
+                margin-top: 4px;
+
+                font-size: .875rem;
+                color: var(--text-secondary);
+              }
+
+              .arrow {
+                flex-shrink: 0;
+                color: var(--text-secondary);
+              }
+
+              @media (max-width: 900px) {
                 .content {
-                  display: grid;
-                  grid-template-columns: 1fr 440px;
-                  gap: 48px;
-                  padding: 48px;
+                  grid-template-columns: 1fr;
+                  gap: 32px;
+                  padding: 32px;
                 }
 
                 .title {
-                  margin: 0;
-                  font-size: 3rem;
-                  font-weight: 400;
-                  line-height: 1.1;
-                  letter-spacing: -.02em;
+                  font-size: 2.25rem;
+                }
+              }
+
+              @media (max-width: 480px) {
+                body {
+                  padding: 12px;
                 }
 
-                .subtitle {
-                  margin-top: 24px;
-                  color: var(--accent);
-                  font-size: 1.1rem;
-                }
-
-                .menu {
-                  display: flex;
-                  flex-direction: column;
+                .content {
+                  padding: 20px;
+                  gap: 24px;
                 }
 
                 .menu-item {
-                  display: flex;
-                  align-items: center;
-                  gap: 16px;
-                  min-height: 84px;
-                  padding: 16px 20px;
-                  color: inherit;
-                  text-decoration: none;
-                  border: 1px solid transparent;
-                  border-radius: 999px;
-                  transition:
-                    background-color .15s ease,
-                    border-color .15s ease,
-                    transform .15s ease;
+                  padding: 14px 16px;
                 }
 
-                .menu-item:hover {
-                  background: rgba(255, 255, 255, .035);
-                  border-color: var(--border-hover);
-                  transform: translateX(4px);
+                .title {
+                  font-size: 1.9rem;
                 }
 
-                .menu-item + .menu-item {
+                .subtitle {
                   margin-top: 12px;
                 }
+              }
+            </style>
+          </head>
 
-                .icon {
-                  width: 48px;
-                  height: 48px;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  border-radius: 50%;
-                  background: #1d2128;
-                  color: var(--accent);
-                  flex-shrink: 0;
-                }
+          <body>
+            <main class="card">
+              <div class="content">
 
-                .material-symbols-rounded {
-                  font-size: 24px;
-                }
+                <section>
+                  <h1 class="title">${PAGE_TITLE}</h1>
+                  <div class="subtitle">Select a sub page</div>
+                </section>
 
-                .item-content {
-                  flex: 1;
-                  min-width: 0;
-                }
+                <nav class="menu" aria-label="Project resources">
 
-                .item-title {
-                  font-size: 1.1rem;
-                  font-weight: 500;
-                  color: var(--text);
-                }
+                  <a class="menu-item" href="./api/">
+                    <span class="icon" aria-hidden="true">
+                      <svg xmlns="http://www.w3.org/2000/svg"
+                           viewBox="0 -960 960 960"
+                           width="22"
+                           height="22"
+                           fill="currentColor">
+                        <path d="M260-320q47 0 91.5 10.5T440-278v-394q-41-24-87-36t-93-12q-36 0-71.5 7T120-692v396q35-12 69.5-18t70.5-6Zm260 42q44-21 88.5-31.5T700-320q36 0 70.5 6t69.5 18v-396q-33-14-68.5-21t-71.5-7q-47 0-93 12t-87 36v394Zm-66.5 93.5Q441-188 430-194q-39-23-82-34.5T260-240q-42 0-82.5 11T100-198q-21 11-40.5-1T40-234v-482q0-11 5.5-21T62-752q46-24 96-36t102-12q58 0 113.5 15T480-740q51-30 106.5-45T700-800q52 0 102 12t96 36q11 5 16.5 15t5.5 21v482q0 23-19.5 35t-40.5 1q-37-20-77.5-31T700-240q-45 0-88 11.5T530-194q-11 6-23.5 9.5T480-181q-14 0-26.5-3.5ZM280-494Zm280-115q0-9 6.5-18.5T581-640q29-10 58-15t61-5q20 0 39.5 2.5T778-651q9 2 15.5 10t6.5 18q0 17-11 25t-28 4q-14-3-29.5-4.5T700-600q-26 0-51 5t-48 13q-18 7-29.5-1T560-609Zm0 220q0-9 6.5-18.5T581-420q29-10 58-15t61-5q20 0 39.5 2.5T778-431q9 2 15.5 10t6.5 18q0 17-11 25t-28 4q-14-3-29.5-4.5T700-380q-26 0-51 4.5T601-363q-18 7-29.5-.5T560-389Zm0-110q0-9 6.5-18.5T581-530q29-10 58-15t61-5q20 0 39.5 2.5T778-541q9 2 15.5 10t6.5 18q0 17-11 25t-28 4q-14-3-29.5-4.5T700-490q-26 0-51 5t-48 13q-18 7-29.5-1T560-499Z"/>
+                      </svg>
+                    </span>
 
-                .item-description {
-                  margin-top: 4px;
-                  font-size: .9rem;
-                  color: var(--text-secondary);
-                }
+                    <span class="item-content">
+                      <div class="item-title">API Documentation</div>
+                      <div class="item-description">
+                        Browse the generated Dokka reference
+                      </div>
+                    </span>
 
-                .arrow {
-                  color: var(--text-secondary);
-                }
+                    <span class="arrow" aria-hidden="true">
+                      <svg xmlns="http://www.w3.org/2000/svg"
+                           viewBox="0 -960 960 960"
+                           width="20"
+                           height="20"
+                           fill="currentColor">
+                        <path d="M504-480 348-636q-11-11-11-28t11-28q11-11 28-11t28 11l184 184q6 6 8.5 13t2.5 15q0 8-2.5 15t-8.5 13L404-268q-11 11-28 11t-28-11q-11-11-11-28t11-28l156-156Z"/>
+                      </svg>
+                    </span>
+                  </a>
 
-                @media (max-width: 900px) {
-                  .content {
-                    grid-template-columns: 1fr;
-                  }
+                  <a class="menu-item" href="./demo/">
+                    <span class="icon" aria-hidden="true">
+                      <svg xmlns="http://www.w3.org/2000/svg"
+                           viewBox="0 -960 960 960"
+                           width="22"
+                           height="22"
+                           fill="currentColor">
+                        <path d="M480-80q-82 0-155-31.5t-127.5-86Q143-252 111.5-325T80-480q0-83 32.5-156t88-127Q256-817 330-848.5T488-880q80 0 151 27.5t124.5 76q53.5 48.5 85 115T880-518q0 115-70 176.5T640-280h-74q-9 0-12.5 5t-3.5 11q0 12 15 34.5t15 51.5q0 50-27.5 74T480-80Zm0-400Zm-177 23q17-17 17-43t-17-43q-17-17-43-17t-43 17q-17 17-17 43t17 43q17 17 43 17t43-17Zm120-160q17-17 17-43t-17-43q-17-17-43-17t-43 17q-17 17-17 43t17 43q17 17 43 17t43-17Zm200 0q17-17 17-43t-17-43q-17-17-43-17t-43 17q-17 17-17 43t17 43q17 17 43 17t43-17Zm120 160q17-17 17-43t-17-43q-17-17-43-17t-43 17q-17 17-17 43t17 43q17 17 43 17t43-17ZM480-160q9 0 14.5-5t5.5-13q0-14-15-33t-15-57q0-42 29-67t71-25h70q66 0 113-38.5T800-518q0-121-92.5-201.5T488-800q-136 0-232 93t-96 227q0 133 93.5 226.5T480-160Z"/>
+                      </svg>
+                    </span>
 
-                  .title {
-                    font-size: 2.25rem;
-                  }
-                }
-              </style>
-            </head>
+                    <span class="item-content">
+                      <div class="item-title">Live Demo</div>
+                      <div class="item-description">
+                        Open the interactive Wasm showcase
+                      </div>
+                    </span>
 
-            <body>
-              <main class="card">
-                <div class="content">
-                  <section>
-                    <h1 class="title">${PAGE_TITLE}</h1>
-                    <div class="subtitle">Select a sub page</div>
-                  </section>
+                    <span class="arrow" aria-hidden="true">
+                      <svg xmlns="http://www.w3.org/2000/svg"
+                           viewBox="0 -960 960 960"
+                           width="20"
+                           height="20"
+                           fill="currentColor">
+                        <path d="M504-480 348-636q-11-11-11-28t11-28q11-11 28-11t28 11l184 184q6 6 8.5 13t2.5 15q0 8-2.5 15t-8.5 13L404-268q-11 11-28 11t-28-11q-11-11-11-28t11-28l156-156Z"/>
+                      </svg>
+                    </span>
+                  </a>
 
-                  <nav class="menu" aria-label="Project resources">
-                    <a class="menu-item" href="./api/">
-                      <span class="icon">
-                        <span class="material-symbols-rounded">menu_book</span>
-                      </span>
-                      <span class="item-content">
-                        <div class="item-title">API Documentation</div>
-                        <div class="item-description">
-                          Browse the generated Dokka reference
-                        </div>
-                      </span>
-                      <span class="material-symbols-rounded arrow">chevron_right</span>
-                    </a>
-
-                    <a class="menu-item" href="./demo/">
-                      <span class="icon">
-                        <span class="material-symbols-rounded">palette</span>
-                      </span>
-                      <span class="item-content">
-                        <div class="item-title">Live Demo</div>
-                        <div class="item-description">
-                          Open the interactive Wasm showcase
-                        </div>
-                      </span>
-                      <span class="material-symbols-rounded arrow">chevron_right</span>
-                    </a>
-                  </nav>
-                </div>
-              </main>
-            </body>
+                </nav>
+              </div>
+            </main>
+          </body>
           </html>
           HTML
           else

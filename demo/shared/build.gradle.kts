@@ -55,7 +55,7 @@ val androidConfig = AndroidLibraryConfig.createFromPath(
 
 buildkonfig {
     setupBuildKonfig(
-        appConfig = module.appConfig,
+        config = module.config,
         isDebug = isDebug(project),
         isExe = isExe(project),
     )

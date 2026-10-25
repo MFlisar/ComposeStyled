@@ -44,7 +44,8 @@ factory; renderer replacements belong in the custom registration callback.
 ## 4. Document and verify
 
 For API or behavior changes, update the relevant `demo\shared` examples and
-`documentation\_partials\usage.md.partial`. Check structural section-comment
+`documentation\Components\<Component>.md`; keep the general overview in
+`documentation\_partials\usage.md.partial` aligned when needed. Check structural section-comment
 spacing in changed Kotlin files and keep function KDoc attached to its
 declaration. Run the smallest existing build or check that covers the affected
 modules and consumers. Follow the consistency checklist in the compound guide;

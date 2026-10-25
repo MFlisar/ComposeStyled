@@ -1,5 +1,5 @@
 import com.michaelflisar.kmpdevtools.SettingsFileUtil
-import com.michaelflisar.kmpdevtools.core.configs.LibraryConfig
+import com.michaelflisar.kmpdevtools.core.Config
 
 dependencyResolutionManagement    {
 
@@ -45,18 +45,18 @@ pluginManagement {
 
 plugins {
     // version catalogue does not work here!
-    id("io.github.mflisar.kmpdevtools.plugins-settings-gradle") version "8.5.1"
+    id("io.github.mflisar.kmpdevtools.plugins-settings-gradle") version "LOCAL-SNAPSHOT" // "8.5.1"
 }
 
 // --------------
 // Library
 // --------------
 
-val libraryConfig = LibraryConfig.read(rootDir)
-val libraryName = libraryConfig.libraryName()
+val config = Config.read(rootDir)
+val libraryName = config.libraryName()
 
 // Library Modules
-SettingsFileUtil.includeModules(settings, libraryName, libraryConfig)
+SettingsFileUtil.includeModules(settings, libraryName, config)
 SettingsFileUtil.includeDokkaModule(settings)
 
 // --------------

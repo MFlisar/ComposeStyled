@@ -101,7 +101,8 @@ Before considering a Styled component migration or renderer change complete:
   renderer reuse, semantics or visual consistency.
 
 For either model, add usage to `demo\shared` alongside the existing component
-demos and update `documentation\_partials\usage.md.partial`. For registered
+demos and update the relevant `documentation\Components\<Component>.md` guide.
+Keep `documentation\_partials\usage.md.partial` focused on general usage. For registered
 components, exercise every theme with default and customized rendering;
 button-like controls also need their variants and interaction states covered,
 and icon-like controls use the `IconComposable` input API rather than separate
