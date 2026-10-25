@@ -21,11 +21,9 @@ env:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 jobs:
-  dokka-pages:
+  build-dokka:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -45,47 +43,200 @@ jobs:
       - name: Build Dokka HTML
         run: ./gradlew "$DOKKA_GRADLE_TASK"
 
+      - name: Upload Dokka artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dokka-html
+          path: ${{ env.DOKKA_HTML_PATH }}
+          if-no-files-found: error
+
+  build-demo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        if: ${{ env.DEMO_TASK != '' }}
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-java@v4
+        if: ${{ env.DEMO_TASK != '' }}
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Grant Permission to Execute Gradle
+        if: ${{ env.DEMO_TASK != '' }}
+        run: chmod +x gradlew
+
+      - uses: gradle/actions/setup-gradle@v3
+        if: ${{ env.DEMO_TASK != '' }}
+
       - name: Build Wasm demo
         if: ${{ env.DEMO_TASK != '' }}
         env:
           INCLUDE_DEMO_MODULES: "true"
         run: ./gradlew "$DEMO_TASK"
 
+      - name: Upload Wasm demo artifact
+        if: ${{ env.DEMO_TASK != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: wasm-demo
+          path: ${{ env.DEMO_HTML_PATH }}
+          if-no-files-found: error
+
+  publish-pages:
+    runs-on: ubuntu-latest
+    needs:
+      - build-dokka
+      - build-demo
+    if: >-
+      ${{
+        always() &&
+        needs.build-dokka.result == 'success' &&
+        (needs.build-demo.result == 'success' || needs.build-demo.result == 'skipped')
+      }}
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Download Dokka artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dokka-html
+          path: ${{ runner.temp }}/dokka-html
+
+      - name: Download Wasm demo artifact
+        if: ${{ env.DEMO_TASK != '' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: wasm-demo
+          path: ${{ runner.temp }}/wasm-demo
+
       - name: Prepare GitHub Pages
         shell: bash
         env:
           PAGES_PATH: ${{ runner.temp }}/github-pages
+          DOKKA_INPUT_PATH: ${{ runner.temp }}/dokka-html
+          DEMO_INPUT_PATH: ${{ runner.temp }}/wasm-demo
         run: |
           set -euo pipefail
-          test -f "$DOKKA_HTML_PATH/index.html"
+          test -f "$DOKKA_INPUT_PATH/index.html"
           mkdir -p "$PAGES_PATH"
 
           if [[ -n "$DEMO_TASK" ]]; then
-            test -f "$DEMO_HTML_PATH/index.html"
+            test -f "$DEMO_INPUT_PATH/index.html"
             mkdir -p "$PAGES_PATH/api" "$PAGES_PATH/demo"
-            cp -a "$DOKKA_HTML_PATH/." "$PAGES_PATH/api/"
-            cp -a "$DEMO_HTML_PATH/." "$PAGES_PATH/demo/"
+            cp -a "$DOKKA_INPUT_PATH/." "$PAGES_PATH/api/"
+            cp -a "$DEMO_INPUT_PATH/." "$PAGES_PATH/demo/"
             cat > "$PAGES_PATH/index.html" <<'HTML'
           <!doctype html>
           <html lang="en">
           <head>
             <meta charset="utf-8">
             <meta name="viewport" content="width=device-width, initial-scale=1">
-            <title>Documentation and Demo</title>
-            <style>
-              body { font-family: system-ui, sans-serif; max-width: 48rem; margin: 4rem auto; padding: 0 1rem; }
-              a { display: block; margin: 1rem 0; }
-            </style>
-          </head>
-          <body>
-            <h1>Documentation and Demo</h1>
-            <a href="./api/">API documentation</a>
-            <a href="./demo/">Wasm demo</a>
-          </body>
-          </html>
+              <meta name="color-scheme" content="light dark">
+              <title>Compose Styled Components</title>
+              <style>
+                :root {
+                  color-scheme: light dark;
+                  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+                  background: #f3f6fb;
+                  color: #172033;
+                }
+                * { box-sizing: border-box; }
+                body {
+                  min-height: 100vh;
+                  margin: 0;
+                  display: grid;
+                  place-items: center;
+                  padding: 2rem 1rem;
+                  background:
+                    radial-gradient(ellipse at 15% 10%, #dce8ff 0, transparent 38%),
+                    radial-gradient(ellipse at 90% 90%, #e6e2ff 0, transparent 36%),
+                    #f3f6fb;
+                }
+                main {
+                  width: min(100%, 42rem);
+                  padding: clamp(2rem, 7vw, 3.5rem);
+                  border: 1px solid #ffffffb8;
+                  border-radius: 1.5rem;
+                  background: #ffffffde;
+                  box-shadow: 0 1.5rem 5rem #263b641a, 0 0.2rem 0.8rem #263b640d;
+                  backdrop-filter: blur(16px);
+                }
+                h1 {
+                  margin: 0 0 1.75rem;
+                  font-size: clamp(1.8rem, 7vw, 2.8rem);
+                  letter-spacing: -0.045em;
+                  line-height: 1.08;
+                }
+                nav { display: grid; gap: 0.85rem; }
+                nav a {
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                  gap: 1rem;
+                  padding: 1.1rem 1.25rem;
+                  border: 1px solid #dce3ef;
+                  border-radius: 1rem;
+                  background: #fff;
+                  color: inherit;
+                  text-decoration: none;
+                  transition: border-color 150ms ease, transform 150ms ease, box-shadow 150ms ease;
+                }
+                nav a:hover {
+                  transform: translateY(-2px);
+                  border-color: #8ca9e8;
+                  box-shadow: 0 0.5rem 1.5rem #263b6414;
+                }
+                nav a:focus-visible {
+                  outline: 3px solid #527de0;
+                  outline-offset: 3px;
+                }
+                nav b { color: #456bc3; font-size: 1.25rem; }
+                @media (prefers-color-scheme: dark) {
+                  :root { background: #101522; color: #eef2fb; }
+                  body {
+                    background:
+                      radial-gradient(ellipse at 15% 10%, #1d3157 0, transparent 38%),
+                      radial-gradient(ellipse at 90% 90%, #30264e 0, transparent 36%),
+                      #101522;
+                  }
+                  main { border-color: #ffffff14; background: #1b2230e8; }
+                  nav a { border-color: #384255; background: #242d3d; }
+                  nav a:hover { border-color: #829fe0; }
+                  nav b { color: #a9c0ff; }
+                }
+                @media (prefers-reduced-motion: reduce) {
+                  nav a { transition: none; }
+                  nav a:hover { transform: none; }
+                }
+              </style>
+            </head>
+            <body>
+              <main>
+                <h1>Compose Styled Components</h1>
+                <nav aria-label="Project resources">
+                  <a href="./api/">
+                    <strong>API documentation</strong>
+                    <b aria-hidden="true">→</b>
+                  </a>
+                  <a href="./demo/">
+                    <strong>Demo</strong>
+                    <b aria-hidden="true">→</b>
+                  </a>
+                </nav>
+              </main>
+            </body>
+            </html>
           HTML
           else
-            cp -a "$DOKKA_HTML_PATH/." "$PAGES_PATH/"
+            cp -a "$DOKKA_INPUT_PATH/." "$PAGES_PATH/"
           fi
 
       - name: Upload Pages artifact
@@ -93,13 +244,6 @@ jobs:
         with:
           path: ${{ runner.temp }}/github-pages
 
-  deploy-pages:
-    runs-on: ubuntu-latest
-    needs: dokka-pages
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
