@@ -59,6 +59,11 @@ jobs:
           java_version = config.dig("config", "java-version")
           github_config = config.dig("publish", "github") || {}
           target_repository = github_config.fetch("repository", "").to_s.strip
+          if target_repository.empty?
+            target_owner = github_config.fetch("user", "").to_s.strip
+            target_repo = github_config.fetch("repo", "").to_s.strip
+            target_repository = "#{target_owner}/#{target_repo}" unless target_owner.empty? || target_repo.empty?
+          end
           target_branch = github_config.fetch("branch", "").to_s.strip
           target_path = github_config.fetch("path", "").to_s.strip
           publish_enabled = publish_target != "none"
@@ -69,7 +74,7 @@ jobs:
 
           if github_enabled
             abort "TARGET_REPOSITORY_TOKEN is required when GitHub publishing is enabled." if ENV["TARGET_REPOSITORY_TOKEN"].to_s.empty?
-            abort "publish.github.repository must be in owner/repository format." unless target_repository.match?(/\A[[:alnum:]_.-]+\/[[:alnum:]_.-]+\z/)
+            abort "publish.github.repository or publish.github.user and publish.github.repo must identify owner/repository." unless target_repository.match?(/\A[[:alnum:]_.-]+\/[[:alnum:]_.-]+\z/)
             abort "publish.github.branch must be set when GitHub publishing is enabled." if target_branch.empty?
             unless target_path.empty? || (!target_path.include?("\\") && target_path.split("/").all? { |part| !part.empty? && part != "." && part != ".." })
               abort "publish.github.path must be a relative path without empty, '.' or '..' segments."
