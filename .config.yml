@@ -44,7 +44,7 @@ app:
   namespace: com.michaelflisar.composestyledcomponents.demo
   version-name: 1.0.0
   path: demo/app
-  live-demo: true
+  interactive-wasm-demo: true
 
 # ---------------------
 # Modules
