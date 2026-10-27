@@ -1,4 +1,4 @@
-[![MFlisar/maven-repository](https://img.shields.io/badge/MFlisar-maven--repository-brightgreen?style=for-the-badge&color=blue)](https://MFlisar.github.io/maven-repository) ![API](https://img.shields.io/badge/api-24%2B-brightgreen.svg?style=for-the-badge) ![Kotlin](https://img.shields.io/github/languages/top/MFlisar/ComposeStyledComponents.svg?style=for-the-badge&amp;color=blueviolet) ![Kotlin Multiplatform](https://img.shields.io/badge/Kotlin_Multiplatform-blue?style=for-the-badge&amp;label=Kotlin)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.mflisar.composestyledcomponents/core?color=blue)](https://central.sonatype.com/artifact/io.github.mflisar.composestyledcomponents/core) ![API](https://img.shields.io/badge/api-24%2B-brightgreen.svg) ![Kotlin](https://img.shields.io/github/languages/top/MFlisar/ComposeStyledComponents.svg?color=blueviolet) ![Kotlin Multiplatform](https://img.shields.io/badge/Kotlin_Multiplatform-blue?label=Kotlin)
 # ComposeStyledComponents
 ![Platforms](https://img.shields.io/badge/PLATFORMS-black?style=for-the-badge) ![Android](https://img.shields.io/badge/android-3DDC84?style=for-the-badge) ![iOS](https://img.shields.io/badge/ios-A2AAAD?style=for-the-badge) ![Windows](https://img.shields.io/badge/windows-5382A1?style=for-the-badge) ![macOS](https://img.shields.io/badge/macos-B0B0B0?style=for-the-badge) ![WebAssembly](https://img.shields.io/badge/wasm-624DE7?style=for-the-badge)
 
@@ -15,23 +15,25 @@ applications with different design systems.
 - Foundation-based renderers as a starting point for custom implementations
 - Support for Android, iOS, Windows, macOS, and WebAssembly
 
+> [!TIP]
+> Try the interactive demo:>
+> [![Open Interactive Demo](https://img.shields.io/badge/Compose_Styled_Components_Demo-2962FF?style=for-the-badge&logo=googlechrome&logoColor=white)](https://mflisar.github.io/ComposeStyledComponents/demo/)
+
+# :camera: Screenshot
+
 # Table of Contents
 
 - [Supported Platforms](#computer-supported-platforms)
 - [Versions](#arrow_right-versions)
 - [Setup](#wrench-setup)
 - [Usage](#rocket-usage)
-- [Modules](#file_folder-modules)
 - [Demo](#sparkles-demo)
-- [More](#information_source-more)
 - [API](#books-api)
 - [Other Libraries](#bulb-other-libraries)
 
-[![Open Interactive Demo](https://raw.githubusercontent.com/MFlisar/kmp-devtools/refs/heads/main/resources/open-interactive-demo.svg)](https://mflisar.github.io/ComposeStyledComponents/demo/)
-
 # :computer: Supported Platforms
 
-| Module | android | iOS | windows | macOS | wasm | Notes |
+| Module | android | ios | windows | macos | wasm | Notes |
 |---|---|---|---|---|---|---|
 | core | ✅ | ✅ | ✅ | ✅ | ✅ | the core module |
 | foundation | ✅ | ✅ | ✅ | ✅ | ✅ | a foundation implementation (can be used as a base for other implementations) |
@@ -54,23 +56,6 @@ applications with different design systems.
 > I try to use as less experimental features as possible, but in this case the ones above are needed!
 
 # :wrench: Setup
-
-<b>This library is not published on maven central</b>
-
-Instead it's published on GitHub, so you need to add the following repository to your settings.gradle.kts:
-
-```java
-dependencyResolutionManagement {
-    repositories {
-        mavenCentral()
-        google()
-        gradlePluginPortal()
-        // ADD THIS
-        maven("https://MFlisar.github.io/maven-repository/artifacts")
-        // ...
-    }
-}
-```
 
 <details open>
 
@@ -148,58 +133,13 @@ StyledTheme(
 Browse the [component guides](documentation/Components/), [module overviews](documentation/Modules/)
 and [advanced guides](documentation/Advanced/) for details.
 
-# :file_folder: Modules
-
-- [Core](documentation/Modules/Core.md)
-- [Cupertino](documentation/Modules/Cupertino.md)
-- [Fluent2](documentation/Modules/Fluent2.md)
-- [Foundation](documentation/Modules/Foundation.md)
-- [Material3](documentation/Modules/Material3.md)
-
 # :sparkles: Demo
 
-A full [demo project](demo/app) is included inside the demo module, it shows nearly every usage with working examples.
-
-# :information_source: More
-
-- Advanced
-  - [ThemeSwitching](documentation/Advanced/ThemeSwitching.md)
-  - [ThemeTokens](documentation/Advanced/ThemeTokens.md)
-  - [ThemesAndRegistry](documentation/Advanced/ThemesAndRegistry.md)
-- Components
-  - [BottomNavigationBar](documentation/Components/BottomNavigationBar.md)
-  - [Button](documentation/Components/Button.md)
-  - [Card](documentation/Components/Card.md)
-  - [Checkbox](documentation/Components/Checkbox.md)
-  - [Chip](documentation/Components/Chip.md)
-  - [Divider](documentation/Components/Divider.md)
-  - [Dropdown](documentation/Components/Dropdown.md)
-  - [FloatingActionButton](documentation/Components/FloatingActionButton.md)
-  - [GroupBox](documentation/Components/GroupBox.md)
-  - [IconButton](documentation/Components/IconButton.md)
-  - [Input](documentation/Components/Input.md)
-  - [LabeledInformation](documentation/Components/LabeledInformation.md)
-  - [LazyAndGridLayouts](documentation/Components/LazyAndGridLayouts.md)
-  - [NavigationItems](documentation/Components/NavigationItems.md)
-  - [NavigationRail](documentation/Components/NavigationRail.md)
-  - [NumberPicker](documentation/Components/NumberPicker.md)
-  - [Picker](documentation/Components/Picker.md)
-  - [PopupMenus](documentation/Components/PopupMenus.md)
-  - [ProgressIndicator](documentation/Components/ProgressIndicator.md)
-  - [RadioButton](documentation/Components/RadioButton.md)
-  - [Scaffold](documentation/Components/Scaffold.md)
-  - [ScrollbarContainers](documentation/Components/ScrollbarContainers.md)
-  - [SegmentedButton](documentation/Components/SegmentedButton.md)
-  - [Snackbar](documentation/Components/Snackbar.md)
-  - [Surface](documentation/Components/Surface.md)
-  - [Switch](documentation/Components/Switch.md)
-  - [Tabs](documentation/Components/Tabs.md)
-  - [Tooltip](documentation/Components/Tooltip.md)
-  - [TopBar](documentation/Components/TopBar.md)
+A [demo project]([demo/app/web, demo/app/windows, demo/shared]) is included.
 
 # :books: API
 
-Check out the [API documentation](https://MFlisar.github.io/ComposeStyledComponents/).
+Check out the [API documentation](https://MFlisar.github.io/ComposeStyledComponents/api/).
 
 # :bulb: Other Libraries
 
