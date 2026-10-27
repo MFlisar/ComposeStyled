@@ -29,20 +29,11 @@ plugins {
 // Setup
 // ------------------------
 
-val module = LibraryModuleConfig.readManual(project)
+val module = LibraryModuleConfig.read(project)
 
-val buildTargets = Targets(
-    // mobile
-    android = true,
-    //iOS = true,
-    // desktop
-    windows = true,
-    //macOS = true,
-    // web
-    wasm = true
-)
+val buildTargets = Targets(Platform.ANDROID, Platform.IOS, Platform.WINDOWS, Platform.MACOS, Platform.WASM)
 
-val androidConfig = AndroidLibraryConfig.createFromPath(
+val androidConfig = AndroidLibraryConfig.create(
     libraryModuleConfig = module,
     compileSdk = app.versions.compileSdk,
     minSdk = app.versions.minSdk,
@@ -55,6 +46,7 @@ val androidConfig = AndroidLibraryConfig.createFromPath(
 
 buildkonfig {
     setupBuildKonfig(
+        project = project,
         config = module.config,
         isDebug = isDebug(project),
         isExe = isExe(project),

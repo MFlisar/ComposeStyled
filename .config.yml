@@ -9,7 +9,7 @@ publish:
     repo: maven-repository
     branch: main
     path: artifacts
-  target: github # [none, maven-central, github]
+  target: maven-central # [none, maven-central, github]
 
 # ---------------------
 # General configuration
@@ -39,12 +39,19 @@ project:
 # APP / DEMO (optional)
 # ---------------------
 
-app:
-  name: Toolbox Demo
-  namespace: com.michaelflisar.composestyledcomponents.demo
-  version-name: 1.0.0
-  path: demo/app
-  interactive-wasm-demo: true
+apps:
+  - name: Compose Styled Components Demo
+    namespace: com.michaelflisar.composestyledcomponents.demo
+    version-name: 1.0.0
+    module-paths:
+      - demo/app/web
+      - demo/app/windows
+      - demo/shared
+    # optional - if set, the app will be published to the homepage and linked in the readme
+    publish:
+      url-path: demo
+      description: Explore the interactive demo
+      module-path: demo/app/web
 
 # ---------------------
 # Modules
@@ -77,9 +84,9 @@ modules:
 # Readme Generation
 # ---------------------
 
-readme:
-  screenshots:
-    exclude-root: true
-    group-by-folder: true
-    excluded-folders: []
-    excluded-images: []
+documentation:
+  path: documentation
+  relative-paths:
+    partials: _partials
+    screenshots: screenshots
+    main-screenshot: # screenshots/main.png

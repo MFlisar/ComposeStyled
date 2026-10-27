@@ -25,23 +25,9 @@ plugins {
 // Setup
 // ------------------------
 
-val module = AppModuleConfig.readManual(project)
+val module = AppModuleConfig.read(project)
 
-val buildTargets = Targets(
-    // mobile
-    //android = true,
-    //iOS = true,
-    // desktop
-    windows = true,
-    //macOS = true,
-    // web
-    wasm = true
-)
-
-val desktopConfig = DesktopAppConfig(
-    mainClass = "com.michaelflisar.demo.MainKt",
-    ico = "icon.ico"
-)
+val buildTargets = Targets(Platform.WASM)
 
 val wasmConfig = WasmAppConfig(
     moduleName = "demo",
@@ -85,14 +71,6 @@ kotlin {
             implementation(project(":demo:shared"))
 
         }
-
-        jvmMain.dependencies {
-
-            implementation(compose.desktop.currentOs) {
-                exclude(group = "org.jetbrains.compose.material", module = "material")
-            }
-
-        }
     }
 }
 
@@ -100,19 +78,4 @@ kotlin {
 // Configurations
 // -------------------
 
-// windows configuration
-compose.desktop {
-    application {
-        BuildFileUtil.setupWindowsApp(
-            appModuleConfig = module,
-            application = this,
-            desktopAppConfig = desktopConfig
-        )
-    }
-}
-
-// THIN + FAT exe
-BuildFileUtil.registerLaunch4JTask(
-    appModuleConfig = module,
-    desktopAppConfig = desktopConfig
-)
+// --
