@@ -16,7 +16,8 @@ applications with different design systems.
 - Support for Android, iOS, Windows, macOS, and WebAssembly
 
 > [!TIP]
-> Try the interactive demo:>
+> Try the interactive demo:
+
 > [![Open Interactive Demo](https://img.shields.io/badge/Compose_Styled_Components_Demo-2962FF?style=for-the-badge&logo=googlechrome&logoColor=white)](https://mflisar.github.io/ComposeStyledComponents/demo/)
 
 # :camera: Screenshot
