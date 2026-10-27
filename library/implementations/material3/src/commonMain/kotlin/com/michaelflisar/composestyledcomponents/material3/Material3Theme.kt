@@ -17,8 +17,8 @@ import com.michaelflisar.composestyledcomponents.classes.StyledThemeProvider
 import com.michaelflisar.composestyledcomponents.material3.components.Material3BottomNavigationBar
 import com.michaelflisar.composestyledcomponents.material3.components.Material3Button
 import com.michaelflisar.composestyledcomponents.material3.components.Material3Card
-import com.michaelflisar.composestyledcomponents.material3.components.Material3Chip
 import com.michaelflisar.composestyledcomponents.material3.components.Material3Checkbox
+import com.michaelflisar.composestyledcomponents.material3.components.Material3Chip
 import com.michaelflisar.composestyledcomponents.material3.components.Material3DropdownMenuItem
 import com.michaelflisar.composestyledcomponents.material3.components.Material3FloatingActionButton
 import com.michaelflisar.composestyledcomponents.material3.components.Material3Icon
@@ -30,7 +30,6 @@ import com.michaelflisar.composestyledcomponents.material3.components.Material3P
 import com.michaelflisar.composestyledcomponents.material3.components.Material3ProgressIndicator
 import com.michaelflisar.composestyledcomponents.material3.components.Material3RadioButton
 import com.michaelflisar.composestyledcomponents.material3.components.Material3Scaffold
-import com.michaelflisar.composestyledcomponents.material3.components.Material3TabRow
 import com.michaelflisar.composestyledcomponents.material3.components.Material3SegmentedButton
 import com.michaelflisar.composestyledcomponents.material3.components.Material3SegmentedButtonRow
 import com.michaelflisar.composestyledcomponents.material3.components.Material3Snackbar
@@ -38,12 +37,16 @@ import com.michaelflisar.composestyledcomponents.material3.components.Material3S
 import com.michaelflisar.composestyledcomponents.material3.components.Material3Surface
 import com.michaelflisar.composestyledcomponents.material3.components.Material3Switch
 import com.michaelflisar.composestyledcomponents.material3.components.Material3Tab
+import com.michaelflisar.composestyledcomponents.material3.components.Material3TabRow
 import com.michaelflisar.composestyledcomponents.material3.components.Material3Tooltip
 import com.michaelflisar.composestyledcomponents.material3.components.Material3TopBar
-import com.michaelflisar.composestyledcomponents.tokens.StyledColorScheme
 import com.michaelflisar.composestyledcomponents.registry.StyledRegistry
+import com.michaelflisar.composestyledcomponents.tokens.StyledColorScheme
+import com.michaelflisar.composestyledcomponents.tokens.StyledColorScheme.Definition
 import com.michaelflisar.composestyledcomponents.tokens.StyledShapes
 import com.michaelflisar.composestyledcomponents.tokens.StyledTypography
+import com.michaelflisar.composestyledcomponents.tokens.darkStyledColors
+import com.michaelflisar.composestyledcomponents.tokens.lightStyledColors
 
 @Composable
 fun rememberMaterial3Theme(
@@ -263,3 +266,58 @@ private fun Color.atTone(tone: Float): Color {
     }
     return lerp(opaque, endpoint, (low + high) / 2f)
 }
+
+fun ColorScheme.toStyledColorScheme(
+    isDarkTheme: Boolean,
+): StyledColorScheme {
+    val baseColorScheme = if (isDarkTheme) darkStyledColors() else lightStyledColors()
+
+    return StyledColorScheme(
+        isDarkTheme = isDarkTheme,
+        backgroundDef = Definition(background, onBackground),
+        surfaceDef = Definition(surface, onSurface),
+        surfaceVariantDef = Definition(surfaceVariant, onSurfaceVariant),
+        primaryDef = Definition(primary, onPrimary),
+        primarySurfaceDef = Definition(primaryContainer, onPrimaryContainer),
+        secondaryDef = Definition(secondary, onSecondary),
+        secondarySurfaceDef = Definition(secondaryContainer, onSecondaryContainer),
+        outline = outline,
+        outlineVariant = outlineVariant,
+        errorDef = Definition(error, onError),
+        errorSurfaceDef = Definition(errorContainer, onErrorContainer),
+        successDef = Definition(baseColorScheme.success, baseColorScheme.onSuccess),
+        successSurfaceDef = Definition(
+            baseColorScheme.successSurface,
+            baseColorScheme.onSuccessSurface
+        ),
+        warningDef = Definition(baseColorScheme.warning, baseColorScheme.onWarning),
+        warningSurfaceDef = Definition(
+            baseColorScheme.warningSurface,
+            baseColorScheme.onWarningSurface
+        ),
+        disableFactors = baseColorScheme.disableFactors,
+    )
+}
+
+fun Typography.toStyledTypography(): StyledTypography = StyledTypography(
+    headlineLarge = headlineLarge,
+    headlineMedium = headlineMedium,
+    headlineSmall = headlineSmall,
+    titleLarge = titleLarge,
+    titleMedium = titleMedium,
+    titleSmall = titleSmall,
+    bodyLarge = bodyLarge,
+    bodyMedium = bodyMedium,
+    bodySmall = bodySmall,
+    labelLarge = labelLarge,
+    labelMedium = labelMedium,
+    labelSmall = labelSmall,
+)
+
+fun Shapes.toStyledShapes(): StyledShapes = StyledShapes(
+    extraSmall = extraSmall,
+    small = small,
+    medium = medium,
+    large = large,
+    extraLarge = extraLarge,
+)
