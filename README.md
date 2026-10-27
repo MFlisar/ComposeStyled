@@ -27,9 +27,7 @@ applications with different design systems.
 - [API](#books-api)
 - [Other Libraries](#bulb-other-libraries)
 
-# :globe_with_meridians: Live Demo
-
-A **live demo** of the app is available here: [Live Demo](https://mflisar.github.io/ComposeStyledComponents/demo/)
+[![Open Interactive Demo](https://raw.githubusercontent.com/MFlisar/kmp-devtools/refs/heads/main/resources/open-interactive-demo.svg)](https://mflisar.github.io/ComposeStyledComponents/demo/)
 
 # :computer: Supported Platforms
 
