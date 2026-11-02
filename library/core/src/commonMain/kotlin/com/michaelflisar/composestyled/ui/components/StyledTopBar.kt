@@ -87,6 +87,7 @@ fun StyledTopBar(
     )
 }
 
+/** Top bar variant with its title centered between navigation and action content. */
 @Composable
 fun StyledCenterAlignedTopBar(
     modifier: Modifier = Modifier,

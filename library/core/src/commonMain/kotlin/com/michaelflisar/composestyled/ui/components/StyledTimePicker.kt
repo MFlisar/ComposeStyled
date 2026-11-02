@@ -21,6 +21,7 @@ import kotlinx.datetime.LocalTime
 // public API
 // -------------------------
 
+/** State-backed 24-hour time picker; [minuteStep] controls minute increments. */
 @Composable
 fun StyledTimePicker(
     value: MutableState<LocalTime>,
@@ -37,6 +38,7 @@ fun StyledTimePicker(
     )
 }
 
+/** Controlled 24-hour time picker; [minuteStep] must be between 1 and 59. */
 @Composable
 fun StyledTimePicker(
     value: LocalTime,

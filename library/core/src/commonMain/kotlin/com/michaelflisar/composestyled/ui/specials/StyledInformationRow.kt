@@ -30,6 +30,7 @@ object StyledInformationRowDefaults {
         StyledTheme.typography.bodyMedium
 }
 
+/** Displays a label and text value in a vertically arranged information row. */
 @Composable
 fun StyledInformationRow(
     label: String,
@@ -59,6 +60,7 @@ fun StyledInformationRow(
     )
 }
 
+/** Displays a label and custom content in a vertically arranged information row. */
 @Composable
 fun StyledInformationRow(
     label: String,
@@ -82,6 +84,7 @@ fun StyledInformationRow(
     }
 }
 
+/** Displays a label and text value side by side, with optional trailing content. */
 @Composable
 fun StyledInformationRowHorizontal(
     label: String,
@@ -121,6 +124,7 @@ fun StyledInformationRowHorizontal(
     }
 }
 
+/** Displays a label and custom content side by side. */
 @Composable
 fun StyledInformationRowHorizontal(
     label: String,

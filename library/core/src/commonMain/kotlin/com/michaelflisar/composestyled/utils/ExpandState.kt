@@ -23,6 +23,7 @@ class ExpandState(
 
     private var singleOnlyState by mutableStateOf(singleOnly)
 
+    /** When true, expanding an item collapses all other expanded items. */
     var singleOnly: Boolean
         get() = singleOnlyState
         set(value) {
@@ -32,19 +33,24 @@ class ExpandState(
             singleOnlyState = value
         }
 
+    /** A snapshot of the IDs currently expanded. */
     val expandedIds: Set<Int>
         get() = expanded.toSet()
 
+    /** Whether [id] is currently expanded. */
     fun isExpanded(id: Int): Boolean = id in expanded
 
+    /** Expands [id], collapsing other items when [singleOnly] is enabled. */
     fun expand(id: Int) {
         expanded = if (singleOnly) setOf(id) else expanded + id
     }
 
+    /** Collapses [id] if it is expanded. */
     fun collapse(id: Int) {
         expanded = expanded - id
     }
 
+    /** Toggles the expanded state of [id]. */
     fun toggle(id: Int) {
         if (isExpanded(id)) {
             collapse(id)
@@ -55,6 +61,7 @@ class ExpandState(
         }
     }
 
+    /** Collapses every expanded item. */
     fun collapseAll() {
         expanded = emptySet()
     }

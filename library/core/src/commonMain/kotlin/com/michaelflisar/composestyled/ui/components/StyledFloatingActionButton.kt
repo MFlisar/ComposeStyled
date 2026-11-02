@@ -71,6 +71,7 @@ object StyledFloatingActionButtonDefaults {
 // public API
 // -------------------------
 
+/** Standard-size floating action button. */
 @Composable
 fun StyledFloatingActionButton(
     onClick: () -> Unit,
@@ -95,6 +96,7 @@ fun StyledFloatingActionButton(
     )
 }
 
+/** Compact floating action button. */
 @Composable
 fun StyledSmallFloatingActionButton(
     onClick: () -> Unit,
@@ -117,6 +119,7 @@ fun StyledSmallFloatingActionButton(
     content = content,
 )
 
+/** Large floating action button. */
 @Composable
 fun StyledLargeFloatingActionButton(
     onClick: () -> Unit,

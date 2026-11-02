@@ -7,6 +7,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.unit.Dp
 import com.michaelflisar.composestyled.classes.StyledLocalMissingException
 
+/** Standard shape scale supplied to Styled components by the active theme. */
 @Immutable
 data class StyledShapes(
     val extraSmall: CornerBasedShape,

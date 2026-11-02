@@ -141,6 +141,7 @@ fun rememberStyledExpandableSectionStyle(
  * Displays a section with a saveable expanded state when [expanded] is not supplied.
  * Customize [style] with [rememberStyledExpandableSectionStyle].
  */
+/** A collapsible content section whose expanded state and presentation are caller-controlled. */
 @Composable
 fun StyledExpandableSection(
     title: @Composable () -> Unit,

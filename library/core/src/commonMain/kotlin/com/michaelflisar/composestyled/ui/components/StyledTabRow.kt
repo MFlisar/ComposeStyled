@@ -50,6 +50,7 @@ object StyledTabRow {
 // public API
 // -------------------------
 
+/** A fixed-width primary tab row with an indicator for the selected tab. */
 @Composable
 fun StyledPrimaryTabRow(
     selectedTabIndex: Int,
@@ -69,6 +70,7 @@ fun StyledPrimaryTabRow(
     )
 }
 
+/** A horizontally scrollable primary tab row for more tabs than fit in the viewport. */
 @Composable
 fun StyledPrimaryScrollableTabRow(
     selectedTabIndex: Int,
@@ -88,6 +90,7 @@ fun StyledPrimaryScrollableTabRow(
     )
 }
 
+/** A secondary tab row for switching between related content within a primary destination. */
 @Composable
 fun StyledSecondaryTabRow(
     selectedTabIndex: Int,
@@ -107,6 +110,7 @@ fun StyledSecondaryTabRow(
     )
 }
 
+/** A horizontally scrollable secondary tab row for a larger set of related tabs. */
 @Composable
 fun StyledSecondaryScrollableTabRow(
     selectedTabIndex: Int,

@@ -1,16 +1,9 @@
 # AKTUELLES
 
-[x] demo: setup in popup?
-[x] ProvideStyledCustomisation
-[x] Dialog window: init position wie center oder so?
-[x] Expandable Toolbar
-
 [x] Starter-Template: Transparenz, Content-Rendering und Statusbar testen
 
     [ ] bei ausgeblendeter Toolbar testen, ob und wie sich die Statusbar-Farbe unabhängig davon ändern lässt.
     [ ] bei ausgeblendeter bottom bar: wie verhält sich nav bar? sollte vermutlich dann scrim behalten oder?
-
-[x] dev tools: action für release mit Auto version / test ja/nein und target maven oder github
 
 [ ] Toolbar Dialog: Fullscreen-Modus berücksichtigen (System-Bar-Abstand aktuell vorhanden)
 [ ] Side Navigation an Toolbar ausrichten
@@ -23,20 +16,19 @@
 
 ### Demo App
 
-    [x] Theme Einstellungen immer links? oder nur auf root seite?
+  <details>
 
+    [x] Theme Einstellungen immer links? oder nur auf root seite?
 	- Toolbar Dialog Demo.
 	- Forms Demo.
 	- Real-World-Beispiele statt isolierter Komponenten.
 		=> mit kommentar section am anfang/ende damit man darauf auch im readme sektionen machen kann
 	- Settings-Beispiel mit echtem State.
-	- Theme-Einstellungen demonstrieren.
-	- Content-Padding für FAB zeigen.
+	- Theme-Einstellungen demonstrieren
 	[x] Starter-Template bereitstellen.
-	- Semitransparente Toolbar unterstützen.
-	- Semitransparente Navigation unterstützen.
-	- Verhalten von Content unter Overlays demonstrieren (bei semi transparenten toolbars und navigation bars).
-  - 
+
+  </details>
+
 ### Features - SPÄTER
 
 [ ] drawer?
@@ -48,6 +40,8 @@
     - Dialoge zunächst direkt integrieren?
     - Changelog zunächst direkt integrieren?
     - preferences zunächst direkt integrieren?
+
+    ALLES IN TOOLBOX vorerst implementieren?
 
     - Später mögliche Aufteilung:
       - compose-dialog

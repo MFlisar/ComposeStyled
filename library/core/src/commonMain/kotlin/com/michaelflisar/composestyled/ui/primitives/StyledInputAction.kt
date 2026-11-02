@@ -7,6 +7,7 @@ import com.michaelflisar.composestyled.classes.IconComposable
 import com.michaelflisar.composestyled.ui.components.StyledIcon
 import com.michaelflisar.composestyled.ui.components.StyledIconButton
 
+/** A clickable text action intended for use alongside an input field. */
 @Composable
 fun StyledInputAction(
     onClick: () -> Unit,
@@ -25,6 +26,7 @@ fun StyledInputAction(
     }
 }
 
+/** An icon action with an accessibility description for input fields. */
 @Composable
 fun StyledInputAction(
     icon: IconComposable,

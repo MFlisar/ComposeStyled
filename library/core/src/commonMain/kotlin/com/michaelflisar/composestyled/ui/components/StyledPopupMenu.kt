@@ -59,14 +59,17 @@ object StyledPopupMenu {
     }
 
     enum class OutsideTapBehavior {
+        /** Uses the popup platform's standard outside-tap handling. */
         PlatformDefault,
         /** Uses the full-window overlay when screen coordinates are available. */
         DismissAndConsume,
     }
 
+    /** Width rules for a popup menu relative to its anchor and available content. */
     @Stable
     sealed interface WidthConfig {
 
+        /** Uses the measured content width, optionally capped by `maxWidth`. */
         @Immutable
         data class Auto(
             val maxWidth: Dp? = StyledPopupMenuDefaults.maxWidth,
@@ -79,7 +82,7 @@ object StyledPopupMenu {
             }
         }
 
-        /** Matches the anchor width, capped by [maxWidth] when provided. */
+        /** Matches the anchor width, capped by `maxWidth` when provided. */
         @Immutable
         data class MatchParent(val maxWidth: Dp? = null) : WidthConfig {
             init {
@@ -89,15 +92,19 @@ object StyledPopupMenu {
             }
         }
 
+        /** Uses the anchor width. */
         @Immutable
         data object MatchAnchor : WidthConfig
 
+        /** Uses at least the anchor width, allowing wider content. */
         @Immutable
         data object AtLeastAnchor : WidthConfig
 
+        /** Uses the menu content's intrinsic width. */
         @Immutable
         data object WrapContent : WidthConfig
 
+        /** Uses a fixed menu width. */
         @Immutable
         data class Fixed(val width: Dp) : WidthConfig {
             init {
@@ -139,6 +146,7 @@ object StyledPopupMenuDefaults {
 // public API
 // -------------------------
 
+/** Shows a menu anchored to this popup-container scope with configurable width and dismissal behavior. */
 @OptIn(InternalComposeStyledApi::class)
 @Composable
 fun StyledPopupContainerScope.StyledPopupMenu(

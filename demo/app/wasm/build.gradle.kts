@@ -3,8 +3,6 @@ import com.michaelflisar.kmpdevtools.BuildFileUtil
 import com.michaelflisar.kmpdevtools.core.Target
 import com.michaelflisar.kmpdevtools.configs.*
 import com.michaelflisar.kmpdevtools.setupDependencies
-import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
-import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
     // kmp + app/library

@@ -23,6 +23,7 @@ enum class SelectionClickBehavior {
     Toggle,
 }
 
+/** Observable multi-selection state with an anchor for modifier-based range selection. */
 @Stable
 class SelectionState<K> internal constructor(
     initialSelected: Set<K>,
@@ -42,6 +43,7 @@ class SelectionState<K> internal constructor(
     val anchor: K?
         get() = anchorState
 
+    /** Whether selection mode is active, including when no items are selected. */
     val isActive: Boolean
         get() = activeState
 
@@ -95,6 +97,7 @@ class SelectionState<K> internal constructor(
         activeState = true
     }
 
+    /** Clears selected keys and exits selection mode. */
     fun clearAndClose() {
         selectedState = emptySet()
         anchorState = null
@@ -147,6 +150,7 @@ class SelectionState<K> internal constructor(
     }
 }
 
+/** Creates selection state outside composition, for example as a screen or ViewModel property. */
 fun <K> selectionStateOf(initialSelected: Collection<K> = emptyList()): SelectionState<K> =
     SelectionState(initialSelected.toSet())
 
@@ -228,6 +232,7 @@ fun <K, T> SelectionState<K>.handleListItemClick(
     )
 }
 
+/** Applies a list click using the supplied pointer keyboard-modifier snapshot. */
 fun <K, T> SelectionState<K>.handleListItemClick(
     index: Int,
     items: List<T>,

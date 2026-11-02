@@ -19,6 +19,7 @@ object StyledSelectionToolbarDefaults {
         @Composable get() = StyledTheme.shapes.large
 }
 
+/** Shows selection actions while [selection] is active, with a default action to clear and close it. */
 @Composable
 fun StyledSelectionToolbar(
     selection: SelectionState<*>,

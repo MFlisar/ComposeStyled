@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import com.michaelflisar.composestyled.StyledTheme
 
+/** Adds horizontal space using the active theme's medium spacing by default. */
 @Composable
 fun StyledHorizontalSpacer(
     size: Dp = StyledTheme.spacing.medium,

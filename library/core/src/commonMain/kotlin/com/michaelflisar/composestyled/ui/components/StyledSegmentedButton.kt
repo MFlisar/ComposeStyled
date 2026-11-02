@@ -74,6 +74,7 @@ object StyledSegmentedButtonDefaults {
 // public API
 // -------------------------
 
+/** A selectable button intended to be placed inside a segmented-button row. */
 @Composable
 fun StyledSegmentedButton(
     selected: Boolean,

@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import com.michaelflisar.composestyled.StyledTheme
 
+/** A non-lazy grid layout for a small, known set of composable items. */
 @Composable
 fun StyledGrid(
     columns: Int,

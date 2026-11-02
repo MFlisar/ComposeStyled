@@ -41,9 +41,14 @@ import com.michaelflisar.composestyled.registry.StyledRegistry
 import com.michaelflisar.composestyled.themes.cupertino.CupertinoThemes
 
 @Composable
-fun rememberCupertinoFlatThemeProvider(): CupertinoFlatThemeProvider = remember { CupertinoFlatThemeProvider() }
+fun rememberCupertinoFlatThemeProvider(): CupertinoFlatThemeProvider =
+    remember { createCupertinoFlatThemeProvider() }
+
+fun createCupertinoFlatThemeProvider(): CupertinoFlatThemeProvider = CupertinoFlatThemeProvider()
 
 class CupertinoFlatThemeProvider internal constructor() : StyledThemeProvider {
+
+    override val id = "cupertino-flat"
     override val defaultThemeColors = CupertinoThemes.blue
     override val defaultIconSet = SFSymbolIconSet
 

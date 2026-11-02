@@ -38,6 +38,7 @@ import com.michaelflisar.composestyled.themes.StyledThemeColors
 import com.michaelflisar.composestyled.themes.StyledThemeColorsCollection
 import com.michaelflisar.composestyled.themes.StyledThemeContrast
 import com.michaelflisar.composestyled.themes.StyledThemeVariant
+import com.michaelflisar.composestyled.themes.rememberThemeColors
 import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.ui.components.StyledDropdownIndex
 import com.michaelflisar.composestyled.ui.components.StyledSurface
@@ -76,21 +77,15 @@ fun DemoContent() {
         Definitions.ImplementationCollections[selectedImplementationIndex.value].second()
 
     // 3) theme settings
-    val themeColors = rememberSaveable(
-        demoThemeColorsKey(selectedThemeProvider.defaultThemeColors, Definitions.ThemeCollections),
-        saver = demoThemeColorsSaver(
-            selectedThemeProvider.defaultThemeColors,
-            Definitions.ThemeCollections
-        ),
-    ) { mutableStateOf(selectedThemeProvider.defaultThemeColors) }
+    val themeColors = rememberThemeColors(selectedThemeProvider, Definitions.ThemeCollections)
     val themeVariant = rememberSaveable { mutableStateOf(StyledThemeVariant.Colorful) }
     val themeAppearance = rememberSaveable { mutableStateOf(StyledThemeAppearance.Light) }
     val themeContrast = rememberSaveable { mutableStateOf(StyledThemeContrast.System) }
 
     val dialogSetup = rememberDialogState(initialVisible = true)
-    val showSetupPanel = rememberSaveable { mutableStateOf(true) }
     val demoStateHolder = rememberSaveableStateHolder()
-
+    val selectedDemo = rememberSaveable { mutableIntStateOf(-1) }
+    val showSetupPanel = selectedDemo.value != 0
 
     StyledTheme(
         platform = selectedPlatform,
@@ -143,13 +138,8 @@ fun DemoContent() {
             Box {
 
                 // 1) content
-                val selectedDemo = rememberSaveable { mutableIntStateOf(-1) }
                 val pages = remember {
                     Definitions.createMainPages { selectedDemo.value = -1 }
-                }
-                LaunchedEffect(selectedDemo.value) {
-                    // demo 0 is the template - it's not adjustable!
-                    showSetupPanel.value = selectedDemo.value != 0
                 }
                 demoStateHolder.SaveableStateProvider(selectedDemo.value) {
                     when (selectedDemo.value) {
@@ -201,7 +191,7 @@ fun DemoContent() {
                             itemSpacing = StyledTheme.spacing.medium,
                             modifier = Modifier.padding(contentPadding),
                         ) {
-                            if (showSetupPanel.value) {
+                            if (showSetupPanel) {
                                 DemoThemeSetup(
                                     platforms = Platform.entries.map { it.name },
                                     implementations = Definitions.ImplementationCollections.map { it.first },

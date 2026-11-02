@@ -51,6 +51,7 @@ import com.michaelflisar.composestyled.themes.StyledThemeColors
 import com.michaelflisar.composestyled.themes.StyledThemeColorsCollection
 import com.michaelflisar.composestyled.themes.StyledThemeContrast
 import com.michaelflisar.composestyled.themes.StyledThemeVariant
+import com.michaelflisar.composestyled.themes.rememberThemeColors
 import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.ui.components.StyledCard
 import com.michaelflisar.composestyled.ui.components.StyledIcon
@@ -72,8 +73,6 @@ import com.michaelflisar.composestyled.ui.state.StyledExpandableTopBarScrollBeha
 import com.michaelflisar.composestyled.ui.state.rememberDialogState
 import com.michaelflisar.composestyled.ui.state.rememberStyledExpandableTopBarScrollBehavior
 import com.michaelflisar.demo.Definitions
-import com.michaelflisar.demo.demoThemeColorsKey
-import com.michaelflisar.demo.demoThemeColorsSaver
 import com.michaelflisar.demo.helper.DemoBottomNavigation
 import com.michaelflisar.demo.helper.DemoSideNavigation
 import com.michaelflisar.demo.helper.DemoTopBar
@@ -99,13 +98,7 @@ internal fun DemoPageTemplate(
     }
 
     // theme states
-    val themeColors = rememberSaveable(
-        demoThemeColorsKey(themeProvider.defaultThemeColors, Definitions.ThemeCollections),
-        saver = demoThemeColorsSaver(
-            themeProvider.defaultThemeColors,
-            Definitions.ThemeCollections
-        ),
-    ) { mutableStateOf(themeProvider.defaultThemeColors) }
+    val themeColors = rememberThemeColors(themeProvider, Definitions.ThemeCollections)
     val themeVariant = rememberSaveable { mutableStateOf(StyledThemeVariant.Colorful) }
     val themeAppearance = rememberSaveable { mutableStateOf(StyledThemeAppearance.System) }
     val themeContrast = rememberSaveable { mutableStateOf(StyledThemeContrast.System) }

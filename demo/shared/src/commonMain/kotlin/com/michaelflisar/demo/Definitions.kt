@@ -325,37 +325,3 @@ class DemoArea(
     val expandState: ExpandState,
     val contents: List<@Composable (baseId: Int, expandState: ExpandState) -> Unit>,
 )
-
-internal fun demoThemeColorsSaver(
-    defaultColors: StyledThemeColors,
-    collections: List<StyledThemeColorsCollection>,
-): Saver<MutableState<StyledThemeColors>, List<String>> {
-    val colorsByKey = collections
-        .flatMap { collection ->
-            collection.themes.map { colors ->
-                (collection.id to colors.id) to colors
-            }
-        }
-        .toMap()
-    return Saver(
-        save = { state ->
-            val key = demoThemeColorsKey(state.value, collections)
-            listOf(key.first, key.second)
-        },
-        restore = { key ->
-            val colors = key
-                .takeIf { it.size == 2 }
-                ?.let { colorsByKey[it[0] to it[1]] }
-                ?: defaultColors
-            mutableStateOf(colors)
-        },
-    )
-}
-
-internal fun demoThemeColorsKey(
-    colors: StyledThemeColors,
-    collections: List<StyledThemeColorsCollection>,
-): Pair<String, String> {
-    val collectionId = collections.firstOrNull { colors in it.themes }?.id.orEmpty()
-    return collectionId to colors.id
-}

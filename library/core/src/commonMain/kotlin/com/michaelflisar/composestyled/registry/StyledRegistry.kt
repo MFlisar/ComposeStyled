@@ -7,6 +7,11 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 
+/**
+ * Hierarchical registry of component implementations and defaults.
+ *
+ * Entries in this registry take precedence over its parent; missing entries are inherited.
+ */
 @Stable
 class StyledRegistry internal constructor(
     private val parent: StyledRegistry? = null,
@@ -49,6 +54,7 @@ class StyledRegistry internal constructor(
 
         private val entries = mutableMapOf<StyledKey<*>, Any>()
 
+        /** Registers a component and, when provided, its defaults under their respective keys. */
         @Composable
         fun register(component: StyledComponent<*>) {
             entries[component.key] = component

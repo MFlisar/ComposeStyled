@@ -41,6 +41,7 @@ internal class StyledTranslatableSideScopeInstance(
     }
 }
 
+/** Places content that can be translated to reveal edge actions or adjacent content. */
 @Composable
 fun StyledTranslatableContent(
     modifier: Modifier = Modifier,

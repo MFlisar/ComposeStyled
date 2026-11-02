@@ -43,6 +43,7 @@ import com.michaelflisar.composestyled.utils.number.NumberUtil
 
 internal val LocalStyledInputEnabled = staticCompositionLocalOf { true }
 
+/** Theme-rendered text input with controlled or state-backed value overloads. */
 object StyledInput {
 
     // -------------
@@ -217,6 +218,7 @@ object StyledInputDefaults {
 // public API
 // -------------------------
 
+/** State-backed input that preserves selection and composition from [TextFieldValue]. */
 @Composable
 @kotlin.jvm.JvmName("StyledInputTextFieldValueState")
 fun StyledInput(
@@ -273,6 +275,7 @@ fun StyledInput(
     )
 }
 
+/** Controlled [TextFieldValue] input for callers that manage cursor and selection state. */
 @Composable
 fun StyledInput(
     value: TextFieldValue,
@@ -329,6 +332,7 @@ fun StyledInput(
     )
 }
 
+/** State-backed string input; use the [TextFieldValue] overload when selection state matters. */
 @Composable
 fun StyledInput(
     value: MutableState<String>,
@@ -382,6 +386,7 @@ fun StyledInput(
     )
 }
 
+/** Controlled string input with optional error, keyboard and supporting-content configuration. */
 @Composable
 fun StyledInput(
     value: String,
@@ -439,6 +444,7 @@ fun StyledInput(
     )
 }
 
+/** State-backed input using the active theme's alternative input treatment. */
 @Composable
 fun StyledAlternativeInput(
     value: MutableState<String>,
@@ -492,6 +498,7 @@ fun StyledAlternativeInput(
     )
 }
 
+/** Controlled string input using the active theme's alternative input treatment. */
 @Composable
 fun StyledAlternativeInput(
     value: String,

@@ -97,6 +97,7 @@ object StyledChipDefaults {
 // public API
 // -------------------------
 
+/** A theme-rendered clickable chip for an action that does not represent persistent selection. */
 @Composable
 fun StyledChip(
     onClick: () -> Unit,
@@ -122,6 +123,7 @@ fun StyledChip(
     content = content,
 )
 
+/** A clickable chip whose appearance reflects [selected]. */
 @Composable
 fun StyledSelectableChip(
     onClick: () -> Unit,

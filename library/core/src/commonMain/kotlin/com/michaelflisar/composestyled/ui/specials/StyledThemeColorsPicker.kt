@@ -79,7 +79,7 @@ fun StyledThemeColorsPicker(
         themeColors in collection.themes
     }
     require(selectedCollectionIndex >= 0) {
-        "No theme colors found with id '${themeColors.id}' in the provided collections."
+        "No theme colors found with id '${themeColors.schemeId}' in the provided collections."
     }
     val selectedCollection = collections[selectedCollectionIndex]
     val selectedThemeIndex = selectedCollection.themes.indexOf(themeColors)

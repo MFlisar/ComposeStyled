@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 
 
+/** A lazy horizontal list that uses Styled theme defaults for its content layout. */
 @Composable
 @OptIn(InternalComposeStyledApi::class)
 fun StyledLazyRow(
@@ -47,6 +48,7 @@ fun StyledLazyRow(
     }
 }
 
+/** A lazy horizontal list with a fixed gap between items. */
 @Composable
 fun StyledLazyRow(
     itemSpacing: Dp,

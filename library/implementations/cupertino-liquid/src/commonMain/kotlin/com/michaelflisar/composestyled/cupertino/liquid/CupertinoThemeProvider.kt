@@ -42,9 +42,13 @@ import com.michaelflisar.composestyled.themes.cupertino.CupertinoThemes
 
 @Composable
 fun rememberCupertinoLiquidThemeProvider(): CupertinoLiquidThemeProvider =
-    remember { CupertinoLiquidThemeProvider() }
+    remember { createCupertinoLiquidThemeProvider() }
+
+fun createCupertinoLiquidThemeProvider(): CupertinoLiquidThemeProvider =
+    CupertinoLiquidThemeProvider()
 
 class CupertinoLiquidThemeProvider internal constructor() : StyledThemeProvider {
+    override val id = "cupertino-liquid"
     override val defaultThemeColors = CupertinoThemes.blue
     override val defaultIconSet = SFSymbolIconSet
 

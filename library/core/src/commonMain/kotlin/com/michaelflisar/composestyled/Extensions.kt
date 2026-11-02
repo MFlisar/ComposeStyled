@@ -3,12 +3,15 @@ package com.michaelflisar.composestyled
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 
+/** Whether this color's relative luminance is at most 50%. */
 val Color.isDark
     get() = luminance() <= 0.5
 
+/** Whether this color's relative luminance is above 50%. */
 val Color.isLight
     get() = !isDark
 
+/** Blends this color toward white by [factor], preserving its alpha. */
 fun Color.lighten(factor: Float): Color {
     require(factor in 0f..1f) { "Factor must be between 0 and 1" }
     val r = red + (1 - red) * factor
@@ -17,6 +20,7 @@ fun Color.lighten(factor: Float): Color {
     return Color(r, g, b, alpha)
 }
 
+/** Blends this color toward black by [factor], preserving its alpha. */
 fun Color.darken(factor: Float): Color {
     require(factor in 0f..1f) { "Factor must be between 0 and 1" }
     val r = red * (1 - factor)

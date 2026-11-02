@@ -328,6 +328,7 @@ object StyledDialogDefaults {
 // public API
 // -------------------------
 
+/** Displays a state-controlled dialog using the selected presentation style and active theme renderer. */
 @Composable
 @OptIn(InternalComposeStyledApi::class)
 fun StyledDialog(

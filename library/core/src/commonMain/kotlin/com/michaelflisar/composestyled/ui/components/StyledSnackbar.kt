@@ -81,6 +81,7 @@ object StyledSnackbarDefaults {
 // public API
 // -------------------------
 
+/** Renders a themed snackbar and scopes its action slots for theme-specific styling. */
 @Composable
 @OptIn(InternalComposeStyledApi::class)
 fun StyledSnackbar(

@@ -30,6 +30,7 @@ import kotlinx.datetime.LocalDate
 // public API
 // -------------------------
 
+/** State-backed calendar picker; optional date bounds disable choices outside the inclusive range. */
 @Composable
 fun StyledDatePicker(
     value: MutableState<LocalDate>,
@@ -48,6 +49,7 @@ fun StyledDatePicker(
     )
 }
 
+/** Calendar picker that reports selected dates through [onValueChange]. */
 @Composable
 fun StyledDatePicker(
     value: LocalDate,

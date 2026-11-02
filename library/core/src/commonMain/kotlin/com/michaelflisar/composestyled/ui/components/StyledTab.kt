@@ -44,6 +44,7 @@ object StyledTab {
 // public API
 // -------------------------
 
+/** A selectable tab item intended to be placed inside a tab row. */
 @Composable
 fun StyledTab(
     selected: Boolean,

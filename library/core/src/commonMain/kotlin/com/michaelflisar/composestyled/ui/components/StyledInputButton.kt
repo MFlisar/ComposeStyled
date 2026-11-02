@@ -20,6 +20,7 @@ import com.michaelflisar.composestyled.registry.LocalStyledRegistry
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 
 
+/** Read-only input styled as a button; clicking it invokes [onClick] instead of editing text. */
 @Composable
 fun StyledInputButton(
     value: String,

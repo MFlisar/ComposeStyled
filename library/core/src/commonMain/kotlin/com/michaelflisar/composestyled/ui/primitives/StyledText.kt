@@ -21,7 +21,7 @@ import com.michaelflisar.composestyled.tokens.LocalStyledTextStyle
 object StyledText {
 
     /**
-     * Returns a lambda that can be used as [onTextLayout] to detect text overflow and call [onOverflow] with the overflowed text.
+     * Returns a lambda for `onTextLayout` that detects text overflow and passes the overflowed text to [onOverflow].
      */
     fun overflowHandler(
         text: String,

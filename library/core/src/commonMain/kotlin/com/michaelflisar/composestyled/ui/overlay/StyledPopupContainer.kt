@@ -14,6 +14,7 @@ import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.layout.positionOnScreen
 
 @Stable
+/** Layout scope exposing measured container geometry to popup content. */
 class StyledPopupContainerScope internal constructor(
     private val width: IntState,
     private val windowOriginOnScreen: androidx.compose.runtime.MutableState<Offset?>,
@@ -25,6 +26,7 @@ class StyledPopupContainerScope internal constructor(
         get() = windowOriginOnScreen.value
 }
 
+/** Places popup content and its anchor content in a shared measured container. */
 @Composable
 fun StyledPopupContainer(
     modifier: Modifier = Modifier,

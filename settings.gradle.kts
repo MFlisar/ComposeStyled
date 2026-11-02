@@ -4,15 +4,24 @@ import com.michaelflisar.kmpdevtools.core.Config
 dependencyResolutionManagement    {
 
     repositories {
+
+        // main
         mavenCentral()
         google()
         gradlePluginPortal()
-        maven("https://jitpack.io")
+
+        // mine
+        maven("https://raw.githubusercontent.com/MFlisar/maven-repository/refs/heads/main/artifacts")
+        // local
+        mavenLocal()
+
+        // jetbrains
         maven("https://oss.sonatype.org/content/repositories/snapshots")
         // jewel + skiko
         maven("https://www.jetbrains.com/intellij-repository/releases")
         maven("https://packages.jetbrains.team/maven/p/ij/intellij-dependencies/")
-        mavenLocal()
+        // jitpack
+        maven("https://jitpack.io")
     }
 
     versionCatalogs {

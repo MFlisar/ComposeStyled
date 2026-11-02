@@ -57,6 +57,7 @@ object StyledIconDefaults {
 // public API
 // -------------------------
 
+/** Renders an [IconComposable] using the active theme's sizing and current content color by default. */
 @Composable
 fun StyledIcon(
     icon: IconComposable,

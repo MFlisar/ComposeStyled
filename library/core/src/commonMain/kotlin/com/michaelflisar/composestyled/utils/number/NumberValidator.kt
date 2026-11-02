@@ -7,11 +7,15 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 
+/** Result of validating a value, optionally carrying a user-facing error message. */
 sealed interface ValidationResult {
+    /** The value passed validation. */
     data object Valid : ValidationResult
+    /** The value failed validation with [message]. */
     data class Invalid(val message: String) : ValidationResult
 }
 
+/** Holds validation state and exposes the latest error for a numeric value. */
 @Stable
 class NumberValidator<T : Number>(
     val error: MutableState<String?> = mutableStateOf(null),
@@ -25,10 +29,12 @@ class NumberValidator<T : Number>(
     // validation
     // -------------------------
 
+    /** Evaluates [value] without changing [error]. */
     fun result(value: T?): ValidationResult {
         return validate(value)
     }
 
+    /** Validates [value], optionally updating [error], and returns whether it is valid. */
     fun check(
         value: T?,
         updateError: Boolean = true,
@@ -42,19 +48,23 @@ class NumberValidator<T : Number>(
         return message == null
     }
 
+    /** Returns the validation message for [value] without changing [error]. */
     fun errorMessage(value: T?): String? {
         return result(value).messageOrNull()
     }
 
+    /** Updates [error] to match [value]. */
     fun update(value: T?) {
         error.value = errorMessage(value)
     }
 
+    /** Clears the current error. */
     fun clear() {
         error.value = null
     }
 }
 
+/** Remembers a validator and keeps its error state synchronized with [value]. */
 @Composable
 fun <T : Number> rememberNumberValidator(
     value: T,

@@ -25,6 +25,7 @@ object StyledPickerDefaults {
 // public API
 // -------------------------
 
+/** Read-only input that starts a picker from its trailing icon, or the whole field if configured. */
 @Composable
 fun StyledPicker(
     value: String,
@@ -49,6 +50,7 @@ fun StyledPicker(
     clickOnIconOnly = clickOnIconOnly,
 )
 
+/** Alternative-style variant of [StyledPicker]. */
 @Composable
 fun StyledAlternativePicker(
     value: String,

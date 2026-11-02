@@ -7,27 +7,33 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 import com.michaelflisar.composestyled.StyledTheme
 
+/** Converts a fixed [Color] into a token usable by theme-aware customizations. */
 fun Color.asColorToken(): ColorToken = ColorToken.Fixed(this)
 
+/** A color resolved either from a fixed value or from the active [StyledTheme]. */
 @Stable
 sealed interface ColorToken {
 
+    /** Resolves this token in the current composition. */
     @Composable
     @ReadOnlyComposable
     fun resolve(): Color
 
+    /** A fixed color, optionally resolved with a different alpha. */
     @Immutable
     data class Fixed(
         val color: Color,
         val alpha: Float? = null,
     ) : ColorToken {
 
+        /** Returns [color], applying [alpha] when it is not null. */
         @Composable
         @ReadOnlyComposable
         override fun resolve(): Color = if (alpha != null) color.copy(alpha = alpha) else color
 
     }
 
+    /** Semantic colors read from the active theme when [resolve] is called. */
     enum class Theme : ColorToken {
         Primary,
         OnPrimary,

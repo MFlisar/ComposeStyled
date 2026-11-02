@@ -9,45 +9,47 @@ import com.michaelflisar.composestyled.themes.createStyledThemeColors
 @OptIn(InternalComposeStyledApi::class)
 object CupertinoThemes {
 
+    const val themeId = "cupertino"
+
     val blue = createStyledThemeColors(
-        "blue", "Blue",
+        themeId, "blue", "Blue",
         Color(0xFF007AFF), Color(0xFF0A84FF),
         Color(0xFF34C759), Color(0xFF30D158),
         Color(0xFFAF52DE), Color(0xFFBF5AF2),
     )
     val green = createStyledThemeColors(
-        "green", "Green",
+        themeId, "green", "Green",
         Color(0xFF34C759), Color(0xFF30D158),
         Color(0xFF007AFF), Color(0xFF0A84FF),
         Color(0xFFFF9500), Color(0xFFFF9F0A),
     )
     val orange = createStyledThemeColors(
-        "orange", "Orange",
+        themeId, "orange", "Orange",
         Color(0xFFFF9500), Color(0xFFFF9F0A),
         Color(0xFF007AFF), Color(0xFF0A84FF),
         Color(0xFFAF52DE), Color(0xFFBF5AF2),
     )
     val pink = createStyledThemeColors(
-        "pink", "Pink",
+        themeId, "pink", "Pink",
         Color(0xFFFF2D55), Color(0xFFFF375F),
         Color(0xFF007AFF), Color(0xFF0A84FF),
         Color(0xFF34C759), Color(0xFF30D158),
     )
     val purple = createStyledThemeColors(
-        "purple", "Purple",
+        themeId, "purple", "Purple",
         Color(0xFFAF52DE), Color(0xFFBF5AF2),
         Color(0xFF007AFF), Color(0xFF0A84FF),
         Color(0xFFFF9500), Color(0xFFFF9F0A),
     )
     val graphite = createStyledThemeColors(
-        "graphite", "Graphite",
+        themeId, "graphite", "Graphite",
         Color(0xFF636366), Color(0xFF98989D),
         Color(0xFF007AFF), Color(0xFF0A84FF),
         Color(0xFF34C759), Color(0xFF30D158),
     )
 
     val collection = StyledThemeColorsCollection(
-        id = "cupertino",
+        id = themeId,
         name = "Cupertino",
         themes = listOf(blue, green, orange, pink, purple, graphite),
         matchingPlatforms = setOf(Platform.IOS),

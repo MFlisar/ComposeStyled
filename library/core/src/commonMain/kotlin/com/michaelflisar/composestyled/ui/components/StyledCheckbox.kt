@@ -73,6 +73,7 @@ object StyledCheckboxDefaults {
 // public API
 // -------------------------
 
+/** Checkbox overload backed by [checked]; changes are written to the state. */
 @Composable
 fun StyledCheckbox(
     checked: MutableState<Boolean>,
@@ -136,5 +137,3 @@ fun StyledCheckbox(
         )
     }
 }
-
-

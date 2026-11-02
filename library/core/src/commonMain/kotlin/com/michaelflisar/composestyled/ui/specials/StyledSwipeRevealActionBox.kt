@@ -127,6 +127,7 @@ class StyledSwipeRevealAction internal constructor(
     )
 }
 
+/** Reveals one or more actions from either edge while keeping the content in place. */
 @Composable
 @OptIn(InternalComposeStyledApi::class)
 fun StyledSwipeRevealActionBox(

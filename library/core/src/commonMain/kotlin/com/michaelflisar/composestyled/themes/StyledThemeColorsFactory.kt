@@ -10,6 +10,7 @@ import com.michaelflisar.composestyled.tokens.lightDisableFactors
 
 @InternalComposeStyledApi
 fun createStyledThemeColors(
+    themeId: String,
     id: String,
     name: String,
     primaryLight: Color,
@@ -33,7 +34,8 @@ fun createStyledThemeColors(
     val colorfulDark = AccentColors(primaryDark, secondaryDark, tertiaryDark)
 
     return StyledThemeColors(
-        id = id,
+        themeId = themeId,
+        schemeId = id,
         name = name,
         monochrome = schemes(monochromeLight, monochromeDark),
         colorful = schemes(colorfulLight, colorfulDark),

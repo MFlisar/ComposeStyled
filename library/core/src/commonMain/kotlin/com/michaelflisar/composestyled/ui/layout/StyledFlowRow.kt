@@ -16,6 +16,7 @@ object StyledFlowRowDefaults {
     val itemVerticalAlignment: Alignment.Vertical = Alignment.Top
 }
 
+/** A theme-aware flow layout that wraps items onto additional rows as needed. */
 @Composable
 fun StyledFlowRow(
     modifier: Modifier = Modifier,
@@ -37,6 +38,7 @@ fun StyledFlowRow(
     )
 }
 
+/** A flow row with separate gaps between items and rows. */
 @Composable
 fun StyledFlowRow(
     itemSpacing: Dp,
@@ -60,6 +62,7 @@ fun StyledFlowRow(
     )
 }
 
+/** A flow row that uses the same gap between items and rows. */
 @Composable
 fun StyledFlowRow(
     spacing: Dp,

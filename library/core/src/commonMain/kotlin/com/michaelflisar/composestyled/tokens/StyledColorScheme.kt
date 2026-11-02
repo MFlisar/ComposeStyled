@@ -5,6 +5,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import com.michaelflisar.composestyled.classes.StyledLocalMissingException
 
+/** Semantic color roles resolved for one light/dark theme and contrast level. */
 @Immutable
 data class StyledColorScheme(
     val isDarkTheme: Boolean,
@@ -38,6 +39,7 @@ data class StyledColorScheme(
     internal val tertiaryDef: Definition = secondaryDef,
     internal val tertiarySurfaceDef: Definition = secondarySurfaceDef,
 ) {
+    /** A foreground/background color pair for one semantic role. */
     @Immutable
     data class Definition(
         val color: Color,

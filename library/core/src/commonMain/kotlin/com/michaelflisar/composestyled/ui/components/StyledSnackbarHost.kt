@@ -47,10 +47,13 @@ object StyledSnackbarHost {
     }
 }
 
+/** Duration policy used by a snackbar message. */
 enum class StyledSnackbarDuration { Short, Long, Indefinite }
 
+/** Result returned when a snackbar is dismissed or its action is performed. */
 enum class StyledSnackbarResult { Dismissed, ActionPerformed }
 
+/** Message and action state exposed to a snackbar renderer. */
 @Stable
 interface StyledSnackbarData {
     val message: String
@@ -58,7 +61,10 @@ interface StyledSnackbarData {
     val withDismissAction: Boolean
     val duration: StyledSnackbarDuration
 
+    /** Completes the pending message with [StyledSnackbarResult.ActionPerformed]. */
     fun performAction()
+
+    /** Completes the pending message with [StyledSnackbarResult.Dismissed]. */
     fun dismiss()
 }
 
@@ -73,6 +79,10 @@ class StyledSnackbarHostState {
     var currentSnackbarData by mutableStateOf<StyledSnackbarData?>(null)
         private set
 
+    /**
+     * Queues [message] until dismissed or acted on, then returns the corresponding result.
+     * Calls are serialized; cancellation removes the waiting or visible message.
+     */
     suspend fun showSnackbar(
         message: String,
         actionLabel: String? = null,
@@ -140,6 +150,7 @@ fun StyledSnackbarHost(
     )
 }
 
+/** Renders one snackbar message and its optional action and dismiss controls. */
 @Composable
 fun StyledSnackbar(
     data: StyledSnackbarData,

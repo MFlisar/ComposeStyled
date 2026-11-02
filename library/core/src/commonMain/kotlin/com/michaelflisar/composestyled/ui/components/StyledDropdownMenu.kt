@@ -164,6 +164,7 @@ object StyledDropdownMenuItemDefaults {
 // public API
 // -------------------------
 
+/** Renders a clickable menu row with optional leading and trailing content. */
 @Composable
 fun StyledDropdownMenuItem(
     text: @Composable () -> Unit,
@@ -188,6 +189,7 @@ fun StyledDropdownMenuItem(
     )
 }
 
+/** Renders a custom menu row with the same interaction and styling as a menu item. */
 @Composable
 fun StyledDropdownMenuContent(
     onClick: (() -> Unit)? = null,

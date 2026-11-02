@@ -7,6 +7,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.michaelflisar.composestyled.classes.StyledLocalMissingException
 
+/** Material-style text roles provided to Styled components by the active theme. */
 @Immutable
 data class StyledTypography(
     val headlineLarge: TextStyle,

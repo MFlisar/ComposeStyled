@@ -52,6 +52,7 @@ object StyledGroupBox {
     }
 }
 
+/** Groups related content under an optional label with theme-aware container styling. */
 @Composable
 @OptIn(InternalComposeStyledApi::class)
 fun StyledGroupBox(

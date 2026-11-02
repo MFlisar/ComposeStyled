@@ -12,8 +12,14 @@ import com.michaelflisar.composestyled.tokens.LocalStyledContentColor
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
+/**
+ * An icon slot that receives accessibility text, layout modifier and tint from its caller.
+ *
+ * Implementations should pass `contentDescription` to the rendered image for accessibility.
+ */
 typealias IconComposable = @Composable (contentDescription: String?, modifier: Modifier, tint: Color) -> Unit
 
+/** Adapts an [ImageVector] to the icon slot, using the supplied tint unless tinting is disabled. */
 fun ImageVector.toIconComposable(
     tint: Color = Color.Unspecified,
     disableTint: Boolean = false,
@@ -32,6 +38,7 @@ fun ImageVector.toIconComposable(
     }
 }
 
+/** Adapts a [Painter] to the icon slot, using the supplied tint unless tinting is disabled. */
 fun Painter.toIconComposable(
     tint: Color = Color.Unspecified,
     disableTint: Boolean = false,
@@ -50,6 +57,7 @@ fun Painter.toIconComposable(
     }
 }
 
+/** Loads and adapts a Compose resource to the icon slot. */
 fun DrawableResource.toIconComposable(
     tint: Color = Color.Unspecified,
     disableTint: Boolean = false,
@@ -68,6 +76,7 @@ fun DrawableResource.toIconComposable(
     }
 }
 
+/** Renders [icon] with a content description, modifier and tint. */
 @Composable
 fun IconComposable(
     icon: IconComposable,

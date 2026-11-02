@@ -13,8 +13,10 @@ import com.michaelflisar.composestyled.tokens.StyledSizes
 import com.michaelflisar.composestyled.tokens.StyledSpacing
 import com.michaelflisar.composestyled.tokens.StyledTypography
 
+/** Provides baseline tokens and behavior tuned for each supported [Platform]. */
 object PlatformDefaults {
 
+    /** Defaults scrollbar indicators to visible on desktop and web, hidden on mobile. */
     fun showScrollbars(platform: Platform): Boolean = platform.isDesktopOrWeb()
 
     /**
@@ -59,6 +61,7 @@ object PlatformDefaults {
         }
     }
 
+    /** Platform-specific baseline values used by the theme's token defaults. */
     @Stable
     data class Defaults(
         val paddings: StyledPadding,
@@ -68,6 +71,7 @@ object PlatformDefaults {
         val shapes: StyledShapes,
     ) {
         companion object {
+            /** Returns the baseline values for [platform]. */
             fun find(platform: Platform): Defaults {
                 return when (platform) {
                     Platform.Android -> Android

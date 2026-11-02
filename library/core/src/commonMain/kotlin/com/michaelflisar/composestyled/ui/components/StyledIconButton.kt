@@ -124,6 +124,7 @@ object StyledIconButtonDefaults {
 // public API
 // -------------------------
 
+/** A theme-rendered icon-only action button with an explicit semantic [role]. */
 @Composable
 fun StyledIconButton(
     onClick: () -> Unit,
@@ -149,6 +150,7 @@ fun StyledIconButton(
     )
 }
 
+/** Convenience overload that renders [icon] with its accessibility description and optional padding. */
 @Composable
 fun StyledIconButton(
     onClick: () -> Unit,

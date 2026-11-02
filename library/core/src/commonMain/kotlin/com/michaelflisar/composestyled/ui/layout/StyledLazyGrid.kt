@@ -23,6 +23,7 @@ object StyledLazyGridDefaults {
     val horizontalArrangement: Arrangement.Horizontal = Arrangement.Start
 }
 
+/** A lazy vertical grid with theme-aware spacing and item content. */
 @Composable
 @OptIn(InternalComposeStyledApi::class)
 fun StyledLazyVerticalGrid(
@@ -56,6 +57,7 @@ fun StyledLazyVerticalGrid(
     }
 }
 
+/** A lazy vertical grid with separate gaps between rows and columns. */
 @Composable
 fun StyledLazyVerticalGrid(
     columns: GridCells,
@@ -83,6 +85,7 @@ fun StyledLazyVerticalGrid(
     )
 }
 
+/** A lazy horizontal grid with theme-aware spacing and item content. */
 @Composable
 @OptIn(InternalComposeStyledApi::class)
 fun StyledLazyHorizontalGrid(
@@ -116,6 +119,7 @@ fun StyledLazyHorizontalGrid(
     }
 }
 
+/** A lazy horizontal grid with separate gaps between rows and columns. */
 @Composable
 fun StyledLazyHorizontalGrid(
     rows: GridCells,

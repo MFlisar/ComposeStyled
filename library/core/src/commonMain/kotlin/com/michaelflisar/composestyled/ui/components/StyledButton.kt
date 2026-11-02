@@ -111,6 +111,7 @@ object StyledButtonDefaults {
 // public API
 // -------------------------
 
+/** A theme-rendered action button; [role] lets the active theme choose its visual emphasis. */
 @Composable
 fun StyledButton(
     onClick: () -> Unit,

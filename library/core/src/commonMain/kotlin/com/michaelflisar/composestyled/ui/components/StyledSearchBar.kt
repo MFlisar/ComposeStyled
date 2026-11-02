@@ -43,6 +43,7 @@ import kotlinx.coroutines.launch
 // public API
 // -------------------------
 
+/** State-backed search input with optional clear, submit and suggestion actions. */
 @Composable
 fun StyledSearchBar(
     value: MutableState<String>,
@@ -73,6 +74,7 @@ fun StyledSearchBar(
     )
 }
 
+/** Controlled search input; suggestions can commit a value through their selection callback. */
 @Composable
 fun StyledSearchBar(
     value: String,

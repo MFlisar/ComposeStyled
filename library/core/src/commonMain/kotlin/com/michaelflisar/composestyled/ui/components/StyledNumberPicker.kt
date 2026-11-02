@@ -38,6 +38,7 @@ import com.michaelflisar.composestyled.utils.repeatingClickable
 // public API
 // -------------------------
 
+/** State-backed numeric stepper using [parser] for editing and [validator] for validation. */
 @Composable
 fun <T : Number> StyledNumberPicker(
     value: MutableState<T>,
@@ -74,6 +75,7 @@ fun <T : Number> StyledNumberPicker(
     )
 }
 
+/** Controlled numeric stepper using [parser] and [validator] for manual input. */
 @Composable
 fun <T : Number> StyledNumberPicker(
     value: T,
@@ -110,6 +112,7 @@ fun <T : Number> StyledNumberPicker(
     variant = StyledInput.Variant.Default,
 )
 
+/** State-backed alternative-style numeric stepper. */
 @Composable
 fun <T : Number> StyledAlternativeNumberPicker(
     value: MutableState<T>,
@@ -146,6 +149,7 @@ fun <T : Number> StyledAlternativeNumberPicker(
     )
 }
 
+/** Controlled alternative-style numeric stepper. */
 @Composable
 fun <T : Number> StyledAlternativeNumberPicker(
     value: T,

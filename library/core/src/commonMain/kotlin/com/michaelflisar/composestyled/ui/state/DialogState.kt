@@ -16,11 +16,13 @@ interface DialogState {
     fun dismiss()
 }
 
+/** Visibility-backed state for dialogs whose content does not require associated data. */
 @Stable
 class VisibilityDialogState internal constructor(initialVisible: Boolean) : DialogState {
     override var visible by mutableStateOf(initialVisible)
         private set
 
+    /** Marks the dialog visible. */
     fun show() {
         visible = true
     }
@@ -41,6 +43,7 @@ class DataDialogState<T : Any> internal constructor(initialData: T?) : DialogSta
     override val visible: Boolean
         get() = data != null
 
+    /** Replaces the dialog data and makes the dialog visible. */
     fun show(data: T) {
         dismissedData = null
         this.data = data
@@ -69,8 +72,10 @@ class DataDialogState<T : Any> internal constructor(initialData: T?) : DialogSta
 fun dialogStateOf(initialVisible: Boolean = false): VisibilityDialogState =
     VisibilityDialogState(initialVisible)
 
+/** Creates data-backed dialog state outside composition. A non-null value means visible. */
 fun <T : Any> dialogStateOf(initialData: T?): DataDialogState<T> = DataDialogState(initialData)
 
+/** Remembers saveable visibility-backed dialog state. */
 @Composable
 fun rememberDialogState(initialVisible: Boolean = false): VisibilityDialogState =
     rememberSaveable(saver = VisibilityDialogStateSaver) { dialogStateOf(initialVisible) }

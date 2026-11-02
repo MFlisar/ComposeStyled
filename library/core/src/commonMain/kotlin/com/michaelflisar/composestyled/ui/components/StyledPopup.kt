@@ -33,6 +33,7 @@ import com.michaelflisar.composestyled.registry.StyledComponent
 import com.michaelflisar.composestyled.registry.StyledKey
 import com.michaelflisar.composestyled.ui.internal.rememberVisibleWindowBoundsOnScreen
 
+/** Registry-backed popup primitive used by dropdowns, menus and other anchored overlays. */
 object StyledPopup {
 
     // -------------
@@ -45,6 +46,7 @@ object StyledPopup {
     // 5) implementation
     // -------------
 
+    /** Theme-resolved visual properties and height limit for a popup. */
     @Stable
     data class Style(
         val shape: Shape,
@@ -88,6 +90,7 @@ object StyledPopup {
 
 object StyledPopupDefaults {
 
+    /** Builds Compose popup window properties with platform-friendly defaults. */
     @Composable
     fun properties(
         focusable: Boolean = true,
@@ -103,6 +106,7 @@ object StyledPopupDefaults {
         usePlatformDefaultWidth = usePlatformDefaultWidth,
     )
 
+    /** Creates popup styling from the active theme and the supplied overrides. */
     @Composable
     fun style(
         shape: Shape = StyledTheme.shapes.small,
@@ -120,6 +124,7 @@ object StyledPopupDefaults {
         maxHeight = maxHeight,
     )
 
+    /** Positions the popup relative to its anchor using an optional dp offset. */
     @Composable
     fun positionProvider(
         offset: DpOffset = DpOffset(0.dp, 4.dp),
@@ -353,6 +358,7 @@ class WindowOverlayPositionProvider internal constructor(
 // public API
 // -------------------------
 
+/** Shows or hides a theme-rendered popup and reports dismissal through [onDismissRequest]. */
 @Composable
 fun StyledPopup(
     visible: Boolean,
@@ -374,6 +380,7 @@ fun StyledPopup(
     )
 }
 
+/** State-backed overload that sets [visible] to false when the popup is dismissed. */
 @Composable
 fun StyledPopup(
     visible: MutableState<Boolean>,

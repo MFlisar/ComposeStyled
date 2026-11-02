@@ -17,6 +17,7 @@ object StyledRowDefaults {
         @Composable get() = StyledTheme.spacing.medium
 }
 
+/** A theme-aware horizontal layout that exposes the standard [RowScope]. */
 @Composable
 fun StyledRow(
     modifier: Modifier = Modifier,
@@ -32,6 +33,7 @@ fun StyledRow(
     )
 }
 
+/** A horizontal layout with a fixed gap between each item. */
 @Composable
 fun StyledRow(
     itemSpacing: Dp,

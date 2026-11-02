@@ -5,6 +5,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.unit.Dp
 import com.michaelflisar.composestyled.classes.StyledLocalMissingException
 
+/** Semantic spacing scale used by Styled components and layouts. */
 @Immutable
 data class StyledSpacing(
     val small: Dp,

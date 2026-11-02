@@ -99,6 +99,7 @@ object StyledBadgeDefaults {
  * Padding on [modifier] adds outer clearance without changing the anchor point.
  * [offset] moves only the badge: positive x points toward end, positive y points downward.
  */
+/** Overlays optional badge content on a composable; pass null to show only the content. */
 @OptIn(InternalComposeStyledApi::class)
 @Composable
 fun StyledBadge(

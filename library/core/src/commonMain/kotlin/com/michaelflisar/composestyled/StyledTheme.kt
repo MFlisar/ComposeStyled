@@ -39,8 +39,10 @@ import com.michaelflisar.composestyled.tokens.StyledTypography
 import com.michaelflisar.composestyled.ui.layout.LocalFloatingDialogHost
 import com.michaelflisar.composestyled.ui.layout.StyledFloatingHost
 
+/** Read-only accessors for the theme and tokens provided by [StyledTheme]. */
 object StyledTheme {
 
+    /** Theme-wide behavior settings that do not belong to an individual component. */
     @Immutable
     data class Behavior(
         val showScrollbars: Boolean = true,
@@ -49,6 +51,7 @@ object StyledTheme {
     enum class ContentColorFallback {
         /** Selects black or white according to which provides the higher contrast. */
         BlackWhite,
+        /** Uses the content color currently provided by the surrounding composition. */
         LocalContentColor
     }
 
@@ -137,7 +140,10 @@ object StyledTheme {
 }
 
 /**
- * Applies Styled tokens and the provider root before creating the theme definition.
+ * Provides theme tokens, the provider's component registry and floating host to [content].
+ *
+ * Use this as the root of a Styled UI subtree. [customization] is applied after the provider's
+ * default registrations, so it can replace renderers and update their defaults.
  */
 @Composable
 fun StyledTheme(
@@ -184,19 +190,21 @@ fun StyledTheme(
         LocalStyledSizes provides sizes,
         LocalStyledBehavior provides behavior,
     ) {
-        themeProvider.Root {
-            val definition = themeProvider.definition()
-            val defaultRegistry = StyledRegistry.createComposable(definition.registry) {
-                register(themeProvider.defaultIconSet)
-            }
-            val registry = customization?.let {
-                StyledRegistry.createComposable(defaultRegistry, it)
-            } ?: defaultRegistry
-            CompositionLocalProvider(
-                LocalStyledThemeName provides definition.name,
-                LocalStyledRegistry provides registry,
-            ) {
-                ProvideFloatingHostIfMissing(content)
+        ProvideFloatingHostIfMissing {
+            themeProvider.Root {
+                val definition = themeProvider.definition()
+                val defaultRegistry = StyledRegistry.createComposable(definition.registry) {
+                    register(themeProvider.defaultIconSet)
+                }
+                val registry = customization?.let {
+                    StyledRegistry.createComposable(defaultRegistry, it)
+                } ?: defaultRegistry
+                CompositionLocalProvider(
+                    LocalStyledThemeName provides definition.name,
+                    LocalStyledRegistry provides registry,
+                ) {
+                    content()
+                }
             }
         }
     }
@@ -217,8 +225,8 @@ internal val LocalStyledBehavior = staticCompositionLocalOf<StyledTheme.Behavior
 }
 
 /**
- * convenience function to provide a custom content color and text style for the content inside this composable.
- * If the contentColor or textStyle is null or unspecified, the current values will be used.
+ * Provides a local content color and/or text style to [content], inheriting the current value for
+ * each argument that is null or unspecified.
  */
 @InternalComposeStyledApi
 @Composable
@@ -240,7 +248,10 @@ fun UpdateStyledThemeLocals(
 }
 
 /**
- * convenience function to provide a custom [StyledRegistry] for the content inside this composable.
+ * Applies registry changes to a subtree without changing the enclosing theme.
+ *
+ * The [update] builder inherits the current registry; register replacements before updating their
+ * defaults.
  */
 @Composable
 fun UpdateStyledCustomization(

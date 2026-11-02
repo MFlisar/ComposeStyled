@@ -268,8 +268,8 @@ fun <T : Any> StyledDropdownIndex(
  * Displays a selection from [items]. [onSelectionChange] receives the index in the
  * original [items] list (even when filtered) and the selected item.
  * An out-of-range [selectedIndex] displays no selection.
- * [content] receives a [RenderContext.Selection] for the closed selection or
- * a [RenderContext.DropdownItem] for each menu entry.
+ * [content] receives `StyledDropdown.RenderContext.Selection` for the closed selection or
+ * `StyledDropdown.RenderContext.DropdownItem` for each menu entry.
  * The container handles the title and layout. Customize text mapping through
  * [StyledDropdownDefaults.defaultRenderer], or render each context separately.
  */

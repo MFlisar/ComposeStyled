@@ -36,6 +36,7 @@ import com.michaelflisar.composestyled.ui.layout.StyledDialog
 import com.michaelflisar.composestyled.ui.layout.StyledScaffold
 import com.michaelflisar.composestyled.ui.layout.StyledScaffoldDefaults
 
+/** Layout or host-window dimensions used by adaptive decisions. */
 @Stable
 data class StyledAdaptiveSize(
     val width: Dp,
@@ -54,9 +55,11 @@ data class StyledAdaptiveSize(
             else -> WidthClass.Expanded
         }
 
+    /** Whether the width meets [threshold]; infinite width is treated as unknown. */
     fun isWidthAtLeast(threshold: Dp): Boolean =
         width != Dp.Infinity && width >= threshold
 
+    /** Width breakpoints used by adaptive layout policies. */
     enum class WidthClass {
         Compact,
         Medium,
@@ -64,6 +67,7 @@ data class StyledAdaptiveSize(
     }
 }
 
+/** Platform, local layout bounds and host-window bounds supplied to an adaptive policy. */
 @Stable
 data class StyledAdaptiveContext(
     val platform: Platform,
@@ -71,6 +75,7 @@ data class StyledAdaptiveContext(
     val windowSize: StyledAdaptiveSize,
 )
 
+/** Resolved navigation, master-detail and dialog decisions for an adaptive context. */
 @Stable
 data class StyledAdaptiveInfo(
     val context: StyledAdaptiveContext,
@@ -79,11 +84,13 @@ data class StyledAdaptiveInfo(
     val dialogStyle: StyledDialog.Style,
 )
 
+/** Whether master and detail content occupy one pane or appear side by side. */
 enum class StyledAdaptiveMasterDetailMode {
     SinglePane,
     SideBySide,
 }
 
+/** Visibility decisions for master/detail panes without changing selection state. */
 @Stable
 data class StyledAdaptiveMasterDetailPanes(
     val showMaster: Boolean,

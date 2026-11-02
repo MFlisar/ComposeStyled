@@ -20,17 +20,11 @@ import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.ui.overlay.StyledPopupContainer
 import com.michaelflisar.composestyled.ui.primitives.StyledExpandIcon
 
-/**
- * A themed button that opens a dropdown menu when clicked. Uses a
- * [StyledPopupContainer] where
- * - popup is a [StyledPopupMenu]
- * - content is a [StyledButton] with a [StyledExpandIcon] at the end of the content
- */
-
 // -------------------------
 // public API
 // -------------------------
 
+/** A themed button with an expand indicator; delegates the click to [onClick]. */
 @Composable
 fun StyledDropdownButton(
     onClick: () -> Unit,
@@ -54,6 +48,7 @@ fun StyledDropdownButton(
     content = content,
 )
 
+/** A themed button that toggles a popup menu; [menuContent] receives a dismiss callback. */
 @Composable
 fun StyledDropdownButton(
     menuContent: @Composable ColumnScope.(dismiss: () -> Unit) -> Unit,

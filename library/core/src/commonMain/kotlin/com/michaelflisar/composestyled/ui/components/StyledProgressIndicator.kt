@@ -51,6 +51,7 @@ object StyledProgressIndicator {
 // public API
 // -------------------------
 
+/** Shows linear or circular progress; a null [progress] displays indeterminate progress. */
 @Composable
 fun StyledProgressIndicator(
     type: StyledProgressIndicator.Type,

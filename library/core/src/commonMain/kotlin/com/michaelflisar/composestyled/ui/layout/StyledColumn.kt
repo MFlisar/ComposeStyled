@@ -17,6 +17,7 @@ object StyledColumnDefaults {
         @Composable get() = StyledTheme.spacing.medium
 }
 
+/** A theme-aware vertical layout that exposes the standard [ColumnScope]. */
 @Composable
 fun StyledColumn(
     modifier: Modifier = Modifier,
@@ -32,6 +33,7 @@ fun StyledColumn(
     )
 }
 
+/** A vertical layout with a fixed gap between each item. */
 @Composable
 fun StyledColumn(
     itemSpacing: Dp,

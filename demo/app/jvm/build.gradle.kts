@@ -3,8 +3,6 @@ import com.michaelflisar.kmpdevtools.BuildFileUtil
 import com.michaelflisar.kmpdevtools.core.Target
 import com.michaelflisar.kmpdevtools.configs.*
 import com.michaelflisar.kmpdevtools.setupDependencies
-import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
-import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
     // kmp + app/library
@@ -16,6 +14,7 @@ plugins {
     // docs, publishing, validation
     // --
     // build tools
+    alias(mflisar.plugins.kmpicon.plugin)
     alias(mflisar.plugins.kmpdevtools.buildplugin)
     // others
     alias(libs.plugins.launch4j)
@@ -33,6 +32,20 @@ val desktopConfig = DesktopAppConfig(
     mainClass = "com.michaelflisar.demo.MainKt",
     ico = "icon.ico"
 )
+
+// copies the android icon to the desktop module as ico
+kmpIcon {
+
+    setup {
+        sourceModule = "demo/app/android" // default: app/app/android"
+        sourceFile = "src/main/ic_launcher-playstore.png"
+    }
+
+    generateIco {
+        file = "icon.ico"
+    }
+
+}
 
 // -------------------
 // Kotlin

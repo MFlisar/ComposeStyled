@@ -9,45 +9,47 @@ import com.michaelflisar.composestyled.themes.createStyledThemeColors
 @OptIn(InternalComposeStyledApi::class)
 object Material3Themes {
 
+    const val themeId = "material3"
+
     val blue = createStyledThemeColors(
-        "blue", "Blue",
+        themeId, "blue", "Blue",
         Color(0xFF415F91), Color(0xFFAAC7FF),
         Color(0xFF006A60), Color(0xFF4CD7C5),
         Color(0xFF705575), Color(0xFFE7B8ED),
     )
     val violet = createStyledThemeColors(
-        "violet", "Violet",
+        themeId, "violet", "Violet",
         Color(0xFF6750A4), Color(0xFFD0BCFF),
         Color(0xFF006A60), Color(0xFF4CD7C5),
         Color(0xFF7E5260), Color(0xFFF0B8C2),
     )
     val green = createStyledThemeColors(
-        "green", "Green",
+        themeId, "green", "Green",
         Color(0xFF386A20), Color(0xFFA1D18A),
         Color(0xFF006A60), Color(0xFF4CD7C5),
         Color(0xFF5B5D8A), Color(0xFFC4C3FF),
     )
     val rose = createStyledThemeColors(
-        "rose", "Rose",
+        themeId, "rose", "Rose",
         Color(0xFF904A46), Color(0xFFFFB4AB),
         Color(0xFF5B5D8A), Color(0xFFC4C3FF),
         Color(0xFF006A60), Color(0xFF4CD7C5),
     )
     val amber = createStyledThemeColors(
-        "amber", "Amber",
+        themeId, "amber", "Amber",
         Color(0xFF775A00), Color(0xFFE9C349),
         Color(0xFF415F91), Color(0xFFAAC7FF),
         Color(0xFF006A60), Color(0xFF4CD7C5),
     )
     val teal = createStyledThemeColors(
-        "teal", "Teal",
+        themeId, "teal", "Teal",
         Color(0xFF006A60), Color(0xFF4CD7C5),
         Color(0xFF415F91), Color(0xFFAAC7FF),
         Color(0xFF775A00), Color(0xFFE9C349),
     )
 
     val collection = StyledThemeColorsCollection(
-        id = "material3",
+        id = themeId,
         name = "Material 3",
         themes = listOf(blue, violet, green, rose, amber, teal),
         matchingPlatforms = setOf(Platform.Android),

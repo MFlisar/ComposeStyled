@@ -73,6 +73,7 @@ object StyledSwitchDefaults {
 // public API
 // -------------------------
 
+/** State-backed switch overload that reads and updates [checked] directly. */
 @Composable
 fun StyledSwitch(
     checked: MutableState<Boolean>,
@@ -99,6 +100,7 @@ fun StyledSwitch(
     )
 }
 
+/** A controlled, theme-rendered switch; a null callback leaves state ownership to the caller. */
 @Composable
 fun StyledSwitch(
     checked: Boolean,
@@ -135,5 +137,4 @@ fun StyledSwitch(
         )
     }
 }
-
 

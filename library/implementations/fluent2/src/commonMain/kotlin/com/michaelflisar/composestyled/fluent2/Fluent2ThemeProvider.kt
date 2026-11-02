@@ -41,9 +41,12 @@ import com.michaelflisar.composestyled.registry.StyledRegistry
 import com.michaelflisar.composestyled.ui.icons.fluent2.Fluent2RegularIconSet
 
 @Composable
-fun rememberFluent2ThemeProvider(): Fluent2ThemeProvider = remember { Fluent2ThemeProvider() }
+fun rememberFluent2ThemeProvider(): Fluent2ThemeProvider = remember { createFluent2ThemeProvider() }
+
+fun createFluent2ThemeProvider(): Fluent2ThemeProvider = Fluent2ThemeProvider()
 
 class Fluent2ThemeProvider internal constructor() : StyledThemeProvider {
+    override val id = "fluent2"
     override val defaultThemeColors = Fluent2Themes.blue
     override val defaultIconSet = Fluent2RegularIconSet
 

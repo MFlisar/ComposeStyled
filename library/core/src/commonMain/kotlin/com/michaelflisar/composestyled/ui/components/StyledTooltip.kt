@@ -94,6 +94,7 @@ object StyledTooltipDefaults {
 // public API
 // -------------------------
 
+/** Shows theme-styled tooltip content controlled by [state]. */
 @Composable
 fun StyledTooltip(
     state: StyledTooltipState = rememberStyledTooltipState(),

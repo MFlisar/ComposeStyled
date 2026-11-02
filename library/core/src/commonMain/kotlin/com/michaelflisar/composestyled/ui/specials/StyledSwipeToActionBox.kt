@@ -141,6 +141,7 @@ class StyledSwipeAction internal constructor(
     }
 }
 
+/** Reveals one action from either edge and invokes it when the swipe is committed. */
 @Composable
 @OptIn(InternalComposeStyledApi::class)
 fun StyledSwipeToActionBox(

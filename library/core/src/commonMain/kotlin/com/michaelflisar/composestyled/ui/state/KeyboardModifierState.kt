@@ -21,6 +21,7 @@ import androidx.compose.ui.input.pointer.isCtrlPressed
 import androidx.compose.ui.input.pointer.isMetaPressed
 import androidx.compose.ui.input.pointer.isShiftPressed
 
+/** Snapshot of keyboard modifiers relevant to selection and range-selection behavior. */
 @Stable
 data class KeyboardModifierSnapshot(
     val shift: Boolean = false,
@@ -28,12 +29,15 @@ data class KeyboardModifierSnapshot(
     val meta: Boolean = false,
     val alt: Boolean = false,
 ) {
+    /** True when neither range nor toggle-selection modifiers are pressed. */
     val isSingleSelect: Boolean
         get() = !shift && !ctrl && !meta
 
+    /** True when Ctrl or Meta is pressed. */
     val isToggleSelect: Boolean
         get() = ctrl || meta
 
+    /** True when Shift is pressed. */
     val isRangeSelect: Boolean
         get() = shift
 
@@ -42,12 +46,14 @@ data class KeyboardModifierSnapshot(
     }
 }
 
+/** Tracks keyboard modifiers from preview key events for use by pointer callbacks. */
 @Stable
 class KeyboardModifierState internal constructor(
     private val isReadOnly: Boolean = false,
 ) {
     private var currentSnapshot by mutableStateOf(KeyboardModifierSnapshot.None)
 
+    /** Latest modifier snapshot observed by this state. */
     val modifiers: KeyboardModifierSnapshot
         get() = currentSnapshot
 
@@ -63,6 +69,7 @@ class KeyboardModifierState internal constructor(
     val isAltPressed: Boolean
         get() = modifiers.alt
 
+    /** Updates the snapshot and returns false so the key event remains unconsumed. */
     fun onKeyEvent(event: KeyEvent): Boolean {
         if (!isReadOnly) {
             currentSnapshot = KeyboardModifierSnapshot(
@@ -75,6 +82,7 @@ class KeyboardModifierState internal constructor(
         return false
     }
 
+    /** Resets the snapshot to no modifiers. */
     fun clear() {
         if (!isReadOnly) {
             currentSnapshot = KeyboardModifierSnapshot.None
@@ -86,12 +94,15 @@ class KeyboardModifierState internal constructor(
     }
 }
 
+/** Remembers a modifier tracker scoped to the current composition. */
 @Composable
 fun rememberKeyboardModifierState(): KeyboardModifierState =
     remember { KeyboardModifierState() }
 
+/** Current keyboard modifier state provided by [ProvideKeyboardModifierState]. */
 val LocalKeyboardModifiers = staticCompositionLocalOf { KeyboardModifierState.None }
 
+/** Provides [state] to descendants for keyboard-aware selection handling. */
 @Composable
 fun ProvideKeyboardModifierState(
     state: KeyboardModifierState,
@@ -103,12 +114,14 @@ fun ProvideKeyboardModifierState(
     )
 }
 
+/** Adds preview-key handling that updates [LocalKeyboardModifiers]. */
 @Composable
 fun Modifier.onKeyboardModifierEvent(): Modifier {
     val state = LocalKeyboardModifiers.current
     return onPreviewKeyEvent(state::onKeyEvent)
 }
 
+/** Converts Compose pointer modifier flags to a reusable modifier snapshot. */
 fun PointerKeyboardModifiers.toKeyboardModifierSnapshot(): KeyboardModifierSnapshot =
     KeyboardModifierSnapshot(
         shift = isShiftPressed,

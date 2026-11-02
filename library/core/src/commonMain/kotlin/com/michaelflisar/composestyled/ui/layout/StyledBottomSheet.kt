@@ -79,6 +79,7 @@ object StyledBottomSheetDefaults {
 // -------------------------
 
 /** Non-modal overlay. Place last in a bounded Box to draw above sibling content. */
+/** Shows a non-modal bottom-sheet overlay using the active dialog renderer and [state]. */
 @Composable
 fun StyledBottomSheet(
     state: DialogState,

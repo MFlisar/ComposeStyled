@@ -143,6 +143,7 @@ fun StyledCard(
     )
 }
 
+/** Alternative-style variant of [StyledCard]. */
 @Composable
 fun StyledAlternativeCard(
     modifier: Modifier = Modifier,

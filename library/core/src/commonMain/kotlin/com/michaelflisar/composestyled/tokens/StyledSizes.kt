@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import com.michaelflisar.composestyled.classes.StyledLocalMissingException
 
+/** Minimum interactive dimensions and default icon size for the active platform. */
 @Immutable
 data class StyledSizes(
 
@@ -19,6 +20,7 @@ data class StyledSizes(
     val iconSize: Dp,
 )
 
+/** Enforces the theme's minimum interactive width and height on this modifier. */
 @Composable
 fun Modifier.minimumInteractiveSize(small: Boolean = false) = this.then(
     Modifier

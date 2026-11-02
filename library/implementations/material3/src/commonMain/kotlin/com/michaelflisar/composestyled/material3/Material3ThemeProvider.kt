@@ -60,12 +60,17 @@ import com.michaelflisar.composestyled.tokens.StyledTypography
 fun rememberMaterial3ThemeProvider(
     customizeColorScheme: ((ColorScheme) -> ColorScheme)? = null,
 ): Material3ThemeProvider = remember(customizeColorScheme) {
-    Material3ThemeProvider(customizeColorScheme)
+    createMaterial3ThemeProvider(customizeColorScheme)
 }
+
+fun createMaterial3ThemeProvider(
+    customizeColorScheme: ((ColorScheme) -> ColorScheme)? = null,
+): Material3ThemeProvider = Material3ThemeProvider(customizeColorScheme)
 
 class Material3ThemeProvider internal constructor(
     private val customizeColorScheme: ((ColorScheme) -> ColorScheme)? = null,
 ) : StyledThemeProvider {
+    override val id = "material3"
     override val defaultThemeColors = Material3Themes.blue
     override val defaultIconSet = Material3FilledIconSet
 
