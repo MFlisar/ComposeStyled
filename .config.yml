@@ -53,7 +53,7 @@ apps:
     publish:
       url-path: demo
       description: Explore the interactive demo
-      module-path: demo/app/web
+      module-path: demo/app/wasm
 
 # ---------------------
 # Modules
