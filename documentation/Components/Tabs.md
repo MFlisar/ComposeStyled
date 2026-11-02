@@ -42,5 +42,17 @@ StyledPrimaryScrollableTabRow(selectedTabIndex = selectedTab.value) {
 // Use StyledSecondaryScrollableTabRow for the scrollable secondary variant.
 ```
 
+Scrollable tab rows display a scrollbar indicator when their contents overflow
+and `StyledTheme.behavior.showScrollbars` is enabled. Disabling that global
+setting hides the indicator but leaves tab scrolling and selected-tab
+auto-scrolling unchanged.
+
 `StyledPager` uses these components for its tab row, so theme overrides affect
 both standalone tabs and pager navigation.
+
+Tabs inside a row inherit a selection palette from that row. The selected tab
+and its indicator use the row's content color, while unselected tabs use a
+subdued version of it. This keeps them visible on custom row containers.
+Explicit `selectedContentColor` and `unselectedContentColor` values on
+`StyledTab` override the inherited colors; standalone tabs use their renderer's
+defaults.

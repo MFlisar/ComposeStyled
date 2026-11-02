@@ -1,6 +1,6 @@
 import com.michaelflisar.kmpdevtools.Targets
 import com.michaelflisar.kmpdevtools.BuildFileUtil
-import com.michaelflisar.kmpdevtools.core.Platform
+import com.michaelflisar.kmpdevtools.core.Target
 import com.michaelflisar.kmpdevtools.configs.*
 import com.michaelflisar.kmpdevtools.setupDependencies
 import com.michaelflisar.kmpdevtools.setupBuildKonfig
@@ -31,7 +31,13 @@ plugins {
 
 val module = LibraryModuleConfig.read(project)
 
-val buildTargets = Targets(Platform.ANDROID, Platform.IOS, Platform.WINDOWS, Platform.MACOS, Platform.WASM)
+val buildTargets = Targets(
+    Target.ANDROID,
+    Target.IOS,
+    Target.JVM,
+    Target.MACOS,
+    Target.WASM
+)
 
 val androidConfig = AndroidLibraryConfig.create(
     libraryModuleConfig = module,
@@ -99,10 +105,15 @@ kotlin {
             api(libs.jetbrains.compose.material.icons.extended)
 
             // modules
-            api(project(":composestyledcomponents:core"))
-            api(project(":composestyledcomponents:implementations:cupertino"))
-            api(project(":composestyledcomponents:implementations:fluent2"))
-            api(project(":composestyledcomponents:implementations:material3"))
+            api(project(":composestyled:core"))
+            // implementations do add their themes via api dependency!
+            api(project(":composestyled:implementations:cupertino-flat"))
+            api(project(":composestyled:implementations:cupertino-liquid"))
+            api(project(":composestyled:implementations:fluent2"))
+            api(project(":composestyled:implementations:material3"))
+            // additional themes fitting all platforms
+            api(project(":composestyled:themes:pastel"))
+            api(project(":composestyled:themes:nature"))
 
         }
 

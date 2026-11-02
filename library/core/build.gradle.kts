@@ -3,7 +3,7 @@ import com.michaelflisar.kmpdevtools.Targets
 import com.michaelflisar.kmpdevtools.configs.AndroidLibraryConfig
 import com.michaelflisar.kmpdevtools.configs.LibraryModuleConfig
 import com.michaelflisar.kmpdevtools.setupDependencies
-import com.michaelflisar.kmpdevtools.core.Platform
+import com.michaelflisar.kmpdevtools.core.Target
 
 plugins {
     // kmp + app/library
@@ -29,7 +29,13 @@ plugins {
 
 val module = LibraryModuleConfig.read(project)
 
-val buildTargets = Targets(Platform.ANDROID, Platform.IOS, Platform.WINDOWS, Platform.MACOS, Platform.WASM)
+val buildTargets = Targets(
+    Target.ANDROID,
+    Target.IOS,
+    Target.JVM,
+    Target.MACOS,
+    Target.WASM
+)
 
 val androidConfig = AndroidLibraryConfig.create(
     libraryModuleConfig = module,
@@ -67,13 +73,20 @@ kotlin {
         // custom source sets
         // ---------------------
 
+        val iosMain = create("iosMain") { dependsOn(commonMain.get()) }
+
         val featureCustomScrollbarMain = create("featureCustomScrollbarMain") { dependsOn(commonMain.get()) }
         val featureFoundationScrollbarMain = create("featureFoundationScrollbarMain") { dependsOn(commonMain.get()) }
 
+        val nonMobileMain = create("nonMobileMain") { dependsOn(commonMain.get()) }
+
         setupDependencies(module, buildTargets, sourceSets) {
 
-            featureCustomScrollbarMain supportedBy Platform.ANDROID
-            featureFoundationScrollbarMain supportedBy !Platform.ANDROID
+            Target.IOS addSourceSet iosMain
+
+            featureCustomScrollbarMain supportedBy Target.ANDROID
+            featureFoundationScrollbarMain supportedBy !Target.ANDROID
+            nonMobileMain supportedBy !Target.LIST_MOBILE
 
         }
         // ---------------------
@@ -86,6 +99,7 @@ kotlin {
             api(libs.jetbrains.compose.components.resources)
             api(libs.jetbrains.compose.foundation)
             api(libs.jetbrains.kotlinx.coroutines.core)
+            api(libs.jetbrains.kotlinx.datetime)
 
         }
 

@@ -1,17 +1,30 @@
-`StyledIconButton` is a separately registered control with the semantic roles
-`Primary`, `Secondary` and `Tertiary`, matching `StyledButton`. Each theme maps
-these roles to its own icon-button styles. It supports `shape`, `interactionSource`
-and `StyledIconButtonDefaults.customize(CustomColors, border)`, and is registered by all three built-in
-themes. The content overload accepts an arbitrary composable slot; the
-`IconComposable` overload applies the configured icon size and optional padding.
-Use `StyledPrimaryIconButton`, `StyledSecondaryIconButton` or
-`StyledTertiaryIconButton` as convenience functions.
+# Icon buttons
+
+`StyledIconButton()` is a separately registered control whose default
+`Role.Default` is resolved by the active theme and surrounding context. Set
+`role = StyledIconButton.Role.Primary`, `Secondary` or `Tertiary` only when you
+intentionally want that emphasis; explicit roles retain their mapping even in
+toolbars, dialogs and snackbars. It supports `shape`, `interactionSource` and
+`StyledIconButtonDefaults.customize(CustomColors, border)`, and is registered
+by all three built-in themes. The content overload accepts an arbitrary
+composable slot; the `IconComposable` overload applies the configured icon size
+and optional padding.
 
 | Theme | Primary | Secondary | Tertiary |
 |-------|---------|-----------|----------|
 | Material 3 | Filled | Outlined | Standard |
-| Cupertino | Filled | Filled tonal | Standard |
+| Cupertino | Filled tonal | Gray | Standard |
 | Fluent 2 | Filled | Neutral secondary | Standard |
+
+Cupertino uses an accent-tinted Primary icon button, a neutral gray Secondary
+icon button with accent-colored content, and an unfilled accent Tertiary.
+
+Renderer `RoleMapping` callbacks receive `(role, context)`. For the default
+role, Material 3, Cupertino and Fluent 2 use Standard icon buttons in modal,
+snackbar, toolbar, input-action and clickable GroupBox contexts. Outside those
+contexts, the defaults above are unchanged. Custom mappings can delegate with
+`ThemeIconButton.DefaultRoleMapping(role, context)`. See [modal actions](Dialog.md)
+for structured labels, automatic toolbar presentation and explicit icon actions.
 
 Fluent 2 buttons and icon buttons share an internal color resolver for default,
 hover, pressed and disabled states. Secondary uses a neutral surface and a

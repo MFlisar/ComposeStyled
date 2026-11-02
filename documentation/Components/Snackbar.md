@@ -1,11 +1,12 @@
 Snackbars support action/dismiss slots and an action on a separate line.
-  Cupertino and Fluent 2 expose `contentPadding` in their renderer `defaults(...)`
-  factories (by default, `padding.large` horizontally and `padding.small` vertically).
-  For example, configure the theme with
-  `snackbar = CupertinoSnackbar.create(defaults = CupertinoSnackbar.defaults(contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp)))`.
+  Cupertino and Fluent 2 ship `contentPadding` in their fixed `StyledSnackbar.Defaults`
+  (by default, `padding.large` horizontally and `padding.small` vertically).
+  For example, customize it with
+  `StyledTheme(customization = { update(StyledSnackbar.DefaultsKey) { copy(contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp)) } })`.
   This controls the snackbar's inner padding, including host-created snackbars;
   host outer padding is unchanged. Material 3 retains its native snackbar padding.
-  The standard dismiss action uses `StyledTertiaryIconButton`. Cupertino and
+  The standard dismiss action uses `StyledIconButton()` with the default role,
+  allowing each theme to choose a snackbar-appropriate style. Cupertino and
   Fluent 2 derive the minimum content-row height directly from the larger of
   `StyledTheme.sizes.minimumInteractiveSize` and `iconSize`, keeping single-line
   messages equally tall with or without that icon. Multiline text and larger

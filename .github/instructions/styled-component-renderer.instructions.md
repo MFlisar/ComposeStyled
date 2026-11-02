@@ -13,26 +13,31 @@ and the consistency checklist, follow
 
 1. Add `<Theme>X : StyledX.Implementation` under the corresponding
    implementation module's `commonMain` package, for Cupertino, Fluent 2 and
-   Material 3. Follow the internal-constructor/public-composable-`create(...)`
+   Material 3. Mirror the Core API's functional category: structural containers
+   such as Scaffold, dialogs and bottom sheets use the theme's `layout` package;
+   controls and content components use `components`. Apply the same distinction
+   to shared Foundation renderers and their layout-specific helpers.
+   Follow the internal-constructor/public-composable-`create(...)`
    pattern. Keep renderer instances stable at each composition call site:
    parameterless factories use `remember { ... }`; configurable factories use
-   `remember(...)` with every constructor parameter as a key, including defaults
-   and role, variant or context mappings. Evaluate composable defaults before the
-   `remember` calculation. Pass a `StyledThemeProvider` to `StyledTheme`.
+   `remember(...)` with every constructor parameter as a key, including
+   role, variant or context mappings. Defaults are not constructor parameters:
+   a renderer with defaults exposes one fixed value through
+   `override val defaults: StyledX.Defaults @Composable get() = StyledX.Defaults(...)` declared directly in the class body. Pass a `StyledThemeProvider` to `StyledTheme`.
    Styled token locals are provided first, then `provider.Root` is applied.
    Only inside that root does `provider.definition()` call `xThemeDefinition()`,
    so factory defaults can read both Styled tokens and native theme locals.
-   Keep renderer creation inside the composable `registerDefaultComponents`
-   callback, not the provider constructor. The provider's definition factory
-   runs the default and custom registration callbacks through
-   `StyledRegistry.createComposable`; `StyledThemeDefinition` holds only name
-   and registry. `rememberXTheme()` remembers the provider, keyed by its root
-   configuration and both registration callbacks, without creating renderers.
-   Do not add per-component implementation parameters to theme factories for
-   registry replacement. Register default renderers through the theme's
-   `registerXComponents()` helper; callers can replace entries through
-   `registerCustomComponents`. Keep any actual theme-factory configuration
-   values in the factory's own `remember` keys.
+   Keep renderer creation inside the composable `registerXComponents()` helper,
+   not the provider constructor. The provider's definition factory
+   runs that helper through `StyledRegistry.createComposable`;
+   `StyledThemeDefinition` holds only name and registry. `rememberXThemeProvider()`
+   remembers the provider, keyed by its root configuration only, without
+   creating renderers. Theme factories take no registration callbacks and no
+   per-component implementation parameters. Register default renderers through
+   the theme's `registerXComponents()` helper; callers replace entries and
+   adjust defaults through the single `StyledTheme(customization = ...)` block
+   (`register(...)` first, then `update(DefaultsKey) { copy(...) }`). Keep any actual theme-factory
+   configuration values in the factory's own `remember` keys.
    Material 3 renderers adapt native Material 3 controls. Cupertino
    and Fluent 2 may implement distinct Foundation-based behavior, as their
    buttons do, or delegate identical rendering to a shared Foundation class,
@@ -45,14 +50,17 @@ and the consistency checklist, follow
    `ProvideCustomStyledContentLocals`; inside native Material 3 content slots,
    use `CopyMaterialThemeLocals` like `Material3Button` so nested `StyledText`
    and `StyledIcon` inherit the control's actual styling.
-3. Wire the component into **all three** theme registration helpers:
-   `registerCupertinoComponents()`, `registerFluent2Components()` and
+3. Wire the component into **all four** theme registration helpers:
+   `registerCupertinoFlatComponents()`, `registerCupertinoLiquidComponents()`,
+   `registerFluent2Components()` and
    `registerMaterial3Components()`. Each helper registers its theme renderer
-   with    `register(ThemeX.create())`; the implementation contract supplies its own
-   key. Do not add a separate
-   component implementation parameter to the `remember*Theme` factories;
-   callers can replace defaults through `registerCustomComponents`, which runs
-   after the default registration callback. Missing registrations fail at
+   with `register(ThemeX.create())`; the implementation contract supplies its own
+   key and, for components with defaults, its `DefaultsKey` value, so keep one
+   `register(...)` call per component and no separate defaults registration. Do
+   not add a separate component implementation parameter to the `remember*Theme`
+   factories; callers replace renderers and update defaults through
+   `StyledTheme(customization)`, which runs after the default registrations.
+   Missing registrations fail at
    lookup. Scoped replacements use `UpdateStyledRegistry` and inherit other
    entries from the parent registry.
 4. Follow Cupertino and Fluent 2 design guidelines in their respective
@@ -70,7 +78,8 @@ and the consistency checklist, follow
 Cupertino and Fluent 2 theme-definition functions must register their own
 theme-named implementation classes, not reference `FoundationX` renderers
 directly. When both themes share Foundation rendering, add a thin
-`CupertinoX`/`Fluent2X` adapter in that theme's `components` package and delegate
+`CupertinoX`/`Fluent2X` adapter in that theme's matching `layout` or `components`
+package and delegate
 to the shared renderer through its supported public constructor or composable
 factory. Prefer the renderer's `create(...)` factory when available. Keep
 theme-specific defaults on the adapter; the theme definition should use only
@@ -92,8 +101,10 @@ implementations. Omit unused sections without renumbering the remaining ones.
 ```kotlin
 class ThemeX internal constructor(
     val roleMapping: RoleMapping,
-    override val defaults: StyledX.Defaults,
 ) : StyledX.Implementation {
+
+    override val defaults: StyledX.Defaults
+        @Composable get() = StyledX.Defaults(/* fixed theme values */)
 
     companion object {
 
@@ -105,17 +116,15 @@ class ThemeX internal constructor(
         // 2) mapping
         // -------------
 
-        // -------------
-        // 3) defaults
-        // -------------
-
     }
 
 }
 ```
 
-Fill the sections with the composable `create(...)` factory, mapping typealias
-and default mapping, and composable `defaults(...)` factory, respectively.
+Fill the sections with the composable `create(...)` factory and the mapping
+typealias and default mapping. Components with defaults declare their fixed
+`defaults` value directly in the class body, not in the companion; it is never
+passed to `create(...)`.
 After the companion, declare concrete renderer variants, then `Render`
 overloads, then any remaining private implementation helpers. File-level
 helpers follow the class. Do not add these declarations when unnecessary.
@@ -145,9 +154,13 @@ typealias RoleMapping = (StyledButton.Role, StyledContext) -> Variant
 
 val DefaultRoleMapping: RoleMapping = { role, context ->
     when {
-        context == StyledSnackbar.Context.SnackbarAction ||
-            context == StyledDialog.Context.DialogAction -> Variant.Text
+        role == StyledButton.Role.Default &&
+            (context == StyledSnackbar.Context.SnackbarAction ||
+                context == StyledDialog.Context.DialogAction) -> Variant.Text
+        role == StyledButton.Role.Default &&
+            context is StyledTopBar.Context -> Variant.Text
         else -> when (role) {
+            StyledButton.Role.Default,
             StyledButton.Role.Primary -> Variant.Primary
             StyledButton.Role.Secondary -> Variant.FilledTonal
             StyledButton.Role.Tertiary -> Variant.Text
@@ -162,17 +175,20 @@ and language settings. If unsupported, report the blocker rather than silently
 moving the alias or changing language settings.
 
 Expose the mapping through `create(...)`, store it on the implementation and
-include it in `remember(mapping, defaults, ...)` using the actual parameter name.
+include it in `remember(mapping, ...)` using the actual parameter name.
 Keep the default lambda in a `val` for a reusable instance. Mappings should be
 pure functions of their inputs and captured configuration. Custom mappings can
 delegate to the default mapping for cases they do not override.
 
 ## Roles, variants and context
 
-Roles describe intent, not appearance. For buttons, the target semantic API uses
-`Role.Primary`, `Role.Secondary` and `Role.Tertiary`; the renderer maps each
-role to a concrete style. Styles such as Material 3 `FilledTonal` or `Text`
-belong to the renderer, not the semantic role enum. Other components may expose
+Roles describe intent, not appearance. Button-like APIs expose
+`Role.Default`, `Role.Primary`, `Role.Secondary` and `Role.Tertiary`.
+`Role.Default` asks the renderer to choose a style from its current context; it
+is not an alias for Primary, Tertiary or a fixed appearance. Explicit roles
+remain authoritative in every context. The renderer maps each role to a
+concrete style. Styles such as Material 3 `FilledTonal` or `Text` belong to the
+renderer, not the semantic role enum. Other components may expose
 theme-neutral variants when distinct styles are part of their intended API.
 Do not add a renderer mapping solely because a component exposes variants.
 Variants with theme-neutral meaning, such as control size or title alignment,
@@ -199,8 +215,9 @@ For a context-aware component:
 - Declare an open `StyledContext` contract in Core and public context values on
   their source components so separate renderer modules can use them in mapping
   signatures. Use precise values such as `SnackbarAction`, rather than a broad
-  `Snackbar` value. Handle known contexts explicitly and fall back to the normal
-  role/variant mapping for unknown contexts.
+  `Snackbar` value. Handle known contexts explicitly for `Role.Default` and
+  fall back to normal role/variant mapping for explicit roles and unknown
+  contexts.
 - Expose the Core context local across modules with `@InternalComposeStyledApi`,
   not Kotlin `internal`. Renderers read it directly inside `Render` with
   `@OptIn(InternalComposeStyledApi::class)` and pass its current value to the
@@ -211,14 +228,14 @@ For a context-aware component:
   buttons, not around all dialog content. Siblings outside the provider retain
   their existing context; nested providers use the nearest supplied value.
 - Handle context and role or variant together in the mapping lambda. Make all
-  known contexts explicitly and provide a normal role/variant fallback because
-  `StyledContext` is open to future source components. A context may map every
-  role to the same style, such as `DialogAction` always returning `Text`. Treat
+  known contexts explicit for the default role and provide a normal role/variant
+  fallback because `StyledContext` is open to future source components.
+  Context-specific defaults must not override explicit roles. Treat
   `StyledContext.Default` and unknown contexts as normal rendering; do not
   require separate mapping classes or implicit merges.
 - Keep mappings configurable through renderer factories and include them in
   `remember` keys. A renderer may supply a design-system-specific default,
-  such as mapping every dialog-action role to Material 3 `Text`; changing
+  such as mapping the default dialog-action role to Material 3 `Text`; changing
   existing defaults is an intentional behavior change that must be documented.
 - Keep explicit customization separate from semantic roles and mapping.
   Resolve color tokens during composition and preserve the renderer's

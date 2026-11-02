@@ -1,7 +1,7 @@
 import com.michaelflisar.kmpdevtools.BuildFileUtil
 import com.michaelflisar.kmpdevtools.Targets
 import com.michaelflisar.kmpdevtools.configs.*
-import com.michaelflisar.kmpdevtools.core.Platform
+import com.michaelflisar.kmpdevtools.core.Target
 import com.michaelflisar.kmpdevtools.setupDependencies
 
 plugins {
@@ -28,7 +28,13 @@ plugins {
 
 val module = LibraryModuleConfig.read(project)
 
-val buildTargets = Targets(Platform.ANDROID, Platform.IOS, Platform.WINDOWS, Platform.MACOS, Platform.WASM)
+val buildTargets = Targets(
+    Target.ANDROID,
+    Target.IOS,
+    Target.JVM,
+    Target.MACOS,
+    Target.WASM
+)
 
 val androidConfig = AndroidLibraryConfig.create(
     libraryModuleConfig = module,
@@ -74,8 +80,10 @@ kotlin {
 
         commonMain.dependencies {
 
-            api(project(":composestyledcomponents:core"))
-            implementation(project(":composestyledcomponents:implementations:foundation"))
+            api(project(":composestyled:core"))
+            api(project(":composestyled:themes:material3"))
+            api(project(":composestyled:iconsets:material3"))
+            implementation(project(":composestyled:implementations:foundation"))
 
             implementation(libs.jetbrains.compose.material3)
 

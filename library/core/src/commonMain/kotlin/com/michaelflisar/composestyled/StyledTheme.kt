@@ -1,0 +1,258 @@
+package com.michaelflisar.composestyled
+
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import com.michaelflisar.composestyled.classes.StyledLocalMissingException
+import com.michaelflisar.composestyled.classes.StyledThemeProvider
+import com.michaelflisar.composestyled.platform.LocalPlatform
+import com.michaelflisar.composestyled.platform.Platform
+import com.michaelflisar.composestyled.platform.PlatformDefaults
+import com.michaelflisar.composestyled.registry.LocalStyledRegistry
+import com.michaelflisar.composestyled.registry.StyledRegistry
+import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
+import com.michaelflisar.composestyled.themes.StyledContrastLevel
+import com.michaelflisar.composestyled.themes.StyledThemeAppearance
+import com.michaelflisar.composestyled.themes.StyledThemeColors
+import com.michaelflisar.composestyled.themes.StyledThemeContrast
+import com.michaelflisar.composestyled.themes.StyledThemeVariant
+import com.michaelflisar.composestyled.tokens.LocalStyledColorScheme
+import com.michaelflisar.composestyled.tokens.LocalStyledContentColor
+import com.michaelflisar.composestyled.tokens.LocalStyledPadding
+import com.michaelflisar.composestyled.tokens.LocalStyledShapes
+import com.michaelflisar.composestyled.tokens.LocalStyledSizes
+import com.michaelflisar.composestyled.tokens.LocalStyledSpacing
+import com.michaelflisar.composestyled.tokens.LocalStyledTextStyle
+import com.michaelflisar.composestyled.tokens.LocalStyledThemeName
+import com.michaelflisar.composestyled.tokens.LocalStyledTypography
+import com.michaelflisar.composestyled.tokens.StyledColorScheme
+import com.michaelflisar.composestyled.tokens.StyledPadding
+import com.michaelflisar.composestyled.tokens.StyledShapes
+import com.michaelflisar.composestyled.tokens.StyledSizes
+import com.michaelflisar.composestyled.tokens.StyledSpacing
+import com.michaelflisar.composestyled.tokens.StyledTypography
+import com.michaelflisar.composestyled.ui.layout.LocalFloatingDialogHost
+import com.michaelflisar.composestyled.ui.layout.StyledFloatingHost
+
+object StyledTheme {
+
+    @Immutable
+    data class Behavior(
+        val showScrollbars: Boolean = true,
+    )
+
+    enum class ContentColorFallback {
+        /** Selects black or white according to which provides the higher contrast. */
+        BlackWhite,
+        LocalContentColor
+    }
+
+    val platform: Platform
+        @Composable @ReadOnlyComposable get() = LocalPlatform.current
+
+    val themeName: String
+        @Composable @ReadOnlyComposable get() = LocalStyledThemeName.current
+
+    val colorScheme: StyledColorScheme
+        @Composable @ReadOnlyComposable get() = LocalStyledColorScheme.current
+
+    val typography: StyledTypography
+        @Composable @ReadOnlyComposable get() = LocalStyledTypography.current
+
+    val shapes: StyledShapes
+        @Composable @ReadOnlyComposable get() = LocalStyledShapes.current
+
+    val padding: StyledPadding
+        @Composable @ReadOnlyComposable get() = LocalStyledPadding.current
+
+    val spacing: StyledSpacing
+        @Composable @ReadOnlyComposable get() = LocalStyledSpacing.current
+
+    val sizes: StyledSizes
+        @Composable @ReadOnlyComposable get() = LocalStyledSizes.current
+
+    val behavior: Behavior
+        @Composable @ReadOnlyComposable get() = LocalStyledBehavior.current
+
+    // ----------------------
+    // theme properties (locals, often times overridden locally inside components)
+    // ----------------------
+
+    val currentContentColor: Color
+        @Composable @ReadOnlyComposable get() = LocalStyledContentColor.current
+
+    val currentTextStyle: TextStyle
+        @Composable @ReadOnlyComposable get() = LocalStyledTextStyle.current
+
+    // ---------------------
+    // functions
+    // ---------------------
+
+    /**
+     * Returns the matching theme content color, or [fallback] when no matching color is defined.
+     * The [ContentColorFallback.BlackWhite] option selects the color with the higher contrast.
+     *
+     * Inverse matching may not work well with black/white content colors, so [checkInversely] is
+     * disabled by default.
+     */
+    @Composable
+    @ReadOnlyComposable
+    fun contentColorFor(
+        backgroundColor: Color,
+        checkInversely: Boolean = false,
+        fallback: ContentColorFallback = ContentColorFallback.LocalContentColor,
+    ): Color {
+        val def = colorScheme.allDefinitions
+        // first - check all definitions
+        // if backgroundColor is a "color", return the corresponding "onColor"
+
+        for (d in def) {
+            if (backgroundColor == d.color) {
+                return d.onColor
+            }
+        }
+        // second - check inversely
+        // if backgroundColor is an "onColor", return the corresponding "color"
+
+        if (checkInversely) {
+            for (d in def) {
+                if (backgroundColor == d.onColor) {
+                    return d.color
+                }
+            }
+        }
+        // fallback
+
+        return when (fallback) {
+            ContentColorFallback.BlackWhite -> backgroundColor.onColorByContrastRatio()
+
+            ContentColorFallback.LocalContentColor -> LocalStyledContentColor.current
+        }
+    }
+}
+
+/**
+ * Applies Styled tokens and the provider root before creating the theme definition.
+ */
+@Composable
+fun StyledTheme(
+    platform: Platform,
+    themeProvider: StyledThemeProvider,
+    themeColors: StyledThemeColors = themeProvider.defaultThemeColors,
+    themeVariant: StyledThemeVariant = StyledThemeVariant.Colorful,
+    themeAppearance: StyledThemeAppearance = StyledThemeAppearance.System,
+    themeContrast: StyledThemeContrast = StyledThemeContrast.System,
+    typography: StyledTypography = PlatformDefaults.typography(platform),
+    shapes: StyledShapes = PlatformDefaults.shapes(platform),
+    paddings: StyledPadding = PlatformDefaults.paddings(platform),
+    spacings: StyledSpacing = PlatformDefaults.spacings(platform),
+    sizes: StyledSizes = PlatformDefaults.sizes(platform),
+    behavior: StyledTheme.Behavior = StyledTheme.Behavior(
+        showScrollbars = PlatformDefaults.showScrollbars(platform)
+    ),
+    customization: (@Composable StyledRegistry.Builder.() -> Unit)? = null,
+    content: @Composable () -> Unit,
+) {
+    val isDark = when (themeAppearance) {
+        StyledThemeAppearance.System -> isSystemInDarkTheme()
+        StyledThemeAppearance.Light -> false
+        StyledThemeAppearance.Dark -> true
+    }
+    val contrast = when (themeContrast) {
+        StyledThemeContrast.System -> PlatformDefaults.systemContrastLevel()
+        StyledThemeContrast.Normal -> StyledContrastLevel.Normal
+        StyledThemeContrast.Medium -> StyledContrastLevel.Medium
+        StyledThemeContrast.High -> StyledContrastLevel.High
+    }
+    val colors = themeColors.resolve(themeVariant, isDark, contrast)
+
+    CompositionLocalProvider(
+        LocalPlatform provides platform,
+        // styles
+        LocalStyledColorScheme provides colors,
+        LocalStyledTypography provides typography,
+        LocalStyledShapes provides shapes,
+        LocalStyledPadding provides paddings,
+        LocalStyledSpacing provides spacings,
+        LocalStyledTextStyle provides typography.bodyMedium,
+        LocalStyledContentColor provides colors.onBackground,
+        LocalStyledSizes provides sizes,
+        LocalStyledBehavior provides behavior,
+    ) {
+        themeProvider.Root {
+            val definition = themeProvider.definition()
+            val defaultRegistry = StyledRegistry.createComposable(definition.registry) {
+                register(themeProvider.defaultIconSet)
+            }
+            val registry = customization?.let {
+                StyledRegistry.createComposable(defaultRegistry, it)
+            } ?: defaultRegistry
+            CompositionLocalProvider(
+                LocalStyledThemeName provides definition.name,
+                LocalStyledRegistry provides registry,
+            ) {
+                ProvideFloatingHostIfMissing(content)
+            }
+        }
+    }
+}
+
+@Composable
+@OptIn(InternalComposeStyledApi::class)
+private fun ProvideFloatingHostIfMissing(content: @Composable () -> Unit) {
+    if (LocalFloatingDialogHost.current == null) {
+        StyledFloatingHost(content = content)
+    } else {
+        content()
+    }
+}
+
+internal val LocalStyledBehavior = staticCompositionLocalOf<StyledTheme.Behavior> {
+    throw StyledLocalMissingException("LocalStyledBehavior")
+}
+
+/**
+ * convenience function to provide a custom content color and text style for the content inside this composable.
+ * If the contentColor or textStyle is null or unspecified, the current values will be used.
+ */
+@InternalComposeStyledApi
+@Composable
+fun UpdateStyledThemeLocals(
+    contentColor: Color? = null,
+    textStyle: TextStyle? = null,
+    content: @Composable () -> Unit,
+) {
+    if ((contentColor == null || contentColor == Color.Unspecified) && textStyle == null) {
+        content()
+        return
+    }
+
+    CompositionLocalProvider(
+        LocalStyledContentColor provides (contentColor ?: StyledTheme.currentContentColor),
+        LocalStyledTextStyle provides (textStyle ?: StyledTheme.currentTextStyle),
+        content = content
+    )
+}
+
+/**
+ * convenience function to provide a custom [StyledRegistry] for the content inside this composable.
+ */
+@Composable
+fun UpdateStyledCustomization(
+    update: @Composable StyledRegistry.Builder.() -> Unit,
+    content: @Composable () -> Unit,
+) {
+    val parentRegistry = LocalStyledRegistry.current
+    val childRegistry = StyledRegistry.createComposable(parentRegistry, update)
+
+    CompositionLocalProvider(
+        LocalStyledRegistry provides childRegistry,
+    ) {
+        content()
+    }
+}

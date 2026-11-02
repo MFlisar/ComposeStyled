@@ -1,5 +1,5 @@
 `StyledHorizontalDivider` and `StyledVerticalDivider` are generic Foundation
-components in `com.michaelflisar.composestyledcomponents.common`; they work with
+components in `com.michaelflisar.composestyled.common`; they work with
 all themes without an additional registry entry. Both accept `modifier`,
 `thickness` (default `1.dp`) and `color` (default
 `StyledTheme.colorScheme.outlineVariant`). Use `Dp.Hairline` for a

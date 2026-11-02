@@ -7,7 +7,7 @@ theme supplies their appearance and behavior.
 ```kotlin
 StyledTheme(
     platform = platform,
-    theme = rememberMaterial3Theme(),
+    themeProvider = rememberMaterial3ThemeProvider(),
 ) {
     StyledButton(onClick = { /* Handle the action */ }) {
         StyledText("Continue")
@@ -17,3 +17,29 @@ StyledTheme(
 
 Browse the [component guides](documentation/Components/), [module overviews](documentation/Modules/)
 and [advanced guides](documentation/Advanced/) for details.
+
+Scrollbar indicators default to the platform policy: visible on desktop and web,
+hidden on mobile. The same `behavior` setting controls indicators on scrollbar
+containers, menus, scrollable tabs and lazy layouts; hiding an indicator does
+not disable scrolling. To suppress them throughout a themed subtree, set
+`behavior` on `StyledTheme`:
+
+```kotlin
+StyledTheme(
+    platform = platform,
+    themeProvider = rememberMaterial3ThemeProvider(),
+    behavior = StyledTheme.Behavior(showScrollbars = false),
+) {
+    // Styled content
+}
+```
+
+[`StyledDialog`](documentation/Components/Dialog.md) uses one state and
+three-action button API with dialog, toolbar-dialog, fullscreen and bottom-sheet
+styles. Its default style is registry-configurable; the adaptive utilities in
+`com.michaelflisar.composestyled.adaptive` expose an observable dialog style
+from the host window size; read `.value` for the current style. Embedded
+`StyledBottomSheet` remains a separate non-modal overlay with the same state and
+button model. See the
+[Adaptive layouts guide](documentation/Components/Adaptive.md) for its
+Scaffold and master/detail layouts, decision policies and Navigation 3 boundary.

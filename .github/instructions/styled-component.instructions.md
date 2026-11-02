@@ -13,6 +13,15 @@ matching Kotlin files.
 - [Theme renderers and mappings](styled-component-renderer.instructions.md)
 - [Layouts, compounds and consistency review](styled-component-compounds.instructions.md)
 
+## Design-system reference
+
+When implementing or reviewing a theme renderer's visual or interaction
+behavior, consult the [design-system guide](../../.guidelines/README.md) and the
+relevant Material 3, Cupertino or Fluent 2 page. Apply component-specific
+guidance in its platform context; these references inform design analysis but
+do not replace the component contracts or source-of-truth implementation
+requirements above.
+
 ## Kotlin comment spacing
 
 Keep structural section-comment blocks used by the component and renderer file

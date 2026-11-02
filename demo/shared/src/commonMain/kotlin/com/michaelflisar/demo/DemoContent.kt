@@ -1,333 +1,223 @@
 package com.michaelflisar.demo
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Build
-import androidx.compose.material.icons.filled.GridView
-import androidx.compose.material.icons.filled.HorizontalRule
-import androidx.compose.material.icons.filled.KeyboardDoubleArrowRight
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Style
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.Stable
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import com.michaelflisar.composestyledcomponents.StyledTheme
-import com.michaelflisar.composestyledcomponents.classes.toIconComposable
-import com.michaelflisar.composestyledcomponents.cupertino.rememberCupertinoTheme
-import com.michaelflisar.composestyledcomponents.fluent2.rememberFluent2Theme
-import com.michaelflisar.composestyledcomponents.material3.rememberMaterial3Theme
-import com.michaelflisar.composestyledcomponents.platform.Platform
-import com.michaelflisar.composestyledcomponents.tokens.autoStyledColors
-import com.michaelflisar.composestyledcomponents.tokens.darkStyledColors
-import com.michaelflisar.composestyledcomponents.tokens.lightStyledColors
-import com.michaelflisar.composestyledcomponents.ui.components.StyledBottomNavigationBar
-import com.michaelflisar.composestyledcomponents.ui.components.StyledFloatingActionButton
-import com.michaelflisar.composestyledcomponents.ui.components.StyledIcon
-import com.michaelflisar.composestyledcomponents.ui.components.StyledNavigationItem
-import com.michaelflisar.composestyledcomponents.ui.components.StyledNavigationRail
-import com.michaelflisar.composestyledcomponents.ui.components.StyledScaffold
-import com.michaelflisar.composestyledcomponents.ui.components.StyledSnackbarHost
-import com.michaelflisar.composestyledcomponents.ui.components.StyledSnackbarHostState
-import com.michaelflisar.composestyledcomponents.ui.components.StyledSnackbarResult
-import com.michaelflisar.composestyledcomponents.ui.components.StyledSurface
-import com.michaelflisar.composestyledcomponents.ui.components.StyledSwitch
-import com.michaelflisar.composestyledcomponents.ui.components.StyledTopBar
-import com.michaelflisar.composestyledcomponents.ui.layout.StyledRow
-import com.michaelflisar.composestyledcomponents.ui.layout.StyledSpacedColumn
-import com.michaelflisar.composestyledcomponents.ui.layout.StyledSpacedRow
-import com.michaelflisar.composestyledcomponents.ui.layout.StyledVerticalScrollbarContainer
-import com.michaelflisar.composestyledcomponents.ui.primitives.StyledHorizontalSpacer
-import com.michaelflisar.composestyledcomponents.ui.primitives.StyledText
-import com.michaelflisar.composestyledcomponents.ui.primitives.StyledVerticalDivider
-import com.michaelflisar.demo.demos.DemoButtons
-import com.michaelflisar.demo.demos.DemoCard
-import com.michaelflisar.demo.demos.DemoChips
-import com.michaelflisar.demo.demos.DemoCheckboxes
-import com.michaelflisar.demo.demos.DemoCustom
-import com.michaelflisar.demo.demos.DemoDividers
-import com.michaelflisar.demo.demos.DemoDropdowns
-import com.michaelflisar.demo.demos.DemoExpandableSections
-import com.michaelflisar.demo.demos.DemoGroupBox
-import com.michaelflisar.demo.demos.DemoIcons
-import com.michaelflisar.demo.demos.DemoInformationRow
-import com.michaelflisar.demo.demos.DemoInputs
-import com.michaelflisar.demo.demos.DemoInteractionBlocker
-import com.michaelflisar.demo.demos.DemoLayouts
-import com.michaelflisar.demo.demos.DemoNumberPicker
-import com.michaelflisar.demo.demos.DemoPicker
-import com.michaelflisar.demo.demos.DemoPopup
-import com.michaelflisar.demo.demos.DemoPrimitives
-import com.michaelflisar.demo.demos.DemoProgressIndicators
-import com.michaelflisar.demo.demos.DemoRadioButtons
-import com.michaelflisar.demo.demos.DemoSegmentedButtons
-import com.michaelflisar.demo.demos.DemoSurfaces
-import com.michaelflisar.demo.demos.DemoSwitches
-import com.michaelflisar.demo.demos.DemoTabs
-import com.michaelflisar.demo.demos.DemoTooltip
-import com.michaelflisar.demo.demos.ScaffoldExamples
-import com.michaelflisar.demo.helper.DropdownWithButtons
-import com.michaelflisar.demo.helper.ExpandState
+import com.michaelflisar.composestyled.StyledTheme
+import com.michaelflisar.composestyled.classes.toIconComposable
+import com.michaelflisar.composestyled.platform.Platform
+import com.michaelflisar.composestyled.platform.PlatformDefaults
+import com.michaelflisar.composestyled.platform.SystemBarStyleEffect
+import com.michaelflisar.composestyled.platform.WindowMode
+import com.michaelflisar.composestyled.platform.currentPlatform
+import com.michaelflisar.composestyled.platform.rememberWindowEnvironment
+import com.michaelflisar.composestyled.platform.systemBarIconStyleFor
+import com.michaelflisar.composestyled.themes.StyledThemeAppearance
+import com.michaelflisar.composestyled.themes.StyledThemeColors
+import com.michaelflisar.composestyled.themes.StyledThemeColorsCollection
+import com.michaelflisar.composestyled.themes.StyledThemeContrast
+import com.michaelflisar.composestyled.themes.StyledThemeVariant
+import com.michaelflisar.composestyled.ui.components.StyledButton
+import com.michaelflisar.composestyled.ui.components.StyledDropdownIndex
+import com.michaelflisar.composestyled.ui.components.StyledSurface
+import com.michaelflisar.composestyled.ui.layout.StyledColumn
+import com.michaelflisar.composestyled.ui.layout.StyledDialog
+import com.michaelflisar.composestyled.ui.layout.StyledGrid
+import com.michaelflisar.composestyled.ui.layout.StyledScaffold
+import com.michaelflisar.composestyled.ui.layout.StyledVerticalScrollbarContainer
+import com.michaelflisar.composestyled.ui.primitives.StyledText
+import com.michaelflisar.composestyled.ui.specials.StyledThemeColorsPicker
+import com.michaelflisar.composestyled.ui.state.rememberDialogState
+import com.michaelflisar.demo.custom.StyledCustomComponent
+import com.michaelflisar.demo.helper.DemoTopBar
 import com.michaelflisar.demo.helper.SubTitle
-import com.michaelflisar.demo.helper.rememberExpandState
-import kotlinx.coroutines.launch
+import kotlin.math.ceil
 
-@Stable
-class DemoArea(
-    val name: String,
-    val imageVector: ImageVector,
-    val expandState: ExpandState,
-    val contents: List<@Composable (baseId: Int, expandState: ExpandState) -> Unit>,
-)
 
 @Composable
 fun DemoContent() {
 
-    val selectedPlatformIndex = remember { mutableStateOf(0) }
-    val selectedThemeIndex = remember { mutableStateOf(0) }
-    val selectedDestination = remember { mutableStateOf(0) }
-    val useRail = remember { mutableStateOf(false) }
-    val expandSingleTestOnly = remember { mutableStateOf(true) }
+    // 1) Host platform
+    val hostPlatform = currentPlatform()
+    val selectedPlatformIndex =
+        rememberSaveable { mutableStateOf(Platform.entries.indexOf(hostPlatform).coerceAtLeast(0)) }
+    val selectedPlatform = Platform.entries[selectedPlatformIndex.value]
 
-    val expandState1 = rememberExpandState(
-        singleOnly = expandSingleTestOnly.value,
-        initialExpandedIds = setOf(0)
-    )
-    val expandState2 = rememberExpandState(
-        singleOnly = expandSingleTestOnly.value,
-        initialExpandedIds = setOf(0)
-    )
-    val expandState3 = rememberExpandState(
-        singleOnly = expandSingleTestOnly.value,
-        initialExpandedIds = setOf(0)
-    )
-    val expandState4 = rememberExpandState(
-        singleOnly = expandSingleTestOnly.value,
-        initialExpandedIds = setOf(0)
-    )
-    val expandState5 = rememberExpandState(
-        singleOnly = expandSingleTestOnly.value,
-        initialExpandedIds = setOf(0)
-    )
-    val expandState6 = rememberExpandState(
-        singleOnly = expandSingleTestOnly.value,
-        initialExpandedIds = setOf(0)
-    )
+    // 2) initial implementation index based on host platform
+    val initialImplementationIndex = when (hostPlatform.os) {
+        Platform.OS.Android -> 1 // Material 3
+        Platform.OS.IOS -> 2 // Cupertino Flat
+        else -> 0 // Fluent 2
+    }
+    val selectedImplementationIndex =
+        rememberSaveable { mutableStateOf(initialImplementationIndex) }
+    val selectedThemeProvider =
+        Definitions.ImplementationCollections[selectedImplementationIndex.value].second()
 
-    val scope = rememberCoroutineScope()
-    val snackbarState = remember { StyledSnackbarHostState() }
-    val showMessage: (String) -> Unit = { message ->
-        scope.launch {
-            snackbarState.currentSnackbarData?.dismiss()
-            snackbarState.showSnackbar(message)
-        }
-    }
-    val showSnackbarWithUndo: (String) -> Unit = { message ->
-        scope.launch {
-            snackbarState.currentSnackbarData?.dismiss()
-            val result = snackbarState.showSnackbar(
-                message = message,
-                actionLabel = "Undo",
-                withDismissAction = true,
-            )
-            if (result == StyledSnackbarResult.ActionPerformed) {
-                snackbarState.showSnackbar("Undo clicked")
-            }
-        }
-    }
+    // 3) theme settings
+    val themeColors = rememberSaveable(
+        demoThemeColorsKey(selectedThemeProvider.defaultThemeColors, Definitions.ThemeCollections),
+        saver = demoThemeColorsSaver(
+            selectedThemeProvider.defaultThemeColors,
+            Definitions.ThemeCollections
+        ),
+    ) { mutableStateOf(selectedThemeProvider.defaultThemeColors) }
+    val themeVariant = rememberSaveable { mutableStateOf(StyledThemeVariant.Colorful) }
+    val themeAppearance = rememberSaveable { mutableStateOf(StyledThemeAppearance.Light) }
+    val themeContrast = rememberSaveable { mutableStateOf(StyledThemeContrast.System) }
 
-    LaunchedEffect(expandState1.expandedIds.toList()) {
-        println("DemoContent: expandState1 = ${expandState1.expandedIds.toList()}")
-    }
-    // sort demos inside areas alphabetically to make it easier to find stuff
+    val dialogSetup = rememberDialogState(initialVisible = true)
+    val showSetupPanel = rememberSaveable { mutableStateOf(true) }
+    val demoStateHolder = rememberSaveableStateHolder()
 
-    val areas = remember {
-        println("DemoContent: recomposing areas")
-        listOf(
-            DemoArea(
-                name = "Components",
-                imageVector = Icons.Default.List,
-                expandState = expandState1,
-                contents = listOf<@Composable (baseId: Int, expandState: ExpandState) -> Unit>(
-                    { baseId, expandState -> DemoButtons(baseId, expandState, showMessage) },
-                    { baseId, expandState -> DemoCard(baseId, expandState) },
-                    { baseId, expandState -> DemoCheckboxes(baseId, expandState) },
-                    { baseId, expandState -> DemoChips(baseId, expandState) },
-                    { baseId, expandState -> DemoDropdowns(baseId, expandState) },
-                    { baseId, expandState -> DemoIcons(baseId, expandState) },
-                    { baseId, expandState -> DemoInputs(baseId, expandState) },
-                    { baseId, expandState ->
-                        DemoInteractionBlocker(
-                            baseId,
-                            expandState,
-                            showMessage
-                        )
-                    },
-                    { baseId, expandState -> DemoNumberPicker(baseId, expandState) },
-                    { baseId, expandState -> DemoPicker(baseId, expandState, showMessage) },
-                    { baseId, expandState -> DemoPopup(baseId, expandState) },
-                    { baseId, expandState -> DemoProgressIndicators(baseId, expandState) },
-                    { baseId, expandState -> DemoRadioButtons(baseId, expandState) },
-                    { baseId, expandState -> DemoSegmentedButtons(baseId, expandState) },
-                    { baseId, expandState -> DemoSurfaces(baseId, expandState) },
-                    { baseId, expandState -> DemoSwitches(baseId, expandState) },
-                    { baseId, expandState -> DemoTabs(baseId, expandState) },
-                    { baseId, expandState -> DemoTooltip(baseId, expandState) }
-                )
-            ),
-            DemoArea(
-                name = "Scaffold + Sub Elements",
-                imageVector = Icons.Default.KeyboardDoubleArrowRight,
-                expandState = expandState2,
-                contents = listOf<@Composable (baseId: Int, expandState: ExpandState) -> Unit>(
-                    { baseId, expandState ->
-                        ScaffoldExamples(
-                            baseId,
-                            expandState,
-                            { showSnackbarWithUndo("Changes saved") })
-                    }
-                )
-            ),
-            DemoArea(
-                name = "Layout",
-                imageVector = Icons.Default.GridView,
-                expandState = expandState3,
-                contents = listOf<@Composable (baseId: Int, expandState: ExpandState) -> Unit>(
-                    { baseId, expandState -> DemoLayouts(baseId, expandState) }
-                )
-            ),
-            DemoArea(
-                name = "Primitives",
-                imageVector = Icons.Default.HorizontalRule,
-                expandState = expandState4,
-                contents = listOf<@Composable (baseId: Int, expandState: ExpandState) -> Unit>(
-                    { baseId, expandState -> DemoDividers(baseId, expandState) },
-                    { baseId, expandState -> DemoPrimitives(baseId, expandState, showMessage) }
-                )
-            ),
-            DemoArea(
-                name = "Specials",
-                imageVector = Icons.Default.Style,
-                expandState = expandState5,
-                contents = listOf<@Composable (baseId: Int, expandState: ExpandState) -> Unit>(
-                    { baseId, expandState -> DemoExpandableSections(baseId, expandState) },
-                    { baseId, expandState -> DemoGroupBox(baseId, expandState) },
-                    { baseId, expandState -> DemoInformationRow(baseId, expandState) },
-                )
-            ),
-            DemoArea(
-                name = "Custom",
-                imageVector = Icons.Default.Build,
-                expandState = expandState6,
-                contents = listOf<@Composable (baseId: Int, expandState: ExpandState) -> Unit>(
-                    { baseId, expandState -> DemoCustom(baseId, expandState) },
-                )
-            ),
-        )
-    }
-
-    val navigationItems = remember {
-        areas.mapIndexed { index, area ->
-            StyledNavigationItem(
-                key = index,
-                label = { StyledText(area.name) },
-                icon = {
-                    StyledIcon(
-                        icon = area.imageVector.toIconComposable(),
-                        contentDescription = null
-                    )
-                },
-            )
-        }
-    }
 
     StyledTheme(
-        platform = Platform.ALL[selectedPlatformIndex.value],
-        theme = when (Platform.ALL[selectedPlatformIndex.value]) {
-            Platform.Android -> rememberMaterial3Theme(
-                registerCustomComponents = {
-                    register(StyledCustomComponent(StyledCustomComponent.Variant.Primary))
-                },
-            )
+        platform = selectedPlatform,
+        themeProvider = selectedThemeProvider,
+        themeColors = themeColors.value,
+        themeVariant = themeVariant.value,
+        themeAppearance = themeAppearance.value,
+        themeContrast = themeContrast.value,
+        behavior = StyledTheme.Behavior(
+            showScrollbars = PlatformDefaults.showScrollbars(hostPlatform),
+        ),
+        customization = {
 
-            is Platform.Desktop -> rememberFluent2Theme(
-                registerCustomComponents = {
-                    register(StyledCustomComponent(StyledCustomComponent.Variant.Secondary))
-                },
-            )
+            // first register components, because the will also register their defaults
 
-            Platform.IOS -> rememberCupertinoTheme(
-                registerCustomComponents = {
-                    register(StyledCustomComponent(StyledCustomComponent.Variant.PrimarySurface))
-                },
-            )
+            // 1) we add a custom component
+            val variant = when (selectedPlatform) {
+                Platform.Android -> StyledCustomComponent.Variant.Primary
+                Platform.IOS -> StyledCustomComponent.Variant.PrimarySurface
+                Platform.Wasm -> StyledCustomComponent.Variant.SecondarySurface
+                Platform.JvmWindows,
+                Platform.JvmMacOS,
+                Platform.JvmLinux,
+                Platform.JvmUnknown,
+                Platform.MacOS,
+                    -> StyledCustomComponent.Variant.Secondary
+            }
+            register(StyledCustomComponent(variant))
 
-            Platform.Web -> rememberFluent2Theme(
-                registerCustomComponents = {
-                    register(StyledCustomComponent(StyledCustomComponent.Variant.SecondarySurface))
-                },
-            )
-        },
-        colors = when (selectedThemeIndex.value) {
-            0 -> lightStyledColors()
-            1 -> darkStyledColors()
-            2 -> autoStyledColors()
-            else -> throw RuntimeException()
+
+            // 2) we replace a default implementation of a component (selectively for a platform)
+            /*
+                         if (platform == Platform.Android) {
+                             // e.g. on android, this makes EVERY button everywhere an outlined button!
+                             register(
+                                 Material3Button.create(
+                                     roleMapping = { role, context -> Material3Button.Variant.Outlined }
+                                 )
+                             )
+                         }
+
+                         // 3) we customize the defaults of a component (selectively for a platform)
+                         if (platform == Platform.JvmWindows) {
+                             update(StyledButton.DefaultsKey) { copy(shape = RectangleShape) }
+                         }
+            */
         }
     ) {
         StyledSurface {
-            StyledRow {
+            Box {
 
-                Setup(
-                    modifier = Modifier.width(200.dp).fillMaxHeight(),
-                    selectedPlatformIndex = selectedPlatformIndex,
-                    selectedThemeIndex = selectedThemeIndex,
-                    useRail = useRail,
-                    expandSingleTestOnly = expandSingleTestOnly
-                )
-
-                StyledVerticalDivider()
-
-                StyledScaffold(
-                    modifier = Modifier.fillMaxSize(),
-                    topBar = {
-                        TopBar()
-                    },
-                    bottomBar = {
-                        if (!useRail.value) {
-                            BottomNavigation(navigationItems, selectedDestination)
+                // 1) content
+                val selectedDemo = rememberSaveable { mutableIntStateOf(-1) }
+                val pages = remember {
+                    Definitions.createMainPages { selectedDemo.value = -1 }
+                }
+                LaunchedEffect(selectedDemo.value) {
+                    // demo 0 is the template - it's not adjustable!
+                    showSetupPanel.value = selectedDemo.value != 0
+                }
+                demoStateHolder.SaveableStateProvider(selectedDemo.value) {
+                    when (selectedDemo.value) {
+                        -1 -> {
+                            SelectDemo(
+                                pages = pages.map { it.first },
+                                selectedDemo = selectedDemo
+                            )
                         }
-                    },
-                    navigationRail = {
-                        if (useRail.value) {
-                            Rail(navigationItems, selectedDestination)
-                        }
-                    },
-                    snackbarHost = { StyledSnackbarHost(snackbarState) },
-                    floatingActionButton = {
-                        FAB(showSnackbarWithUndo)
-                    },
-                ) { paddingValues ->
 
-                    Content(
-                        paddingValues = paddingValues,
-                        areaIndex = selectedDestination.value,
-                        areas = areas
-                    )
+                        else -> {
+                            pages.getOrNull(selectedDemo.value)?.second?.invoke()
+                        }
+                    }
+                }
+
+                // 2) setup dialog
+                StyledDialog(
+                    state = dialogSetup,
+                    properties = StyledDialog.Properties(
+                        dismissOnBackPress = false, // not dismissable
+                        dismissOnClickOutside = false, // not dismissable
+                    ),
+                    style = StyledDialog.Style.FloatingWindow(
+                        initialSize = DpSize(640.dp, 420.dp),
+                        initiallyMinimized = true,
+                        minSize = DpSize(120.dp, 240.dp),
+                        draggable = true,
+                        resizable = true,
+                        showMaximizeButton = true,
+                        showCloseButton = false, // not dismissable, so no close button
+                        icon = Icons.Default.Settings.toIconComposable(),
+                        bubble = StyledDialog.BubbleConfig(
+                            containerColor = Color.Red,
+                            contentColor = Color.White,
+                            borderColor = null,
+                            shape = RoundedCornerShape(50),
+                            shadowElevation = 20.dp,
+                        ),
+                        initialBubblePosition = StyledDialog.FloatingPosition(
+                            alignment = Alignment.BottomStart,
+                            offset = DpOffset(16.dp, (-48).dp)
+                        )
+                    ),
+                    title = { StyledText("Setup") },
+                ) { contentPadding ->
+                    StyledVerticalScrollbarContainer {
+                        StyledColumn(
+                            itemSpacing = StyledTheme.spacing.medium,
+                            modifier = Modifier.padding(contentPadding),
+                        ) {
+                            if (showSetupPanel.value) {
+                                DemoThemeSetup(
+                                    platforms = Platform.entries.map { it.name },
+                                    implementations = Definitions.ImplementationCollections.map { it.first },
+                                    themeCollections = Definitions.ThemeCollections,
+                                    selectedPlatformIndex = selectedPlatformIndex,
+                                    selectedImplementationIndex = selectedImplementationIndex,
+                                    themeColors = themeColors,
+                                    themeVariant = themeVariant,
+                                    themeAppearance = themeAppearance,
+                                    themeContrast = themeContrast,
+                                )
+                            } else {
+                                SubTitle("Template (not adjustable) - shows a easy start point for your own app")
+                            }
+                        }
+                    }
                 }
 
             }
@@ -335,140 +225,102 @@ fun DemoContent() {
     }
 }
 
-// -----------------
-// main content areas
-// -----------------
-
 @Composable
-private fun Setup(
-    modifier: Modifier,
-    selectedPlatformIndex: MutableState<Int>,
-    selectedThemeIndex: MutableState<Int>,
-    useRail: MutableState<Boolean>,
-    expandSingleTestOnly: MutableState<Boolean>,
+private fun SelectDemo(
+    pages: List<String>,
+    selectedDemo: MutableState<Int>,
 ) {
-    val themes = listOf("Light", "Dark", "Auto")
-    val platforms = Platform.ALL.map { it.toString() }
-
-    StyledVerticalScrollbarContainer(
-        modifier = modifier
-            .padding(StyledTheme.padding.content)
-    ) {
-        StyledSpacedColumn {
-            SubTitle("Platform")
-            DropdownWithButtons(
-                items = platforms,
-                selectedIndex = selectedPlatformIndex
-            )
-
-            SubTitle("Theme")
-            DropdownWithButtons(
-                items = themes,
-                selectedIndex = selectedThemeIndex
-            )
-
-            StyledSpacedRow {
-                StyledText(
-                    modifier = Modifier.weight(1f),
-                    text = "Navigation rail"
-                )
-                StyledSwitch(
-                    checked = useRail
-                )
-            }
-
-            StyledSpacedRow {
-                StyledText(
-                    modifier = Modifier.weight(1f),
-                    text = "Expand single test only"
-                )
-                StyledSwitch(
-                    checked = expandSingleTestOnly
-                )
-            }
-
-            SubTitle("Theme Name")
-            StyledText(
-                text = "${platforms[selectedPlatformIndex.value]} => ${StyledTheme.themeName}"
-            )
-        }
-    }
-}
-
-@Composable
-private fun Content(
-    paddingValues: PaddingValues,
-    areaIndex: Int,
-    areas: List<DemoArea>,
-) {
-    StyledVerticalScrollbarContainer(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues)
-            .padding(
-                start = StyledTheme.padding.content.calculateStartPadding(LocalLayoutDirection.current),
-                end = StyledTheme.padding.content.calculateEndPadding(LocalLayoutDirection.current),
-            )
-    ) {
-        StyledHorizontalSpacer(size = StyledTheme.padding.content.calculateTopPadding())
-
-        StyledSpacedColumn {
-            val area = remember(areas, areaIndex) { areas[areaIndex] }
-            area.contents.forEachIndexed { index, content ->
-                content(areaIndex * 10_000 + index * 100, area.expandState)
-            }
-        }
-
-        StyledHorizontalSpacer(size = StyledTheme.padding.content.calculateBottomPadding())
-    }
-}
-
-
-@Composable
-private fun TopBar() {
-    StyledTopBar(
-        title = { StyledText("Styled Components") },
-        containerColor = StyledTheme.colorScheme.primary,
-        contentColor = StyledTheme.colorScheme.onPrimary
-    )
-}
-
-@Composable
-private fun BottomNavigation(
-    navigationItems: List<StyledNavigationItem<Int>>,
-    selectedDestination: MutableState<Int>,
-) {
-    StyledBottomNavigationBar(
-        items = navigationItems,
-        selectedKey = selectedDestination.value,
-        onItemClick = { selectedDestination.value = it.key },
-        containerColor = StyledTheme.colorScheme.primary,
-        contentColor = StyledTheme.colorScheme.onPrimary
-    )
-}
-
-@Composable
-private fun Rail(
-    navigationItems: List<StyledNavigationItem<Int>>,
-    selectedDestination: MutableState<Int>,
-) {
-    StyledNavigationRail(
-        items = navigationItems,
-        selectedKey = selectedDestination.value,
-        onItemClick = { selectedDestination.value = it.key },
-        containerColor = StyledTheme.colorScheme.primary,
-        contentColor = StyledTheme.colorScheme.onPrimary
-    )
-}
-
-@Composable
-private fun FAB(showSnackbarWithUndo: (String) -> Unit) {
-    StyledFloatingActionButton(
-        onClick = { showSnackbarWithUndo("Show snackbar") }
-    ) {
-        StyledIcon(
-            icon = Icons.Default.Add.toIconComposable(),
-            contentDescription = "Show snackbar"
+    val scaffoldColor = StyledTheme.colorScheme.surface
+    val topBarColor = StyledTheme.colorScheme.primary
+    if (rememberWindowEnvironment().mode == WindowMode.Normal) {
+        SystemBarStyleEffect(
+            statusBar = systemBarIconStyleFor(topBarColor, scaffoldColor),
+            navigationBar = systemBarIconStyleFor(scaffoldColor, scaffoldColor),
         )
     }
+
+    StyledScaffold(
+        containerColor = scaffoldColor,
+        topBar = {
+            DemoTopBar(
+                containerColor = topBarColor,
+                title = "ComposeStyled",
+            )
+        },
+    ) { paddingValues ->
+        StyledColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(StyledTheme.padding.content),
+            itemSpacing = StyledTheme.spacing.medium,
+        ) {
+            StyledText("Choose a demo", style = StyledTheme.typography.titleLarge)
+
+            val cols = 2
+
+            val rows = ceil(pages.size / cols.toFloat()).toInt()
+            StyledGrid(
+                columns = cols,
+                rows = rows,
+                modifier = Modifier.fillMaxWidth()
+                    .height(240.dp),
+                spacing = StyledTheme.spacing.medium,
+                contentPadding = PaddingValues(0.dp),
+            ) { row, column ->
+                val demoIndex = row * 2 + column
+                if (demoIndex < pages.size) {
+                    StyledButton(
+                        modifier = Modifier.fillMaxSize(),
+                        onClick = { selectedDemo.value = demoIndex },
+                        shape = RectangleShape
+                    ) {
+                        StyledText(pages[demoIndex])
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DemoThemeSetup(
+    platforms: List<String>,
+    implementations: List<String>,
+    themeCollections: List<StyledThemeColorsCollection>,
+    selectedPlatformIndex: MutableState<Int>,
+    selectedImplementationIndex: MutableState<Int>,
+    themeColors: MutableState<StyledThemeColors>,
+    themeVariant: MutableState<StyledThemeVariant>,
+    themeAppearance: MutableState<StyledThemeAppearance>,
+    themeContrast: MutableState<StyledThemeContrast>,
+) {
+    SubTitle("Platform")
+    StyledDropdownIndex(
+        modifier = Modifier.fillMaxWidth(),
+        items = platforms,
+        selectedIndex = selectedPlatformIndex
+    )
+
+    SubTitle("Implementation")
+    StyledDropdownIndex(
+        modifier = Modifier.fillMaxWidth(),
+        items = implementations,
+        selectedIndex = selectedImplementationIndex,
+    )
+
+    SubTitle("Theme colors")
+    StyledThemeColorsPicker(
+        themeColors = themeColors,
+        themeVariant = themeVariant,
+        themeAppearance = themeAppearance,
+        themeContrast = themeContrast,
+        modifier = Modifier.fillMaxWidth(),
+        collections = themeCollections,
+    )
+
+    SubTitle("Theme Name")
+    StyledText(
+        text = "${platforms[selectedPlatformIndex.value]} => ${StyledTheme.themeName}"
+    )
 }

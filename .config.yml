@@ -3,13 +3,14 @@
 # ---------------------
 
 publish:
-  group-id: io.github.mflisar.composestyledcomponents
+  group-id: io.github.mflisar.composestyled
   github:
     user: MFlisar
     repo: maven-repository
     branch: main
     path: artifacts
-  target: maven-central # [none, maven-central, github]
+  release-target: maven-central # [none, maven-central, github]
+  test-target: github # [none, maven-central, github]
 
 # ---------------------
 # General configuration
@@ -28,8 +29,8 @@ config:
 # ---------------------
 
 project:
-  namespace: com.michaelflisar.composestyledcomponents
-  repo-name: ComposeStyledComponents
+  namespace: com.michaelflisar.composestyled
+  repo-name: ComposeStyled
   release: 2026
   license:
     name: Apache License 2.0
@@ -40,12 +41,13 @@ project:
 # ---------------------
 
 apps:
-  - name: Compose Styled Components Demo
-    namespace: com.michaelflisar.composestyledcomponents.demo
+  - name: Compose Styled Demo
+    namespace: com.michaelflisar.composestyled.demo
     version-name: 1.0.0
     module-paths:
-      - demo/app/web
-      - demo/app/windows
+      - demo/app/wasm
+      - demo/app/jvm
+      - demo/app/android
       - demo/shared
     # optional - if set, the app will be published to the homepage and linked in the readme
     publish:
@@ -68,15 +70,42 @@ modules:
     - artifact-id: foundation
       description: a foundation implementation (can be used as a base for other implementations)
       path: library/implementations/foundation
-    - artifact-id: cupertino
-      description: a cupertino implementation
-      path: library/implementations/cupertino
+    - artifact-id: cupertino-flat
+      description: a flat Cupertino implementation
+      path: library/implementations/cupertino-flat
+    - artifact-id: cupertino-liquid
+      description: a Liquid Glass Cupertino implementation
+      path: library/implementations/cupertino-liquid
     - artifact-id: fluent2
       description: a fluent2 implementation
       path: library/implementations/fluent2
     - artifact-id: material3
       description: a material3 implementation
       path: library/implementations/material3
+    - artifact-id: iconset-material3
+      description: Material icon sets
+      path: library/iconsets/material3
+    - artifact-id: iconset-fluent2
+      description: Fluent 2 icon sets
+      path: library/iconsets/fluent2
+    - artifact-id: iconset-sfsymbols
+      description: SF Symbols icon set
+      path: library/iconsets/sfsymbols
+    - artifact-id: theme-cupertino
+      description: cupertino color themes
+      path: library/themes/cupertino
+    - artifact-id: theme-fluent2
+      description: fluent2 color themes
+      path: library/themes/fluent2
+    - artifact-id: theme-material3
+      description: material3 color themes
+      path: library/themes/material3
+    - artifact-id: theme-pastel
+      description: pastel color themes
+      path: library/themes/pastel
+    - artifact-id: theme-nature
+      description: nature color themes
+      path: library/themes/nature
   # XCFrameworks [name, path, targets (ios, macos)]
   xcframeworks: []
 

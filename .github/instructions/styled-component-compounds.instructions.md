@@ -10,22 +10,31 @@ For Core component APIs and renderer implementation details, follow the
 
 ## Generic layouts and compounds
 
-1. Add generic layouts under `library\core\src\commonMain\kotlin\com\michaelflisar\composestyledcomponents\ui\layout`
-   with package `com.michaelflisar.composestyledcomponents.ui.layout`.
-   Place compounds alongside related controls in `ui\components`. Compose
-   Foundation layouts and existing Styled components directly; no
-   `StyledKey`, renderer class or theme-factory registration is needed.
-2. Follow the layout pairs: `StyledColumn`, `StyledRow` and `StyledFlowRow`
-   accept explicit arrangements; their `StyledSpaced*` counterparts use
-   `Arrangement.spacedBy` with overridable spacing defaulted from
-   `StyledTheme.spacing.medium`. Flow layouts expose separate item/row spacing,
-   item alignment and line/item limits. Preserve the underlying layout's
-   `ColumnScope`, `RowScope` or `FlowRowScope` content receiver and forward its
-   modifier and layout arguments.
-   Spaced convenience functions delegate to their corresponding public Styled
-   layout (`StyledSpacedRow` to `StyledRow`, `StyledSpacedFlowRow` to
-   `StyledFlowRow`), changing only arrangements rather than duplicating the
-   underlying Foundation call.
+1. Add arrangements and structural containers under `library\core\src\commonMain\kotlin\com\michaelflisar\composestyled\ui\layout`
+   with package `com.michaelflisar.composestyled.ui.layout`.
+   This includes Scaffold, dialogs and bottom sheets, even when they have
+   theme-specific renderers. Place controls and content components, including
+   their compounds, in `ui\components`. Classify compounds by their purpose,
+   not by whether they compose other controls.
+   Independently choose the rendering model: shared compositions use Foundation
+   layouts and existing Styled components directly, without a new `StyledKey`,
+   renderer or registration; theme-specific layouts use the registered contract
+   from the Core guide. Mirror the functional classification in renderer folders.
+2. `StyledColumn` and `StyledRow` accept explicit arrangements and default to
+   no spacing. Their spacing overloads require `itemSpacing`, accept main-axis
+   alignment and delegate to the arrangement overload using `Arrangement.spacedBy`.
+   Do not default `itemSpacing`: calls without layout arguments must remain
+   unambiguous. Callers can use `StyledTheme.spacing.medium` for themed spacing.
+   `StyledFlowRow` and lazy layouts also provide spacing overloads with
+   required spacing parameters. Flow rows require item and row spacing, and
+   also provide a `spacing` overload to set both to the same value; lazy lists
+   require item spacing, and lazy grids require spacing on both axes.
+   Flow layouts expose separate item/row spacing, item alignment and line/item
+   limits. Preserve the underlying layout's `ColumnScope`, `RowScope` or
+   `FlowRowScope` content receiver and forward its modifier and layout arguments.
+   Spacing overloads delegate to their corresponding public Styled layout,
+   changing only arrangements rather than duplicating the underlying
+   Foundation call.
 3. For compounds, use existing Styled controls for themed parts and Styled
    tokens for shared layout defaults. Do not branch on the theme name or import
    concrete Cupertino, Fluent 2 or Material 3 implementations into `core`.
@@ -55,7 +64,7 @@ For Core component APIs and renderer implementation details, follow the
 Before considering a Styled component migration or renderer change complete:
 
 - Find all consumers and helper paths, not only direct demos. Trace shared bases,
-  named role/variant overloads, single/multi-select variants and default content slots.
+  generic role parameters, single/multi-select variants and default content slots.
   When a new Styled primitive replaces old rendering, migrate every equivalent
   internal implementation in the same change.
 - Check composition, not just appearance: equivalent standalone and compound
@@ -71,10 +80,12 @@ Before considering a Styled component migration or renderer change complete:
   section.
 - Check that `MutableState` overloads precede and delegate to their matching
   value/`onValueChange` overloads, icon parameters use `IconComposable` named
-  `icon`, and role/variant dispatch stays in a private `*Impl` function.
+  `icon`, and role/variant dispatch follows the Core guide, including
+  context-resolved `Role.Default` for button-like controls.
 - Check that defaults lookups use `StyledXDefaults` while public dispatch still
-  resolves the active implementation. Keep registry `Key.defaults` reads only
-  inside the matching `StyledXDefaults`; consumers use its accessors. Include
+  resolves the active implementation. Keep registry `DefaultsKey` reads only
+  inside the matching `StyledXDefaults`; consumers use its accessors. Verify
+  `DefaultsKey` sits in the `// 1) key` section next to `Key`. Include
   every relevant configuration value in renderer and theme factory `remember`
   keys.
 - Check all three themes and shared Foundation delegation. Preserve disabled,

@@ -22,24 +22,38 @@ keep function KDoc attached directly to its declaration.
 
 Find the public API, implementation contract, defaults, renderers, theme
 factories, registry entries and all affected consumers. For migrations, also
-trace convenience APIs, variants, shared bases, compound slots and equivalent
-legacy implementations.
+trace generic role parameters and their context providers, variants, shared
+bases, compound slots and equivalent legacy implementations. Button-like APIs
+use a generic public role with `Role.Default`; do not create named
+Primary/Secondary/Tertiary convenience functions, and keep explicit roles
+authoritative across contexts.
 
-Choose the model described in the component guides: registered component,
-generic layout or compound. Identify compatibility and behavior changes before
-editing.
+For theme-specific visual or interaction behavior, consult the
+[design-system guide](../../../.guidelines/README.md) and the relevant Material
+3, Cupertino or Fluent 2 page. Use its component-level guidance in context, and
+distinguish official recommendations from the Compose-oriented review
+questions derived from them.
+
+Classify folder placement by purpose (layout/container versus control/content)
+independently of the rendering model (registered renderer versus shared
+composition), as described in the component guides. Identify compatibility and
+behavior changes before editing.
 
 ## 3. Implement across the affected paths
 
-Follow the applicable Core and renderer contracts for registered components,
-including all theme factories and registry wiring. For layouts and compounds,
-follow the shared-composition guidance and reuse public Styled controls wherever
-they represent themed parts. Preserve existing API semantics, callback
+Follow the applicable Core and renderer contracts for registered controls and
+layouts, including all theme factories and registry wiring. For shared
+compositions and compounds, follow the shared-composition guidance and reuse
+public Styled controls wherever they represent themed parts. Preserve existing API semantics, callback
 ownership, content scopes and interaction behavior.
 
-Register each theme's default renderer in its `registerXComponents()` helper.
-Do not add a separate per-component implementation parameter to the theme
-factory; renderer replacements belong in the custom registration callback.
+Register each theme's default renderer in its `registerXComponents()` helper
+with a single `register(...)` call; a component's fixed defaults are registered
+with it via `StyledComponentWithDefaults`. Place a component's `DefaultsKey`
+directly below `Key` in the `// 1) key` section. Do not add a separate
+per-component implementation parameter to the theme factory; renderer
+replacements and default changes belong in `StyledTheme(customization)`
+(`register(...)` first, then `update(DefaultsKey) { ... }`).
 
 ## 4. Document and verify
 

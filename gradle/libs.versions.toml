@@ -43,6 +43,7 @@ desugar =                               "2.1.5"
 buildkonfig =                           "0.23.0"
 easylauncher = 					        "6.4.1"
 launch4j =                              "4.0.0"
+haze =                                  "2.0.1"
 
 [plugins]
 
@@ -135,3 +136,5 @@ jetbrains-kotlinx-atomicfu =                        { module = "org.jetbrains.ko
 
 # others
 desugar =			        	                    { module = "com.android.tools:desugar_jdk_libs", 	                    version.ref = "desugar" }
+haze-core =                                         { module = "dev.chrisbanes.haze:haze",                              version.ref = "haze" }
+haze-glass =                                        { module = "dev.chrisbanes.haze:haze-glass",                        version.ref = "haze" }

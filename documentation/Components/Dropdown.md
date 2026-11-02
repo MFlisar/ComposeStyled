@@ -1,5 +1,5 @@
 The dropdown compounds live in
-`com.michaelflisar.composestyledcomponents.common`. Their anchors compose
+`com.michaelflisar.composestyled.common`. Their anchors compose
 `StyledButton` with the same `Primary`, `Secondary` and `Tertiary` roles,
 alongside `StyledIcon`, `StyledText`, `StyledInput`, `StyledCheckbox` and styled
 action buttons. They do not own a separate theme-specific renderer and work
@@ -15,9 +15,10 @@ val filter = remember {
     }
 }
 
-StyledSecondaryDropdown(
+StyledDropdown(
     items = fruits,
     selected = selected,
+    role = StyledButton.Role.Secondary,
     title = "Fruit",
     filter = filter,
     popupWidthConfig = StyledPopupMenu.WidthConfig.AtLeastAnchor,
@@ -51,10 +52,12 @@ otherwise the component throws `IllegalArgumentException`. Repeated selected
 indices are treated as one selection. Value-based selection uses the first
 equal item; use index overloads to distinguish equal entries.
 
-`StyledDropdown` and `StyledDropdownMultiSelect` use the primary button role.
-Use the corresponding `StyledSecondary...` or `StyledTertiary...` composable
-when another semantic button role is needed; role selection is not a public
-parameter.
+`StyledDropdown` and `StyledDropdownMultiSelect` default to
+`StyledButton.Role.Default`, allowing the theme to choose an appropriate anchor
+style for the surrounding context. All value- and index-based single- and
+multi-select functions expose the same `role` parameter. Set an explicit
+`StyledButton.Role` only when you intentionally want primary, secondary or
+tertiary emphasis.
 
 `sortSelectionByItems` defaults to `true`, ordering rendered selections and
 callback results by original index. Set it to `false` to preserve selection
@@ -63,13 +66,18 @@ the complete list. The filter and scroll position reset on reopening. Disabling
 an open dropdown dismisses it. The focusable popup dismisses through the platform
 back/Escape and outside-click handling.
 
-All dropdown role functions accept `shape` and button `customization`; titles
+All dropdown functions accept `shape` and button `customization`; titles
 render inside the button anchor. Popup colors inherit the styled surface tokens.
 `popupWidthConfig` supports `MatchAnchor` (default),
 `AtLeastAnchor`, `WrapContent` and `Fixed(width)`. Width is constrained by the
-window. `popupMaxHeight` defaults to `320.dp`; the filter and multi-selection
-actions remain above the scrollable entries. Popups align to the logical start,
-prefer opening below the anchor, and move above it when space permits.
+window. `popupMaxHeight` defaults to `320.dp`; the title, filter and
+multi-selection actions remain pinned above the scrollable entries. Popups align
+to the logical start, prefer opening below the anchor, and move above it when
+space permits.
+
+Material 3 uses the shared popup layout for this pinned header, styled with the
+active Material 3 surface, shape, border and elevation tokens; its native
+dropdown menu scrolls the complete content and cannot pin a header separately.
 
 Dropdown `role` accepts the `StyledButton.Role` values directly; its
 `RenderContext.Selection` and `RenderContext.DropdownItem` are content data

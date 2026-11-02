@@ -1,3 +1,5 @@
+# Input
+
 `StyledInput` exposes `Default` and `Alternative` variants; each renderer maps them
 to its own field appearances. It supports enabled/read-only modes, single-line or
 multiline input (`singleLine = false`, `minLines`, `maxLines`), label, placeholder,
@@ -11,6 +13,11 @@ Keyboard options/actions, visual transformation and interaction source are
 forwarded to the underlying text field. Leading and trailing slots provide an
 input-owned context so Styled buttons and icon buttons in those slots use the
 button pointer cursor rather than inheriting the text input cursor.
+
+`StyledInput` also accepts `TextFieldValue` (or `MutableState<TextFieldValue>`)
+when the caller needs to control cursor position, selection or IME composition.
+Custom input renderers receive and forward `TextFieldValue` in
+`StyledInput.Implementation.Render`.
 
 For passwords combine `PasswordVisualTransformation()` with
 `KeyboardOptions(keyboardType = KeyboardType.Password)`. For errors set `isError`,
@@ -29,7 +36,15 @@ StyledInput(
 )
 ```
 
-Input decoration slots are forwarded directly; their remembered state, focus,
-cursor/selection and implementation animations are not shared between renderers.
+Input decoration slots are forwarded directly; their remembered state, focus
+and implementation animations are not shared between renderers. The
+internally managed cursor/selection value and numeric text draft are saved
+across supported host recreation; controlled input text remains caller-owned.
 Material 3 uses native controls; Cupertino and Fluent 2 share Foundation controls
 with theme-specific defaults.
+
+Numeric `StyledInput` and `StyledOptionalInput` overloads (and their Alternative
+variants) support `Int`, `Long`, `Float` and `Double`. Byte, Short and custom Number
+subclasses are rejected with `IllegalArgumentException`, even when keyboard options
+are supplied explicitly. Use a supported type for the value and, for optional
+inputs, the sample.

@@ -3,7 +3,7 @@
   through `StyledCard.Key` and add
   `StyledCardDefaults.contentPadding` as `PaddingValues` by default (16 dp on
   all sides for Material 3 and Cupertino, 12 dp for Fluent 2),
-  configured through each card renderer's `defaults(contentPadding = ...)`.
+  changed via `StyledTheme(customization = { update(StyledCard.DefaultsKey) { copy(contentPadding = ...) } })`.
   Override `contentPadding`, for example with
   `PaddingValues(horizontal = 20.dp, vertical = 12.dp)`, per card or use `applyContentPadding = false` for
   caller-managed padding. Card padding is no longer part of `StyledPadding`.

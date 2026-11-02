@@ -1,0 +1,55 @@
+package com.michaelflisar.composestyled.themes.pastel
+
+import androidx.compose.ui.graphics.Color
+import com.michaelflisar.composestyled.platform.Platform
+import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
+import com.michaelflisar.composestyled.themes.StyledThemeColorsCollection
+import com.michaelflisar.composestyled.themes.createStyledThemeColors
+
+@OptIn(InternalComposeStyledApi::class)
+object PastelThemes {
+
+    val mint = createStyledThemeColors(
+        "mint", "Mint",
+        Color(0xFF4D9C85), Color(0xFF78D7B5),
+        Color(0xFF6486C2), Color(0xFF9CB8F0),
+        Color(0xFFB36B86), Color(0xFFE99AB4),
+    )
+    val rose = createStyledThemeColors(
+        "rose", "Rose",
+        Color(0xFFB45F78), Color(0xFFF29BB0),
+        Color(0xFF6686BC), Color(0xFF9DB9EE),
+        Color(0xFF9A7652), Color(0xFFD8B98D),
+    )
+    val lavender = createStyledThemeColors(
+        "lavender", "Lavender",
+        Color(0xFF7963B5), Color(0xFFB6A1F0),
+        Color(0xFF4D9C85), Color(0xFF78D7B5),
+        Color(0xFFB36B86), Color(0xFFE99AB4),
+    )
+    val peach = createStyledThemeColors(
+        "peach", "Peach",
+        Color(0xFFB56645), Color(0xFFF0A47F),
+        Color(0xFF6686BC), Color(0xFF9DB9EE),
+        Color(0xFF7963B5), Color(0xFFB6A1F0),
+    )
+    val sky = createStyledThemeColors(
+        "sky", "Sky",
+        Color(0xFF4D7FAE), Color(0xFF8FC4F2),
+        Color(0xFF4D9C85), Color(0xFF78D7B5),
+        Color(0xFFB36B86), Color(0xFFE99AB4),
+    )
+    val lemon = createStyledThemeColors(
+        "lemon", "Lemon",
+        Color(0xFF8A761F), Color(0xFFD9C45D),
+        Color(0xFF4D7FAE), Color(0xFF8FC4F2),
+        Color(0xFFB56645), Color(0xFFF0A47F),
+    )
+
+    val collection = StyledThemeColorsCollection(
+        id = "pastel",
+        name = "Pastel",
+        themes = listOf(mint, rose, lavender, peach, sky, lemon),
+        matchingPlatforms = Platform.entries.toSet(),
+    )
+}

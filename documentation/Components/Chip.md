@@ -8,4 +8,4 @@ controls;
 Material 3 defaults to `ElevatedAssistChip` and `ElevatedFilterChip` to avoid
 the hover-background issue in its flat chip variants. Override that mapping by
 registering a configured `Material3Chip.create(...)` through
-`registerCustomComponents` with `rememberMaterial3Theme(...)`.
+`StyledTheme(customization = ...)`.

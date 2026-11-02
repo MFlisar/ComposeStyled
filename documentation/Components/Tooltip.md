@@ -18,8 +18,10 @@ StyledTooltip(
 ```
 
 Customize the tooltip with `shape`, `containerColor`, `contentColor`,
-`maxWidth`, `shadowElevation` and `contentPadding`. Its defaults are supplied
-by the active theme. `rememberStyledTooltipState(initialIsVisible, isPersistent)`
+`maxWidth`, `shadowElevation` and `contentPadding`. Each theme ships fixed
+`StyledTooltip.Defaults` (registered under `StyledTooltip.DefaultsKey`), adjustable via
+`StyledTheme(customization = { update(StyledTooltip.DefaultsKey) { copy(...) } })`.
+`rememberStyledTooltipState(initialIsVisible, isPersistent)`
 controls its initial visibility and timeout behavior; `state.show()` suspends
 until dismissal and `state.dismiss()` hides it. Set `enableUserInput = false`
 to disable automatic hover, focus and long-press triggers.
