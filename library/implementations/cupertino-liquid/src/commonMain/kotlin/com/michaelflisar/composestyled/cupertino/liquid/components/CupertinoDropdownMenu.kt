@@ -29,6 +29,7 @@ class CupertinoLiquidPopupMenu internal constructor() : StyledPopupMenu.Implemen
         onDismissRequest: () -> Unit,
         modifier: Modifier,
         offset: DpOffset,
+        placement: StyledPopupMenu.Placement,
         properties: PopupProperties,
         scrollState: ScrollState,
         style: com.michaelflisar.composestyled.ui.components.StyledPopup.Style,
@@ -41,6 +42,7 @@ class CupertinoLiquidPopupMenu internal constructor() : StyledPopupMenu.Implemen
             onDismissRequest = onDismissRequest,
             modifier = modifier.liquidGlass(style.shape, style.containerColor),
             offset = offset,
+            placement = placement,
             properties = properties,
             scrollState = scrollState,
             style = style.copy(

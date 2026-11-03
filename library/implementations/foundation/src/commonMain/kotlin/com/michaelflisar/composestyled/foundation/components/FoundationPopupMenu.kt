@@ -49,6 +49,7 @@ class FoundationPopupMenu : StyledPopupMenu.Implementation {
         onDismissRequest: () -> Unit,
         modifier: Modifier,
         offset: DpOffset,
+        placement: StyledPopupMenu.Placement,
         properties: PopupProperties,
         scrollState: ScrollState,
         style: StyledPopup.Style,
@@ -61,6 +62,7 @@ class FoundationPopupMenu : StyledPopupMenu.Implementation {
                 StyledPopupDefaults.windowOverlayPositionProvider(
                     offset = offset,
                     isVisible = expanded,
+                    placement = placement,
                     parentWindowOriginOnScreen = style.parentWindowOriginOnScreen,
                 )
             val menuSize = remember { mutableStateOf(IntSize.Zero) }
@@ -79,6 +81,7 @@ class FoundationPopupMenu : StyledPopupMenu.Implementation {
                     maxHeight = style.maxHeight,
                     windowOverlay = true,
                     windowOverlaySize = positionProvider.popupWindowSize(),
+                    onTransitionFinished = style.onTransitionFinished,
                 ),
             ) {
                 Box(
@@ -189,7 +192,7 @@ class FoundationPopupMenu : StyledPopupMenu.Implementation {
             visible = expanded,
             onDismissRequest = onDismissRequest,
             modifier = modifier,
-            popupPositionProvider = StyledPopupDefaults.positionProvider(offset, expanded),
+            popupPositionProvider = StyledPopupDefaults.positionProvider(offset, expanded, placement),
             properties = properties,
             style = style,
         ) {

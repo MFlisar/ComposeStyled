@@ -8,8 +8,10 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -65,30 +67,32 @@ class Material3DropdownMenu internal constructor() : StyledDropdownMenuItem.Impl
         } else {
             colors
         }
-        DropdownMenuItem(
-            text = {
-                CopyMaterialThemeLocals(
-                    contentColor = LocalContentColor.current,
-                    content = { Row(content = content) },
-                )
-            },
-            onClick = onClick ?: {},
-            modifier = modifier
-                .heightIn(min = minHeight)
-                .padding(itemPadding)
-                .clip(shape),
-            enabled = effectiveEnabled,
-            colors = MenuDefaults.itemColors(
-                textColor = renderColors.textColor,
-                leadingIconColor = renderColors.leadingIconColor,
-                trailingIconColor = renderColors.trailingIconColor,
-                disabledTextColor = renderColors.disabledTextColor,
-                disabledLeadingIconColor = renderColors.disabledLeadingIconColor,
-                disabledTrailingIconColor = renderColors.disabledTrailingIconColor,
-            ),
-            contentPadding = contentPadding,
-            interactionSource = interactionSource,
-        )
+        CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides minHeight) {
+            DropdownMenuItem(
+                text = {
+                    CopyMaterialThemeLocals(
+                        contentColor = LocalContentColor.current,
+                        content = { Row(content = content) },
+                    )
+                },
+                onClick = onClick ?: {},
+                modifier = modifier
+                    .heightIn(min = minHeight)
+                    .padding(itemPadding)
+                    .clip(shape),
+                enabled = effectiveEnabled,
+                colors = MenuDefaults.itemColors(
+                    textColor = renderColors.textColor,
+                    leadingIconColor = renderColors.leadingIconColor,
+                    trailingIconColor = renderColors.trailingIconColor,
+                    disabledTextColor = renderColors.disabledTextColor,
+                    disabledLeadingIconColor = renderColors.disabledLeadingIconColor,
+                    disabledTrailingIconColor = renderColors.disabledTrailingIconColor,
+                ),
+                contentPadding = contentPadding,
+                interactionSource = interactionSource,
+            )
+        }
     }
 
     @OptIn(InternalComposeStyledApi::class)
@@ -107,30 +111,32 @@ class Material3DropdownMenu internal constructor() : StyledDropdownMenuItem.Impl
         itemPadding: PaddingValues,
         minHeight: Dp,
     ) {
-        DropdownMenuItem(
-            text = { CopyMaterialThemeLocals(contentColor = LocalContentColor.current, content = text) },
-            onClick = onClick,
-            modifier = modifier
-                .heightIn(min = minHeight)
-                .padding(itemPadding)
-                .clip(shape),
-            leadingIcon = leadingIcon?.let { slot ->
-                { CopyMaterialThemeLocals(contentColor = LocalContentColor.current, content = slot) }
-            },
-            trailingIcon = trailingIcon?.let { slot ->
-                { CopyMaterialThemeLocals(contentColor = LocalContentColor.current, content = slot) }
-            },
-            enabled = enabled,
-            colors = MenuDefaults.itemColors(
-                textColor = colors.textColor,
-                leadingIconColor = colors.leadingIconColor,
-                trailingIconColor = colors.trailingIconColor,
-                disabledTextColor = colors.disabledTextColor,
-                disabledLeadingIconColor = colors.disabledLeadingIconColor,
-                disabledTrailingIconColor = colors.disabledTrailingIconColor,
-            ),
-            contentPadding = contentPadding,
-            interactionSource = interactionSource,
-        )
+        CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides minHeight) {
+            DropdownMenuItem(
+                text = { CopyMaterialThemeLocals(contentColor = LocalContentColor.current, content = text) },
+                onClick = onClick,
+                modifier = modifier
+                    .heightIn(min = minHeight)
+                    .padding(itemPadding)
+                    .clip(shape),
+                leadingIcon = leadingIcon?.let { slot ->
+                    { CopyMaterialThemeLocals(contentColor = LocalContentColor.current, content = slot) }
+                },
+                trailingIcon = trailingIcon?.let { slot ->
+                    { CopyMaterialThemeLocals(contentColor = LocalContentColor.current, content = slot) }
+                },
+                enabled = enabled,
+                colors = MenuDefaults.itemColors(
+                    textColor = colors.textColor,
+                    leadingIconColor = colors.leadingIconColor,
+                    trailingIconColor = colors.trailingIconColor,
+                    disabledTextColor = colors.disabledTextColor,
+                    disabledLeadingIconColor = colors.disabledLeadingIconColor,
+                    disabledTrailingIconColor = colors.disabledTrailingIconColor,
+                ),
+                contentPadding = contentPadding,
+                interactionSource = interactionSource,
+            )
+        }
     }
 }

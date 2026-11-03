@@ -10,7 +10,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -57,7 +56,9 @@ import kotlin.math.ceil
 
 
 @Composable
-fun DemoContent() {
+fun DemoContent(
+    toolbar: @Composable (() -> Unit)? = null,
+) {
 
     // 1) Host platform
     val hostPlatform = currentPlatform()
@@ -135,82 +136,89 @@ fun DemoContent() {
         }
     ) {
         StyledSurface {
-            Box {
+            StyledColumn {
 
-                // 1) content
-                val pages = remember {
-                    Definitions.createMainPages { selectedDemo.value = -1 }
-                }
-                demoStateHolder.SaveableStateProvider(selectedDemo.value) {
-                    when (selectedDemo.value) {
-                        -1 -> {
-                            SelectDemo(
-                                pages = pages.map { it.first },
-                                selectedDemo = selectedDemo
-                            )
-                        }
+                // 1) toolbar
+                toolbar?.invoke()
 
-                        else -> {
-                            pages.getOrNull(selectedDemo.value)?.second?.invoke()
-                        }
+                // 2) content
+                Box(
+                    modifier = Modifier.weight(1f).fillMaxWidth()
+                ) {
+                    val pages = remember {
+                        Definitions.createMainPages { selectedDemo.value = -1 }
                     }
-                }
-
-                // 2) setup dialog
-                StyledDialog(
-                    state = dialogSetup,
-                    properties = StyledDialog.Properties(
-                        dismissOnBackPress = false, // not dismissable
-                        dismissOnClickOutside = false, // not dismissable
-                    ),
-                    style = StyledDialog.Style.FloatingWindow(
-                        initialSize = DpSize(640.dp, 420.dp),
-                        initiallyMinimized = true,
-                        minSize = DpSize(120.dp, 240.dp),
-                        draggable = true,
-                        resizable = true,
-                        showMaximizeButton = true,
-                        showCloseButton = false, // not dismissable, so no close button
-                        icon = Icons.Default.Settings.toIconComposable(),
-                        bubble = StyledDialog.BubbleConfig(
-                            containerColor = Color.Red,
-                            contentColor = Color.White,
-                            borderColor = null,
-                            shape = RoundedCornerShape(50),
-                            shadowElevation = 20.dp,
-                        ),
-                        initialBubblePosition = StyledDialog.FloatingPosition(
-                            alignment = Alignment.BottomStart,
-                            offset = DpOffset(16.dp, (-48).dp)
-                        )
-                    ),
-                    title = { StyledText("Setup") },
-                ) { contentPadding ->
-                    StyledVerticalScrollbarContainer {
-                        StyledColumn(
-                            itemSpacing = StyledTheme.spacing.medium,
-                            modifier = Modifier.padding(contentPadding),
-                        ) {
-                            if (showSetupPanel) {
-                                DemoThemeSetup(
-                                    platforms = Platform.entries.map { it.name },
-                                    implementations = Definitions.ImplementationCollections.map { it.first },
-                                    themeCollections = Definitions.ThemeCollections,
-                                    selectedPlatformIndex = selectedPlatformIndex,
-                                    selectedImplementationIndex = selectedImplementationIndex,
-                                    themeColors = themeColors,
-                                    themeVariant = themeVariant,
-                                    themeAppearance = themeAppearance,
-                                    themeContrast = themeContrast,
+                    demoStateHolder.SaveableStateProvider(selectedDemo.value) {
+                        when (selectedDemo.value) {
+                            -1 -> {
+                                SelectDemo(
+                                    pages = pages.map { it.first },
+                                    selectedDemo = selectedDemo
                                 )
-                            } else {
-                                SubTitle("Template (not adjustable) - shows a easy start point for your own app")
+                            }
+
+                            else -> {
+                                pages.getOrNull(selectedDemo.value)?.second?.invoke()
                             }
                         }
                     }
                 }
-
             }
+
+            // 2) setup dialog
+            StyledDialog(
+                state = dialogSetup,
+                properties = StyledDialog.Properties(
+                    dismissOnBackPress = false, // not dismissable
+                    dismissOnClickOutside = false, // not dismissable
+                ),
+                style = StyledDialog.Style.FloatingWindow(
+                    initialSize = DpSize(640.dp, 420.dp),
+                    initiallyMinimized = true,
+                    minSize = DpSize(120.dp, 240.dp),
+                    draggable = true,
+                    resizable = true,
+                    showMaximizeButton = true,
+                    showCloseButton = false, // not dismissable, so no close button
+                    icon = Icons.Default.Settings.toIconComposable(),
+                    bubble = StyledDialog.BubbleConfig(
+                        containerColor = Color.Red,
+                        contentColor = Color.White,
+                        borderColor = null,
+                        shape = RoundedCornerShape(50),
+                        shadowElevation = 20.dp,
+                    ),
+                    initialBubblePosition = StyledDialog.FloatingPosition(
+                        alignment = Alignment.BottomStart,
+                        offset = DpOffset(16.dp, (-48).dp)
+                    )
+                ),
+                title = { StyledText("Setup") },
+            ) { contentPadding ->
+                StyledVerticalScrollbarContainer {
+                    StyledColumn(
+                        itemSpacing = StyledTheme.spacing.medium,
+                        modifier = Modifier.padding(contentPadding),
+                    ) {
+                        if (showSetupPanel) {
+                            DemoThemeSetup(
+                                platforms = Platform.entries.map { it.name },
+                                implementations = Definitions.ImplementationCollections.map { it.first },
+                                themeCollections = Definitions.ThemeCollections,
+                                selectedPlatformIndex = selectedPlatformIndex,
+                                selectedImplementationIndex = selectedImplementationIndex,
+                                themeColors = themeColors,
+                                themeVariant = themeVariant,
+                                themeAppearance = themeAppearance,
+                                themeContrast = themeContrast,
+                            )
+                        } else {
+                            SubTitle("Template (not adjustable) - shows a easy start point for your own app")
+                        }
+                    }
+                }
+            }
+
         }
     }
 }

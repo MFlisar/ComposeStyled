@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.TransformOrigin
@@ -43,6 +44,16 @@ class FoundationPopup : StyledPopup.Implementation {
     ) {
         val transitionState = remember { MutableTransitionState(false) }
         transitionState.targetState = visible
+
+        LaunchedEffect(
+            transitionState.currentState,
+            transitionState.targetState,
+            style.onTransitionFinished,
+        ) {
+            if (transitionState.isIdle) {
+                style.onTransitionFinished?.invoke(transitionState.currentState)
+            }
+        }
 
         if (transitionState.currentState || transitionState.targetState) {
             val overlayModifier = if (style.windowOverlay) {

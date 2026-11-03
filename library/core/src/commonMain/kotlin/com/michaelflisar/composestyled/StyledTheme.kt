@@ -188,7 +188,7 @@ fun StyledTheme(
         LocalStyledTextStyle provides typography.bodyMedium,
         LocalStyledContentColor provides colors.onBackground,
         LocalStyledSizes provides sizes,
-        LocalStyledBehavior provides behavior,
+        LocalStyledBehavior provides behavior
     ) {
         ProvideFloatingHostIfMissing {
             themeProvider.Root {

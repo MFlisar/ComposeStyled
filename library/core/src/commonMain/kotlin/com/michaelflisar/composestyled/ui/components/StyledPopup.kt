@@ -59,6 +59,8 @@ object StyledPopup {
         @InternalComposeStyledApi val windowOverlaySize: IntSize = IntSize.Zero,
         @InternalComposeStyledApi
         val parentWindowOriginOnScreen: IntOffset = IntOffset.Zero,
+        @InternalComposeStyledApi
+        val onTransitionFinished: ((Boolean) -> Unit)? = null,
     ) {
         init {
             require(maxHeight.value.isFinite() && maxHeight > 0.dp) {
@@ -128,29 +130,38 @@ object StyledPopupDefaults {
     @Composable
     fun positionProvider(
         offset: DpOffset = DpOffset(0.dp, 4.dp),
-    ): PopupPositionProvider = positionProvider(offset, isVisible = true)
+        placement: StyledPopupMenu.Placement = StyledPopupMenu.Placement.Anchor,
+    ): PopupPositionProvider = positionProvider(
+        offset = offset,
+        isVisible = true,
+        placement = placement,
+    )
 
     @Composable
     fun positionProvider(
         isVisible: Boolean,
+        placement: StyledPopupMenu.Placement = StyledPopupMenu.Placement.Anchor,
     ): PopupPositionProvider = positionProvider(
         offset = DpOffset(0.dp, 4.dp),
         isVisible = isVisible,
+        placement = placement,
     )
 
     @Composable
     fun positionProvider(
         offset: DpOffset,
         isVisible: Boolean,
+        placement: StyledPopupMenu.Placement = StyledPopupMenu.Placement.Anchor,
     ): PopupPositionProvider {
         val density = LocalDensity.current
         val windowSize = LocalWindowInfo.current.containerSize
         // Recreate the provider when IME resizing changes the host window size.
-        return remember(density, offset, windowSize, isVisible) {
+        return remember(density, offset, windowSize, isVisible, placement) {
             AnchoredPopupPositionProvider(
                 with(density) {
                     IntOffset(offset.x.roundToPx(), offset.y.roundToPx())
                 },
+                placement,
             )
         }
     }
@@ -160,6 +171,7 @@ object StyledPopupDefaults {
     fun windowOverlayPositionProvider(
         offset: DpOffset,
         isVisible: Boolean,
+        placement: StyledPopupMenu.Placement,
         parentWindowOriginOnScreen: IntOffset,
     ): WindowOverlayPositionProvider {
         val density = LocalDensity.current
@@ -180,12 +192,14 @@ object StyledPopupDefaults {
             density,
             offset,
             isVisible,
+            placement,
             parentWindowOriginOnScreen,
         ) {
             WindowOverlayPositionProvider(
                 with(density) {
                     IntOffset(offset.x.roundToPx(), offset.y.roundToPx())
                 },
+                placement,
                 parentWindowOriginOnScreen,
                 parentWindowSize,
                 visibleWindowBoundsOnScreen,
@@ -206,13 +220,14 @@ object StyledPopupDefaults {
 @Stable
 class WindowOverlayPositionProvider internal constructor(
     offset: IntOffset,
+    placement: StyledPopupMenu.Placement,
     private val parentWindowOriginOnScreen: IntOffset,
     private val parentWindowSize: State<IntSize>,
     private val visibleWindowBoundsOnScreen: State<IntRect?>,
     private val safeDrawingInsets: State<IntRect>,
     private val geometryRevision: MutableState<Int>,
 ) : PopupPositionProvider {
-    private val anchoredPositionProvider = AnchoredPopupPositionProvider(offset)
+    private val anchoredPositionProvider = AnchoredPopupPositionProvider(offset, placement)
     private val anchorBounds = mutableStateOf<IntRect?>(null)
     private val overlayOrigin = mutableStateOf(IntOffset.Zero)
     private val overlaySize = mutableStateOf(IntSize.Zero)
@@ -406,6 +421,7 @@ fun StyledPopup(
  */
 private class AnchoredPopupPositionProvider(
     private val offset: IntOffset,
+    private val placement: StyledPopupMenu.Placement,
 ) : PopupPositionProvider {
     private var lastAnchorBounds: IntRect? = null
     private var lastWindowSize: IntSize? = null
@@ -418,6 +434,29 @@ private class AnchoredPopupPositionProvider(
         popupContentSize: IntSize,
     ): IntOffset {
         val rtl = layoutDirection == LayoutDirection.Rtl
+        if (placement == StyledPopupMenu.Placement.Submenu) {
+            val preferredX = if (rtl) {
+                anchorBounds.left - popupContentSize.width - offset.x
+            } else {
+                anchorBounds.right + offset.x
+            }
+            val alternateX = if (rtl) {
+                anchorBounds.right + offset.x
+            } else {
+                anchorBounds.left - popupContentSize.width - offset.x
+            }
+            val maxX = (windowSize.width - popupContentSize.width).coerceAtLeast(0)
+            val x = when {
+                preferredX in 0..maxX -> preferredX
+                alternateX in 0..maxX -> alternateX
+                else -> preferredX.coerceIn(0, maxX)
+            }
+            val maxY = (windowSize.height - popupContentSize.height).coerceAtLeast(0)
+            return IntOffset(
+                x = x,
+                y = (anchorBounds.top + offset.y).coerceIn(0, maxY),
+            )
+        }
         val dx = if (rtl) -offset.x else offset.x
         val start =
             (if (rtl) anchorBounds.right - popupContentSize.width else anchorBounds.left) + dx
@@ -449,6 +488,10 @@ private class AnchoredPopupPositionProvider(
         requestedMaxHeight: Int,
         preferredHeight: Int,
     ): Int {
+        if (placement == StyledPopupMenu.Placement.Submenu) {
+            val top = (anchorBounds.top + offset.y).coerceIn(0, windowSize.height)
+            return (windowSize.height - top).coerceAtLeast(0).coerceAtMost(requestedMaxHeight)
+        }
         val placement = resolvePlacement(
             anchorBounds = anchorBounds,
             windowSize = windowSize,

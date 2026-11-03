@@ -26,6 +26,7 @@ import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.runtime.LocalStyledContext
 import com.michaelflisar.composestyled.runtime.StyledContext
 import com.michaelflisar.composestyled.ui.components.StyledButton
+import com.michaelflisar.composestyled.ui.components.StyledToolbar
 import com.michaelflisar.composestyled.ui.components.StyledTopBar
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
 import com.michaelflisar.composestyled.ui.components.StyledSnackbar
@@ -86,7 +87,8 @@ class Material3Button internal constructor(
                         context == StyledDialog.Context.DialogAction ||
                         context == StyledDialog.Context.FullscreenAction ||
                         context == StyledDialog.Context.BottomSheetAction ||
-                        context is StyledTopBar.Context) -> Variant.Text
+                        context is StyledTopBar.Context ||
+                        context == StyledToolbar.Context.Action) -> Variant.Text
                 else -> when (role) {
                     StyledButton.Role.Default,
                     StyledButton.Role.Primary -> Variant.Primary
@@ -122,7 +124,9 @@ class Material3Button internal constructor(
         val context = LocalStyledContext.current
         val variant = roleMapping(role, context)
         val isGroupBox = context == StyledGroupBox.Context.Clickable
-        val isTopBarDefault = role == StyledButton.Role.Default && context is StyledTopBar.Context
+        val isContainerDefaultText = role == StyledButton.Role.Default &&
+            (context is StyledTopBar.Context ||
+                context == StyledToolbar.Context.Action)
 
         when (variant) {
             Variant.FilledTonal -> {
@@ -293,7 +297,7 @@ class Material3Button internal constructor(
                     colors = ButtonDefaults.textButtonColors(
                         containerColor = Color.Unspecified,
                         contentColor = customization?.colors?.textForeground?.resolve()
-                            ?: if (isTopBarDefault) StyledTheme.currentContentColor
+                            ?: if (isContainerDefaultText) StyledTheme.currentContentColor
                             else MaterialTheme.colorScheme.primary
                     ),
                     contentPadding = if (isGroupBox) {

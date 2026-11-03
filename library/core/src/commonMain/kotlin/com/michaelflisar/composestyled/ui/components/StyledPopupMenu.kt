@@ -8,8 +8,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -24,8 +27,12 @@ import com.michaelflisar.composestyled.registry.LocalStyledRegistry
 import com.michaelflisar.composestyled.registry.StyledComponent
 import com.michaelflisar.composestyled.registry.StyledKey
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
+import com.michaelflisar.composestyled.ui.internal.LocalStyledToolbarPopupContext
 import com.michaelflisar.composestyled.ui.overlay.StyledPopupContainerScope
 import kotlin.math.roundToInt
+
+internal val LocalStyledPopupMenuDismiss =
+    staticCompositionLocalOf<(() -> Unit)?> { null }
 
 object StyledPopupMenu {
 
@@ -49,6 +56,7 @@ object StyledPopupMenu {
             onDismissRequest: () -> Unit,
             modifier: Modifier,
             offset: DpOffset,
+            placement: Placement,
             properties: PopupProperties,
             scrollState: ScrollState,
             style: StyledPopup.Style,
@@ -56,6 +64,14 @@ object StyledPopupMenu {
             header: (@Composable () -> Unit)?,
             content: @Composable ColumnScope.() -> Unit,
         )
+    }
+
+    /** Placement behavior relative to the measured popup container. */
+    enum class Placement {
+        /** Opens below or above its anchor, depending on available space. */
+        Anchor,
+        /** Opens beside its anchor and flips to the other side when needed. */
+        Submenu,
     }
 
     enum class OutsideTapBehavior {
@@ -135,7 +151,10 @@ object StyledPopupMenuDefaults {
         @Composable get() = StyledTheme.colorScheme.surface
 
     val contentPadding: PaddingValues
-        @Composable get() = PaddingValues(vertical = StyledTheme.padding.small)
+        @Composable get() = PaddingValues(
+            vertical = if (LocalStyledToolbarPopupContext.current != null) 0.dp
+            else StyledTheme.padding.small,
+        )
 
     @Composable
     fun contentColor(containerColor: Color = this.containerColor): Color =
@@ -157,6 +176,7 @@ fun StyledPopupContainerScope.StyledPopupMenu(
     properties: PopupProperties = StyledPopupDefaults.properties(),
     widthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenuDefaults.widthConfig,
     offset: DpOffset = StyledPopupMenuDefaults.offset,
+    placement: StyledPopupMenu.Placement = StyledPopupMenu.Placement.Anchor,
     scrollState: ScrollState = rememberScrollState(),
     shape: Shape = StyledPopupMenuDefaults.shape,
     containerColor: Color = StyledPopupMenuDefaults.containerColor,
@@ -175,6 +195,26 @@ fun StyledPopupContainerScope.StyledPopupMenu(
     require(offset.x.value.isFinite() && offset.y.value.isFinite()) {
         "Menu offset must be finite"
     }
+    val toolbarContext = LocalStyledToolbarPopupContext.current
+    val lastAncestor = toolbarContext?.ancestors?.lastOrNull()
+    val animationLevel = lastAncestor?.level ?: toolbarContext?.rootLevel
+    val animationId = lastAncestor?.id ?: toolbarContext?.rootId
+    val onTransitionFinished: ((Boolean) -> Unit)? =
+        remember(animationLevel, animationId) {
+            val level = animationLevel
+            val id = animationId
+            if (level != null && id != null) {
+                { finished -> level.setPopupAnimationFinished(id, finished) }
+            } else {
+                null
+            }
+        }
+    val rootDismiss = LocalStyledPopupMenuDismiss.current ?: onDismissRequest
+    val menuContent: @Composable ColumnScope.() -> Unit = {
+        CompositionLocalProvider(LocalStyledPopupMenuDismiss provides rootDismiss) {
+            content()
+        }
+    }
     val density = LocalDensity.current
     val windowOrigin = parentWindowOriginOnScreen
     val useWindowOverlay =
@@ -187,6 +227,7 @@ fun StyledPopupContainerScope.StyledPopupMenu(
             onDismissRequest = onDismissRequest,
             modifier = popupMenuWidthModifier(widthConfig, anchorWidth).then(modifier),
             offset = offset,
+            placement = placement,
             properties = properties,
             scrollState = scrollState,
             style = StyledPopup.Style(
@@ -197,6 +238,7 @@ fun StyledPopupContainerScope.StyledPopupMenu(
                 border = border,
                 maxHeight = maxHeight,
                 windowOverlay = useWindowOverlay,
+                onTransitionFinished = onTransitionFinished,
                 parentWindowOriginOnScreen = windowOrigin
                     ?.takeIf { useWindowOverlay }
                     ?.let {
@@ -208,7 +250,7 @@ fun StyledPopupContainerScope.StyledPopupMenu(
             ),
             contentPadding = contentPadding,
             header = popupHeader,
-            content = content,
+            content = menuContent,
         )
     }
 }

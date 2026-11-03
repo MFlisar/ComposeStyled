@@ -38,6 +38,7 @@ import com.michaelflisar.composestyled.runtime.StyledContext
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
 import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.ui.components.StyledSnackbar
+import com.michaelflisar.composestyled.ui.components.StyledToolbar
 import com.michaelflisar.composestyled.ui.components.StyledTopBar
 import com.michaelflisar.composestyled.ui.specials.StyledGroupBox
 import com.michaelflisar.composestyled.ui.specials.StyledSidePane
@@ -88,7 +89,8 @@ class CupertinoFlatButton internal constructor(
                         context == StyledDialog.Context.DialogAction ||
                         context == StyledDialog.Context.FullscreenAction ||
                         context == StyledDialog.Context.BottomSheetAction ||
-                        context is StyledTopBar.Context) -> Variant.Plain
+                        context is StyledTopBar.Context ||
+                        context == StyledToolbar.Context.Action) -> Variant.Plain
                 else -> when (role) {
                     StyledButton.Role.Default,
                     StyledButton.Role.Primary -> Variant.Tinted
@@ -130,7 +132,8 @@ class CupertinoFlatButton internal constructor(
             interactionSource = interactionSource,
             customization = customization,
             defaultContentColor = if (role == StyledButton.Role.Default &&
-                context is StyledTopBar.Context
+                (context is StyledTopBar.Context ||
+                    context == StyledToolbar.Context.Action)
             ) StyledTheme.currentContentColor else null,
             content = content,
         )

@@ -112,6 +112,37 @@ scrollable list. Dropdown filters and multi-selection actions use that slot.
 Use `StyledDropdownMenuDivider()` to separate groups with a horizontal divider
 and vertical spacing based on `StyledTheme.spacing.small`.
 
+Use `StyledPopupMenuSubmenu` for cascading menus. It composes a normal styled
+menu item as its anchor, opens a nested `StyledPopupMenu` beside that item, and
+flips to the opposite side when the preferred side does not fit. Submenus can
+nest recursively. The `dismiss` callback closes the entire menu hierarchy;
+`dismissSubmenu` closes only the current submenu and its descendants:
+
+```kotlin
+StyledPopupMenuSubmenu(
+    text = { StyledText("Export") },
+    leadingIcon = { StyledIcon(icon = StyledIcons.Share, contentDescription = null) },
+) { dismiss, dismissSubmenu ->
+    StyledDropdownMenuItem(
+        text = { StyledText("PDF") },
+        onClick = {
+            exportPdf()
+            dismiss()
+        },
+    )
+}
+```
+
+The submenu opens when its item is activated, including keyboard activation.
+Inside `StyledToolbarMenuButton`, root and nested menus additionally open after
+a brief hover delay and switch to hovered siblings; the regular
+`StyledDropdownButton` and standalone popup menus remain click-driven. Toolbar
+menu popups are non-focusable by default so they do not capture focus and block
+hover over sibling triggers. Hovering a nested popup keeps its full ancestor
+menu chain active. Clicking a toolbar trigger or submenu anchor during its
+opening animation has no effect; clicking it after the animation completes closes
+that menu.
+
 When the menu content overflows, it displays a scrollbar indicator according
 to `StyledTheme.behavior.showScrollbars`. Hiding indicators globally leaves
 menus and dropdowns scrollable.

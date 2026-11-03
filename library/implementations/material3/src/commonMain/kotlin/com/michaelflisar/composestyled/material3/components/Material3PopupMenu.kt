@@ -53,6 +53,7 @@ class Material3PopupMenu internal constructor() : StyledPopupMenu.Implementation
         onDismissRequest: () -> Unit,
         modifier: Modifier,
         offset: DpOffset,
+        placement: StyledPopupMenu.Placement,
         properties: PopupProperties,
         scrollState: ScrollState,
         style: StyledPopup.Style,
@@ -65,6 +66,7 @@ class Material3PopupMenu internal constructor() : StyledPopupMenu.Implementation
                 StyledPopupDefaults.windowOverlayPositionProvider(
                     offset = offset,
                     isVisible = expanded,
+                    placement = placement,
                     parentWindowOriginOnScreen = style.parentWindowOriginOnScreen,
                 )
             val menuSize = remember { mutableStateOf(IntSize.Zero) }
@@ -83,6 +85,7 @@ class Material3PopupMenu internal constructor() : StyledPopupMenu.Implementation
                     maxHeight = style.maxHeight,
                     windowOverlay = true,
                     windowOverlaySize = positionProvider.popupWindowSize(),
+                    onTransitionFinished = style.onTransitionFinished,
                 ),
             ) {
                 Box(
@@ -195,7 +198,7 @@ class Material3PopupMenu internal constructor() : StyledPopupMenu.Implementation
             visible = expanded,
             onDismissRequest = onDismissRequest,
             modifier = modifier,
-            popupPositionProvider = StyledPopupDefaults.positionProvider(offset, expanded),
+            popupPositionProvider = StyledPopupDefaults.positionProvider(offset, expanded, placement),
             properties = properties,
             style = style,
         ) {
