@@ -2,14 +2,17 @@
 
 ComposeStyled's adaptive APIs make layout decisions from the space available to
 the UI. They do not own destination selection, a back stack or navigation
-behavior. All Adaptive APIs live in
-`com.michaelflisar.composestyled.adaptive`.
+behavior. Adaptive APIs live in `com.michaelflisar.composestyled.adaptive`;
+the reusable master/detail layout lives in
+`com.michaelflisar.composestyled.ui.layout`.
 
-There are two UI composables:
+The UI composables are:
 
 - `StyledAdaptiveScaffold` chooses bottom or side navigation and provides
   scaffold content.
-- `StyledAdaptiveMasterDetail` arranges a master and optional detail pane.
+- `StyledAdaptiveContainer` provides adaptive information for its available
+  layout bounds.
+- `StyledMasterDetail` arranges master and detail panes for a resolved mode.
 
 `StyledAdaptive` is the utility for decisions. Its composable queries return
 Compose `State` values; reading `.value` makes the current composition react to
@@ -36,12 +39,13 @@ The default policy keeps these thresholds:
 | Master/detail | Side-by-side at 720 dp on desktop/web or 840 dp on mobile |
 | Dialog | Fullscreen below 600 dp window width or 480 dp window height; otherwise toolbar dialog |
 
-Navigation and master/detail use the measured local layout size. Dialog style
-uses the host window size. The utility observes the host window by default; to
-base a decision on a specific layout, pass `layoutSize: State<StyledAdaptiveSize>`.
-Supply a `StyledAdaptivePolicy` to replace any of the default decisions. For
-pure calculations, construct a `StyledAdaptiveContext` with separate local
-layout and host-window sizes and call `StyledAdaptive.resolve(context, policy)`.
+Navigation and master/detail use `context.layoutSize`; inside
+`StyledAdaptiveContainer` this is the container's measured bounds. Without an
+explicit layout size, `StyledAdaptive.info` uses the host window for that
+context. Dialog style always uses the host window size. Supply a
+`StyledAdaptivePolicy` to replace any of the default decisions. For pure
+calculations, construct a `StyledAdaptiveContext` with separate local layout and
+host-window sizes and call `StyledAdaptive.resolve(context, policy)`.
 
 The `State` returned by `StyledAdaptive.navigation`, `masterDetail` and
 `dialog` is read-only. Its value updates as the observed source changes. The
@@ -50,55 +54,37 @@ corresponding value types are `StyledNavigationMode`,
 `StyledAdaptive.showScrollbars(platform)` reports the platform preference; the
 theme's `StyledTheme.behavior.showScrollbars` can independently override it.
 
-## Master/detail
+## Adaptive container
 
-The caller supplies the related content. Adaptive never infers which entries
-belong together from a back stack.
+Use `StyledAdaptiveContainer` when adaptive decisions should use the local
+space available to a content area rather than the host window. It measures its
+own bounds and provides an observable `State<StyledAdaptiveInfo>`; the caller
+can derive any number of decisions from that same state.
 
 ```kotlin
-var selectedItem by remember { mutableStateOf<String?>(null) }
-
-StyledAdaptiveMasterDetail(
-    master = {
-        StyledButton(onClick = { selectedItem = "item" }) {
-            StyledText("Open item")
-        }
-    },
-    detail = if (selectedItem != null) {
-        { StyledText("Details for $selectedItem") }
-    } else null,
-    emptyDetail = {
-        StyledText("Select an item")
-    },
-)
+StyledAdaptiveContainer(Modifier.fillMaxSize()) { adaptiveInfo ->
+    val masterDetailMode = StyledAdaptive.masterDetail(adaptiveInfo)
+    val navigationMode = StyledAdaptive.navigation(adaptiveInfo)
+    // Use both decisions for content measured in this container.
+}
 ```
 
-`detail = null` means no detail is present. `SinglePane` shows the detail when
-one exists, otherwise the master. `SideBySide` always reserves the master pane;
-it shows the detail when present and otherwise leaves an empty detail area or
-composes `emptyDetail`. A non-null detail slot counts as present even when it
-chooses to render no visible content.
-
-`masterFraction` (default `0.4f`) sets the master's share of the available
-width, and `paneSpacing` sets the gap. The layout mirrors naturally in RTL.
-Switching modes only changes which supplied content is composed; selection,
-back behavior and saveable state remain the caller's responsibility.
-
-Pass `masterDetailMode` to use an already-resolved
-`State<StyledAdaptiveMasterDetailMode>`, for example when a parent or app-owned
-Navigation 3 scene strategy needs rendering and scene selection to use the same
-decision. Otherwise the layout measures its own available constraints. The
-explicit mode is authoritative; its other slot information still reflects the
-layout's locally measured size. Inside Scaffold content, derive it from the
-provided info state with `StyledAdaptive.masterDetail(adaptiveInfo)`.
+The container does not apply padding or impose a visual layout. Use its
+`modifier` to control the measured area. `StyledAdaptiveScaffold` also uses the
+container internally: its content receives adaptive information measured for
+the scaffold body, while its hoisted state reports the overall scaffold
+constraints used for navigation selection.
 
 ## Scaffold
 
 Both `StyledAdaptiveScaffold` overloads preserve the existing navigation-item
 and custom-navigation forms. Their content receives both scaffold padding and
-an observable `State<StyledAdaptiveInfo>` for the measured body:
+an observable `State<StyledAdaptiveInfo>` for the measured body. Feed its
+derived mode to `StyledMasterDetail`:
 
 ```kotlin
+var selectedItem by remember { mutableStateOf<String?>(null) }
+
 StyledAdaptiveScaffold(
     platform = StyledTheme.platform,
     navigation = { mode ->
@@ -106,11 +92,16 @@ StyledAdaptiveScaffold(
     },
 ) { paddingValues, adaptiveInfo ->
     val masterDetailMode = StyledAdaptive.masterDetail(adaptiveInfo)
+    StyledMasterDetail(
+        mode = masterDetailMode.value,
+        detailData = selectedItem,
+        master = { StyledText("Items") },
+        detail = { item -> StyledText(item ?: "Select an item") },
+    )
     StyledText(
         "Width class: ${adaptiveInfo.value.context.layoutSize.widthClass}",
         Modifier.padding(paddingValues).consumeWindowInsets(paddingValues),
     )
-    // Pass masterDetailMode to StyledAdaptiveMasterDetail when composing its panes.
 }
 ```
 
@@ -139,17 +130,18 @@ layout-derived decisions.
 ## Navigation 3 boundary
 
 Navigation 3 can use `StyledAdaptive.masterDetail()` to choose a scene
-presentation, then pass the same state as `masterDetailMode` to
-`StyledAdaptiveMasterDetail`. The
-application's scene strategy decides which related entries form the master and
-detail and which entries a single-pane scene exposes. The application remains
-responsible for `Scene.entries`, previous entries, scene keys, entry decorators,
-back and predictive-back behavior, lifecycles and transitions. Do not render
-back-stack entries outside their Navigation 3 entry/decorator context.
+presentation, then pass that mode to `StyledMasterDetail` when rendering
+content. The application's scene strategy decides which related entries form
+the master and detail and which entries a single-pane scene exposes. The
+application remains responsible for `Scene.entries`, previous entries, scene
+keys, entry decorators, back and predictive-back behavior, lifecycles and
+transitions. Do not render back-stack entries outside their Navigation 3
+entry/decorator context.
 
 The core module has no Navigation 3 dependency and supplies no scene strategy
 or adapter. This keeps adaptive layout reusable for applications using other
 navigation approaches.
 
 See [Scaffold](Scaffold.md), [Side navigation](SideNavigation.md) and
-[Dialog](Dialog.md) for their component-specific behavior.
+[Dialog](Dialog.md) for their component-specific behavior. See
+[Master/detail](MasterDetail.md) for the pane layout API.

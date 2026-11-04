@@ -1,8 +1,10 @@
 package com.michaelflisar.composestyled.material3.components
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -26,7 +28,7 @@ import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.runtime.LocalStyledContext
 import com.michaelflisar.composestyled.runtime.StyledContext
 import com.michaelflisar.composestyled.ui.components.StyledButton
-import com.michaelflisar.composestyled.ui.components.StyledToolbar
+import com.michaelflisar.composestyled.ui.components.StyledMenuBar
 import com.michaelflisar.composestyled.ui.components.StyledTopBar
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
 import com.michaelflisar.composestyled.ui.components.StyledSnackbar
@@ -88,7 +90,7 @@ class Material3Button internal constructor(
                         context == StyledDialog.Context.FullscreenAction ||
                         context == StyledDialog.Context.BottomSheetAction ||
                         context is StyledTopBar.Context ||
-                        context == StyledToolbar.Context.Action) -> Variant.Text
+                        context == StyledMenuBar.Context.MenuItem) -> Variant.Text
                 else -> when (role) {
                     StyledButton.Role.Default,
                     StyledButton.Role.Primary -> Variant.Primary
@@ -124,15 +126,20 @@ class Material3Button internal constructor(
         val context = LocalStyledContext.current
         val variant = roleMapping(role, context)
         val isGroupBox = context == StyledGroupBox.Context.Clickable
+        val buttonModifier = if (context == StyledMenuBar.Context.MenuItem) {
+            modifier.width(IntrinsicSize.Min)
+        } else {
+            modifier
+        }
         val isContainerDefaultText = role == StyledButton.Role.Default &&
             (context is StyledTopBar.Context ||
-                context == StyledToolbar.Context.Action)
+                context == StyledMenuBar.Context.MenuItem)
 
         when (variant) {
             Variant.FilledTonal -> {
                 FilledTonalButton(
                     onClick = onClick,
-                    modifier = modifier,
+                    modifier = buttonModifier,
                     enabled = enabled,
                     shape = shape,
                     interactionSource = interactionSource,
@@ -161,7 +168,7 @@ class Material3Button internal constructor(
             Variant.Primary -> {
                 Button(
                     onClick = onClick,
-                    modifier = modifier,
+                    modifier = buttonModifier,
                     enabled = enabled,
                     shape = shape,
                     interactionSource = interactionSource,
@@ -190,7 +197,7 @@ class Material3Button internal constructor(
             Variant.Secondary -> {
                 Button(
                     onClick = onClick,
-                    modifier = modifier,
+                    modifier = buttonModifier,
                     enabled = enabled,
                     shape = shape,
                     interactionSource = interactionSource,
@@ -221,7 +228,7 @@ class Material3Button internal constructor(
             Variant.Elevated -> {
                 ElevatedButton(
                     onClick = onClick,
-                    modifier = modifier,
+                    modifier = buttonModifier,
                     enabled = enabled,
                     shape = shape,
                     interactionSource = interactionSource,
@@ -256,7 +263,7 @@ class Material3Button internal constructor(
                 ) {
                     OutlinedButton(
                         onClick = onClick,
-                        modifier = modifier,
+                        modifier = buttonModifier,
                         enabled = enabled,
                         shape = shape,
                         interactionSource = interactionSource,
@@ -290,7 +297,7 @@ class Material3Button internal constructor(
             Variant.Text -> {
                 TextButton(
                     onClick = onClick,
-                    modifier = modifier,
+                    modifier = buttonModifier,
                     enabled = enabled,
                     shape = shape,
                     interactionSource = interactionSource,

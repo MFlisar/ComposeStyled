@@ -7,8 +7,10 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
@@ -35,11 +37,11 @@ import com.michaelflisar.composestyled.registry.StyledComponentWithDefaults
 import com.michaelflisar.composestyled.registry.StyledKey
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.ui.icons.StyledIcons
-import com.michaelflisar.composestyled.ui.internal.LocalStyledToolbarPopupContext
-import com.michaelflisar.composestyled.ui.internal.LocalStyledToolbarSubmenuAnchor
-import com.michaelflisar.composestyled.ui.internal.StyledToolbarMenuAncestor
-import com.michaelflisar.composestyled.ui.internal.StyledToolbarPopupContext
-import com.michaelflisar.composestyled.ui.internal.ToolbarPopupMenuContent
+import com.michaelflisar.composestyled.ui.internal.LocalStyledMenuBarPopupContext
+import com.michaelflisar.composestyled.ui.internal.LocalStyledMenuBarSubmenuAnchor
+import com.michaelflisar.composestyled.ui.internal.MenuBarPopupMenuContent
+import com.michaelflisar.composestyled.ui.internal.StyledMenuBarAncestor
+import com.michaelflisar.composestyled.ui.internal.StyledMenuBarPopupContext
 import com.michaelflisar.composestyled.ui.overlay.StyledPopupContainer
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.ui.primitives.StyledHorizontalDivider
@@ -157,7 +159,7 @@ object StyledDropdownMenuItemDefaults {
     val minHeight: Dp
         @Composable get() {
             val default = LocalStyledRegistry.current[StyledDropdownMenuItem.DefaultsKey].minHeight
-            return if (LocalStyledToolbarPopupContext.current != null) {
+            return if (LocalStyledMenuBarPopupContext.current != null) {
                 minOf(default, 36.dp)
             } else {
                 default
@@ -167,7 +169,7 @@ object StyledDropdownMenuItemDefaults {
     val contentPadding: PaddingValues
         @Composable get() = PaddingValues(
             horizontal = StyledTheme.padding.medium,
-            vertical = if (LocalStyledToolbarPopupContext.current != null) 0.dp
+            vertical = if (LocalStyledMenuBarPopupContext.current != null) 0.dp
             else StyledTheme.padding.small,
         )
 
@@ -189,6 +191,8 @@ object StyledDropdownMenuItemDefaults {
         textColor, leadingIconColor, trailingIconColor,
         disabledTextColor, disabledLeadingIconColor, disabledTrailingIconColor,
     )
+
+    val widthConfig = StyledPopupMenu.WidthConfig.AtLeastAnchor
 }
 
 // -------------------------
@@ -212,10 +216,17 @@ fun StyledDropdownMenuItem(
     minHeight: Dp = StyledDropdownMenuItemDefaults.minHeight,
 ) {
     val effectiveInteractionSource = menuItemInteractionSource(interactionSource)
-    ToolbarMenuItemHoverEffect(effectiveInteractionSource)
+    MenuBarMenuItemHoverEffect(effectiveInteractionSource)
+    val effectiveLeadingIcon = leadingIcon ?: if (
+        LocalStyledMenuBarPopupContext.current != null
+    ) {
+        { Spacer(Modifier.size(StyledIconDefaults.size)) }
+    } else {
+        null
+    }
 
     LocalStyledRegistry.current[StyledDropdownMenuItem.Key].Render(
-        text, onClick, modifier, leadingIcon, trailingIcon, enabled, colors,
+        text, onClick, modifier, effectiveLeadingIcon, trailingIcon, enabled, colors,
         contentPadding, effectiveInteractionSource, shape, itemPadding, minHeight,
     )
 }
@@ -237,7 +248,7 @@ fun StyledDropdownMenuContent(
     content: @Composable RowScope.() -> Unit,
 ) {
     val effectiveInteractionSource = menuItemInteractionSource(interactionSource)
-    ToolbarMenuItemHoverEffect(effectiveInteractionSource)
+    MenuBarMenuItemHoverEffect(effectiveInteractionSource)
 
     LocalStyledRegistry.current[StyledDropdownMenuItem.Key].Render(
         content, onClick, modifier, enabled, colors, contentPadding,
@@ -288,7 +299,7 @@ fun StyledDropdownMenuDivider(
 ) {
     StyledHorizontalDivider(
         modifier = modifier.padding(
-            vertical = if (LocalStyledToolbarPopupContext.current != null) 4.dp
+            vertical = if (LocalStyledMenuBarPopupContext.current != null) StyledTheme.padding.small
             else StyledTheme.spacing.small,
         ),
     )
@@ -306,28 +317,29 @@ fun StyledPopupMenuSubmenu(
     leadingIcon: (@Composable () -> Unit)? = null,
     enabled: Boolean = true,
     properties: PopupProperties = StyledPopupDefaults.properties(
-        focusable = LocalStyledToolbarPopupContext.current == null,
+        focusable = LocalStyledMenuBarPopupContext.current == null,
     ),
+    animation: StyledPopup.Animation = StyledPopupMenuDefaults.animation,
     content: @Composable ColumnScope.(
         dismiss: () -> Unit,
         dismissSubmenu: () -> Unit,
     ) -> Unit,
 ) {
     val expanded = remember { mutableStateOf(false) }
-    val toolbarContext = LocalStyledToolbarPopupContext.current
-    val menuLevel = toolbarContext?.menuLevel
+    val menuBarContext = LocalStyledMenuBarPopupContext.current
+    val menuLevel = menuBarContext?.menuLevel
     val submenuId = remember(menuLevel) { Any() }
     val interactionSource = remember { MutableInteractionSource() }
     val hovered by interactionSource.collectIsHoveredAsState()
     val anchorHoverTarget = remember { Any() }
-    val submenuPopupContext = if (toolbarContext != null && menuLevel != null) {
-        remember(toolbarContext, submenuId) {
-            StyledToolbarPopupContext(
-                rootLevel = toolbarContext.rootLevel,
-                rootId = toolbarContext.rootId,
+    val submenuPopupContext = if (menuBarContext != null && menuLevel != null) {
+        remember(menuBarContext, submenuId) {
+            StyledMenuBarPopupContext(
+                rootLevel = menuBarContext.rootLevel,
+                rootId = menuBarContext.rootId,
                 menuLevel = menuLevel.createChildLevel(submenuId),
-                ancestors = toolbarContext.ancestors +
-                    StyledToolbarMenuAncestor(menuLevel, submenuId),
+                ancestors = menuBarContext.ancestors +
+                    StyledMenuBarAncestor(menuLevel, submenuId),
             )
         }
     } else {
@@ -360,8 +372,8 @@ fun StyledPopupMenuSubmenu(
         }
     }
     val dismissAll: () -> Unit = LocalStyledPopupMenuDismiss.current ?: {
-        if (toolbarContext != null) {
-            toolbarContext.rootLevel.close(toolbarContext.rootId)
+        if (menuBarContext != null) {
+            menuBarContext.rootLevel.close(menuBarContext.rootId)
         } else {
             expanded.value = false
         }
@@ -378,16 +390,17 @@ fun StyledPopupMenuSubmenu(
         popup = {
             if (submenuPopupContext != null) {
                 CompositionLocalProvider(
-                    LocalStyledToolbarPopupContext provides submenuPopupContext,
+                    LocalStyledMenuBarPopupContext provides submenuPopupContext,
                 ) {
                     StyledPopupMenu(
                         expanded = isExpanded && enabled,
                         onDismissRequest = dismissFromPopup,
                         properties = properties,
-                        widthConfig = StyledPopupMenu.WidthConfig.Auto(),
+                        widthConfig = StyledDropdownMenuItemDefaults.widthConfig,
                         placement = StyledPopupMenu.Placement.Submenu,
+                        animation = animation,
                     ) {
-                        ToolbarPopupMenuContent(submenuPopupContext) {
+                        MenuBarPopupMenuContent(submenuPopupContext) {
                             content(dismissAll, dismissSubmenu)
                         }
                     }
@@ -397,8 +410,9 @@ fun StyledPopupMenuSubmenu(
                     expanded = isExpanded && enabled,
                     onDismissRequest = dismissFromPopup,
                     properties = properties,
-                    widthConfig = StyledPopupMenu.WidthConfig.Auto(),
+                    widthConfig = StyledDropdownMenuItemDefaults.widthConfig,
                     placement = StyledPopupMenu.Placement.Submenu,
+                    animation = animation,
                 ) {
                     content(dismissAll, dismissSubmenu)
                 }
@@ -406,7 +420,7 @@ fun StyledPopupMenuSubmenu(
         },
         content = {
             CompositionLocalProvider(
-                LocalStyledToolbarSubmenuAnchor provides (toolbarContext != null),
+                LocalStyledMenuBarSubmenuAnchor provides (menuBarContext != null),
             ) {
                 StyledDropdownMenuItem(
                     text = text,
@@ -421,7 +435,7 @@ fun StyledPopupMenuSubmenu(
                     leadingIcon = leadingIcon,
                     trailingIcon = {
                         StyledIcon(
-                            icon = StyledIcons.NavigateForward,
+                            icon = StyledIcons.Submenu,
                             contentDescription = "Open submenu",
                         )
                     },
@@ -441,22 +455,22 @@ fun StyledPopupMenuSubmenu(
 private fun menuItemInteractionSource(
     interactionSource: MutableInteractionSource?,
 ): MutableInteractionSource? {
-    if (LocalStyledToolbarPopupContext.current == null || interactionSource != null) {
+    if (LocalStyledMenuBarPopupContext.current == null || interactionSource != null) {
         return interactionSource
     }
     return remember { MutableInteractionSource() }
 }
 
 @Composable
-private fun ToolbarMenuItemHoverEffect(
+private fun MenuBarMenuItemHoverEffect(
     interactionSource: MutableInteractionSource?,
 ) {
-    val toolbarContext = LocalStyledToolbarPopupContext.current
-    val isSubmenuAnchor = LocalStyledToolbarSubmenuAnchor.current
+    val menuBarContext = LocalStyledMenuBarPopupContext.current
+    val isSubmenuAnchor = LocalStyledMenuBarSubmenuAnchor.current
     val hovered = interactionSource?.collectIsHoveredAsState()?.value == true
-    LaunchedEffect(toolbarContext, hovered, isSubmenuAnchor) {
-        if (toolbarContext != null && hovered && !isSubmenuAnchor) {
-            toolbarContext.menuLevel.closeActive()
+    LaunchedEffect(menuBarContext, hovered, isSubmenuAnchor) {
+        if (menuBarContext != null && hovered && !isSubmenuAnchor) {
+            menuBarContext.menuLevel.closeActive()
         }
     }
 }

@@ -2,30 +2,33 @@
 
 `StyledButton()` uses `Role.Default`. Each theme resolves that role using the
 current component context, so callers do not need to choose a visual role for
-toolbar actions, dialog actions or other context-sensitive controls. Set
-`role = StyledButton.Role.Primary`, `StyledButton.Role.Secondary` or
-`StyledButton.Role.Tertiary` only when you intentionally want that semantic
+menu-bar items, top-bar actions, dialog actions or other context-sensitive
+controls. Set `role = StyledButton.Role.Primary`,
+`StyledButton.Role.Secondary` or `StyledButton.Role.Tertiary` only when you
+intentionally want that semantic
 emphasis; an explicit role is not replaced by the context. Concrete styles are
 selected by each theme's configurable `roleMapping(role, context)` lambda, not
 by a visual variant in the Core API.
 Context is owned by its source component and exposed through the open
 `StyledContext` contract. Top-bar navigation and action slots provide their own
 contexts; the default role uses the bar's actual `contentColor` for icons and
-text. `StyledSnackbar.Context.SnackbarAction` is provided around the snackbar action
-and dismiss-action slots. `StyledDialog.Context.DialogAction`, `FullscreenAction`
-and `BottomSheetAction` are supplied by the [dialog family](Dialog.md), only
-around its action buttons. Dialog buttons also provide an action-slot context
+text. Menu bars provide `StyledMenuBar.Context.MenuItem`.
+`StyledSnackbar.Context.SnackbarAction` is provided around the snackbar action
+and dismiss-action slots. `StyledDialog.Context.DialogAction`,
+`FullscreenAction` and `BottomSheetAction` are supplied by the
+[dialog family](Dialog.md), only around its action buttons. Dialog buttons also
+provide an action-slot context
 (positive, negative or neutral) so Fluent 2 can retain its established action
 hierarchy while Material 3 and Cupertino use their text/plain defaults.
 Clickable `StyledGroupBox` content maps the default
 role to each theme's outlined button style. Input leading/trailing slots provide
 their own contexts; icon-button defaults select an input-friendly style there.
 
-| Theme | Default role outside a context | Default in navigation and action slots | Default in snackbar and dialog actions |
-|-------|--------------------------------|----------------------------------------|---------------------------------------|
-| Material 3 | Primary | Text, using the bar content color | Text |
-| Cupertino | Tinted | Plain, using the bar content color | Plain |
-| Fluent 2 | Primary | Transparent, using the bar content color | Transparent in snackbars; Primary/Secondary/Subtle by dialog action slot |
+| Theme | Default role outside a context | Default in navigation and action slots | Default in menu-bar items | Default in snackbar and dialog actions |
+|-------|--------------------------------|----------------------------------------|----------------------------|---------------------------------------|
+| Material 3 | Primary | Text, using the bar content color | Text | Text |
+| Cupertino | Tinted | Plain, using the bar content color | Plain | Plain |
+| Fluent 2 | Primary | Transparent, using the bar content color | Transparent | Transparent in snackbars; Primary/Secondary/Subtle by dialog action slot |
 
 Explicit roles keep their normal role mapping in all these contexts. A theme's
 custom mapping can choose a different result.

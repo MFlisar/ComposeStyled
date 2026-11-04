@@ -1,5 +1,11 @@
 package com.michaelflisar.composestyled.ui.components
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.safeDrawing
@@ -14,6 +20,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalWindowInfo
@@ -46,7 +53,14 @@ object StyledPopup {
     // 5) implementation
     // -------------
 
-    /** Theme-resolved visual properties and height limit for a popup. */
+    /** Enter and exit transitions applied to popup content. */
+    @Stable
+    data class Animation(
+        val enter: EnterTransition,
+        val exit: ExitTransition,
+    )
+
+    /** Theme-resolved visual properties, animation and height limit for a popup. */
     @Stable
     data class Style(
         val shape: Shape,
@@ -61,6 +75,7 @@ object StyledPopup {
         val parentWindowOriginOnScreen: IntOffset = IntOffset.Zero,
         @InternalComposeStyledApi
         val onTransitionFinished: ((Boolean) -> Unit)? = null,
+        val animation: Animation = StyledPopupDefaults.animation,
     ) {
         init {
             require(maxHeight.value.isFinite() && maxHeight > 0.dp) {
@@ -92,6 +107,18 @@ object StyledPopup {
 
 object StyledPopupDefaults {
 
+    /** Default fade-and-scale animation used by popups outside a menu bar. */
+    val animation = StyledPopup.Animation(
+        enter = fadeIn() + scaleIn(
+            initialScale = 0.8f,
+            transformOrigin = TransformOrigin.Center,
+        ),
+        exit = fadeOut() + scaleOut(
+            targetScale = 0.8f,
+            transformOrigin = TransformOrigin.Center,
+        ),
+    )
+
     /** Builds Compose popup window properties with platform-friendly defaults. */
     @Composable
     fun properties(
@@ -117,6 +144,7 @@ object StyledPopupDefaults {
         shadowElevation: Dp = 8.dp,
         border: BorderStroke? = null,
         maxHeight: Dp = 320.dp,
+        animation: StyledPopup.Animation = StyledPopupDefaults.animation,
     ) = StyledPopup.Style(
         shape = shape,
         containerColor = containerColor,
@@ -124,6 +152,7 @@ object StyledPopupDefaults {
         shadowElevation = shadowElevation,
         border = border,
         maxHeight = maxHeight,
+        animation = animation,
     )
 
     /** Positions the popup relative to its anchor using an optional dp offset. */
@@ -373,7 +402,10 @@ class WindowOverlayPositionProvider internal constructor(
 // public API
 // -------------------------
 
-/** Shows or hides a theme-rendered popup and reports dismissal through [onDismissRequest]. */
+/**
+ * Shows or hides a theme-rendered popup and reports dismissal through [onDismissRequest].
+ * [animation] overrides the transitions in [style] for this popup.
+ */
 @Composable
 fun StyledPopup(
     visible: Boolean,
@@ -382,6 +414,7 @@ fun StyledPopup(
     popupPositionProvider: PopupPositionProvider = StyledPopupDefaults.positionProvider(),
     properties: PopupProperties = StyledPopupDefaults.properties(),
     style: StyledPopup.Style = StyledPopupDefaults.style(),
+    animation: StyledPopup.Animation = style.animation,
     content: @Composable () -> Unit,
 ) {
     LocalStyledRegistry.current[StyledPopup.Key].Render(
@@ -390,12 +423,15 @@ fun StyledPopup(
         modifier = modifier,
         popupPositionProvider = popupPositionProvider,
         properties = properties,
-        style = style,
+        style = style.copy(animation = animation),
         content = content,
     )
 }
 
-/** State-backed overload that sets [visible] to false when the popup is dismissed. */
+/**
+ * State-backed overload that sets [visible] to false when dismissed.
+ * [animation] overrides the transitions in [style] for this popup.
+ */
 @Composable
 fun StyledPopup(
     visible: MutableState<Boolean>,
@@ -403,6 +439,7 @@ fun StyledPopup(
     popupPositionProvider: PopupPositionProvider = StyledPopupDefaults.positionProvider(),
     properties: PopupProperties = StyledPopupDefaults.properties(),
     style: StyledPopup.Style = StyledPopupDefaults.style(),
+    animation: StyledPopup.Animation = style.animation,
     content: @Composable () -> Unit,
 ) {
     StyledPopup(
@@ -412,6 +449,7 @@ fun StyledPopup(
         popupPositionProvider = popupPositionProvider,
         properties = properties,
         style = style,
+        animation = animation,
         content = content,
     )
 }

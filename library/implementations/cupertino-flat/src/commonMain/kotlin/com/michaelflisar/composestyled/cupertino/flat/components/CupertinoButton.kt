@@ -38,7 +38,7 @@ import com.michaelflisar.composestyled.runtime.StyledContext
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
 import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.ui.components.StyledSnackbar
-import com.michaelflisar.composestyled.ui.components.StyledToolbar
+import com.michaelflisar.composestyled.ui.components.StyledMenuBar
 import com.michaelflisar.composestyled.ui.components.StyledTopBar
 import com.michaelflisar.composestyled.ui.specials.StyledGroupBox
 import com.michaelflisar.composestyled.ui.specials.StyledSidePane
@@ -90,7 +90,7 @@ class CupertinoFlatButton internal constructor(
                         context == StyledDialog.Context.FullscreenAction ||
                         context == StyledDialog.Context.BottomSheetAction ||
                         context is StyledTopBar.Context ||
-                        context == StyledToolbar.Context.Action) -> Variant.Plain
+                        context == StyledMenuBar.Context.MenuItem) -> Variant.Plain
                 else -> when (role) {
                     StyledButton.Role.Default,
                     StyledButton.Role.Primary -> Variant.Tinted
@@ -133,7 +133,7 @@ class CupertinoFlatButton internal constructor(
             customization = customization,
             defaultContentColor = if (role == StyledButton.Role.Default &&
                 (context is StyledTopBar.Context ||
-                    context == StyledToolbar.Context.Action)
+                    context == StyledMenuBar.Context.MenuItem)
             ) StyledTheme.currentContentColor else null,
             content = content,
         )
@@ -181,6 +181,11 @@ private fun CupertinoFlatButton(
         },
     )
     val minimumSize = maxOf(44.dp, StyledTheme.sizes.minimumInteractiveSize)
+    val minimumWidth = if (LocalStyledContext.current == StyledMenuBar.Context.MenuItem) {
+        0.dp
+    } else {
+        minimumSize
+    }
     val buttonPadding = if (isGroupBox) {
         PaddingValues(0.dp)
     } else {
@@ -193,7 +198,7 @@ private fun CupertinoFlatButton(
     ) {
         Row(
             modifier = modifier
-                .sizeIn(minWidth = minimumSize, minHeight = minimumSize)
+                .sizeIn(minWidth = minimumWidth, minHeight = minimumSize)
                 .clickable(
                     interactionSource = source,
                     indication = null,

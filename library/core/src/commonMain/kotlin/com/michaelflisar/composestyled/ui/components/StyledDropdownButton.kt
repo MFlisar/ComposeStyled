@@ -3,9 +3,11 @@ package com.michaelflisar.composestyled.ui.components
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -19,12 +21,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
 import com.michaelflisar.composestyled.StyledTheme
-import com.michaelflisar.composestyled.ui.internal.LocalStyledToolbarMenuLevel
-import com.michaelflisar.composestyled.ui.internal.LocalStyledToolbarPopupContext
-import com.michaelflisar.composestyled.ui.internal.StyledToolbarPopupContext
-import com.michaelflisar.composestyled.ui.internal.ToolbarPopupMenuContent
+import com.michaelflisar.composestyled.classes.IconComposable
+import com.michaelflisar.composestyled.ui.internal.LocalStyledMenuBarLevel
+import com.michaelflisar.composestyled.ui.internal.LocalStyledMenuBarPopupContext
+import com.michaelflisar.composestyled.ui.internal.MenuBarPopupMenuContent
+import com.michaelflisar.composestyled.ui.internal.StyledMenuBarPopupContext
 import com.michaelflisar.composestyled.ui.overlay.StyledPopupContainer
 import com.michaelflisar.composestyled.ui.primitives.StyledExpandIcon
 
@@ -33,11 +37,11 @@ import com.michaelflisar.composestyled.ui.primitives.StyledExpandIcon
 // -------------------------
 
 /**
- * A themed toolbar menu button that opens after hovering and switches with sibling menus.
- * Its popup is non-focusable by default inside [StyledToolbar] so pointer hover can reach siblings.
+ * A themed menu-bar item that opens after hovering and switches with sibling menus.
+ * Its popup is non-focusable by default inside [StyledMenuBar] so pointer hover can reach siblings.
  */
 @Composable
-fun StyledToolbarMenuButton(
+fun StyledMenuBarItem(
     menuContent: @Composable ColumnScope.(dismiss: () -> Unit) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
@@ -48,51 +52,54 @@ fun StyledToolbarMenuButton(
     customization: StyledButton.Customization? = null,
     // menu
     menuProperties: PopupProperties = StyledPopupDefaults.properties(
-        focusable = LocalStyledToolbarMenuLevel.current == null,
+        focusable = LocalStyledMenuBarLevel.current == null,
     ),
-    menuWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenu.WidthConfig.Auto(),
+    menuWidthConfig: StyledPopupMenu.WidthConfig =
+        StyledPopupMenu.WidthConfig.Auto(maxWidth = 260.dp),
     menuShape: Shape = StyledPopupMenuDefaults.shape,
     menuContainerColor: Color = StyledPopupMenuDefaults.containerColor,
     menuContentColor: Color = StyledPopupMenuDefaults.contentColor(menuContainerColor),
     menuOffset: DpOffset = StyledPopupMenuDefaults.offset,
     menuMaxHeight: Dp = StyledPopupMenuDefaults.maxHeight,
+    menuAnimation: StyledPopup.Animation = StyledPopupMenuDefaults.menuBarAnimation,
     // content
+    icon: IconComposable? = null,
     content: @Composable RowScope.() -> Unit,
 ) {
-    val toolbarLevel = LocalStyledToolbarMenuLevel.current
-    val menuId = remember(toolbarLevel) { Any() }
+    val menuBarLevel = LocalStyledMenuBarLevel.current
+    val menuId = remember(menuBarLevel) { Any() }
     val fallbackExpanded = remember { mutableStateOf(false) }
-    val menuLevel = remember(toolbarLevel, menuId) {
-        toolbarLevel?.createChildLevel(menuId)
+    val menuLevel = remember(menuBarLevel, menuId) {
+        menuBarLevel?.createChildLevel(menuId)
     }
-    val effectiveInteractionSource = if (toolbarLevel != null && interactionSource == null) {
-        remember(toolbarLevel) { MutableInteractionSource() }
+    val effectiveInteractionSource = if (menuBarLevel != null && interactionSource == null) {
+        remember(menuBarLevel) { MutableInteractionSource() }
     } else {
         interactionSource
     }
     val hovered = effectiveInteractionSource?.collectIsHoveredAsState()?.value == true
-    val anchorHoverTarget = remember(toolbarLevel, menuId) { Any() }
-    LaunchedEffect(toolbarLevel, menuId, enabled, hovered) {
-        if (toolbarLevel != null) {
+    val anchorHoverTarget = remember(menuBarLevel, menuId) { Any() }
+    LaunchedEffect(menuBarLevel, menuId, enabled, hovered) {
+        if (menuBarLevel != null) {
             if (enabled) {
-                toolbarLevel.setHoverTarget(
+                menuBarLevel.setHoverTarget(
                     id = menuId,
                     target = anchorHoverTarget,
                     hovered = hovered,
                     openOnHover = true,
                 )
             } else {
-                toolbarLevel.close(menuId)
+                menuBarLevel.close(menuId)
             }
         }
         if (!enabled) {
             fallbackExpanded.value = false
         }
     }
-    val popupContext = if (toolbarLevel != null && menuLevel != null) {
-        remember(toolbarLevel, menuId, menuLevel) {
-            StyledToolbarPopupContext(
-                rootLevel = toolbarLevel,
+    val popupContext = if (menuBarLevel != null && menuLevel != null) {
+        remember(menuBarLevel, menuId, menuLevel) {
+            StyledMenuBarPopupContext(
+                rootLevel = menuBarLevel,
                 rootId = menuId,
                 menuLevel = menuLevel,
             )
@@ -100,17 +107,17 @@ fun StyledToolbarMenuButton(
     } else {
         null
     }
-    val expanded = toolbarLevel?.isActive(menuId) ?: fallbackExpanded.value
+    val expanded = menuBarLevel?.isActive(menuId) ?: fallbackExpanded.value
     val dismiss = {
-        if (toolbarLevel != null) {
-            toolbarLevel.close(menuId)
+        if (menuBarLevel != null) {
+            menuBarLevel.close(menuId)
         } else {
             fallbackExpanded.value = false
         }
     }
     val dismissFromPopup = {
-        if (toolbarLevel != null) {
-            toolbarLevel.closeFromPopup(menuId, hovered)
+        if (menuBarLevel != null) {
+            menuBarLevel.closeFromPopup(menuId, hovered)
         } else {
             fallbackExpanded.value = false
         }
@@ -120,7 +127,7 @@ fun StyledToolbarMenuButton(
         popup = {
             CompositionLocalProvider(LocalStyledPopupMenuDismiss provides dismiss) {
                 if (popupContext != null) {
-                    CompositionLocalProvider(LocalStyledToolbarPopupContext provides popupContext) {
+                    CompositionLocalProvider(LocalStyledMenuBarPopupContext provides popupContext) {
                         StyledPopupMenu(
                             expanded = expanded && enabled,
                             onDismissRequest = dismissFromPopup,
@@ -131,8 +138,9 @@ fun StyledToolbarMenuButton(
                             contentColor = menuContentColor,
                             offset = menuOffset,
                             maxHeight = menuMaxHeight,
+                            animation = menuAnimation,
                         ) {
-                            ToolbarPopupMenuContent(popupContext) {
+                            MenuBarPopupMenuContent(popupContext) {
                                 menuContent(dismiss)
                             }
                         }
@@ -148,6 +156,7 @@ fun StyledToolbarMenuButton(
                         contentColor = menuContentColor,
                         offset = menuOffset,
                         maxHeight = menuMaxHeight,
+                        animation = menuAnimation,
                     ) {
                         menuContent(dismiss)
                     }
@@ -157,8 +166,8 @@ fun StyledToolbarMenuButton(
         content = {
             StyledButton(
                 onClick = {
-                    if (toolbarLevel != null) {
-                        toolbarLevel.openFromClick(menuId)
+                    if (menuBarLevel != null) {
+                        menuBarLevel.openFromClick(menuId)
                     } else {
                         fallbackExpanded.value = !fallbackExpanded.value
                     }
@@ -170,7 +179,28 @@ fun StyledToolbarMenuButton(
                 shape = shape,
                 customization = customization,
                 content = {
-                    DropdownButtonContent(expanded = expanded && enabled, content = content)
+                    DropdownButtonContent(
+                        expanded = expanded && enabled,
+                        content = {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(
+                                    StyledTheme.spacing.small
+                                ),
+                            ) {
+                                icon?.let {
+                                    Box(
+                                        modifier = Modifier.size(StyledIconDefaults.size),
+                                        contentAlignment = Alignment.Center,
+                                    ) {
+                                        StyledIcon(icon = it, contentDescription = null)
+                                    }
+                                }
+                                content()
+                            }
+                        },
+                        iconSize = StyledIconDefaults.size,
+                    )
                 },
             )
         },
@@ -220,6 +250,7 @@ fun StyledDropdownButton(
     menuContentColor: Color = StyledPopupMenuDefaults.contentColor(menuContainerColor),
     menuOffset: DpOffset = StyledPopupMenuDefaults.offset,
     menuMaxHeight: Dp = StyledPopupMenuDefaults.maxHeight,
+    menuAnimation: StyledPopup.Animation = StyledPopupMenuDefaults.animation,
     // content
     content: @Composable RowScope.() -> Unit,
 ) = StyledDropdownButtonImpl(
@@ -237,6 +268,7 @@ fun StyledDropdownButton(
     menuContentColor = menuContentColor,
     menuOffset = menuOffset,
     menuMaxHeight = menuMaxHeight,
+    menuAnimation = menuAnimation,
     content = content,
 )
 
@@ -288,6 +320,7 @@ private fun StyledDropdownButtonImpl(
     menuContentColor: Color = StyledPopupMenuDefaults.contentColor(menuContainerColor),
     menuOffset: DpOffset = StyledPopupMenuDefaults.offset,
     menuMaxHeight: Dp = StyledPopupMenuDefaults.maxHeight,
+    menuAnimation: StyledPopup.Animation = StyledPopupMenuDefaults.animation,
     // content
     content: @Composable RowScope.() -> Unit,
 ) {
@@ -306,6 +339,7 @@ private fun StyledDropdownButtonImpl(
                 contentColor = menuContentColor,
                 offset = menuOffset,
                 maxHeight = menuMaxHeight,
+                animation = menuAnimation,
             ) {
                 menuContent { expanded.value = false }
             }
@@ -335,6 +369,7 @@ private fun StyledDropdownButtonImpl(
 private fun DropdownButtonContent(
     expanded: Boolean,
     content: @Composable RowScope.() -> Unit,
+    iconSize: Dp = StyledTheme.sizes.iconSize,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -344,6 +379,7 @@ private fun DropdownButtonContent(
         StyledExpandIcon(
             expanded = expanded,
             rotationDirection = StyledExpandIcon.RotationDirection.Clockwise,
+            size = iconSize,
         )
     }
 }

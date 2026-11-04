@@ -1,25 +1,11 @@
 package com.michaelflisar.composestyled.adaptive
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.State
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.Dp
@@ -28,13 +14,8 @@ import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.classes.StyledNavigationMode
 import com.michaelflisar.composestyled.platform.Platform
 import com.michaelflisar.composestyled.platform.PlatformDefaults
-import com.michaelflisar.composestyled.ui.components.StyledBottomNavigationBar
-import com.michaelflisar.composestyled.ui.components.StyledNavigationItem
 import com.michaelflisar.composestyled.ui.components.StyledSideNavigation
-import com.michaelflisar.composestyled.ui.components.StyledSideNavigationDefaults
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
-import com.michaelflisar.composestyled.ui.layout.StyledScaffold
-import com.michaelflisar.composestyled.ui.layout.StyledScaffoldDefaults
 
 /** Layout or host-window dimensions used by adaptive decisions. */
 @Stable
@@ -89,14 +70,6 @@ enum class StyledAdaptiveMasterDetailMode {
     SinglePane,
     SideBySide,
 }
-
-/** Visibility decisions for master/detail panes without changing selection state. */
-@Stable
-data class StyledAdaptiveMasterDetailPanes(
-    val showMaster: Boolean,
-    val showDetail: Boolean,
-    val showEmptyDetail: Boolean,
-)
 
 /**
  * Adaptive breakpoints. Replace only the decisions that differ from the defaults.
@@ -219,26 +192,6 @@ object StyledAdaptive {
     }
 
     /**
-     * Resolves which panes are visible without changing selection or navigation state.
-     */
-    fun masterDetailPanes(
-        mode: StyledAdaptiveMasterDetailMode,
-        hasDetail: Boolean,
-    ): StyledAdaptiveMasterDetailPanes = when (mode) {
-        StyledAdaptiveMasterDetailMode.SinglePane -> StyledAdaptiveMasterDetailPanes(
-            showMaster = !hasDetail,
-            showDetail = hasDetail,
-            showEmptyDetail = false,
-        )
-
-        StyledAdaptiveMasterDetailMode.SideBySide -> StyledAdaptiveMasterDetailPanes(
-            showMaster = true,
-            showDetail = hasDetail,
-            showEmptyDetail = !hasDetail,
-        )
-    }
-
-    /**
      * Whether scrollbars should be shown by default for the given platform.
      */
     fun showScrollbars(platform: Platform): Boolean = PlatformDefaults.showScrollbars(platform)
@@ -278,262 +231,4 @@ object StyledAdaptive {
         } else {
             StyledDialog.Style.ToolbarDialog()
         }
-}
-
-/**
- * Arranges caller-owned navigation and renders scaffold content with its current adaptive information.
- */
-@Composable
-fun <T> StyledAdaptiveScaffold(
-    platform: Platform,
-    navigationItems: List<StyledNavigationItem<T>>,
-    selectedKey: MutableState<T> = remember { mutableStateOf(navigationItems.first().key) },
-    modifier: Modifier = Modifier,
-    topBar: @Composable () -> Unit = {},
-    snackbarHost: @Composable () -> Unit = {},
-    floatingActionButton: @Composable () -> Unit = {},
-    floatingActionButtonPosition: StyledScaffold.FloatingActionButtonPosition = StyledScaffold.FloatingActionButtonPosition.End,
-    containerColor: Color = StyledTheme.colorScheme.surface,
-    contentColor: Color = StyledTheme.contentColorFor(containerColor),
-    contentWindowInsets: WindowInsets = StyledScaffoldDefaults.contentWindowInsets,
-    policy: StyledAdaptivePolicy = StyledAdaptive.DefaultPolicy,
-    navigationMode: (platform: Platform, layoutSize: StyledAdaptiveSize) -> StyledNavigationMode =
-        { currentPlatform, layoutSize ->
-            policy.navigationMode(currentPlatform, layoutSize)
-        },
-    navigationContainerColor: Color = StyledTheme.colorScheme.surfaceVariant,
-    navigationContentColor: Color = StyledTheme.contentColorFor(containerColor),
-    sideNavigationExpanded: MutableState<Boolean> = remember { mutableStateOf(false) },
-    state: StyledAdaptiveScaffoldState = remember { StyledAdaptiveScaffoldState() },
-    sideNavigationToggleIcon: @Composable (StyledSideNavigation.ToggleState) -> Unit = {
-        StyledSideNavigationDefaults.ToggleIcon(it)
-    },
-    collapseSideNavigationOnModeChange: Boolean = true,
-    content: @Composable (PaddingValues, State<StyledAdaptiveInfo>) -> Unit,
-) {
-    val sideNavigationScrollState = rememberScrollState()
-    BoxWithConstraints(modifier) {
-        val density = LocalDensity.current
-        val windowSize = LocalWindowInfo.current.containerSize
-        val hostSize = with(density) {
-            StyledAdaptiveSize(windowSize.width.toDp(), windowSize.height.toDp())
-        }
-        val layoutSize = StyledAdaptiveSize(maxWidth, maxHeight)
-        val navigationMode = navigationMode(platform, layoutSize)
-        val scaffoldInfo = StyledAdaptive.resolve(
-            StyledAdaptiveContext(platform, layoutSize, hostSize),
-            policy,
-        ).copy(navigationMode = navigationMode)
-        SideEffect {
-            if (
-                collapseSideNavigationOnModeChange &&
-                state.navigationMode != null &&
-                state.navigationMode != navigationMode &&
-                navigationMode == StyledNavigationMode.Side(StyledSideNavigation.Mode.Expandable)
-            ) {
-                sideNavigationExpanded.value = false
-            }
-            state.update(scaffoldInfo)
-        }
-        StyledScaffold(
-            modifier = Modifier,
-            topBar = topBar,
-            bottomBar = {
-                if (navigationMode.isBottom) {
-                    StyledBottomNavigationBar(
-                        items = navigationItems,
-                        selectedKey = selectedKey.value,
-                        onItemClick = { selectedKey.value = it.key },
-                        containerColor = navigationContainerColor,
-                        contentColor = navigationContentColor,
-                    )
-                }
-            },
-            sideNavigation = {
-                if (navigationMode.isSide) {
-                    StyledSideNavigation(
-                        items = navigationItems,
-                        selectedKey = selectedKey.value,
-                        onItemClick = { selectedKey.value = it.key },
-                        containerColor = navigationContainerColor,
-                        contentColor = navigationContentColor,
-                        mode = when (navigationMode) {
-                            StyledNavigationMode.Bottom -> error("Bottom navigation has no side mode")
-                            is StyledNavigationMode.Side -> navigationMode.mode
-                        },
-                        expanded = sideNavigationExpanded,
-                        toggleIcon = sideNavigationToggleIcon,
-                        scrollState = sideNavigationScrollState,
-                    )
-                }
-            },
-            snackbarHost = snackbarHost,
-            floatingActionButton = floatingActionButton,
-            floatingActionButtonPosition = floatingActionButtonPosition,
-            containerColor = containerColor,
-            contentColor = contentColor,
-            contentWindowInsets = contentWindowInsets,
-        ) { paddingValues ->
-            BoxWithConstraints(Modifier.fillMaxSize()) {
-                val contentInfo = StyledAdaptive.resolve(
-                    StyledAdaptiveContext(
-                        platform = platform,
-                        layoutSize = StyledAdaptiveSize(maxWidth, maxHeight),
-                        windowSize = hostSize,
-                    ),
-                    policy,
-                ).copy(navigationMode = navigationMode)
-                val contentInfoState = rememberUpdatedState(contentInfo)
-                content(paddingValues, contentInfoState)
-            }
-        }
-    }
-}
-
-/**
- * Arranges caller-owned navigation and renders scaffold content with its current adaptive information.
- */
-@Composable
-fun StyledAdaptiveScaffold(
-    platform: Platform,
-    modifier: Modifier = Modifier,
-    topBar: @Composable () -> Unit = {},
-    snackbarHost: @Composable () -> Unit = {},
-    floatingActionButton: @Composable () -> Unit = {},
-    floatingActionButtonPosition: StyledScaffold.FloatingActionButtonPosition = StyledScaffold.FloatingActionButtonPosition.End,
-    containerColor: Color = StyledTheme.colorScheme.surface,
-    contentColor: Color = StyledTheme.contentColorFor(containerColor),
-    contentWindowInsets: WindowInsets = StyledScaffoldDefaults.contentWindowInsets,
-    policy: StyledAdaptivePolicy = StyledAdaptive.DefaultPolicy,
-    navigationMode: (platform: Platform, layoutSize: StyledAdaptiveSize) -> StyledNavigationMode =
-        { currentPlatform, layoutSize ->
-            policy.navigationMode(currentPlatform, layoutSize)
-        },
-    state: StyledAdaptiveScaffoldState = remember { StyledAdaptiveScaffoldState() },
-    sideNavigationExpanded: MutableState<Boolean> = remember { mutableStateOf(false) },
-    collapseSideNavigationOnModeChange: Boolean = true,
-    navigation: @Composable (navigationMode: StyledNavigationMode) -> Unit,
-    content: @Composable (PaddingValues, State<StyledAdaptiveInfo>) -> Unit,
-) {
-    BoxWithConstraints(modifier) {
-        val density = LocalDensity.current
-        val windowSize = LocalWindowInfo.current.containerSize
-        val hostSize = with(density) {
-            StyledAdaptiveSize(windowSize.width.toDp(), windowSize.height.toDp())
-        }
-        val layoutSize = StyledAdaptiveSize(maxWidth, maxHeight)
-        val navigationMode = navigationMode(platform, layoutSize)
-        val scaffoldInfo = StyledAdaptive.resolve(
-            StyledAdaptiveContext(platform, layoutSize, hostSize),
-            policy,
-        ).copy(navigationMode = navigationMode)
-        SideEffect {
-            if (
-                collapseSideNavigationOnModeChange &&
-                state.navigationMode != null &&
-                state.navigationMode != navigationMode &&
-                navigationMode == StyledNavigationMode.Side(StyledSideNavigation.Mode.Expandable)
-            ) {
-                sideNavigationExpanded.value = false
-            }
-            state.update(scaffoldInfo)
-        }
-        StyledScaffold(
-            modifier = Modifier,
-            topBar = topBar,
-            bottomBar = {
-                if (navigationMode.isBottom) {
-                    navigation(navigationMode)
-                }
-            },
-            sideNavigation = {
-                if (navigationMode.isSide) {
-                    navigation(navigationMode)
-                }
-            },
-            snackbarHost = snackbarHost,
-            floatingActionButton = floatingActionButton,
-            floatingActionButtonPosition = floatingActionButtonPosition,
-            containerColor = containerColor,
-            contentColor = contentColor,
-            contentWindowInsets = contentWindowInsets,
-        ) { paddingValues ->
-            BoxWithConstraints(Modifier.fillMaxSize()) {
-                val contentInfo = StyledAdaptive.resolve(
-                    StyledAdaptiveContext(
-                        platform = platform,
-                        layoutSize = StyledAdaptiveSize(maxWidth, maxHeight),
-                        windowSize = hostSize,
-                    ),
-                    policy,
-                ).copy(navigationMode = navigationMode)
-                val contentInfoState = rememberUpdatedState(contentInfo)
-                content(paddingValues, contentInfoState)
-            }
-        }
-    }
-}
-
-/**
- * Arranges a master and optional detail pane without owning selection or navigation state.
- */
-@Composable
-fun StyledAdaptiveMasterDetail(
-    modifier: Modifier = Modifier,
-    platform: Platform = StyledTheme.platform,
-    masterDetailMode: State<StyledAdaptiveMasterDetailMode>? = null,
-    policy: StyledAdaptivePolicy = StyledAdaptive.DefaultPolicy,
-    masterFraction: Float = 0.4f,
-    paneSpacing: Dp = StyledTheme.spacing.medium,
-    master: @Composable (StyledAdaptiveInfo) -> Unit,
-    detail: (@Composable (StyledAdaptiveInfo) -> Unit)? = null,
-    emptyDetail: (@Composable (StyledAdaptiveInfo) -> Unit)? = null,
-) {
-    require(masterFraction > 0f && masterFraction < 1f) {
-        "masterFraction must be greater than 0 and less than 1"
-    }
-    require(paneSpacing >= 0.dp && paneSpacing != Dp.Infinity) {
-        "paneSpacing must be finite and non-negative"
-    }
-    BoxWithConstraints(modifier.fillMaxSize()) {
-        val layoutSizeState = rememberUpdatedState(StyledAdaptiveSize(maxWidth, maxHeight))
-        val localInfo = StyledAdaptive.info(
-            platform = platform,
-            layoutSize = layoutSizeState,
-            policy = policy,
-        ).value
-        val currentInfo = masterDetailMode?.value?.let {
-            localInfo.copy(masterDetailMode = it)
-        } ?: localInfo
-        val panes = StyledAdaptive.masterDetailPanes(
-            mode = currentInfo.masterDetailMode,
-            hasDetail = detail != null,
-        )
-        when (currentInfo.masterDetailMode) {
-            StyledAdaptiveMasterDetailMode.SinglePane -> {
-                if (panes.showDetail) {
-                    detail?.invoke(currentInfo)
-                } else {
-                    master(currentInfo)
-                }
-            }
-
-            StyledAdaptiveMasterDetailMode.SideBySide -> {
-                Row(modifier = Modifier.fillMaxSize()) {
-                    if (panes.showMaster) {
-                        Box(Modifier.weight(masterFraction).fillMaxSize()) {
-                            master(currentInfo)
-                        }
-                    }
-                    Spacer(Modifier.width(paneSpacing))
-                    Box(Modifier.weight(1f - masterFraction).fillMaxSize()) {
-                        when {
-                            panes.showDetail -> detail?.invoke(currentInfo)
-                            panes.showEmptyDetail -> emptyDetail?.invoke(currentInfo)
-                        }
-                    }
-                }
-            }
-        }
-    }
 }

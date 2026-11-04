@@ -16,7 +16,7 @@ StyledIcon(
 
 The Core set contains `Add`, `NavigateBack`, `Cancel`, `Check`, `Clear`,
 `Close`, `Delete`, `Dropdown`, `Edit`, `Menu`, `More`, `Remove`, `Search`,
-`NavigateForward`, `Refresh`, `Save`, `Home`, `Settings`, `Account`,
+`NavigateForward`, `Submenu`, `Refresh`, `Save`, `Home`, `Settings`, `Account`,
 `Notifications`, `Info`, `Help`, `Favorite`, `Share`, `Filter`, `Sort`, `Copy`,
 `Paste` and `Cut`. The IDs are semantic: `Remove` is a minus action while
 `Delete` is destructive deletion. `StyledIcon` still accepts any
@@ -49,6 +49,7 @@ The iOS mapping is:
 | `Add` | `plus` |
 | `NavigateBack` | `chevron.left` |
 | `NavigateForward` | `chevron.right` |
+| `Submenu` | `chevron.right` |
 | `Cancel` | `xmark.circle` |
 | `Check` | `checkmark` |
 | `Clear` / `Close` | `xmark` |
@@ -158,5 +159,6 @@ This keeps app-specific icon names out of the core API and lets the app choose
 different providers for different theme implementations.
 
 The Material icon vectors are distributed under Apache 2.0; Fluent UI System
-icons are distributed under the MIT license. The downloaded vector source files
-retain their respective license notices.
+icons are distributed under the MIT license. Their Compose vector source files
+are downloaded from [Composables](https://composables.com/icons) and retain
+their respective license notices.

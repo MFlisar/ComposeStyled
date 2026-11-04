@@ -4,7 +4,7 @@
 `Role.Default` is resolved by the active theme and surrounding context. Set
 `role = StyledIconButton.Role.Primary`, `Secondary` or `Tertiary` only when you
 intentionally want that emphasis; explicit roles retain their mapping even in
-toolbars, dialogs and snackbars. It supports `shape`, `interactionSource` and
+top bars, dialogs and snackbars. It supports `shape`, `interactionSource` and
 `StyledIconButtonDefaults.customize(CustomColors, border)`, and is registered
 by all three built-in themes. The content overload accepts an arbitrary
 composable slot; the `IconComposable` overload applies the configured icon size
@@ -21,10 +21,10 @@ icon button with accent-colored content, and an unfilled accent Tertiary.
 
 Renderer `RoleMapping` callbacks receive `(role, context)`. For the default
 role, Material 3, Cupertino and Fluent 2 use Standard icon buttons in modal,
-snackbar, toolbar, input-action and clickable GroupBox contexts. Outside those
+snackbar, top-bar, input-action and clickable GroupBox contexts. Outside those
 contexts, the defaults above are unchanged. Custom mappings can delegate with
 `ThemeIconButton.DefaultRoleMapping(role, context)`. See [modal actions](Dialog.md)
-for structured labels, automatic toolbar presentation and explicit icon actions.
+for structured labels, automatic top-bar presentation and explicit icon actions.
 
 Fluent 2 buttons and icon buttons share an internal color resolver for default,
 hover, pressed and disabled states. Secondary uses a neutral surface and a

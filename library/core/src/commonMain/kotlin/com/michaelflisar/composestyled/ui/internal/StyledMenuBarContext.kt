@@ -22,16 +22,16 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-internal val LocalStyledToolbarMenuLevel =
-    staticCompositionLocalOf<StyledToolbarMenuLevel?> { null }
+internal val LocalStyledMenuBarLevel =
+    staticCompositionLocalOf<StyledMenuBarLevel?> { null }
 
-internal val LocalStyledToolbarPopupContext =
-    staticCompositionLocalOf<StyledToolbarPopupContext?> { null }
+internal val LocalStyledMenuBarPopupContext =
+    staticCompositionLocalOf<StyledMenuBarPopupContext?> { null }
 
-internal val LocalStyledToolbarSubmenuAnchor = staticCompositionLocalOf { false }
+internal val LocalStyledMenuBarSubmenuAnchor = staticCompositionLocalOf { false }
 
 @Stable
-internal class StyledToolbarMenuLevel(
+internal class StyledMenuBarLevel(
     private val coroutineScope: CoroutineScope,
 ) {
     var activeId by mutableStateOf<Any?>(null)
@@ -43,12 +43,12 @@ internal class StyledToolbarMenuLevel(
     private val hoverTargets = mutableMapOf<Any, MutableSet<Any>>()
     private val openJobs = mutableMapOf<Any, Job>()
     private val closeJobs = mutableMapOf<Any, Job>()
-    private val childLevels = mutableMapOf<Any, StyledToolbarMenuLevel>()
+    private val childLevels = mutableMapOf<Any, StyledMenuBarLevel>()
 
     fun isActive(id: Any): Boolean = activeId == id
 
     fun createChildLevel(id: Any) =
-        childLevels.getOrPut(id) { StyledToolbarMenuLevel(coroutineScope) }
+        childLevels.getOrPut(id) { StyledMenuBarLevel(coroutineScope) }
 
     fun openFromHover(id: Any) {
         activate(id, pinned = false)
@@ -206,22 +206,22 @@ internal class StyledToolbarMenuLevel(
 }
 
 @Stable
-internal class StyledToolbarMenuAncestor(
-    val level: StyledToolbarMenuLevel,
+internal class StyledMenuBarAncestor(
+    val level: StyledMenuBarLevel,
     val id: Any,
 )
 
 @Stable
-internal class StyledToolbarPopupContext(
-    val rootLevel: StyledToolbarMenuLevel,
+internal class StyledMenuBarPopupContext(
+    val rootLevel: StyledMenuBarLevel,
     val rootId: Any,
-    val menuLevel: StyledToolbarMenuLevel,
-    val ancestors: List<StyledToolbarMenuAncestor> = emptyList(),
+    val menuLevel: StyledMenuBarLevel,
+    val ancestors: List<StyledMenuBarAncestor> = emptyList(),
 )
 
 @Composable
-internal fun ToolbarPopupMenuContent(
-    context: StyledToolbarPopupContext,
+internal fun MenuBarPopupMenuContent(
+    context: StyledMenuBarPopupContext,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val interactionSource = remember(context) { MutableInteractionSource() }
@@ -238,7 +238,7 @@ internal fun ToolbarPopupMenuContent(
         }
     }
 
-    CompositionLocalProvider(LocalStyledToolbarPopupContext provides context) {
+    CompositionLocalProvider(LocalStyledMenuBarPopupContext provides context) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -249,7 +249,7 @@ internal fun ToolbarPopupMenuContent(
     }
 }
 
-private fun StyledToolbarPopupContext.setHoverTarget(
+private fun StyledMenuBarPopupContext.setHoverTarget(
     target: Any,
     hovered: Boolean,
 ) {

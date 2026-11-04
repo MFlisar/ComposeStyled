@@ -86,6 +86,7 @@ class Material3PopupMenu internal constructor() : StyledPopupMenu.Implementation
                     windowOverlay = true,
                     windowOverlaySize = positionProvider.popupWindowSize(),
                     onTransitionFinished = style.onTransitionFinished,
+                    animation = style.animation,
                 ),
             ) {
                 Box(

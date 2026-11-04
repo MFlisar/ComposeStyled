@@ -1,5 +1,8 @@
 package com.michaelflisar.composestyled.ui.components
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.ColumnScope
@@ -13,6 +16,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -27,7 +31,7 @@ import com.michaelflisar.composestyled.registry.LocalStyledRegistry
 import com.michaelflisar.composestyled.registry.StyledComponent
 import com.michaelflisar.composestyled.registry.StyledKey
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
-import com.michaelflisar.composestyled.ui.internal.LocalStyledToolbarPopupContext
+import com.michaelflisar.composestyled.ui.internal.LocalStyledMenuBarPopupContext
 import com.michaelflisar.composestyled.ui.overlay.StyledPopupContainerScope
 import kotlin.math.roundToInt
 
@@ -144,6 +148,26 @@ object StyledPopupMenuDefaults {
     val border: BorderStroke? = null
     val widthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenu.WidthConfig.MatchParent()
 
+    /** Menu-bar popups unfold from the top without fading. */
+    val menuBarAnimation = StyledPopup.Animation(
+        enter = expandVertically(
+            animationSpec = tween(120),
+            expandFrom = Alignment.Top,
+        ),
+        exit = shrinkVertically(
+            animationSpec = tween(90),
+            shrinkTowards = Alignment.Top,
+        ),
+    )
+
+    /** Uses the menu-bar animation inside its popup context and the standard animation otherwise. */
+    val animation: StyledPopup.Animation
+        @Composable get() = if (LocalStyledMenuBarPopupContext.current != null) {
+            menuBarAnimation
+        } else {
+            StyledPopupDefaults.animation
+        }
+
     val shape: Shape
         @Composable get() = StyledTheme.shapes.small
 
@@ -152,8 +176,11 @@ object StyledPopupMenuDefaults {
 
     val contentPadding: PaddingValues
         @Composable get() = PaddingValues(
-            vertical = if (LocalStyledToolbarPopupContext.current != null) 0.dp
-            else StyledTheme.padding.small,
+            vertical = if (LocalStyledMenuBarPopupContext.current != null) {
+                StyledTheme.padding.small
+            } else {
+                StyledTheme.padding.small
+            },
         )
 
     @Composable
@@ -165,7 +192,10 @@ object StyledPopupMenuDefaults {
 // public API
 // -------------------------
 
-/** Shows a menu anchored to this popup-container scope with configurable width and dismissal behavior. */
+/**
+ * Shows a menu anchored to this popup-container scope with configurable width, animation
+ * and dismissal behavior.
+ */
 @OptIn(InternalComposeStyledApi::class)
 @Composable
 fun StyledPopupContainerScope.StyledPopupMenu(
@@ -187,6 +217,7 @@ fun StyledPopupContainerScope.StyledPopupMenu(
     contentPadding: PaddingValues = StyledPopupMenuDefaults.contentPadding,
     outsideTapBehavior: StyledPopupMenu.OutsideTapBehavior =
         StyledPopupMenu.OutsideTapBehavior.PlatformDefault,
+    animation: StyledPopup.Animation = StyledPopupMenuDefaults.animation,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     require(maxHeight.value.isFinite() && maxHeight > 0.dp) {
@@ -195,10 +226,10 @@ fun StyledPopupContainerScope.StyledPopupMenu(
     require(offset.x.value.isFinite() && offset.y.value.isFinite()) {
         "Menu offset must be finite"
     }
-    val toolbarContext = LocalStyledToolbarPopupContext.current
-    val lastAncestor = toolbarContext?.ancestors?.lastOrNull()
-    val animationLevel = lastAncestor?.level ?: toolbarContext?.rootLevel
-    val animationId = lastAncestor?.id ?: toolbarContext?.rootId
+    val menuBarContext = LocalStyledMenuBarPopupContext.current
+    val lastAncestor = menuBarContext?.ancestors?.lastOrNull()
+    val animationLevel = lastAncestor?.level ?: menuBarContext?.rootLevel
+    val animationId = lastAncestor?.id ?: menuBarContext?.rootId
     val onTransitionFinished: ((Boolean) -> Unit)? =
         remember(animationLevel, animationId) {
             val level = animationLevel
@@ -237,6 +268,7 @@ fun StyledPopupContainerScope.StyledPopupMenu(
                 shadowElevation = shadowElevation,
                 border = border,
                 maxHeight = maxHeight,
+                animation = animation,
                 windowOverlay = useWindowOverlay,
                 onTransitionFinished = onTransitionFinished,
                 parentWindowOriginOnScreen = windowOrigin

@@ -66,6 +66,15 @@ is replaced by explicit Styled colors; no tonal overlay is applied.
 Menu defaults are centralized in `StyledPopupMenuDefaults`, including width
 configuration, size limits, offset, shape, colors, shadow, border and content
 padding. Theme-dependent defaults are read from the current Styled locals.
+Popups use a fade-and-scale transition by default. Supply a
+`StyledPopup.Animation` with custom Compose `EnterTransition` and
+`ExitTransition` values to `StyledPopupMenu`; direct `StyledPopup` instances
+accept the same animation through `StyledPopupDefaults.style(animation = ...)`.
+Menu-bar popups use a short vertical unfold from the top without fading.
+Regular Foundation popups measure their content before starting the enter
+transition, avoiding a race between initial layout and animation.
+Full-window dismiss overlays keep a fade-only transition so their pointer bounds
+remain stable during animation.
 Cupertino Liquid popup menus use Liquid Glass without an additional drop
 shadow, regardless of the configured `shadowElevation`.
 The ComposeStyled-specific `outsideTapBehavior` is separate from the platform
@@ -134,14 +143,16 @@ StyledPopupMenuSubmenu(
 ```
 
 The submenu opens when its item is activated, including keyboard activation.
-Inside `StyledToolbarMenuButton`, root and nested menus additionally open after
-a brief hover delay and switch to hovered siblings; the regular
-`StyledDropdownButton` and standalone popup menus remain click-driven. Toolbar
-menu popups are non-focusable by default so they do not capture focus and block
-hover over sibling triggers. Hovering a nested popup keeps its full ancestor
-menu chain active. Clicking a toolbar trigger or submenu anchor during its
-opening animation has no effect; clicking it after the animation completes closes
-that menu.
+Inside `StyledMenuBarItem`, root and nested menus additionally open after a
+brief hover delay and switch to hovered siblings; the regular
+`StyledDropdownButton` and standalone popup menus remain click-driven. Menu-bar
+popups are non-focusable by default so they do not capture focus and block
+hover over sibling triggers. Their vertical content padding matches the menu
+items' horizontal content padding, and menu-item minimum height is capped at
+36 dp. Hovering a nested popup keeps its
+full ancestor menu chain active. Clicking a menu-bar trigger or submenu anchor
+during its opening animation has no effect; clicking it after the animation
+completes closes that menu.
 
 When the menu content overflows, it displays a scrollbar indicator according
 to `StyledTheme.behavior.showScrollbars`. Hiding indicators globally leaves
@@ -158,7 +169,7 @@ The menu is hidden and closed when the button is disabled.
 An `onClick` overload performs a direct action without opening a menu.
 
 `StyledDropdownButton` defaults to `StyledButton.Role.Default`, so its theme can
-choose a style appropriate to a toolbar, modal or other surrounding context.
+choose a style appropriate to a menu bar, modal or other surrounding context.
 Use `role` for an intentional explicit `Primary`, `Secondary` or `Tertiary`
 emphasis. The same generic API has both an `onClick` and a `menuContent`
 overload. Shared button parameters follow `StyledButton` ordering: action,

@@ -12,6 +12,7 @@ import com.michaelflisar.composestyled.ui.icons.fluent2.filled.FluentuiSystemIco
 import com.michaelflisar.composestyled.ui.icons.fluent2.filled.FluentuiSystemIconsArrowSync
 import com.michaelflisar.composestyled.ui.icons.fluent2.filled.FluentuiSystemIconsCheckmark
 import com.michaelflisar.composestyled.ui.icons.fluent2.filled.FluentuiSystemIconsChevronDown
+import com.michaelflisar.composestyled.ui.icons.fluent2.filled.FluentuiSystemIconsChevronRight
 import com.michaelflisar.composestyled.ui.icons.fluent2.filled.FluentuiSystemIconsClipboardPaste
 import com.michaelflisar.composestyled.ui.icons.fluent2.filled.FluentuiSystemIconsCopy
 import com.michaelflisar.composestyled.ui.icons.fluent2.filled.FluentuiSystemIconsCut
@@ -50,6 +51,7 @@ object Fluent2FilledIconSet : StyledIconSet {
         StyledIcons.Name.Remove to FluentuiSystemIconsSubtract.toIconComposable(),
         StyledIcons.Name.Search to FluentuiSystemIconsSearch.toIconComposable(),
         StyledIcons.Name.NavigateForward to FluentuiSystemIconsArrowRight.toIconComposable(),
+        StyledIcons.Name.Submenu to FluentuiSystemIconsChevronRight.toIconComposable(),
         StyledIcons.Name.Refresh to FluentuiSystemIconsArrowSync.toIconComposable(),
         StyledIcons.Name.Save to FluentuiSystemIconsSave.toIconComposable(),
         StyledIcons.Name.Home to FluentuiSystemIconsHome.toIconComposable(),

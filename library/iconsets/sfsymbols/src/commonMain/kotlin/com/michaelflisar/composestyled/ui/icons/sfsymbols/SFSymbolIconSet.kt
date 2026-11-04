@@ -22,6 +22,7 @@ object SFSymbolIconSet : StyledIconSet {
         StyledIcons.Name.Remove to "minus",
         StyledIcons.Name.Search to "magnifyingglass",
         StyledIcons.Name.NavigateForward to "chevron.right",
+        StyledIcons.Name.Submenu to "chevron.right",
         StyledIcons.Name.Refresh to "arrow.clockwise",
         StyledIcons.Name.Save to "square.and.arrow.down",
         StyledIcons.Name.Home to "house",

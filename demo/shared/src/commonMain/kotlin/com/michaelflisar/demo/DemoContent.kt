@@ -57,7 +57,7 @@ import kotlin.math.ceil
 
 @Composable
 fun DemoContent(
-    toolbar: @Composable (() -> Unit)? = null,
+    menuBar: @Composable (() -> Unit)? = null,
 ) {
 
     // 1) Host platform
@@ -138,8 +138,8 @@ fun DemoContent(
         StyledSurface {
             StyledColumn {
 
-                // 1) toolbar
-                toolbar?.invoke()
+                // 1) menu bar
+                menuBar?.invoke()
 
                 // 2) content
                 Box(

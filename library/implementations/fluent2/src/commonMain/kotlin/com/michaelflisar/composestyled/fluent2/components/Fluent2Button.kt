@@ -45,7 +45,7 @@ import com.michaelflisar.composestyled.runtime.StyledContext
 import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
 import com.michaelflisar.composestyled.ui.components.StyledSnackbar
-import com.michaelflisar.composestyled.ui.components.StyledToolbar
+import com.michaelflisar.composestyled.ui.components.StyledMenuBar
 import com.michaelflisar.composestyled.ui.components.StyledTopBar
 import com.michaelflisar.composestyled.ui.specials.StyledGroupBox
 import com.michaelflisar.composestyled.ui.specials.StyledSidePane
@@ -95,7 +95,7 @@ class Fluent2Button internal constructor(
                     context == StyledSnackbar.Context.SnackbarAction -> Variant.Transparent
                 role == StyledButton.Role.Default &&
                     (context is StyledTopBar.Context ||
-                        context == StyledToolbar.Context.Action) -> Variant.Transparent
+                        context == StyledMenuBar.Context.MenuItem) -> Variant.Transparent
                 else -> when (role) {
                     StyledButton.Role.Default,
                     StyledButton.Role.Primary -> Variant.Primary
@@ -137,7 +137,7 @@ class Fluent2Button internal constructor(
             customization = customization,
             defaultContentColor = if (role == StyledButton.Role.Default &&
                 (context is StyledTopBar.Context ||
-                    context == StyledToolbar.Context.Action)
+                    context == StyledMenuBar.Context.MenuItem)
             ) StyledTheme.currentContentColor else null,
             content = content,
         )
@@ -212,7 +212,7 @@ private fun Fluent2Button(
     val focusInner = if (StyledTheme.colorScheme.isDarkTheme) Color.Black else Color.White
     // settings
 
-    val minWidth = 96.dp
+    val minWidth = if (context == StyledMenuBar.Context.MenuItem) 0.dp else 96.dp
     val minHeight = maxOf(32.dp, StyledTheme.sizes.minimumInteractiveSize)
     val buttonPadding = if (isGroupBox) {
         PaddingValues(0.dp)

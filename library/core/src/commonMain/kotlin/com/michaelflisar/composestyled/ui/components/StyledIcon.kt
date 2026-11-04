@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.classes.IconComposable
 import com.michaelflisar.composestyled.tokens.LocalStyledContentColor
@@ -48,6 +49,7 @@ object StyledIconDefaults {
     val size: Dp
         @OptIn(InternalComposeStyledApi::class)
         @Composable get() = when (LocalStyledContext.current) {
+            StyledMenuBar.Context.MenuItem -> minOf(StyledTheme.sizes.iconSize, 16.dp)
             StyledBadge.Context.BadgeContent -> StyledBadgeDefaults.iconSize
             else -> StyledTheme.sizes.iconSize
         }

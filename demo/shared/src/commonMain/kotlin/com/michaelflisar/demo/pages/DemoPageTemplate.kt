@@ -29,8 +29,9 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.StyledTheme
+import com.michaelflisar.composestyled.adaptive.StyledAdaptive
 import com.michaelflisar.composestyled.adaptive.StyledAdaptiveInfo
-import com.michaelflisar.composestyled.adaptive.StyledAdaptiveMasterDetail
+import com.michaelflisar.composestyled.adaptive.StyledAdaptiveContainer
 import com.michaelflisar.composestyled.adaptive.StyledAdaptiveMasterDetailMode
 import com.michaelflisar.composestyled.adaptive.StyledAdaptiveScaffold
 import com.michaelflisar.composestyled.adaptive.StyledAdaptiveScaffoldState
@@ -62,6 +63,7 @@ import com.michaelflisar.composestyled.ui.components.StyledSwitch
 import com.michaelflisar.composestyled.ui.icons.StyledIcons
 import com.michaelflisar.composestyled.ui.layout.StyledColumn
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
+import com.michaelflisar.composestyled.ui.layout.StyledMasterDetail
 import com.michaelflisar.composestyled.ui.layout.StyledRow
 import com.michaelflisar.composestyled.ui.layout.StyledScaffold
 import com.michaelflisar.composestyled.ui.layout.StyledScaffoldDefaults
@@ -607,71 +609,75 @@ private fun TemplateSwitchRow(
 @Composable
 private fun SubPageMasterPane(contentPadding: PaddingValues) {
     val selectedItem = rememberSaveable { mutableStateOf<Int?>(null) }
-    StyledAdaptiveMasterDetail(
-        modifier = Modifier.fillMaxSize(),
-        master = { adaptiveInfo ->
-            StyledVerticalScrollbarContainer(
-                modifier = Modifier.fillMaxSize()
-                    .background(StyledTheme.colorScheme.surface),
-                contentPadding = contentPadding,
-            ) {
-                StyledColumn(
-                    modifier = Modifier.fillMaxWidth(),
-                    itemSpacing = StyledTheme.spacing.medium,
+    StyledAdaptiveContainer(Modifier.fillMaxSize()) { adaptiveInfo ->
+        val masterDetailMode = StyledAdaptive.masterDetail(adaptiveInfo)
+        StyledMasterDetail(
+            modifier = Modifier.fillMaxSize(),
+            mode = masterDetailMode.value,
+            detailData = selectedItem.value,
+            master = {
+                StyledVerticalScrollbarContainer(
+                    modifier = Modifier.fillMaxSize()
+                        .background(StyledTheme.colorScheme.surface),
+                    contentPadding = contentPadding,
                 ) {
-                    SubTitle("Items")
-                    for (item in 1..5) {
-                        StyledListItem(
-                            headline = { StyledText("Item $item") },
-                            supporting = { StyledText("Select to view details") },
-                            onClick = { selectedItem.value = item },
-                            modifier = Modifier.fillMaxWidth(),
-                            customization = if (selectedItem.value == item) {
-                                StyledListItemDefaults.customize(
-                                    containerColor = StyledTheme.colorScheme.primarySurface,
-                                )
-                            } else {
-                                null
-                            },
-                        )
-                    }
-                }
-            }
-        },
-        detail = selectedItem.value?.let { item ->
-            { adaptiveInfo ->
-                StyledColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(StyledTheme.colorScheme.surfaceVariant)
-                        .padding(contentPadding),
-                    itemSpacing = StyledTheme.spacing.medium,
-                ) {
-                    StyledText(
-                        text = "Details $item",
-                    )
-                    if (adaptiveInfo.masterDetailMode == StyledAdaptiveMasterDetailMode.SinglePane) {
-                        StyledButton(
-                            onClick = { selectedItem.value = null }
-                        ) {
-                            StyledText("Back to items")
+                    StyledColumn(
+                        modifier = Modifier.fillMaxWidth(),
+                        itemSpacing = StyledTheme.spacing.medium,
+                    ) {
+                        SubTitle("Items")
+                        for (item in 1..5) {
+                            StyledListItem(
+                                headline = { StyledText("Item $item") },
+                                supporting = { StyledText("Select to view details") },
+                                onClick = { selectedItem.value = item },
+                                modifier = Modifier.fillMaxWidth(),
+                                customization = if (selectedItem.value == item) {
+                                    StyledListItemDefaults.customize(
+                                        containerColor = StyledTheme.colorScheme.primarySurface,
+                                    )
+                                } else {
+                                    null
+                                },
+                            )
                         }
                     }
                 }
-            }
-        },
-        emptyDetail = {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(StyledTheme.colorScheme.surfaceVariant)
-                    .padding(contentPadding),
-                contentAlignment = Alignment.Center,
-            ) {
-                StyledText("Select an item to see its details.")
-            }
-        },
-    )
+            },
+            detail = { item ->
+                if (item == null) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(StyledTheme.colorScheme.surfaceVariant)
+                            .padding(contentPadding),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        StyledText("Select an item to see its details.")
+                    }
+                } else {
+                    StyledColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(StyledTheme.colorScheme.surfaceVariant)
+                            .padding(contentPadding),
+                        itemSpacing = StyledTheme.spacing.medium,
+                    ) {
+                        StyledText(
+                            text = "Details $item",
+                        )
+                        if (masterDetailMode.value == StyledAdaptiveMasterDetailMode.SinglePane) {
+                            StyledButton(
+                                onClick = { selectedItem.value = null }
+                            ) {
+                                StyledText("Back to items")
+                            }
+                        }
+                    }
+                }
+            },
+        )
+    }
 }
 
 @Composable

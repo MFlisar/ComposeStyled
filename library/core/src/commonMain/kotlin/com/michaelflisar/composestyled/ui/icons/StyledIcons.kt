@@ -28,6 +28,7 @@ object StyledIcons {
         Remove,
         Search,
         NavigateForward,
+        Submenu,
         Refresh,
         Save,
         Home,
@@ -86,6 +87,9 @@ object StyledIcons {
 
     /** Navigate to the next screen or location. */
     val NavigateForward: IconComposable = icon(Name.NavigateForward)
+
+    /** Indicate that a menu item opens a submenu. */
+    val Submenu: IconComposable = icon(Name.Submenu)
 
     /** Reload or update content. */
     val Refresh: IconComposable = icon(Name.Refresh)

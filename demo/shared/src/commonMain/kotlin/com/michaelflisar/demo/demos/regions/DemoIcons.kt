@@ -26,6 +26,7 @@ internal fun DemoIcons(baseId: Int, expandState: ExpandState) {
         StyledFlowRow(spacing = StyledTheme.spacing.medium) {
             StyledIcon(icon = StyledIcons.NavigateBack, contentDescription = "Navigate back")
             StyledIcon(icon = StyledIcons.NavigateForward, contentDescription = "Navigate forward")
+            StyledIcon(icon = StyledIcons.Submenu, contentDescription = "Open submenu")
             StyledIcon(icon = StyledIcons.Cancel, contentDescription = "Cancel")
             StyledIcon(icon = StyledIcons.Check, contentDescription = "Check")
             StyledIcon(icon = StyledIcons.Add, contentDescription = "Add")

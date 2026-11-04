@@ -18,10 +18,9 @@ import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.ui.components.StyledDropdownMenuDivider
 import com.michaelflisar.composestyled.ui.components.StyledDropdownMenuItem
 import com.michaelflisar.composestyled.ui.components.StyledIcon
-import com.michaelflisar.composestyled.ui.components.StyledPopupMenu
 import com.michaelflisar.composestyled.ui.components.StyledPopupMenuSubmenu
-import com.michaelflisar.composestyled.ui.components.StyledToolbar
-import com.michaelflisar.composestyled.ui.components.StyledToolbarMenuButton
+import com.michaelflisar.composestyled.ui.components.StyledMenuBar
+import com.michaelflisar.composestyled.ui.components.StyledMenuBarItem
 import com.michaelflisar.composestyled.ui.icons.StyledIcons
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.ui.state.KeyboardModifierState
@@ -55,8 +54,8 @@ fun main() {
             ClearKeyboardModifierStateOnWindowFocusLoss(window, keyboardModifierState)
             ProvideKeyboardModifierState(keyboardModifierState) {
                 DemoContent(
-                    toolbar = {
-                        DemoDesktopToolbar()
+                    menuBar = {
+                        DemoDesktopMenuBar()
                     }
                 )
             }
@@ -65,13 +64,11 @@ fun main() {
 }
 
 @Composable
-private fun DemoDesktopToolbar() {
+private fun DemoDesktopMenuBar() {
     val status = remember { mutableStateOf("Ready") }
 
-    val menuWidthConfig = StyledPopupMenu.WidthConfig.Auto(maxWidth = 260.dp)
-
-    StyledToolbar {
-        StyledToolbarMenuButton(
+    StyledMenuBar {
+        StyledMenuBarItem(
             menuContent = { dismissMenu ->
                 StyledDropdownMenuItem(
                     text = { StyledText("New") },
@@ -96,9 +93,9 @@ private fun DemoDesktopToolbar() {
                 StyledDropdownMenuDivider()
                 StyledPopupMenuSubmenu(
                     text = { StyledText("Export") },
-                    leadingIcon = {
-                        StyledIcon(icon = StyledIcons.Share, contentDescription = null)
-                    },
+                    //leadingIcon = {
+                    //    StyledIcon(icon = StyledIcons.Share, contentDescription = null)
+                    //},
                 ) { dismiss, _ ->
                     StyledDropdownMenuItem(
                         text = { StyledText("PDF") },
@@ -130,12 +127,12 @@ private fun DemoDesktopToolbar() {
                     }
                 }
             },
-            menuWidthConfig = menuWidthConfig,
         ) {
             StyledText("File")
         }
 
-        StyledToolbarMenuButton(
+        StyledMenuBarItem(
+            icon = StyledIcons.Edit,
             menuContent = { dismissMenu ->
                 StyledDropdownMenuItem(
                     text = { StyledText("Undo") },
@@ -179,8 +176,7 @@ private fun DemoDesktopToolbar() {
                         },
                     )
                 }
-            },
-            menuWidthConfig = menuWidthConfig,
+            }
         ) {
             StyledText("Edit")
         }
