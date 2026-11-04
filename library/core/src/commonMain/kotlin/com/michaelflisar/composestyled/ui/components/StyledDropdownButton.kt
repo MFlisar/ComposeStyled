@@ -185,7 +185,7 @@ fun StyledMenuBarItem(
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(
-                                    StyledTheme.spacing.small
+                                    StyledTheme.spacing.medium
                                 ),
                             ) {
                                 icon?.let {
@@ -373,7 +373,7 @@ private fun DropdownButtonContent(
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.small),
+        horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
     ) {
         content()
         StyledExpandIcon(

@@ -40,11 +40,8 @@ fun StyledMenuBar(
     modifier: Modifier = Modifier,
     containerColor: Color = StyledTheme.colorScheme.surface,
     contentColor: Color = StyledTheme.contentColorFor(containerColor),
-    contentPadding: PaddingValues = PaddingValues(
-        horizontal = StyledTheme.padding.small,
-        vertical = 2.dp,
-    ),
-    itemSpacing: Dp = StyledTheme.spacing.small,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    itemSpacing: Dp = 0.dp,
     content: @Composable RowScope.() -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -65,7 +62,7 @@ fun StyledMenuBar(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 36.dp)
+                    //.heightIn(min = 36.dp)
                     .padding(contentPadding),
                 horizontalArrangement = Arrangement.spacedBy(itemSpacing),
                 verticalAlignment = Alignment.CenterVertically,

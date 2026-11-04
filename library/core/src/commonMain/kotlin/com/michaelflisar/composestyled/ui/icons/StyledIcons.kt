@@ -1,6 +1,9 @@
 package com.michaelflisar.composestyled.ui.icons
 
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.classes.IconComposable
+import com.michaelflisar.composestyled.classes.toIconComposable
 import com.michaelflisar.composestyled.registry.LocalStyledRegistry
 
 /**
@@ -45,6 +48,15 @@ object StyledIcons {
         Paste,
         Cut,
     }
+
+    /** Renders a blank 24x24 icon. */
+    val Empty: IconComposable = ImageVector.Builder(
+        name = "Empty",
+        defaultWidth = 24.dp,
+        defaultHeight = 24.dp,
+        viewportWidth = 24f,
+        viewportHeight = 24f,
+    ).build().toIconComposable()
 
     /** Create or add a new item. */
     val Add: IconComposable = icon(Name.Add)

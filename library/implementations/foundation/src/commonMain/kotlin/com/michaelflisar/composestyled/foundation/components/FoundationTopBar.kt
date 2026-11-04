@@ -1,5 +1,8 @@
 package com.michaelflisar.composestyled.foundation.components
 
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.snap
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.calculateStartPadding
@@ -12,12 +15,16 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.UpdateStyledThemeLocals
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.ui.components.StyledTopBar
@@ -41,6 +48,14 @@ class FoundationTopBar(
         title: @Composable () -> Unit,
     ) {
         val gap = StyledTheme.spacing.medium
+        val hasMeasuredNavigation = remember { mutableStateOf(false) }
+        val navigationHasContent = remember { mutableStateOf(true) }
+        val animateNavigationGap = remember { mutableStateOf(false) }
+        val targetGap = if (navigationHasContent.value) gap else 0.dp
+        val navigationGap = animateDpAsState(
+            targetValue = targetGap,
+            animationSpec = if (animateNavigationGap.value) spring() else snap(),
+        ).value
         UpdateStyledThemeLocals(
             contentColor = contentColor,
         ) {
@@ -55,10 +70,25 @@ class FoundationTopBar(
                         end = StyledTheme.padding.content.calculateEndPadding(LocalLayoutDirection.current),
                     ),
                 content = {
-                    Box(contentAlignment = Alignment.Center) { navigationIcon() }
-                    Box {
-                        UpdateStyledThemeLocals(
-                            textStyle = StyledTheme.typography.titleLarge,
+                        Box(
+                            modifier = Modifier.onSizeChanged { size ->
+                                val hasContent = size.width > 0
+                                if (
+                                    hasMeasuredNavigation.value &&
+                                    navigationHasContent.value != hasContent
+                                ) {
+                                    animateNavigationGap.value = true
+                                }
+                                navigationHasContent.value = hasContent
+                                hasMeasuredNavigation.value = true
+                            },
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            navigationIcon()
+                        }
+                        Box {
+                            UpdateStyledThemeLocals(
+                                textStyle = StyledTheme.typography.titleLarge,
                             content = title,
                         )
                     }
@@ -70,7 +100,7 @@ class FoundationTopBar(
                 val action = measurables[2].measure(
                     loose.copy(maxWidth = (constraints.maxWidth - navigation.width).coerceAtLeast(0))
                 )
-                val start = navigation.width + if (navigation.width > 0) gap.roundToPx() else 0
+                val start = navigation.width + navigationGap.roundToPx()
                 val end = action.width + if (action.width > 0) gap.roundToPx() else 0
                 val centered = centerTitle || variant == StyledTopBar.Variant.CenterAligned
                 val titlePadding = if (centered) 2 * maxOf(start, end) else start + end
