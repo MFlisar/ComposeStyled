@@ -31,8 +31,8 @@ import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.utils.number.NumberParser
 import com.michaelflisar.composestyled.ui.icons.StyledIcons
 import com.michaelflisar.composestyled.utils.number.NumberUtil
-import com.michaelflisar.composestyled.utils.number.NumberValidator
 import com.michaelflisar.composestyled.utils.repeatingClickable
+import com.michaelflisar.composestyled.utils.Validator
 
 // -------------------------
 // public API
@@ -42,7 +42,7 @@ import com.michaelflisar.composestyled.utils.repeatingClickable
 @Composable
 fun <T : Number> StyledNumberPicker(
     value: MutableState<T>,
-    validator: NumberValidator<T>,
+    validator: Validator<T>,
     parser: NumberParser<T>,
     modifier: Modifier = Modifier,
     label: String = "",
@@ -55,6 +55,7 @@ fun <T : Number> StyledNumberPicker(
     prefix: @Composable (() -> Unit)? = null,
     suffix: @Composable (() -> Unit)? = null,
     onCurrentValueIsInvalid: (text: String) -> Unit = {},
+    variant: StyledInput.Variant = StyledInput.Variant.Auto,
 ) {
     StyledNumberPicker(
         value = value.value,
@@ -62,6 +63,7 @@ fun <T : Number> StyledNumberPicker(
         parser = parser,
         onValueChange = { value.value = it },
         modifier = modifier,
+        variant = variant,
         label = label,
         enabled = enabled,
         showButtons = showButtons,
@@ -79,7 +81,7 @@ fun <T : Number> StyledNumberPicker(
 @Composable
 fun <T : Number> StyledNumberPicker(
     value: T,
-    validator: NumberValidator<T>,
+    validator: Validator<T>,
     parser: NumberParser<T>,
     onValueChange: (T) -> Unit = {},
     modifier: Modifier = Modifier,
@@ -93,6 +95,7 @@ fun <T : Number> StyledNumberPicker(
     prefix: @Composable (() -> Unit)? = null,
     suffix: @Composable (() -> Unit)? = null,
     onCurrentValueIsInvalid: (text: String) -> Unit = {},
+    variant: StyledInput.Variant = StyledInput.Variant.Auto,
 ) = StyledNumberPickerImpl(
     value = value,
     validator = validator,
@@ -109,14 +112,14 @@ fun <T : Number> StyledNumberPicker(
     prefix = prefix,
     suffix = suffix,
     onCurrentValueIsInvalid = onCurrentValueIsInvalid,
-    variant = StyledInput.Variant.Default,
+    variant = variant,
 )
 
-/** State-backed alternative-style numeric stepper. */
+/** State-backed numeric stepper with a fixed outlined input style. */
 @Composable
-fun <T : Number> StyledAlternativeNumberPicker(
+fun <T : Number> StyledOutlinedNumberPicker(
     value: MutableState<T>,
-    validator: NumberValidator<T>,
+    validator: Validator<T>,
     parser: NumberParser<T>,
     modifier: Modifier = Modifier,
     label: String = "",
@@ -130,7 +133,7 @@ fun <T : Number> StyledAlternativeNumberPicker(
     suffix: @Composable (() -> Unit)? = null,
     onCurrentValueIsInvalid: (text: String) -> Unit = {},
 ) {
-    StyledAlternativeNumberPicker(
+    StyledOutlinedNumberPicker(
         value = value.value,
         validator = validator,
         parser = parser,
@@ -149,11 +152,11 @@ fun <T : Number> StyledAlternativeNumberPicker(
     )
 }
 
-/** Controlled alternative-style numeric stepper. */
+/** Controlled numeric stepper with a fixed outlined input style. */
 @Composable
-fun <T : Number> StyledAlternativeNumberPicker(
+fun <T : Number> StyledOutlinedNumberPicker(
     value: T,
-    validator: NumberValidator<T>,
+    validator: Validator<T>,
     parser: NumberParser<T>,
     onValueChange: (T) -> Unit = {},
     modifier: Modifier = Modifier,
@@ -184,7 +187,7 @@ fun <T : Number> StyledAlternativeNumberPicker(
         prefix = prefix,
         suffix = suffix,
         onCurrentValueIsInvalid = onCurrentValueIsInvalid,
-        variant = StyledInput.Variant.Alternative,
+        variant = StyledInput.Variant.Outlined,
     )
 }
 
@@ -196,7 +199,7 @@ fun <T : Number> StyledAlternativeNumberPicker(
 @OptIn(InternalComposeStyledApi::class)
 private fun <T : Number> StyledNumberPickerImpl(
     value: T,
-    validator: NumberValidator<T>,
+    validator: Validator<T>,
     parser: NumberParser<T>,
     onValueChange: (T) -> Unit = {},
     modifier: Modifier = Modifier,
@@ -210,7 +213,7 @@ private fun <T : Number> StyledNumberPickerImpl(
     prefix: @Composable (() -> Unit)? = null,
     suffix: @Composable (() -> Unit)? = null,
     onCurrentValueIsInvalid: (text: String) -> Unit = {},
-    variant: StyledInput.Variant = StyledInput.Variant.Default,
+    variant: StyledInput.Variant = StyledInput.Variant.Auto,
 ) {
     NumberUtil.requireSupported(value)
     val normalizedValue = parser.normalize(value)
@@ -364,53 +367,29 @@ private fun <T : Number> StyledNumberPickerImpl(
         null
     }
     CompositionLocalProvider(LocalStyledContext provides StyledInput.Context.NumberPicker) {
-        if (variant == StyledInput.Variant.Alternative) {
-            StyledAlternativeInput(
-                value = inputText,
-                onValueChange = onInputValueChange,
-                modifier = modifier,
-                enabled = enabled,
-                readOnly = !allowManualInput,
-                interactionEnabled = enabled && allowManualInput,
-                isError = parseError || !validator.isValid.value,
-                errorMessage = errorMessage,
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = if (NumberUtil.supportsDecimal(normalizedValue)) {
-                        KeyboardType.Decimal
-                    } else {
-                        KeyboardType.Number
-                    }
-                ),
-                textStyle = textStyle,
-                label = styledLabel,
-                leadingIcon = leadingIcon,
-                trailingIcon = trailingIcon,
-                supportingText = supportingText,
-            )
-        } else {
-            StyledInput(
-                value = inputText,
-                onValueChange = onInputValueChange,
-                modifier = modifier,
-                enabled = enabled,
-                readOnly = !allowManualInput,
-                interactionEnabled = enabled && allowManualInput,
-                isError = parseError || !validator.isValid.value,
-                errorMessage = errorMessage,
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = if (NumberUtil.supportsDecimal(normalizedValue)) {
-                        KeyboardType.Decimal
-                    } else {
-                        KeyboardType.Number
-                    }
-                ),
-                textStyle = textStyle,
-                label = styledLabel,
-                leadingIcon = leadingIcon,
-                trailingIcon = trailingIcon,
-                supportingText = supportingText,
-            )
-        }
+        StyledInput(
+            value = inputText,
+            onValueChange = onInputValueChange,
+            modifier = modifier,
+            variant = variant,
+            enabled = enabled,
+            readOnly = !allowManualInput,
+            interactionEnabled = enabled && allowManualInput,
+            isError = parseError || !validator.isValid.value,
+            errorMessage = errorMessage,
+            keyboardOptions = KeyboardOptions.Default.copy(
+                keyboardType = if (NumberUtil.supportsDecimal(normalizedValue)) {
+                    KeyboardType.Decimal
+                } else {
+                    KeyboardType.Number
+                }
+            ),
+            textStyle = textStyle,
+            label = styledLabel,
+            leadingIcon = leadingIcon,
+            trailingIcon = trailingIcon,
+            supportingText = supportingText,
+        )
     }
 }
 

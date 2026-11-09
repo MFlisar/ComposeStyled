@@ -40,11 +40,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.UpdateStyledThemeLocals
 import com.michaelflisar.composestyled.StyledTheme
+import com.michaelflisar.composestyled.tokens.LocalStyledContentColor
 import com.michaelflisar.composestyled.ui.components.StyledBottomNavigationBar
 import com.michaelflisar.composestyled.ui.internal.LocalStyledBottomNavigationColors
 import com.michaelflisar.composestyled.ui.internal.StyledBottomNavigationColors
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
-import com.michaelflisar.composestyled.ui.layout.StyledHorizontalScrollbarContainer
+import com.michaelflisar.composestyled.ui.layout.StyledHorizontalScrollContainer
 
 @InternalComposeStyledApi
 class FoundationBottomNavigationBar(
@@ -118,7 +119,7 @@ class FoundationBottomNavigationBar(
                 }
                 Box(modifier.fillMaxWidth().background(containerColor).windowInsetsPadding(windowInsets)) {
                     if (scrollable) {
-                        StyledHorizontalScrollbarContainer(
+                        StyledHorizontalScrollContainer(
                             scrollState = scrollState,
                             showScrollbar = showScrollbar,
                         ) { items() }
@@ -164,7 +165,7 @@ class FoundationBottomNavigationBar(
         val keyboardFocus = enabled && focused &&
             LocalInputModeManager.current.inputMode == InputMode.Keyboard
         val selectionColors = LocalStyledBottomNavigationColors.current
-        val barContentColor = StyledTheme.currentContentColor
+        val barContentColor = LocalStyledContentColor.current
         val resolvedIndicatorColor =
             selectionColors?.indicatorColor
                 ?.takeUnless { it == Color.Unspecified }

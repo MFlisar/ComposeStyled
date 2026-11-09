@@ -40,16 +40,16 @@ needed to avoid the visible keyboard. Its height is limited to the available
 safe space on that side, including system insets, so the input remains visible.
 On Android, suggestions can grow beyond the generic menu height limit when more
 space becomes available, and their size and placement update as the keyboard or
-system insets change. The slot has a `ColumnScope` receiver and a
-`selectSuggestion` callback, so it can contain existing Styled controls such as
-`StyledDropdownMenuItem`:
+system insets change. The slot has a `StyledPopupMenuScope` receiver and a
+`selectSuggestion` callback. Use its menu DSL to render suggestions; selecting
+an item updates the query and closes the popup:
 
 ```kotlin
 StyledSearchBar(
     value = query,
     placeholder = { StyledText("Search components") },
     suggestions = { selectSuggestion ->
-        StyledDropdownMenuItem(
+        item(
             text = { StyledText("Buttons") },
             onClick = { selectSuggestion("Buttons") },
         )
@@ -63,7 +63,9 @@ input field and its actions.
 `popupWidthConfig` defaults to `StyledPopupMenuDefaults.widthConfig`, sharing
 the popup menu's width policy. Override it per search bar, for example with
 `popupWidthConfig = StyledPopupMenu.WidthConfig.WrapContent` or
-`StyledPopupMenu.WidthConfig.Fixed(320.dp)`.
+`StyledPopupMenu.WidthConfig.Fixed(320.dp)`. Set
+`popupHorizontalAlignment = StyledPopupMenu.HorizontalAlignment.End` to align
+the suggestions' logical end edge with the search bar; `Start` is the default.
 
 Call `selectSuggestion(text)` when an item is selected. It updates the query,
 places the cursor at the end without selecting text, and closes the popup while
@@ -101,10 +103,10 @@ val result = SearchUtil.search(
 StyledSearchBar(
     value = query,
     suggestions = { selectSuggestion ->
-        result.forEach { item ->
-            StyledDropdownMenuItem(
-                text = { StyledText(item) },
-                onClick = { selectSuggestion(item) },
+        result.forEach { suggestion ->
+            item(
+                text = { StyledText(suggestion) },
+                onClick = { selectSuggestion(suggestion) },
             )
         }
         StyledText("${result.size} matches")

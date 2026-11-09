@@ -9,7 +9,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
-import com.michaelflisar.composestyled.UpdateStyledThemeLocals
+import com.michaelflisar.composestyled.material3.ProvideStyledLocals
 import com.michaelflisar.composestyled.ui.components.StyledSurface
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 
@@ -47,7 +47,7 @@ class Material3Surface internal constructor() : StyledSurface.Implementation {
             border = border,
             shadowElevation = shadowElevation,
         ) {
-            UpdateStyledThemeLocals(contentColor = contentColor, content = content)
+            ProvideStyledLocals(contentColor = contentColor, content = content)
         }
     }
 }

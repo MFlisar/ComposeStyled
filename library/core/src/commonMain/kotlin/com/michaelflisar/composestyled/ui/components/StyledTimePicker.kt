@@ -95,7 +95,7 @@ private fun TimeField(
     ) {
         StyledButton(
             onClick = onIncrease,
-            role = StyledButton.Role.Tertiary,
+            variant = StyledButton.Variant.Plain,
             enabled = enabled,
             modifier = Modifier
                 .fillMaxWidth()
@@ -111,7 +111,7 @@ private fun TimeField(
         )
         StyledButton(
             onClick = onDecrease,
-            role = StyledButton.Role.Tertiary,
+            variant = StyledButton.Variant.Plain,
             enabled = enabled,
             modifier = Modifier
                 .fillMaxWidth()

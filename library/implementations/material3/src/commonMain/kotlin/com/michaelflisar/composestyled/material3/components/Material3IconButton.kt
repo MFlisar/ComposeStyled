@@ -6,7 +6,6 @@ import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -16,11 +15,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.StyledTheme
+import com.michaelflisar.composestyled.tokens.LocalStyledContentColor
 import com.michaelflisar.composestyled.ui.components.StyledIconButton
+import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.ui.components.StyledInput
 import com.michaelflisar.composestyled.ui.specials.StyledGroupBox
 import com.michaelflisar.composestyled.ui.specials.StyledSidePane
-import com.michaelflisar.composestyled.material3.CopyMaterialThemeLocals
+import com.michaelflisar.composestyled.material3.ProvideStyledLocals
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.runtime.LocalStyledContext
 import com.michaelflisar.composestyled.runtime.StyledContext
@@ -29,7 +30,7 @@ import com.michaelflisar.composestyled.ui.components.StyledSnackbar
 import com.michaelflisar.composestyled.ui.components.StyledTopBar
 
 class Material3IconButton internal constructor(
-    val roleMapping: RoleMapping,
+    val variantMapping: VariantMapping,
 ) : StyledIconButton.Implementation {
 
     override val defaults: StyledIconButton.Defaults
@@ -43,18 +44,18 @@ class Material3IconButton internal constructor(
 
         @Composable
         fun create(
-            roleMapping: RoleMapping = DefaultRoleMapping,
-        ) = remember(roleMapping) { Material3IconButton(roleMapping) }
+            variantMapping: VariantMapping = DefaultVariantMapping,
+        ) = remember(variantMapping) { Material3IconButton(variantMapping) }
 
         // -------------
         // 2) mapping
         // -------------
 
-        typealias RoleMapping = (StyledIconButton.Role, StyledContext) -> Variant
+        typealias VariantMapping = (StyledButton.Variant, StyledContext) -> Variant
 
-        val DefaultRoleMapping: RoleMapping = { role, context ->
+        val DefaultVariantMapping: VariantMapping = { variant, context ->
             when {
-                role == StyledIconButton.Role.Default &&
+                variant == StyledButton.Variant.Auto &&
                     (context is StyledDialog.ActionContext ||
                         context == StyledDialog.Context.DialogAction ||
                         context == StyledDialog.Context.FullscreenAction ||
@@ -64,11 +65,11 @@ class Material3IconButton internal constructor(
                         context is StyledInput.Context ||
                         context == StyledGroupBox.Context.Clickable ||
                         context == StyledSidePane.Context.IconSlot) -> Variant.Standard
-                else -> when (role) {
-                    StyledIconButton.Role.Default,
-                    StyledIconButton.Role.Primary -> Variant.Filled
-                    StyledIconButton.Role.Secondary -> Variant.Outlined
-                    StyledIconButton.Role.Tertiary -> Variant.Standard
+                else -> when (variant) {
+                    StyledButton.Variant.Auto,
+                    StyledButton.Variant.Plain -> Variant.Standard
+                    StyledButton.Variant.Filled -> Variant.Filled
+                    StyledButton.Variant.Outlined -> Variant.Outlined
                 }
             }
         }
@@ -84,7 +85,7 @@ class Material3IconButton internal constructor(
     @OptIn(InternalComposeStyledApi::class)
     @Composable
     override fun Render(
-        role: StyledIconButton.Role,
+        variant: StyledButton.Variant,
         onClick: () -> Unit,
         modifier: Modifier,
         enabled: Boolean,
@@ -99,14 +100,23 @@ class Material3IconButton internal constructor(
             ?.takeIf { it != Color.Unspecified }
         val textForeground = customization?.colors?.textForeground?.resolve()
             ?.takeIf { it != Color.Unspecified }
-        val isTopBarDefault = role == StyledIconButton.Role.Default &&
-            LocalStyledContext.current is StyledTopBar.Context
+        val context = LocalStyledContext.current
+        val inheritsStyledContentColor = variant == StyledButton.Variant.Auto &&
+            (context is StyledTopBar.Context ||
+                context is StyledInput.Context ||
+                context is StyledDialog.ActionContext &&
+                context.context == StyledDialog.Context.FullscreenAction)
         val borderTint = if (enabled) {
             customization?.border?.resolve()?.takeIf { it != Color.Unspecified }
         } else {
             null
         }
-        when (roleMapping(role, LocalStyledContext.current)) {
+        @Composable
+        fun styledSlotColor(color: Color) =
+            if (enabled) color else color.copy(
+                alpha = color.alpha * StyledTheme.colorScheme.disableFactors.content,
+            )
+        when (variantMapping(variant, LocalStyledContext.current)) {
             Variant.Standard -> IconButton(
                 onClick = onClick,
                 modifier = modifier,
@@ -114,12 +124,19 @@ class Material3IconButton internal constructor(
                 shape = shape,
                 interactionSource = interactionSource,
                 colors = IconButtonDefaults.iconButtonColors(
-                    contentColor = textForeground ?: if (isTopBarDefault) {
-                        StyledTheme.currentContentColor
-                    } else Color.Unspecified
+                    contentColor = textForeground ?: if (inheritsStyledContentColor) {
+                        LocalStyledContentColor.current
+                    } else StyledTheme.colorScheme.onSurfaceVariant
                 ),
             ) {
-                CopyMaterialThemeLocals(contentColor = LocalContentColor.current, content = content)
+                ProvideStyledLocals(
+                    contentColor = styledSlotColor(
+                        textForeground ?: if (inheritsStyledContentColor) {
+                            LocalStyledContentColor.current
+                        } else StyledTheme.colorScheme.onSurfaceVariant
+                    ),
+                    content = content,
+                )
             }
 
             Variant.Outlined -> OutlinedIconButton(
@@ -129,12 +146,17 @@ class Material3IconButton internal constructor(
                 shape = shape,
                 interactionSource = interactionSource,
                 colors = IconButtonDefaults.outlinedIconButtonColors(
-                    contentColor = textForeground ?: Color.Unspecified
+                    contentColor = textForeground ?: StyledTheme.colorScheme.onSurfaceVariant
                 ),
                 border = borderTint?.let { BorderStroke(1.dp, it) }
                     ?: IconButtonDefaults.outlinedIconButtonBorder(enabled),
             ) {
-                CopyMaterialThemeLocals(contentColor = LocalContentColor.current, content = content)
+                ProvideStyledLocals(
+                    contentColor = styledSlotColor(
+                        textForeground ?: StyledTheme.colorScheme.onSurfaceVariant
+                    ),
+                    content = content,
+                )
             }
 
             Variant.Filled -> FilledIconButton(
@@ -144,11 +166,16 @@ class Material3IconButton internal constructor(
                 shape = shape,
                 interactionSource = interactionSource,
                 colors = IconButtonDefaults.filledIconButtonColors(
-                    contentColor = filledForeground ?: Color.Unspecified,
+                    contentColor = filledForeground ?: StyledTheme.colorScheme.onPrimary,
                     containerColor = filledBackground ?: Color.Unspecified,
                 ),
             ) {
-                CopyMaterialThemeLocals(contentColor = LocalContentColor.current, content = content)
+                ProvideStyledLocals(
+                    contentColor = styledSlotColor(
+                        filledForeground ?: StyledTheme.colorScheme.onPrimary
+                    ),
+                    content = content,
+                )
             }
 
             Variant.FilledTonal -> FilledTonalIconButton(
@@ -158,11 +185,16 @@ class Material3IconButton internal constructor(
                 shape = shape,
                 interactionSource = interactionSource,
                 colors = IconButtonDefaults.filledTonalIconButtonColors(
-                    contentColor = filledForeground ?: Color.Unspecified,
+                    contentColor = filledForeground ?: StyledTheme.colorScheme.onSecondarySurface,
                     containerColor = filledBackground ?: Color.Unspecified,
                 ),
             ) {
-                CopyMaterialThemeLocals(contentColor = LocalContentColor.current, content = content)
+                ProvideStyledLocals(
+                    contentColor = styledSlotColor(
+                        filledForeground ?: StyledTheme.colorScheme.onSecondarySurface
+                    ),
+                    content = content,
+                )
             }
         }
     }

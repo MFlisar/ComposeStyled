@@ -39,7 +39,7 @@ Its native one-/two-/three-line minimum heights are 56/72/88 dp. Cupertino uses
 ## Free content
 
 Use the trailing `ColumnScope` lambda for arbitrary content. This overload uses
-the same renderer, customization and click behavior, but does not infer text
+the same renderer, color parameters and click behavior, but does not infer text
 roles or line patterns from its children.
 
 ```kotlin
@@ -73,7 +73,7 @@ StyledListItem(
     actions = {
         StyledIconButton(
             onClick = { showFileMenu() },
-            role = StyledIconButton.Role.Tertiary,
+            variant = StyledButton.Variant.Plain,
             icon = Icons.Default.MoreVert.toIconComposable(),
             contentDescription = "File actions",
         )
@@ -86,7 +86,7 @@ actions. Pass their enabled state explicitly when they should also be disabled.
 `interactionSource` belongs to the whole item's interaction. Keep interactive
 children in `actions`, not in the main content.
 
-## Defaults and customization
+## Defaults and colors
 
 Items are flat and borderless by default, without elevation or Card variants.
 Adjust `shape`, `minHeight`, `contentPadding` and `spacing` through parameters or
@@ -95,20 +95,18 @@ overload, not a fixed height or a line-pattern selector. Semantic items retain
 their theme's pattern minimums, and native Material items cannot shrink below
 their native minimums.
 
-`StyledListItemDefaults.customize(...)` accepts color tokens for the container,
-main content, supporting/overline content and optional border. Tokens resolve
-during composition. An explicit main content color also supplies the secondary
-color unless `supportingColor` overrides it. There is also a fixed-color overload
-whose required first argument is `containerColor`.
+Set `containerColor`, `contentColor`, `supportingColor` and `borderColor`
+directly. Each defaults to `Color.Unspecified`, so the renderer keeps its theme
+default when no override is supplied. If `contentColor` is set and
+`supportingColor` is not, supporting and overline content use `contentColor`.
+`Color.Unspecified` for `borderColor` leaves the item borderless.
 
 ```kotlin
 StyledListItem(
     headline = { StyledText("Highlighted item") },
-    customization = StyledListItemDefaults.customize(
-        containerColor = ColorToken.Theme.PrimarySurface,
-        contentColor = ColorToken.Theme.OnPrimarySurface,
-        border = ColorToken.Theme.Primary,
-    ),
+    containerColor = StyledTheme.colorScheme.primarySurface,
+    contentColor = StyledTheme.colorScheme.onPrimarySurface,
+    borderColor = StyledTheme.colorScheme.outline,
 )
 ```
 

@@ -1,86 +1,62 @@
 # Menu Bar
 
 `StyledMenuBar` is a compact, theme-aware horizontal menu bar for application
-commands such as File and Edit. It is available from shared Compose code and is
-primarily intended for desktop interfaces.
-
-Use `StyledMenuBarItem` for each top-level menu. Its content is the menu label,
-and its `menuContent` slot defines that menu's entries:
+commands such as File and Edit. Its content receiver is a
+`StyledMenuBarScope`: use `menu` for a popup trigger, `item` for an immediate
+command, `divider` for a separator, and `custom` for arbitrary row content.
 
 ```kotlin
 StyledMenuBar {
-    StyledMenuBarItem(
-        menuContent = { dismiss ->
-            StyledDropdownMenuItem(
-                text = { StyledText("Save") },
-                onClick = {
-                    save()
-                    dismiss()
-                },
-            )
-        },
-    ) {
-        StyledText("File")
+    menu("File") {
+        item("Save", onClick = {
+            save()
+            dismiss()
+        })
+        divider()
+        item("Close", onClick = { closeDocument() })
     }
 
-    StyledMenuBarItem(
-        icon = StyledIcons.Edit,
-        menuContent = { dismiss ->
-            StyledDropdownMenuItem(
-                text = { StyledText("Undo") },
-                onClick = {
-                    undo()
-                    dismiss()
-                },
-            )
-        },
-    ) {
-        StyledText("Edit")
+    menu("Edit", icon = StyledIcons.Edit) {
+        item("Undo", onClick = {
+            undo()
+            dismiss()
+        })
     }
+
+    item("Help", onClick = { showHelp() })
 }
 ```
+
+Menu content uses `StyledPopupMenuScope`, so popup menus and menu-bar menus
+share the same `item`, `header`, `divider`, `checkbox`, `submenu` and `custom`
+operations. Call `dismiss()` after a command to close the complete menu
+hierarchy; simple items close automatically by default. Set `closeOnClick =
+false` for an action that should leave the menu open. The `custom` operation
+accepts `RowScope` content and can also make the row clickable. Use
+`StyledMenuBarScope.custom` for arbitrary content in the horizontal bar itself.
 
 `StyledMenuBar` fills the available width, uses the active theme's surface and
 content colors, and applies compact default padding and item spacing. Override
 `containerColor`, `contentColor`, `contentPadding` or `itemSpacing` when needed.
-Menu-bar items wrap their content with theme-appropriate padding and do not have
-a fixed minimum width.
-Menu-bar items use `StyledButton` internally, so theme renderer overrides
-continue to apply. The bar provides `StyledMenuBar.Context.MenuItem`; buttons
-using `Role.Default` receive the theme's menu-bar treatment, while explicit
-roles remain authoritative. `StyledIcon` uses a compact size capped at 16 dp in
-this context; an explicit `size` still takes precedence. `StyledMenuBarItem`'s
-optional `icon` uses that same size and spacing, and takes up space only when
-provided. The expand indicator uses the same compact size.
+Menu-bar entries use `StyledButton` internally, so theme renderer overrides
+continue to apply. Buttons using `Role.Default` receive the menu-bar treatment;
+explicit roles remain authoritative. `StyledIcon` uses a compact size capped
+at 16 dp in this context, and an explicit size takes precedence.
 
 Menu-bar popups open after a brief hover delay, and hovering another top-level
 menu switches directly to it. Click and keyboard activation remain available.
-Clicking a closed trigger opens it. Clicking the same trigger during its
-opening animation has no effect; after the menu is fully shown, clicking it
-closes the menu. Their content is measured before the entrance begins, then
-unfolds vertically from the top without fading. Customize the animation with
-`menuAnimation` on `StyledMenuBarItem` or `animation` on
-`StyledPopupMenuSubmenu`. Their width
-defaults to the measured content width,
-capped at 260 dp; set `menuWidthConfig` when a menu needs a different width. Popups have
-vertical content padding matching the menu items' horizontal content padding,
-and menu-item minimum height is capped at 36 dp for a compact menu-bar
-presentation. Items without a leading icon still reserve its slot to keep their
-labels aligned. Popups are
-non-focusable by default so they do not capture focus and block hover over
-sibling menus. Keep `menuProperties.focusable` false when customizing popup
-properties if sibling-menu switching is required.
+Clicking a closed trigger opens it; clicking it during its opening animation
+has no effect, and clicking after the menu is fully shown closes it. Popups are
+measured before entrance and unfold vertically from the top without fading.
+Their width defaults to the measured content width, capped at 260 dp. Menu
+items without a leading icon still reserve its slot to keep labels aligned.
+Popups are non-focusable by default so they do not capture focus and block
+hover over sibling menus.
 
-Outside a `StyledMenuBar`, `StyledMenuBarItem` behaves as a click-to-toggle menu
-button.
-
-For cascading menus, use `StyledPopupMenuSubmenu` inside a popup menu. It opens
-beside its parent item and flips to the other side when there is not enough
-horizontal room. Its `dismiss` callback closes the entire menu hierarchy, while
-`dismissSubmenu` closes only that submenu and its descendants. Within a
-menu-bar popup, submenu items also open on hover and sibling submenus switch
-without requiring the parent popup to close. A short close delay lets the
-pointer cross the gap between an anchor and its popup. Hovering any descendant
-popup keeps every ancestor menu active. Ordinary dropdown menus keep their
-normal size and click-driven behavior. Keyboard shortcut binding is not part
-of this API.
+For cascading menus, use `submenu` inside a popup scope. It opens beside its
+parent item and flips to the other side when there is not enough horizontal
+room. `dismiss()` closes the full hierarchy, while `dismissSubmenu()` closes
+only that submenu and its descendants. Within a menu-bar popup, submenu items
+also open on hover and sibling submenus switch without closing the parent.
+Ordinary popup menus remain click-driven. Keyboard shortcut binding is not
+part of this API.

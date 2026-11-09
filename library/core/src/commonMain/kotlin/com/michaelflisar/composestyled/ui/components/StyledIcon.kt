@@ -49,6 +49,7 @@ object StyledIconDefaults {
     val size: Dp
         @OptIn(InternalComposeStyledApi::class)
         @Composable get() = when (LocalStyledContext.current) {
+            StyledButton.Context.Icon -> minOf(StyledTheme.sizes.iconSize, 18.dp)
             StyledMenuBar.Context.MenuItem -> minOf(StyledTheme.sizes.iconSize, 16.dp)
             StyledBadge.Context.BadgeContent -> StyledBadgeDefaults.iconSize
             else -> StyledTheme.sizes.iconSize

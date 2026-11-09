@@ -8,7 +8,8 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.Surface
 import androidx.compose.ui.unit.dp
-import com.michaelflisar.composestyled.ui.layout.StyledHorizontalScrollbarContainer
+import com.michaelflisar.composestyled.tokens.LocalStyledContentColor
+import com.michaelflisar.composestyled.ui.layout.StyledHorizontalScrollContainer
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,7 +19,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
@@ -26,8 +26,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
-import com.michaelflisar.composestyled.UpdateStyledThemeLocals
 import com.michaelflisar.composestyled.StyledTheme
+import com.michaelflisar.composestyled.material3.ProvideStyledLocals
 import com.michaelflisar.composestyled.ui.components.StyledBottomNavigationBar
 import com.michaelflisar.composestyled.ui.internal.LocalStyledBottomNavigationColors
 import com.michaelflisar.composestyled.ui.internal.StyledBottomNavigationColors
@@ -63,7 +63,7 @@ class Material3BottomNavigationBar internal constructor() : StyledBottomNavigati
         } else {
             contentColor
         }
-        UpdateStyledThemeLocals(
+        ProvideStyledLocals(
             contentColor = resolvedContentColor,
             textStyle = StyledTheme.typography.labelLarge,
         ) {
@@ -94,7 +94,7 @@ class Material3BottomNavigationBar internal constructor() : StyledBottomNavigati
                         color = containerColor,
                         contentColor = resolvedContentColor,
                     ) {
-                        StyledHorizontalScrollbarContainer(
+                        StyledHorizontalScrollContainer(
                             modifier = Modifier.windowInsetsPadding(windowInsets),
                             scrollState = scrollState,
                             showScrollbar = showScrollbar,
@@ -158,7 +158,7 @@ class Material3BottomNavigationBar internal constructor() : StyledBottomNavigati
             return
         }
         val selectionColors = LocalStyledBottomNavigationColors.current
-        val barContentColor = StyledTheme.currentContentColor
+        val barContentColor = LocalStyledContentColor.current
         val resolvedIndicatorColor = selectionColors?.indicatorColor
             ?.takeUnless { it == Color.Unspecified }
             ?: StyledTheme.colorScheme.primarySurface
@@ -177,31 +177,28 @@ class Material3BottomNavigationBar internal constructor() : StyledBottomNavigati
                 ?: barContentColor,
             indicatorColor = resolvedIndicatorColor,
         )
-        val iconColor = when {
-            !enabled -> colors.disabledIconColor
-            selected -> colors.selectedIconColor
-            else -> colors.unselectedIconColor
-        }
-        val textColor = when {
-            !enabled -> colors.disabledTextColor
-            selected -> colors.selectedTextColor
-            else -> colors.unselectedTextColor
-        }
+        @Composable
+        fun withEnabledState(color: Color) =
+            if (enabled) color else color.copy(
+                alpha = color.alpha * StyledTheme.colorScheme.disableFactors.content,
+            )
+        val iconColor = withEnabledState(
+            if (selected) colors.selectedIconColor else colors.unselectedIconColor,
+        )
+        val textColor = withEnabledState(
+            if (selected) colors.selectedTextColor else colors.unselectedTextColor,
+        )
         val styledLabel: (@Composable () -> Unit)? = if (label != null) {
             {
-                UpdateStyledThemeLocals(
+                ProvideStyledLocals(
                     contentColor = textColor,
                     textStyle = StyledTheme.typography.labelMedium.copy(textAlign = TextAlign.Center),
                 ) {
-                    CompositionLocalProvider(
-                        LocalTextStyle provides LocalTextStyle.current.copy(textAlign = TextAlign.Center),
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center,
                     ) {
-                        Box(
-                            modifier = Modifier.fillMaxWidth(),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            label()
-                        }
+                        label()
                     }
                 }
             }
@@ -216,7 +213,7 @@ class Material3BottomNavigationBar internal constructor() : StyledBottomNavigati
                 colors = colors,
                 interactionSource = interactionSource,
                 icon = {
-                    UpdateStyledThemeLocals(contentColor = iconColor, content = icon)
+                    ProvideStyledLocals(contentColor = iconColor, content = icon)
                 },
                 label = styledLabel,
             )

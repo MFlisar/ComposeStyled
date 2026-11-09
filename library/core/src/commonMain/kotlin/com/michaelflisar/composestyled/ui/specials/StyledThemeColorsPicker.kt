@@ -21,8 +21,8 @@ import com.michaelflisar.composestyled.themes.StyledThemeColors
 import com.michaelflisar.composestyled.themes.StyledThemeColorsCollection
 import com.michaelflisar.composestyled.themes.StyledThemeContrast
 import com.michaelflisar.composestyled.themes.StyledThemeVariant
-import com.michaelflisar.composestyled.ui.components.StyledDropdown
-import com.michaelflisar.composestyled.ui.components.StyledDropdownIndex
+import com.michaelflisar.composestyled.tokens.LocalStyledContentColor
+import com.michaelflisar.composestyled.ui.components.StyledPopupDropdownIndex
 import com.michaelflisar.composestyled.ui.components.StyledSegmentedButtonRow
 import com.michaelflisar.composestyled.ui.layout.StyledRow
 import com.michaelflisar.composestyled.ui.primitives.StyledText
@@ -89,7 +89,7 @@ fun StyledThemeColorsPicker(
         verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.small),
     ) {
         StyledText("Appearance")
-        StyledSegmentedButtonRow<StyledThemeAppearance>(
+        StyledSegmentedButtonRow(
             items = StyledThemeAppearance.entries,
             selected = themeAppearance,
             modifier = Modifier.fillMaxWidth(),
@@ -107,38 +107,37 @@ fun StyledThemeColorsPicker(
             },
         )
 
-        StyledText("Collection")
-        StyledDropdownIndex(
-            modifier = Modifier.fillMaxWidth(),
-            items = collections.map(StyledThemeColorsCollection::name),
-            selectedIndex = selectedCollectionIndex,
-            onSelectionChange = { index, _ ->
-                onThemeColorsChange(collections[index].themes.first())
-            },
-        )
+        StyledText("Theme and Color")
+        StyledRow(
+            itemSpacing = StyledTheme.spacing.medium
+        ) {
+            StyledPopupDropdownIndex(
+                modifier = Modifier.weight(1f),
+                items = collections.map(StyledThemeColorsCollection::name),
+                selectedIndex = selectedCollectionIndex,
+                onSelectionChange = { index, _ ->
+                    onThemeColorsChange(collections[index].themes.first())
+                },
+            )
 
-        StyledText("Theme colors")
-        StyledDropdownIndex(
-            modifier = Modifier.fillMaxWidth(),
-            items = selectedCollection.themes,
-            selectedIndex = selectedThemeIndex,
-            content = StyledDropdown.renderContent(
-                content = { context ->
-                    context.selection?.let { colors ->
-                        ThemeColorsOption(colors, themeVariant)
+            StyledPopupDropdownIndex(
+                modifier = Modifier.weight(1f),
+                items = selectedCollection.themes,
+                selectedIndex = selectedThemeIndex,
+                content = {
+                    selection { colors ->
+                        colors?.let { ThemeColorsOption(it, themeVariant) }
                     }
+                    item { colors, _ -> ThemeColorsOption(colors, themeVariant) }
                 },
-                dropdownContent = { context ->
-                    ThemeColorsOption(context.item, themeVariant)
+                onSelectionChange = { index, _ ->
+                    onThemeColorsChange(selectedCollection.themes[index])
                 },
-            ),
-            onSelectionChange = { index, _ ->
-                onThemeColorsChange(selectedCollection.themes[index])
-            },
-        )
+            )
+        }
 
         StyledText("Variant")
-        StyledSegmentedButtonRow<StyledThemeVariant>(
+        StyledSegmentedButtonRow(
             items = StyledThemeVariant.entries,
             selected = themeVariant,
             modifier = Modifier.fillMaxWidth(),
@@ -162,7 +161,7 @@ fun StyledThemeColorsPicker(
         )
 
         StyledText("Contrast")
-        StyledDropdownIndex(
+        StyledPopupDropdownIndex(
             modifier = Modifier.fillMaxWidth(),
             items = StyledThemeContrast.entries.map(StyledThemeContrast::label),
             selectedIndex = StyledThemeContrast.entries.indexOf(themeContrast),
@@ -196,7 +195,7 @@ private fun ThemeColorsOption(themeColors: StyledThemeColors, themeVariant: Styl
     val colors = themeColors.resolve(themeVariant, isDark = false, contrast = StyledContrastLevel.Normal)
     StyledRow(itemSpacing = StyledTheme.spacing.medium) {
         Canvas(
-            Modifier.size(16.dp).border(1.dp, StyledTheme.currentContentColor, CircleShape),
+            Modifier.size(16.dp).border(1.dp, LocalStyledContentColor.current, CircleShape),
         ) {
             drawCircle(color = colors.primary)
         }

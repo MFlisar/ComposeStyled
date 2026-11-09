@@ -45,19 +45,67 @@ fun systemBarIconStyleFor(
     require(background != Color.Unspecified) {
         "A specified background color is required to calculate system-bar icon contrast."
     }
-    val effectiveColor = if (color == Color.Unspecified) {
-        background
-    } else {
-        color.compositeOver(background)
-    }
+    val effectiveColor = color.compositeOverBackground(background)
     val contentColor = StyledTheme.contentColorFor(
         backgroundColor = effectiveColor,
         fallback = StyledTheme.ContentColorFallback.BlackWhite,
     )
-    return if (contentColor.luminance() > 0.5f) {
+    return systemBarIconStyleForContentColor(contentColor, effectiveColor)
+}
+
+private fun systemBarIconStyleForContentColor(
+    contentColor: Color,
+    background: Color,
+): SystemBarIconStyle {
+    require(background != Color.Unspecified) {
+        "A specified background color is required to calculate system-bar icon contrast."
+    }
+    require(contentColor != Color.Unspecified) {
+        "A specified content color is required to calculate system-bar icon style."
+    }
+    val effectiveContentColor = contentColor.compositeOver(background)
+    return if (effectiveContentColor.luminance() > 0.5f) {
         SystemBarIconStyle.Light
     } else {
         SystemBarIconStyle.Dark
+    }
+}
+
+private fun Color.compositeOverBackground(background: Color): Color =
+    if (this == Color.Unspecified) background else compositeOver(background)
+
+/**
+ * Applies contrast-aware system-bar icon styles when the current window is in normal mode.
+ *
+ * [statusBarColor] and [navigationBarColor] are the colors rendered behind their respective bars.
+ * [backgroundColor] is used as the underlay for translucent colors and defaults to the theme
+ * surface. Specify [statusBarContentColor] or [navigationBarContentColor] to use the corresponding
+ * bar's actual content color when it differs from the contrast-aware default. Other window modes
+ * leave system-bar styling unchanged.
+ */
+@Composable
+fun SystemBarStyleEffectIfNeeded(
+    statusBarColor: Color,
+    navigationBarColor: Color,
+    backgroundColor: Color = StyledTheme.colorScheme.surface,
+    statusBarContentColor: Color? = null,
+    navigationBarContentColor: Color? = null,
+) {
+    if (rememberWindowEnvironment().mode == WindowMode.Normal) {
+        SystemBarStyleEffect(
+            statusBar = statusBarContentColor?.let {
+                systemBarIconStyleForContentColor(
+                    contentColor = it,
+                    background = statusBarColor.compositeOverBackground(backgroundColor),
+                )
+            } ?: systemBarIconStyleFor(statusBarColor, backgroundColor),
+            navigationBar = navigationBarContentColor?.let {
+                systemBarIconStyleForContentColor(
+                    contentColor = it,
+                    background = navigationBarColor.compositeOverBackground(backgroundColor),
+                )
+            } ?: systemBarIconStyleFor(navigationBarColor, backgroundColor),
+        )
     }
 }
 

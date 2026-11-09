@@ -41,11 +41,23 @@ object NatureThemes {
         Color(0xFF56752D), Color(0xFFB2D57D),
         Color(0xFF176B8A), Color(0xFF75C9E8),
     )
+    val blossom = createStyledThemeColors(
+        themeId, "blossom", "Blossom",
+        Color(0xFFA54B73), Color(0xFFF0A1BB),
+        Color(0xFF76579B), Color(0xFFC2A5E8),
+        Color(0xFF5C783D), Color(0xFFB6D18A),
+    )
+    val stone = createStyledThemeColors(
+        themeId, "stone", "Stone",
+        Color(0xFF68737D), Color(0xFFBDC7D0),
+        Color(0xFF84796B), Color(0xFFD1C4B5),
+        Color(0xFF6D8475), Color(0xFFBBD0C0),
+    )
 
     val collection = StyledThemeColorsCollection(
         id = themeId,
         name = "Nature",
-        themes = listOf(forest, ocean, meadow, sunset, earth),
+        themes = listOf(forest, ocean, meadow, sunset, earth, blossom, stone),
         matchingPlatforms = Platform.entries.toSet(),
     )
 }

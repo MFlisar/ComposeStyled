@@ -24,10 +24,12 @@ focus.
 Bottom bars handle their safe-area insets themselves. Pass
 `WindowInsets(0, 0, 0, 0)` when embedding a bar inside other content.
 
-System-bar styling is caller-directed. On Android, call `SystemBarStyleEffect`
-from the containing screen with an icon style computed from this bar's
-`containerColor` and its actual underlay. The library leaves native contrast
-scrims and the iOS home indicator platform controlled.
+System-bar styling is caller-directed. From the containing Scaffold, call
+`SystemBarStyleEffectIfNeeded` with this bar's `containerColor` as
+`navigationBarColor`; pass the actual Scaffold container as `backgroundColor`
+when it differs from the theme surface. If the bar has an explicit
+`contentColor`, pass it as `navigationBarContentColor` as well. The library
+leaves the iOS home indicator platform controlled.
 
 Icon and label slots receive their own content-color scope. Nested `StyledIcon`,
 `StyledText` and other Styled content inherit the foreground of their slot,

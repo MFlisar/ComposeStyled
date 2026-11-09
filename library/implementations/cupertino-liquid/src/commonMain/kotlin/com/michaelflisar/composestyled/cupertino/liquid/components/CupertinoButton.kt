@@ -35,6 +35,7 @@ import com.michaelflisar.composestyled.cupertino.liquid.liquidGlass
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.runtime.LocalStyledContext
 import com.michaelflisar.composestyled.runtime.StyledContext
+import com.michaelflisar.composestyled.tokens.LocalStyledContentColor
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
 import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.ui.components.StyledSnackbar
@@ -50,7 +51,7 @@ import com.michaelflisar.composestyled.ui.specials.StyledSwipeRevealActionBox
  * subject to the constraints supplied by the caller.
  */
 class CupertinoLiquidButton internal constructor(
-    val roleMapping: RoleMapping,
+    val variantMapping: VariantMapping,
 ) : StyledButton.Implementation {
 
     override val defaults: StyledButton.Defaults
@@ -64,26 +65,26 @@ class CupertinoLiquidButton internal constructor(
 
         @Composable
         fun create(
-            roleMapping: RoleMapping = DefaultRoleMapping,
-        ): CupertinoLiquidButton = remember(roleMapping) {
-            CupertinoLiquidButton(roleMapping)
+            variantMapping: VariantMapping = DefaultVariantMapping,
+        ): CupertinoLiquidButton = remember(variantMapping) {
+            CupertinoLiquidButton(variantMapping)
         }
 
         // -------------
         // 2) mapping
         // -------------
 
-        typealias RoleMapping = (StyledButton.Role, StyledContext) -> Variant
+        typealias VariantMapping = (StyledButton.Variant, StyledContext) -> Variant
 
-        val DefaultRoleMapping: RoleMapping = { role, context ->
+        val DefaultVariantMapping: VariantMapping = { variant, context ->
             when {
-                role == StyledButton.Role.Default &&
+                variant == StyledButton.Variant.Auto &&
                     context == StyledGroupBox.Context.Clickable -> Variant.Outlined
-                role == StyledButton.Role.Default &&
+                variant == StyledButton.Variant.Auto &&
                     context == StyledSidePane.Context.IconSlot -> Variant.Plain
-                role == StyledButton.Role.Default &&
+                variant == StyledButton.Variant.Auto &&
                     context == StyledSwipeRevealActionBox.Context.RevealAction -> Variant.Plain
-                role == StyledButton.Role.Default &&
+                variant == StyledButton.Variant.Auto &&
                     (context is StyledDialog.ActionContext ||
                         context == StyledSnackbar.Context.SnackbarAction ||
                         context == StyledDialog.Context.DialogAction ||
@@ -91,11 +92,11 @@ class CupertinoLiquidButton internal constructor(
                         context == StyledDialog.Context.BottomSheetAction ||
                         context is StyledTopBar.Context ||
                         context == StyledMenuBar.Context.MenuItem) -> Variant.Plain
-                else -> when (role) {
-                    StyledButton.Role.Default,
-                    StyledButton.Role.Primary -> Variant.Tinted
-                    StyledButton.Role.Secondary -> Variant.Gray
-                    StyledButton.Role.Tertiary -> Variant.Plain
+                else -> when (variant) {
+                    StyledButton.Variant.Auto -> Variant.Tinted
+                    StyledButton.Variant.Filled -> Variant.Filled
+                    StyledButton.Variant.Outlined -> Variant.Outlined
+                    StyledButton.Variant.Plain -> Variant.Plain
                 }
             }
         }
@@ -113,7 +114,7 @@ class CupertinoLiquidButton internal constructor(
     @OptIn(InternalComposeStyledApi::class)
     @Composable
     override fun Render(
-        role: StyledButton.Role,
+        variant: StyledButton.Variant,
         onClick: () -> Unit,
         modifier: Modifier,
         enabled: Boolean,
@@ -124,17 +125,17 @@ class CupertinoLiquidButton internal constructor(
     ) {
         val context = LocalStyledContext.current
         CupertinoLiquidButton(
-            variant = roleMapping(role, context),
+            variant = variantMapping(variant, context),
             onClick = onClick,
             modifier = modifier,
             enabled = enabled,
             shape = shape,
             interactionSource = interactionSource,
             customization = customization,
-            defaultContentColor = if (role == StyledButton.Role.Default &&
+            defaultContentColor = if (variant == StyledButton.Variant.Auto &&
                 (context is StyledTopBar.Context ||
                     context == StyledMenuBar.Context.MenuItem)
-            ) StyledTheme.currentContentColor else null,
+            ) LocalStyledContentColor.current else null,
             content = content,
         )
     }

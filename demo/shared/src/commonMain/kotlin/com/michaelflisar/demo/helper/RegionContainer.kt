@@ -34,11 +34,18 @@ internal fun RegionContainer(
         title = { StyledText(title) },
         modifier = Modifier.fillMaxWidth().registerScrollToTopTarget(scrollToTopTarget),
         expanded = isExpanded,
-        onToggle = { expanded.toggle(id) },
-        onExpansionAnimationFinished = { isExpanded ->
-            if (isExpanded) {
-                scope.launch { scrollToTopTarget.request() }
+        onToggle = {
+            val willExpand = !expanded.isExpanded(id)
+            scrollToTopTarget.stopKeepOnTop()
+            expanded.toggle(id)
+            if (willExpand) {
+                scope.launch {
+                    scrollToTopTarget.request(keepOnTop = true)
+                }
             }
+        },
+        onExpansionAnimationFinished = { _ ->
+            scrollToTopTarget.stopKeepOnTop()
         },
     ) {
         stateHolder.SaveableStateProvider(id.toString()) {

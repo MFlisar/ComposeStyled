@@ -28,7 +28,13 @@ object StyledExpandIcon {
     }
 
     enum class RotationDirection {
-        Clockwise, CounterClockwise
+        Clockwise,
+        CounterClockwise;
+
+        companion object {
+            fun forStartPlacement() = CounterClockwise
+            fun forEndPlacement() = Clockwise
+        }
     }
 
     @Stable

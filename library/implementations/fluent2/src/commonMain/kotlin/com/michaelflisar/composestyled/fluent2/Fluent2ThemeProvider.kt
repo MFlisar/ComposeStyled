@@ -10,6 +10,7 @@ import com.michaelflisar.composestyled.fluent2.components.Fluent2BottomNavigatio
 import com.michaelflisar.composestyled.fluent2.components.Fluent2Button
 import com.michaelflisar.composestyled.fluent2.components.Fluent2Card
 import com.michaelflisar.composestyled.fluent2.components.Fluent2Chip
+import com.michaelflisar.composestyled.fluent2.components.Fluent2Clickable
 import com.michaelflisar.composestyled.fluent2.layout.Fluent2Dialog
 import com.michaelflisar.composestyled.fluent2.layout.Fluent2BottomSheet
 import com.michaelflisar.composestyled.fluent2.components.Fluent2Checkbox
@@ -75,6 +76,7 @@ fun fluent2ThemeDefinition(): StyledThemeDefinition {
 fun StyledRegistry.Builder.registerFluent2Components() {
     register(Fluent2Badge.create())
     register(Fluent2Button.create())
+    register(Fluent2Clickable.create())
     register(Fluent2Dialog.create())
     register(Fluent2BottomSheet.create())
     register(Fluent2Chip.create())

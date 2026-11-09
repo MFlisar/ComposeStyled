@@ -43,8 +43,9 @@ class Fluent2Card internal constructor(
 
         val DefaultVariantMapping: VariantMapping = { variant ->
             when (variant) {
-                StyledCard.Variant.Standard -> Variant.Standard
-                StyledCard.Variant.Alternative -> Variant.Alternative
+                StyledCard.Variant.Auto,
+                StyledCard.Variant.Filled -> Variant.Standard
+                StyledCard.Variant.Outlined -> Variant.Alternative
             }
         }
     }

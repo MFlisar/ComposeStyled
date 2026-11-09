@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import com.michaelflisar.composestyled.UpdateStyledThemeLocals
+import com.michaelflisar.composestyled.material3.ProvideStyledLocals
 import com.michaelflisar.composestyled.ui.layout.StyledScaffold
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.foundation.layout.FoundationScaffoldSideNavigationLayout
@@ -50,7 +50,7 @@ class Material3Scaffold internal constructor() : StyledScaffold.Implementation {
             StyledScaffold.FloatingActionButtonPosition.Center -> FabPosition.Center
             StyledScaffold.FloatingActionButtonPosition.End -> FabPosition.End
         }
-        UpdateStyledThemeLocals(contentColor = contentColor) {
+        ProvideStyledLocals(contentColor = contentColor) {
             Scaffold(
                 modifier = modifier,
                 topBar = topBar,

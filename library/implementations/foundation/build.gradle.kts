@@ -84,6 +84,10 @@ kotlin {
             implementation(libs.jetbrains.compose.ui.backhandler)
 
         }
+
+        commonTest.dependencies {
+            implementation(libs.jetbrains.kotlin.test)
+        }
     }
 }
 

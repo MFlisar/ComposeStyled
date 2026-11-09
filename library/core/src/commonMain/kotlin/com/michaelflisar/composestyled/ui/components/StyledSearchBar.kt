@@ -4,7 +4,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -33,6 +32,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import com.michaelflisar.composestyled.platform.Platform
 import com.michaelflisar.composestyled.platform.currentPlatform
+import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.ui.overlay.StyledPopupContainer
 import com.michaelflisar.composestyled.ui.icons.StyledIcons
 import com.michaelflisar.composestyled.ui.primitives.StyledInputAction
@@ -56,7 +56,9 @@ fun StyledSearchBar(
     onClear: (() -> Unit)? = null,
     onSearch: (() -> Unit)? = null,
     popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenuDefaults.widthConfig,
-    suggestions: (@Composable ColumnScope.(selectSuggestion: (String) -> Unit) -> Unit)? = null,
+    popupHorizontalAlignment: StyledPopupMenu.HorizontalAlignment =
+        StyledPopupMenu.HorizontalAlignment.Start,
+    suggestions: (@Composable StyledPopupMenuScope.(selectSuggestion: (String) -> Unit) -> Unit)? = null,
 ) {
     StyledSearchBar(
         value = value.value,
@@ -70,11 +72,13 @@ fun StyledSearchBar(
         onClear = onClear,
         onSearch = onSearch,
         popupWidthConfig = popupWidthConfig,
+        popupHorizontalAlignment = popupHorizontalAlignment,
         suggestions = suggestions,
     )
 }
 
 /** Controlled search input; suggestions can commit a value through their selection callback. */
+@OptIn(InternalComposeStyledApi::class)
 @Composable
 fun StyledSearchBar(
     value: String,
@@ -88,7 +92,9 @@ fun StyledSearchBar(
     onClear: (() -> Unit)? = null,
     onSearch: (() -> Unit)? = null,
     popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenuDefaults.widthConfig,
-    suggestions: (@Composable ColumnScope.(selectSuggestion: (String) -> Unit) -> Unit)? = null,
+    popupHorizontalAlignment: StyledPopupMenu.HorizontalAlignment =
+        StyledPopupMenu.HorizontalAlignment.Start,
+    suggestions: (@Composable StyledPopupMenuScope.(selectSuggestion: (String) -> Unit) -> Unit)? = null,
 ) {
     val actualInteractionSource = interactionSource ?: remember { MutableInteractionSource() }
     val focused by actualInteractionSource.collectIsFocusedAsState()
@@ -133,6 +139,7 @@ fun StyledSearchBar(
                     outsideTapBehavior =
                         StyledPopupMenu.OutsideTapBehavior.DismissAndConsume,
                     widthConfig = popupWidthConfig,
+                    horizontalAlignment = popupHorizontalAlignment,
                     maxHeight = popupMaxHeight,
                 ) {
                     suggestions.invoke(this) { suggestion ->

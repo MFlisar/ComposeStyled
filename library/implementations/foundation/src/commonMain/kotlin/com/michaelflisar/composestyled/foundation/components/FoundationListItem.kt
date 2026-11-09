@@ -51,27 +51,27 @@ fun FoundationListItem(
     threeLineMinHeight: Dp,
     contentPadding: PaddingValues,
     spacing: Dp,
-    customization: StyledListItem.Customization?,
-    leading: (@Composable () -> Unit)?,
-    actions: (@Composable RowScope.() -> Unit)?,
-    content: StyledListItem.Content,
     containerColor: Color,
     contentColor: Color,
     supportingColor: Color,
+    borderColor: Color,
+    leading: (@Composable () -> Unit)?,
+    actions: (@Composable RowScope.() -> Unit)?,
+    content: StyledListItem.Content,
+    defaultContainerColor: Color,
+    defaultContentColor: Color,
+    defaultSupportingColor: Color,
     headlineStyle: TextStyle,
     supportingStyle: TextStyle,
     overlineStyle: TextStyle,
     nativeContent: (@Composable (Modifier, Color, Color) -> Unit)? = null,
 ) {
-    val background = customization?.containerColor?.resolve()
-        ?.takeIf { it != Color.Unspecified } ?: containerColor
-    val foreground = customization?.contentColor?.resolve()
-        ?.takeIf { it != Color.Unspecified } ?: contentColor
-    val secondary = customization?.supportingColor?.resolve()
-        ?.takeIf { it != Color.Unspecified }
-        ?: customization?.contentColor?.resolve()?.takeIf { it != Color.Unspecified }
-        ?: supportingColor
-    val border = customization?.border?.resolve()?.takeIf { it != Color.Unspecified }
+    val background = containerColor.takeUnless { it == Color.Unspecified } ?: defaultContainerColor
+    val foreground = contentColor.takeUnless { it == Color.Unspecified } ?: defaultContentColor
+    val secondary = supportingColor.takeUnless { it == Color.Unspecified }
+        ?: contentColor.takeUnless { it == Color.Unspecified }
+        ?: defaultSupportingColor
+    val border = borderColor.takeUnless { it == Color.Unspecified }
     val factor = if (enabled) 1f else StyledTheme.colorScheme.disableFactors.content
     val mainColor = foreground.copy(alpha = foreground.alpha * factor)
     val secondaryColor = secondary.copy(alpha = secondary.alpha * factor)

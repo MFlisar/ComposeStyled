@@ -5,6 +5,8 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
@@ -12,6 +14,10 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 /**
@@ -25,11 +31,20 @@ class ScrollToTopRequester internal constructor(
 ) {
     internal var containerCoordinates: LayoutCoordinates? = null
 
-    internal suspend fun scrollToTop(target: LayoutCoordinates) {
+    internal suspend fun scrollToTop(target: LayoutCoordinates, animate: Boolean? = null) {
         val container = checkNotNull(containerCoordinates) {
             "Attach the scroll host with Modifier.supportScrollToTopRequester"
         }
-        scrollState.scrollToTop(target, container, topPaddingPx, animate)
+        scrollState.scrollToTop(target, container, topPaddingPx, animate ?: this.animate)
+    }
+
+    internal fun distanceToTop(target: LayoutCoordinates): Float? {
+        val container = containerCoordinates ?: return null
+        if (!target.isAttached || !container.isAttached) {
+            return null
+        }
+        val targetTop = container.localPositionOf(target, Offset.Zero).y
+        return targetTop - topPaddingPx
     }
 }
 
@@ -39,11 +54,77 @@ class ScrollToTopRequester internal constructor(
  */
 class ScrollToTopTarget internal constructor(
     internal val modifier: Modifier,
-    private val requestScroll: suspend () -> Unit,
+    private val scope: CoroutineScope,
+    private val distanceToTop: () -> Float?,
+    private val requestScroll: suspend (animate: Boolean?) -> Unit,
 ) {
-    /** Requests scrolling this target below the viewport's top padding. */
-    suspend fun request() {
-        requestScroll()
+    private var keepOnTopJob: Job? = null
+
+    /**
+     * Requests scrolling this target below the viewport's top padding.
+     * When [keepOnTop] is true, the initial request uses the configured animation;
+     * later requests immediately follow content-size changes until [stopKeepOnTop] is called.
+     */
+    suspend fun request(keepOnTop: Boolean = false) {
+        stopKeepOnTop()
+        if (!keepOnTop) {
+            requestScroll(null)
+            return
+        }
+
+        val initialScrollFinished = CompletableDeferred<Unit>()
+        val job = scope.launch {
+            val animationJob = launch {
+                requestScroll(null)
+            }
+            var wasBelowTarget = (distanceToTop() ?: 0f) > 0f
+            var crossedTarget = false
+            while (animationJob.isActive) {
+                withFrameNanos { }
+                val distance = distanceToTop()
+                if (wasBelowTarget && distance != null && distance < -1f) {
+                    animationJob.cancel()
+                    crossedTarget = true
+                    break
+                }
+                if (distance != null) {
+                    wasBelowTarget = distance > 0f
+                }
+            }
+            animationJob.join()
+            if (crossedTarget) {
+                requestImmediately()
+            }
+            initialScrollFinished.complete(Unit)
+            while (true) {
+                withFrameNanos { }
+                val distance = distanceToTop() ?: continue
+                if (distance > 1f || distance < -1f) {
+                    requestImmediately()
+                }
+            }
+        }
+        job.invokeOnCompletion { cause ->
+            if (cause != null) {
+                initialScrollFinished.completeExceptionally(cause)
+            }
+        }
+        keepOnTopJob = job
+        initialScrollFinished.await()
+    }
+
+    /**
+     * Immediately positions this target below the viewport's top padding.
+     * Useful when adjusting the target as content changes size.
+     */
+    suspend fun requestImmediately() {
+        requestScroll(false)
+    }
+
+    /** Stops any ongoing keep-on-top requests. */
+    fun stopKeepOnTop() {
+        keepOnTopJob?.cancel()
+        keepOnTopJob = null
     }
 }
 
@@ -74,16 +155,26 @@ fun rememberScrollToTopRequester(
 @Composable
 fun rememberScrollToTopTarget(
     requester: ScrollToTopRequester,
-): ScrollToTopTarget = remember(requester) {
-    var targetCoordinates: LayoutCoordinates? = null
-    ScrollToTopTarget(
-        modifier = Modifier.onGloballyPositioned { targetCoordinates = it },
-        requestScroll = {
-            requester.scrollToTop(checkNotNull(targetCoordinates) {
-                "Register the scroll-to-top target before requesting it"
-            })
-        },
-    )
+): ScrollToTopTarget {
+    val scope = rememberCoroutineScope()
+    return remember(requester, scope) {
+        var targetCoordinates: LayoutCoordinates? = null
+        ScrollToTopTarget(
+            modifier = Modifier.onGloballyPositioned { targetCoordinates = it },
+            scope = scope,
+            distanceToTop = {
+                targetCoordinates?.let(requester::distanceToTop)
+            },
+            requestScroll = { animateOverride ->
+                requester.scrollToTop(
+                    checkNotNull(targetCoordinates) {
+                        "Register the scroll-to-top target before requesting it"
+                    },
+                    animateOverride,
+                )
+            },
+        )
+    }
 }
 
 /**
@@ -103,11 +194,25 @@ fun rememberScrollToTopTarget(
         "topPadding must be finite and non-negative"
     }
     val topPaddingPx = with(LocalDensity.current) { topPadding.roundToPx() }
-    return remember(lazyListState, itemIndex, topPaddingPx, animate) {
+    val scope = rememberCoroutineScope()
+    return remember(lazyListState, itemIndex, topPaddingPx, animate, scope) {
         ScrollToTopTarget(
             modifier = Modifier,
-            requestScroll = {
-                lazyListState.scrollToTop(itemIndex, topPaddingPx, animate)
+            scope = scope,
+            distanceToTop = {
+                val layoutInfo = lazyListState.layoutInfo
+                val targetOffset = layoutInfo.visibleItemsInfo
+                    .firstOrNull { it.index == itemIndex }
+                    ?.offset
+                when {
+                    targetOffset != null -> (targetOffset - topPaddingPx).toFloat()
+                    layoutInfo.visibleItemsInfo.isEmpty() -> null
+                    itemIndex < lazyListState.firstVisibleItemIndex -> Float.NEGATIVE_INFINITY
+                    else -> Float.POSITIVE_INFINITY
+                }
+            },
+            requestScroll = { animateOverride ->
+                lazyListState.scrollToTop(itemIndex, topPaddingPx, animateOverride ?: animate)
             },
         )
     }

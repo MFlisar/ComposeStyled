@@ -30,6 +30,20 @@ class SelectionState<K> internal constructor(
     initialAnchor: K? = initialSelected.firstOrNull(),
     initiallyActive: Boolean = initialSelected.isNotEmpty(),
 ) {
+    companion object {
+        /** Saves and restores String selection keys without conversion. */
+        val StringSaver: Saver<String, String> = Saver(
+            save = { it },
+            restore = { it },
+        )
+
+        /** Saves and restores Int selection keys without conversion. */
+        val IntSaver: Saver<Int, Int> = Saver(
+            save = { it },
+            restore = { it },
+        )
+    }
+
     private var selectedState by mutableStateOf(initialSelected)
     private var anchorState by mutableStateOf(initialAnchor)
     private var activeState by mutableStateOf(initiallyActive)

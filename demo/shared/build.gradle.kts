@@ -115,6 +115,16 @@ kotlin {
             api(project(":composestyled:themes:pastel"))
             api(project(":composestyled:themes:nature"))
 
+            // ---------------------------
+            // libraries with style support
+            // ---------------------------
+
+            api(project(":composestyled:libraries:composetable"))
+            api(project(":composestyled:libraries:composedialogs"))
+            api(project(":composestyled:libraries:composepreferences"))
+
+            // TODO
+            // composedialogs + composepreferences + composechangelog
         }
 
     }

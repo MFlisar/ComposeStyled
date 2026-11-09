@@ -9,6 +9,7 @@ import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.registry.LocalStyledRegistry
 import com.michaelflisar.composestyled.registry.StyledComponent
 import com.michaelflisar.composestyled.registry.StyledKey
+import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.ui.internal.SliderScale
 import com.michaelflisar.composestyled.ui.internal.rangeLike
 import com.michaelflisar.composestyled.ui.internal.updateRangeState
@@ -50,6 +51,7 @@ object StyledRangeSlider {
 // public API
 // -------------------------
 
+@OptIn(InternalComposeStyledApi::class)
 @Composable
 fun <T> StyledRangeSlider(
     value: MutableState<out ClosedRange<T>>,
@@ -85,6 +87,7 @@ fun <T> StyledRangeSlider(
  * [minimumWindowSize] and [maximumWindowSize] constrain the selected range's size, not its values.
  * When either limit is reached, moving one endpoint moves the other to preserve that limit.
  */
+@OptIn(InternalComposeStyledApi::class)
 @Composable
 fun <T> StyledRangeSlider(
     value: ClosedRange<T>,

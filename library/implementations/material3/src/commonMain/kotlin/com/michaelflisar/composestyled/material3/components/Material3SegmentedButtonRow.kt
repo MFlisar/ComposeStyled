@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.CornerBasedShape
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MultiChoiceSegmentedButtonRow
 import androidx.compose.material3.SegmentedButton
@@ -18,7 +17,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
-import com.michaelflisar.composestyled.material3.CopyMaterialThemeLocals
+import com.michaelflisar.composestyled.StyledTheme
+import com.michaelflisar.composestyled.material3.ProvideStyledLocals
 import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.ui.components.StyledSegmentedButtonRow as StyledSegmentedButtonRowApi
 
@@ -77,7 +77,9 @@ class Material3SegmentedButtonRow internal constructor() : StyledSegmentedButton
                         },
                         contentPadding = itemContentPadding,
                     ) {
-                        renderContent { content(item, selected) }
+                        renderContent(selected, enabled, customization) {
+                            content(item, selected)
+                        }
                     }
                 }
             }
@@ -101,7 +103,9 @@ class Material3SegmentedButtonRow internal constructor() : StyledSegmentedButton
                         },
                         contentPadding = itemContentPadding,
                     ) {
-                        renderContent { content(item, selected) }
+                        renderContent(selected, enabled, customization) {
+                            content(item, selected)
+                        }
                     }
                 }
             }
@@ -111,10 +115,25 @@ class Material3SegmentedButtonRow internal constructor() : StyledSegmentedButton
 
 @Composable
 private fun renderContent(
+    selected: Boolean,
+    enabled: Boolean,
+    customization: StyledButton.Customization?,
     content: @Composable () -> Unit,
 ) {
-    CopyMaterialThemeLocals(
-        contentColor = LocalContentColor.current,
+    val selectedColor = customization?.colors?.filledForeground?.resolve()
+        ?.takeUnless { it == Color.Unspecified }
+        ?: StyledTheme.colorScheme.onSecondarySurface
+    val unselectedColor = customization?.colors?.textForeground?.resolve()
+        ?.takeUnless { it == Color.Unspecified }
+        ?: StyledTheme.colorScheme.onSurface
+    val contentColor = (if (selected) selectedColor else unselectedColor).let { color ->
+        if (enabled) color else color.copy(
+            alpha = color.alpha * StyledTheme.colorScheme.disableFactors.content,
+        )
+    }
+    ProvideStyledLocals(
+        contentColor = contentColor,
+        textStyle = StyledTheme.typography.labelLarge,
     ) {
         content()
     }
@@ -124,9 +143,19 @@ private fun renderContent(
 private fun segmentedButtonColors(
     customization: StyledButton.Customization?,
 ) = SegmentedButtonDefaults.colors(
-    activeContainerColor = customization?.colors?.filledBackground?.resolve() ?: Color.Unspecified,
-    activeContentColor = customization?.colors?.filledForeground?.resolve() ?: Color.Unspecified,
-    activeBorderColor = customization?.border?.resolve() ?: Color.Unspecified,
-    inactiveContentColor = customization?.colors?.textForeground?.resolve() ?: Color.Unspecified,
-    inactiveBorderColor = customization?.border?.resolve() ?: Color.Unspecified,
+    activeContainerColor = customization?.colors?.filledBackground?.resolve()
+        ?.takeUnless { it == Color.Unspecified }
+        ?: StyledTheme.colorScheme.secondarySurface,
+    activeContentColor = customization?.colors?.filledForeground?.resolve()
+        ?.takeUnless { it == Color.Unspecified }
+        ?: StyledTheme.colorScheme.onSecondarySurface,
+    activeBorderColor = customization?.border?.resolve()
+        ?.takeUnless { it == Color.Unspecified }
+        ?: StyledTheme.colorScheme.outline,
+    inactiveContentColor = customization?.colors?.textForeground?.resolve()
+        ?.takeUnless { it == Color.Unspecified }
+        ?: StyledTheme.colorScheme.onSurface,
+    inactiveBorderColor = customization?.border?.resolve()
+        ?.takeUnless { it == Color.Unspecified }
+        ?: StyledTheme.colorScheme.outline,
 )

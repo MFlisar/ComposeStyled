@@ -7,7 +7,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.ui.components.StyledPopupMenu
-import com.michaelflisar.composestyled.ui.components.StyledDropdownMenuItem
+import com.michaelflisar.composestyled.ui.components.StyledPopupMenuItemRenderer
 import com.michaelflisar.composestyled.foundation.components.FoundationPopupMenu
 import com.michaelflisar.composestyled.foundation.components.FoundationDropdownMenu
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
@@ -30,8 +30,8 @@ class Fluent2PopupMenu internal constructor() :
 class Fluent2DropdownMenu internal constructor() :
     FoundationDropdownMenu(hoverAlpha = 0.08f, pressedAlpha = 0.12f) {
 
-    override val defaults: StyledDropdownMenuItem.Defaults
-        @Composable get() = StyledDropdownMenuItem.Defaults(
+    override val defaults: StyledPopupMenuItemRenderer.Defaults
+        @Composable get() = StyledPopupMenuItemRenderer.Defaults(
             minHeight = StyledTheme.sizes.minimumInteractiveSize,
             itemPadding = PaddingValues(horizontal = StyledTheme.padding.small),
             itemShape = StyledTheme.shapes.small,

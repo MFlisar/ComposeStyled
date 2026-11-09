@@ -137,7 +137,29 @@ object StyledDialog {
             val initialBubblePosition: FloatingPosition? = null,
             /** Starts with the bubble shown instead of the expanded window. */
             val initiallyMinimized: Boolean = false,
+            /** Outside-click handling and optional dimming; defaults to passing clicks through. */
+            val backgroundMode: FloatingWindowBackgroundMode =
+                FloatingWindowBackgroundMode.Interactive,
         ) : Style
+    }
+
+    /** Defines outside-click handling and optional dimming for an expanded floating window. */
+    @Stable
+    sealed interface FloatingWindowBackgroundMode {
+        /** Passes outside clicks through to the host content without showing a scrim. */
+        object Interactive : FloatingWindowBackgroundMode
+
+        /** Consumes outside clicks without changing the window state. */
+        @Stable
+        data class Block(val showScrim: Boolean = false) : FloatingWindowBackgroundMode
+
+        /** Minimizes the window on outside clicks without dismissing it. */
+        @Stable
+        data class Minimize(val showScrim: Boolean = false) : FloatingWindowBackgroundMode
+
+        /** Dismisses the dialog on outside clicks. */
+        @Stable
+        data class Dismiss(val showScrim: Boolean = false) : FloatingWindowBackgroundMode
     }
 
     /** Alignment-based placement relative to the host's available area, followed by a dp offset. */
@@ -182,7 +204,7 @@ object StyledDialog {
         val label: String?,
         val icon: IconComposable?,
         val presentation: ButtonPresentation,
-        val role: StyledButton.Role,
+        val variant: StyledButton.Variant,
         val content: @Composable RowScope.() -> Unit,
     ) {
         /** Custom content is rendered unchanged as a text-style action, without automatic icons. */
@@ -193,18 +215,18 @@ object StyledDialog {
             content: @Composable RowScope.() -> Unit,
         ) : this(
             onClick, enabled, dismissOnClick, null, null, ButtonPresentation.Text,
-            StyledButton.Role.Default, content,
+            StyledButton.Variant.Auto, content,
         )
 
-        /** Custom content can opt into a semantic role while retaining the trailing content slot. */
+        /** Custom content can opt into a fixed visual variant while retaining the trailing content slot. */
         constructor(
             onClick: () -> Unit,
-            role: StyledButton.Role,
+            variant: StyledButton.Variant,
             enabled: Boolean = true,
             dismissOnClick: Boolean? = null,
             content: @Composable RowScope.() -> Unit,
         ) : this(
-            onClick, enabled, dismissOnClick, null, null, ButtonPresentation.Text, role, content,
+            onClick, enabled, dismissOnClick, null, null, ButtonPresentation.Text, variant, content,
         )
 
         /** Label also supplies the accessible name and tooltip when rendered as an icon. */
@@ -215,9 +237,9 @@ object StyledDialog {
             presentation: ButtonPresentation = ButtonPresentation.Auto,
             enabled: Boolean = true,
             dismissOnClick: Boolean? = null,
-            role: StyledButton.Role = StyledButton.Role.Default,
+            variant: StyledButton.Variant = StyledButton.Variant.Auto,
         ) : this(
-            onClick, enabled, dismissOnClick, label, icon, presentation, role,
+            onClick, enabled, dismissOnClick, label, icon, presentation, variant,
             content = { StyledText(label) },
         ) {
             require(label.isNotBlank()) { "Dialog button label must not be blank" }
@@ -227,7 +249,7 @@ object StyledDialog {
         }
 
         internal fun withOnClick(onClick: () -> Unit): Button =
-            Button(onClick, enabled, dismissOnClick, label, icon, presentation, role, content)
+            Button(onClick, enabled, dismissOnClick, label, icon, presentation, variant, content)
     }
 
     @Stable
@@ -362,7 +384,29 @@ fun StyledDialog(
         val registry = LocalStyledRegistry.current
         val implementation = registry[StyledDialog.Key]
         val resolvedButtons = dialogButtons(state, properties, buttons, onDismissRequest)
-        if (style is StyledDialog.Style.FloatingWindow) {
+        if (style is StyledDialog.Style.Fullscreen) {
+            val host = checkNotNull(LocalFullscreenDialogHost.current) {
+                "StyledDialog.Style.Fullscreen requires StyledTheme"
+            }
+            val entry = remember(state) { FullscreenDialogEntry() }
+            val compositionLocalContext = currentCompositionLocalContext
+            val render: @Composable () -> Unit = {
+                CompositionLocalProvider(compositionLocalContext) {
+                    CompositionLocalProvider(LocalFullscreenDialogEntry provides entry) {
+                        implementation.Render(
+                            style, onDismissRequest, dismissWithoutAnimation, modifier, properties,
+                            title, resolvedButtons, visible, { state.visible }, content,
+                        )
+                    }
+                }
+            }
+            val currentRender = rememberUpdatedState(render)
+            SideEffect { entry.content = { currentRender.value() } }
+            DisposableEffect(host, entry) {
+                host.register(entry)
+                onDispose { host.unregister(entry) }
+            }
+        } else if (style is StyledDialog.Style.FloatingWindow) {
             val host = checkNotNull(LocalFloatingDialogHost.current) {
                 "StyledDialog.Style.FloatingWindow requires StyledTheme or StyledFloatingHost"
             }

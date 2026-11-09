@@ -17,11 +17,8 @@ import com.michaelflisar.composestyled.fluent2.rememberFluent2ThemeProvider
 import com.michaelflisar.composestyled.material3.rememberMaterial3ThemeProvider
 import com.michaelflisar.composestyled.platform.Platform
 import com.michaelflisar.composestyled.platform.PlatformDefaults
-import com.michaelflisar.composestyled.platform.SystemBarStyleEffect
-import com.michaelflisar.composestyled.platform.WindowMode
+import com.michaelflisar.composestyled.platform.SystemBarStyleEffectIfNeeded
 import com.michaelflisar.composestyled.platform.currentPlatform
-import com.michaelflisar.composestyled.platform.rememberWindowEnvironment
-import com.michaelflisar.composestyled.platform.systemBarIconStyleFor
 import com.michaelflisar.composestyled.themes.StyledThemeAppearance
 import com.michaelflisar.composestyled.themes.StyledThemeContrast
 import com.michaelflisar.composestyled.themes.StyledThemeVariant
@@ -107,20 +104,12 @@ fun ScaffoldStarterTemplate(
         val scaffoldColor = StyledTheme.colorScheme.surface
         val bottomNavColor = StyledTheme.colorScheme.surface
 
-        // following takes care of system bar styling inkl. icon colors
-        val windowEnvironment = rememberWindowEnvironment()
-        if (windowEnvironment.mode == WindowMode.Normal) {
-            SystemBarStyleEffect(
-                statusBar = systemBarIconStyleFor(
-                    color = topAppBarColor,
-                    background = scaffoldColor,
-                ),
-                navigationBar = systemBarIconStyleFor(
-                    color = bottomNavColor,
-                    background = scaffoldColor,
-                ),
-            )
-        }
+        // Applies contrast-aware system-bar icon colors for normal app windows.
+        SystemBarStyleEffectIfNeeded(
+            statusBarColor = topAppBarColor,
+            navigationBarColor = bottomNavColor,
+            backgroundColor = scaffoldColor,
+        )
 
         StyledScaffold(
             topBar = {

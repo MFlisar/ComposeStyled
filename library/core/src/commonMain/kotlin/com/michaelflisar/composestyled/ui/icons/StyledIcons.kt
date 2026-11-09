@@ -32,6 +32,7 @@ object StyledIcons {
         Search,
         NavigateForward,
         Submenu,
+        SubmenuBack,
         Refresh,
         Save,
         Home,
@@ -102,6 +103,9 @@ object StyledIcons {
 
     /** Indicate that a menu item opens a submenu. */
     val Submenu: IconComposable = icon(Name.Submenu)
+
+    /** Return from a submenu to its parent menu. */
+    val SubmenuBack: IconComposable = icon(Name.SubmenuBack)
 
     /** Reload or update content. */
     val Refresh: IconComposable = icon(Name.Refresh)

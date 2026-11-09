@@ -6,9 +6,14 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 import com.michaelflisar.composestyled.StyledTheme
+import com.michaelflisar.composestyled.tokens.LocalStyledContentColor
 
 /** Converts a fixed [Color] into a token usable by theme-aware customizations. */
 fun Color.asColorToken(): ColorToken = ColorToken.Fixed(this)
+
+/** Converts a specified [Color] into a token, or returns `null` for [Color.Unspecified]. */
+fun Color.asColorTokenOrNull(): ColorToken? =
+    takeIf { it != Color.Unspecified }?.asColorToken()
 
 /** A color resolved either from a fixed value or from the active [StyledTheme]. */
 @Stable
@@ -78,7 +83,7 @@ sealed interface ColorToken {
                 OnErrorSurface -> StyledTheme.colorScheme.onErrorSurface
                 Outline -> StyledTheme.colorScheme.outline
                 OutlineVariant -> StyledTheme.colorScheme.outlineVariant
-                LocalContentColor -> StyledTheme.currentContentColor
+                LocalContentColor -> LocalStyledContentColor.current
             }
         }
     }

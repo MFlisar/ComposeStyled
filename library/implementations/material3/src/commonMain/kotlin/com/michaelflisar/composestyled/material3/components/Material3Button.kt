@@ -10,8 +10,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -21,12 +19,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.StyledTheme
-import com.michaelflisar.composestyled.material3.CopyMaterialThemeLocals
 import com.michaelflisar.composestyled.material3.CopyStyledLocals
-import com.michaelflisar.composestyled.material3.components.Material3Button.Companion.DefaultRoleMapping
+import com.michaelflisar.composestyled.material3.ProvideStyledLocals
+import com.michaelflisar.composestyled.material3.components.Material3Button.Companion.DefaultVariantMapping
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.runtime.LocalStyledContext
 import com.michaelflisar.composestyled.runtime.StyledContext
+import com.michaelflisar.composestyled.tokens.LocalStyledContentColor
 import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.ui.components.StyledMenuBar
 import com.michaelflisar.composestyled.ui.components.StyledTopBar
@@ -37,7 +36,7 @@ import com.michaelflisar.composestyled.ui.specials.StyledSidePane
 import com.michaelflisar.composestyled.ui.specials.StyledSwipeRevealActionBox
 
 class Material3Button internal constructor(
-    val roleMapping: RoleMapping,
+    val variantMapping: VariantMapping,
 ) : StyledButton.Implementation {
 
     override val defaults: StyledButton.Defaults
@@ -50,40 +49,36 @@ class Material3Button internal constructor(
         // -------------
 
         /**
-         * Creates a Material3Button implementation for StyledButton with the given role mapping.
-         * @param roleMapping The mapping of StyledButton roles to MaterialButton variants. Defaults to [DefaultRoleMapping].
+         * Creates a Material3Button implementation for StyledButton with the given variant mapping.
+         * @param variantMapping The mapping of StyledButton variants to MaterialButton variants. Defaults to [DefaultVariantMapping].
          * @return A Material3Button implementation for StyledButton.
          */
         @Composable
         fun create(
-            roleMapping: RoleMapping = DefaultRoleMapping,
-        ) = remember(roleMapping) {
-            Material3Button(roleMapping = roleMapping)
+            variantMapping: VariantMapping = DefaultVariantMapping,
+        ) = remember(variantMapping) {
+            Material3Button(variantMapping = variantMapping)
         }
 
         // -------------
         // 2) mapping
         // -------------
 
-        typealias RoleMapping = (StyledButton.Role, StyledContext) -> Variant
+        typealias VariantMapping = (StyledButton.Variant, StyledContext) -> Variant
 
         /**
-         * The default mapping of StyledButton roles to MaterialButton variants.
-         * - DialogAction and SnackbarAction contexts map to Text variant.
-         * - Other contexts map by role:
-         *   - Primary role maps to Primary variant.
-         *   - Secondary role maps to Outlined variant.
-         *   - Tertiary role maps to Text variant.
+         * Maps Auto to context-appropriate styles; explicit variants keep their
+         * visual meaning in every context.
          */
-        val DefaultRoleMapping: RoleMapping = { role, context ->
+        val DefaultVariantMapping: VariantMapping = { variant, context ->
             when {
-                role == StyledButton.Role.Default &&
+                variant == StyledButton.Variant.Auto &&
                     context == StyledGroupBox.Context.Clickable -> Variant.Outlined
-                role == StyledButton.Role.Default &&
+                variant == StyledButton.Variant.Auto &&
                     context == StyledSidePane.Context.IconSlot -> Variant.Text
-                role == StyledButton.Role.Default &&
+                variant == StyledButton.Variant.Auto &&
                     context == StyledSwipeRevealActionBox.Context.RevealAction -> Variant.Text
-                role == StyledButton.Role.Default &&
+                variant == StyledButton.Variant.Auto &&
                     (context is StyledDialog.ActionContext ||
                         context == StyledSnackbar.Context.SnackbarAction ||
                         context == StyledDialog.Context.DialogAction ||
@@ -91,11 +86,11 @@ class Material3Button internal constructor(
                         context == StyledDialog.Context.BottomSheetAction ||
                         context is StyledTopBar.Context ||
                         context == StyledMenuBar.Context.MenuItem) -> Variant.Text
-                else -> when (role) {
-                    StyledButton.Role.Default,
-                    StyledButton.Role.Primary -> Variant.Primary
-                    StyledButton.Role.Secondary -> Variant.Outlined
-                    StyledButton.Role.Tertiary -> Variant.Text
+                else -> when (variant) {
+                    StyledButton.Variant.Auto,
+                    StyledButton.Variant.Filled -> Variant.Primary
+                    StyledButton.Variant.Outlined -> Variant.Outlined
+                    StyledButton.Variant.Plain -> Variant.Text
                 }
             }
         }
@@ -114,7 +109,7 @@ class Material3Button internal constructor(
     @OptIn(InternalComposeStyledApi::class)
     @Composable
     override fun Render(
-        role: StyledButton.Role,
+        variant: StyledButton.Variant,
         onClick: () -> Unit,
         modifier: Modifier,
         enabled: Boolean,
@@ -124,18 +119,23 @@ class Material3Button internal constructor(
         content: @Composable (RowScope.() -> Unit),
     ) {
         val context = LocalStyledContext.current
-        val variant = roleMapping(role, context)
+        val rendererVariant = variantMapping(variant, context)
         val isGroupBox = context == StyledGroupBox.Context.Clickable
         val buttonModifier = if (context == StyledMenuBar.Context.MenuItem) {
             modifier.width(IntrinsicSize.Min)
         } else {
             modifier
         }
-        val isContainerDefaultText = role == StyledButton.Role.Default &&
+        val isContainerDefaultText = variant == StyledButton.Variant.Auto &&
             (context is StyledTopBar.Context ||
                 context == StyledMenuBar.Context.MenuItem)
+        @Composable
+        fun styledContentColor(color: Color) =
+            if (enabled) color else color.copy(
+                alpha = color.alpha * StyledTheme.colorScheme.disableFactors.content,
+            )
 
-        when (variant) {
+        when (rendererVariant) {
             Variant.FilledTonal -> {
                 FilledTonalButton(
                     onClick = onClick,
@@ -145,9 +145,9 @@ class Material3Button internal constructor(
                     interactionSource = interactionSource,
                     colors = ButtonDefaults.filledTonalButtonColors(
                         containerColor = customization?.colors?.filledBackground?.resolve()
-                            ?: Color.Unspecified,
+                            ?: StyledTheme.colorScheme.secondarySurface,
                         contentColor = customization?.colors?.filledForeground?.resolve()
-                            ?: Color.Unspecified,
+                            ?: StyledTheme.colorScheme.onSecondarySurface,
                     ),
                     contentPadding = if (isGroupBox) {
                         PaddingValues(0.dp)
@@ -155,10 +155,13 @@ class Material3Button internal constructor(
                         ButtonDefaults.ContentPadding
                     },
                 ) {
-                    // copy styles from M3 Button to styled locals
-
-                    CopyMaterialThemeLocals(
-                        contentColor = LocalContentColor.current
+                    ProvideStyledLocals(
+                        contentColor = styledContentColor(
+                            customization?.colors?.filledForeground?.resolve()
+                                ?.takeUnless { it == Color.Unspecified }
+                                ?: StyledTheme.colorScheme.onSecondarySurface
+                        ),
+                        textStyle = StyledTheme.typography.labelLarge,
                     ) {
                         content()
                     }
@@ -176,7 +179,7 @@ class Material3Button internal constructor(
                         containerColor = customization?.colors?.filledBackground?.resolve()
                             ?: StyledTheme.colorScheme.primary,
                         contentColor = customization?.colors?.filledForeground?.resolve()
-                            ?: MaterialTheme.colorScheme.onPrimary
+                            ?: StyledTheme.colorScheme.onPrimary
                     ),
                     contentPadding = if (isGroupBox) {
                         PaddingValues(0.dp)
@@ -184,10 +187,13 @@ class Material3Button internal constructor(
                         ButtonDefaults.ContentPadding
                     },
                 ) {
-                    // copy styles from M3 Button to styled locals
-
-                    CopyMaterialThemeLocals(
-                        contentColor = LocalContentColor.current
+                    ProvideStyledLocals(
+                        contentColor = styledContentColor(
+                            customization?.colors?.filledForeground?.resolve()
+                                ?.takeUnless { it == Color.Unspecified }
+                                ?: StyledTheme.colorScheme.onPrimary
+                        ),
+                        textStyle = StyledTheme.typography.labelLarge,
                     ) {
                         content()
                     }
@@ -215,10 +221,13 @@ class Material3Button internal constructor(
                         ButtonDefaults.ContentPadding
                     },
                 ) {
-                    // copy styles from M3 Button to styled locals
-
-                    CopyMaterialThemeLocals(
-                        contentColor = LocalContentColor.current
+                    ProvideStyledLocals(
+                        contentColor = styledContentColor(
+                            customization?.colors?.filledForeground?.resolve()
+                                ?.takeUnless { it == Color.Unspecified }
+                                ?: StyledTheme.colorScheme.onSecondary
+                        ),
+                        textStyle = StyledTheme.typography.labelLarge,
                     ) {
                         content()
                     }
@@ -236,7 +245,7 @@ class Material3Button internal constructor(
                         containerColor = customization?.colors?.filledBackground?.resolve()
                             ?: Color.Unspecified,
                         contentColor = customization?.colors?.filledForeground?.resolve()
-                            ?: Color.Unspecified
+                            ?: StyledTheme.colorScheme.primary
                     ),
                     contentPadding = if (isGroupBox) {
                         PaddingValues(0.dp)
@@ -244,10 +253,13 @@ class Material3Button internal constructor(
                         ButtonDefaults.ContentPadding
                     },
                 ) {
-                    // copy styles from M3 Button to styled locals
-
-                    CopyMaterialThemeLocals(
-                        contentColor = LocalContentColor.current
+                    ProvideStyledLocals(
+                        contentColor = styledContentColor(
+                            customization?.colors?.filledForeground?.resolve()
+                                ?.takeUnless { it == Color.Unspecified }
+                                ?: StyledTheme.colorScheme.primary
+                        ),
+                        textStyle = StyledTheme.typography.labelLarge,
                     ) {
                         content()
                     }
@@ -270,7 +282,7 @@ class Material3Button internal constructor(
                         colors = ButtonDefaults.outlinedButtonColors(
                             containerColor = Color.Unspecified,
                             contentColor = customization?.colors?.textForeground?.resolve()
-                                ?: MaterialTheme.colorScheme.onSurfaceVariant
+                                ?: StyledTheme.colorScheme.onSurfaceVariant
                         ),
                         border = if (isGroupBox) {
                             null
@@ -283,10 +295,13 @@ class Material3Button internal constructor(
                             ButtonDefaults.ContentPadding
                         },
                     ) {
-                        // copy styles from M3 Button to styled locals
-
-                        CopyMaterialThemeLocals(
-                            contentColor = LocalContentColor.current
+                        ProvideStyledLocals(
+                            contentColor = styledContentColor(
+                                customization?.colors?.textForeground?.resolve()
+                                    ?.takeUnless { it == Color.Unspecified }
+                                    ?: StyledTheme.colorScheme.onSurfaceVariant
+                            ),
+                            textStyle = StyledTheme.typography.labelLarge,
                         ) {
                             content()
                         }
@@ -304,8 +319,8 @@ class Material3Button internal constructor(
                     colors = ButtonDefaults.textButtonColors(
                         containerColor = Color.Unspecified,
                         contentColor = customization?.colors?.textForeground?.resolve()
-                            ?: if (isContainerDefaultText) StyledTheme.currentContentColor
-                            else MaterialTheme.colorScheme.primary
+                            ?: if (isContainerDefaultText) LocalStyledContentColor.current
+                            else StyledTheme.colorScheme.primary
                     ),
                     contentPadding = if (isGroupBox) {
                         PaddingValues(0.dp)
@@ -313,10 +328,14 @@ class Material3Button internal constructor(
                         ButtonDefaults.TextButtonContentPadding
                     },
                 ) {
-                    // copy styles from M3 Button to styled locals
-
-                    CopyMaterialThemeLocals(
-                        contentColor = LocalContentColor.current
+                    ProvideStyledLocals(
+                        contentColor = styledContentColor(
+                            customization?.colors?.textForeground?.resolve()
+                                ?.takeUnless { it == Color.Unspecified }
+                                ?: if (isContainerDefaultText) LocalStyledContentColor.current
+                                else StyledTheme.colorScheme.primary
+                        ),
+                        textStyle = StyledTheme.typography.labelLarge,
                     ) {
                         content()
                     }

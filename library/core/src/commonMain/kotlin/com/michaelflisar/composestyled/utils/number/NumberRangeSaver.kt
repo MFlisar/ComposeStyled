@@ -1,6 +1,7 @@
 package com.michaelflisar.composestyled.utils.number
 
 import androidx.compose.runtime.saveable.Saver
+import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 
 /**
  * Creates a saver for standard numeric ranges of type [Int], [Long], [Float] or [Double].
@@ -8,6 +9,7 @@ import androidx.compose.runtime.saveable.Saver
  * Restoring the endpoints through [NumberUtil.range] preserves the concrete range type, including
  * when the saver is used from a generic function. Unsupported number types fail during restoration.
  */
+@OptIn(InternalComposeStyledApi::class)
 fun <T> numberRangeSaver(): Saver<ClosedRange<T>, List<Any>>
     where T : Number, T : Comparable<T> = Saver(
     save = { listOf(it.start, it.endInclusive) },

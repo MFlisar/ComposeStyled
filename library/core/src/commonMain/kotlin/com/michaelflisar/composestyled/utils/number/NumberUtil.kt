@@ -1,13 +1,15 @@
 package com.michaelflisar.composestyled.utils.number
 
+import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import kotlin.math.pow
 import kotlin.math.roundToLong
 
-internal object NumberUtil {
+@InternalComposeStyledApi
+object NumberUtil {
 
     @Suppress("UNCHECKED_CAST")
     fun <T> range(start: T, endInclusive: T): ClosedRange<T>
-        where T : Number, T : Comparable<T> {
+            where T : Number, T : Comparable<T> {
         requireSupported(start)
         require(endInclusive::class == start::class) { "Range endpoints must have the same number type." }
         return when (start) {

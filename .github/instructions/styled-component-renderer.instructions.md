@@ -46,10 +46,13 @@ and the consistency checklist, follow
 2. Keep visual and interaction behavior in the renderer: role/variant/context
    mapping, disabled/pressed/hover/focus states, semantics and theme-specific
    dimensions. Forward the caller's modifier, callbacks, interaction source and
-   slots. Provide styled content color/text style for descendants using
-   `ProvideCustomStyledContentLocals`; inside native Material 3 content slots,
-   use `CopyMaterialThemeLocals` like `Material3Button` so nested `StyledText`
-   and `StyledIcon` inherit the control's actual styling.
+slots. Styled is the source of truth for content color and text style in
+Material 3 renderers: resolve the effective Styled values for the component
+and its state, then use `ProvideStyledLocals` inside native Material 3 slots
+to provide those same values to both Styled descendants and Material 3's
+`LocalContentColor`/`LocalTextStyle`. Do not read Material 3 locals back into
+Styled content; native theme colors and typography are already adapted from
+Styled by the provider.
 3. Wire the component into **all four** theme registration helpers:
    `registerCupertinoFlatComponents()`, `registerCupertinoLiquidComponents()`,
    `registerFluent2Components()` and

@@ -11,10 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationItemIconPosition
-import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Surface
 import androidx.compose.material3.WideNavigationRailItem
 import androidx.compose.material3.WideNavigationRailItemDefaults
@@ -34,7 +31,7 @@ import com.michaelflisar.composestyled.foundation.components.FoundationSideNavig
 import com.michaelflisar.composestyled.foundation.components.FoundationSideNavigationLabel
 import com.michaelflisar.composestyled.foundation.components.FoundationSideNavigationLayout
 import com.michaelflisar.composestyled.foundation.components.LocalSideNavigationLayout
-import com.michaelflisar.composestyled.material3.CopyMaterialThemeLocals
+import com.michaelflisar.composestyled.material3.ProvideStyledLocals
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.ui.components.StyledSideNavigation
 import com.michaelflisar.composestyled.ui.components.StyledSideNavigationDefaults
@@ -113,19 +110,23 @@ class Material3SideNavigation internal constructor() : StyledSideNavigation.Impl
         val currentLabel by rememberUpdatedState(label)
         val labelContent = remember { movableContentOf { currentLabel?.invoke() } }
         val palette = LocalStyledSelectionColors.current
-        val defaults = WideNavigationRailItemDefaults.colors()
         val selectedContent = palette?.selectedContentColor?.takeUnless { it == Color.Unspecified }
-            ?: defaults.selectedIconColor
+            ?: StyledTheme.colorScheme.onSecondarySurface
         val unselectedContent = palette?.unselectedContentColor?.takeUnless { it == Color.Unspecified }
-            ?: StyledTheme.currentContentColor
+            ?: StyledTheme.colorScheme.onSurfaceVariant
         val colors = WideNavigationRailItemDefaults.colors(
             selectedIconColor = selectedContent,
             selectedTextColor = selectedContent,
             unselectedIconColor = unselectedContent,
             unselectedTextColor = unselectedContent,
             selectedIndicatorColor = palette?.indicatorColor?.takeUnless { it == Color.Unspecified }
-                ?: defaults.selectedIndicatorColor,
+                ?: StyledTheme.colorScheme.secondarySurface,
         )
+        val styledContentColor = (if (selected) selectedContent else unselectedContent).let { color ->
+            if (enabled) color else color.copy(
+                alpha = color.alpha * StyledTheme.colorScheme.disableFactors.content,
+            )
+        }
         FoundationSideNavigationItemFrame(modifier) {
             // Keep the native icon position fixed: its independent position animation would
             // move the icon and desynchronize the label from the frame's width animation.
@@ -141,32 +142,33 @@ class Material3SideNavigation internal constructor() : StyledSideNavigation.Impl
                 interactionSource = interactionSource,
                 colors = colors,
                 icon = {
-                    ProvideTextStyle(MaterialTheme.typography.labelLarge) {
-                        CopyMaterialThemeLocals(contentColor = LocalContentColor.current) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Column(
-                                    Modifier.width(StyledTheme.sizes.iconSize),
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                ) {
-                                    icon()
-                                    if (compactLabelVisible && label != null) {
-                                        FoundationSideNavigationCompactLabel(
-                                            modifier = Modifier.requiredWidth(64.dp),
-                                            content = labelContent,
-                                        )
-                                    }
+                    ProvideStyledLocals(
+                        contentColor = styledContentColor,
+                        textStyle = StyledTheme.typography.labelLarge,
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Column(
+                                Modifier.width(StyledTheme.sizes.iconSize),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                            ) {
+                                icon()
+                                if (compactLabelVisible && label != null) {
+                                    FoundationSideNavigationCompactLabel(
+                                        modifier = Modifier.requiredWidth(64.dp),
+                                        content = labelContent,
+                                    )
                                 }
-                                if (label != null) {
-                                    val layout = LocalSideNavigationLayout.current
-                                    FoundationSideNavigationLabel(
-                                        expanded,
-                                        labelWidth = ((layout?.expandedWidth ?: StyledSideNavigationDefaults.expandedWidth) -
-                                            (layout?.compactWidth ?: StyledSideNavigationDefaults.compactWidth))
-                                            .coerceAtLeast(0.dp) + 8.dp,
-                                    ) {
-                                        Box(Modifier.padding(start = 8.dp)) {
-                                            if (!compactLabelVisible) labelContent()
-                                        }
+                            }
+                            if (label != null) {
+                                val layout = LocalSideNavigationLayout.current
+                                FoundationSideNavigationLabel(
+                                    expanded,
+                                    labelWidth = ((layout?.expandedWidth ?: StyledSideNavigationDefaults.expandedWidth) -
+                                        (layout?.compactWidth ?: StyledSideNavigationDefaults.compactWidth))
+                                        .coerceAtLeast(0.dp) + 8.dp,
+                                ) {
+                                    Box(Modifier.padding(start = 8.dp)) {
+                                        if (!compactLabelVisible) labelContent()
                                     }
                                 }
                             }

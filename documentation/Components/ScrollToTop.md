@@ -84,10 +84,12 @@ reversed. List content padding is included in the requested viewport offset.
 
 ## Request timing and lower-level scrolling
 
-Targets expose `suspend fun request()`. Callers choose when to invoke it. For
-expandable sections, `onExpansionAnimationFinished` is a convenient point to
-request scrolling after the section has reached its final size, so the scroll
-range reflects the expanded content. Initial expansion does not automatically
+Targets expose `suspend fun request(keepOnTop: Boolean = false)`,
+`suspend fun requestImmediately()`, and `stopKeepOnTop()`. A keep-on-top request
+first scrolls with the configured animation, then follows size changes in either
+direction until `stopKeepOnTop()` is called. The tracking is managed by the
+target itself. For expandable sections, start it when expanding and stop it
+from `onExpansionAnimationFinished`. Initial expansion does not automatically
 request scrolling.
 
 For lower-level use, the `ScrollState.scrollToTop(target, container, topPaddingPx)`

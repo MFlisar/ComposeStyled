@@ -37,7 +37,9 @@ import com.michaelflisar.composestyled.tokens.StyledSizes
 import com.michaelflisar.composestyled.tokens.StyledSpacing
 import com.michaelflisar.composestyled.tokens.StyledTypography
 import com.michaelflisar.composestyled.ui.layout.LocalFloatingDialogHost
+import com.michaelflisar.composestyled.ui.layout.LocalFullscreenDialogHost
 import com.michaelflisar.composestyled.ui.layout.StyledFloatingHost
+import com.michaelflisar.composestyled.ui.layout.StyledFullscreenDialogHost
 
 /** Read-only accessors for the theme and tokens provided by [StyledTheme]. */
 object StyledTheme {
@@ -51,6 +53,7 @@ object StyledTheme {
     enum class ContentColorFallback {
         /** Selects black or white according to which provides the higher contrast. */
         BlackWhite,
+
         /** Uses the content color currently provided by the surrounding composition. */
         LocalContentColor
     }
@@ -81,16 +84,6 @@ object StyledTheme {
 
     val behavior: Behavior
         @Composable @ReadOnlyComposable get() = LocalStyledBehavior.current
-
-    // ----------------------
-    // theme properties (locals, often times overridden locally inside components)
-    // ----------------------
-
-    val currentContentColor: Color
-        @Composable @ReadOnlyComposable get() = LocalStyledContentColor.current
-
-    val currentTextStyle: TextStyle
-        @Composable @ReadOnlyComposable get() = LocalStyledTextStyle.current
 
     // ---------------------
     // functions
@@ -137,10 +130,38 @@ object StyledTheme {
             ContentColorFallback.LocalContentColor -> LocalStyledContentColor.current
         }
     }
+
+    @Composable
+    @ReadOnlyComposable
+    fun supportingOnColor(
+        backgroundColor: Color,
+        minimumContrastRatio: Float = 4.5f,
+    ) = backgroundColor.supportingOnColor(
+        defaultOnColor = contentColorFor(
+            backgroundColor = backgroundColor,
+            fallback = ContentColorFallback.BlackWhite
+        ),
+        minimumContrastRatio = minimumContrastRatio,
+    )
+
+    /**
+     * Returns a less prominent variant of [contentColor] against [containerColor].
+     *
+     * The result targets 65% of the original contrast, with [minimumContrastRatio] as its floor
+     * when the original contrast permits.
+     */
+    fun supportColorOf(
+        contentColor: Color,
+        containerColor: Color,
+        minimumContrastRatio: Float = 4.5f,
+    ): Color = contentColor.supportingColor(
+        backgroundColor = containerColor,
+        minimumContrastRatio = minimumContrastRatio,
+    )
 }
 
 /**
- * Provides theme tokens, the provider's component registry and floating host to [content].
+ * Provides theme tokens, the provider's component registry and dialog overlay hosts to [content].
  *
  * Use this as the root of a Styled UI subtree. [customization] is applied after the provider's
  * default registrations, so it can replace renderers and update their defaults.
@@ -190,20 +211,22 @@ fun StyledTheme(
         LocalStyledSizes provides sizes,
         LocalStyledBehavior provides behavior
     ) {
-        ProvideFloatingHostIfMissing {
-            themeProvider.Root {
-                val definition = themeProvider.definition()
-                val defaultRegistry = StyledRegistry.createComposable(definition.registry) {
-                    register(themeProvider.defaultIconSet)
-                }
-                val registry = customization?.let {
-                    StyledRegistry.createComposable(defaultRegistry, it)
-                } ?: defaultRegistry
-                CompositionLocalProvider(
-                    LocalStyledThemeName provides definition.name,
-                    LocalStyledRegistry provides registry,
-                ) {
-                    content()
+        ProvideFullscreenDialogHostIfMissing {
+            ProvideFloatingHostIfMissing {
+                themeProvider.Root {
+                    val definition = themeProvider.definition()
+                    val defaultRegistry = StyledRegistry.createComposable(definition.registry) {
+                        register(themeProvider.defaultIconSet)
+                    }
+                    val registry = customization?.let {
+                        StyledRegistry.createComposable(defaultRegistry, it)
+                    } ?: defaultRegistry
+                    CompositionLocalProvider(
+                        LocalStyledThemeName provides definition.name,
+                        LocalStyledRegistry provides registry,
+                    ) {
+                        content()
+                    }
                 }
             }
         }
@@ -215,6 +238,16 @@ fun StyledTheme(
 private fun ProvideFloatingHostIfMissing(content: @Composable () -> Unit) {
     if (LocalFloatingDialogHost.current == null) {
         StyledFloatingHost(content = content)
+    } else {
+        content()
+    }
+}
+
+@Composable
+@OptIn(InternalComposeStyledApi::class)
+private fun ProvideFullscreenDialogHostIfMissing(content: @Composable () -> Unit) {
+    if (LocalFullscreenDialogHost.current == null) {
+        StyledFullscreenDialogHost(content = content)
     } else {
         content()
     }
@@ -241,8 +274,8 @@ fun UpdateStyledThemeLocals(
     }
 
     CompositionLocalProvider(
-        LocalStyledContentColor provides (contentColor ?: StyledTheme.currentContentColor),
-        LocalStyledTextStyle provides (textStyle ?: StyledTheme.currentTextStyle),
+        LocalStyledContentColor provides (contentColor ?: LocalStyledContentColor.current),
+        LocalStyledTextStyle provides (textStyle ?: LocalStyledTextStyle.current),
         content = content
     )
 }

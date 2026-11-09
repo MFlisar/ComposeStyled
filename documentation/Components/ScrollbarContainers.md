@@ -3,12 +3,15 @@
 For positioning a heading below the viewport's top when it opens, see
 [Expandable section](expandable-section.md#scroll-to-the-heading-when-opening).
 
-`StyledVerticalScrollbarContainer` and `StyledHorizontalScrollbarContainer`
-share their scrolling, alignment and overlap behavior across platforms. Android
-uses a custom draggable scrollbar from `featureCustomScrollbarMain`. iOS,
-Windows (JVM), macOS and Wasm use Compose Foundation scrollbars from
-`featureFoundationScrollbarMain`, selected through an internal `expect`/`actual`
-function. The public container APIs are identical on all targets.
+`StyledVerticalScrollContainer` and `StyledHorizontalScrollContainer` provide
+scrolling for ordinary column and row content, with shared scrollbar alignment
+and overlap behavior across platforms. Use the corresponding
+`StyledVerticalScrollbarLayout` or `StyledHorizontalScrollbarLayout` when
+content already manages its own scrolling, such as a lazy layout or a custom
+scrollable. Android uses a custom draggable scrollbar from
+`featureCustomScrollbarMain`. iOS, Windows (JVM), macOS and Wasm use Compose
+Foundation scrollbars from `featureFoundationScrollbarMain`, selected through
+an internal `expect`/`actual` function.
 
 ## Content padding
 
@@ -19,7 +22,7 @@ It does not add extra items or item spacing, and start/end respect layout direct
 The scrollbar track is not inset by content padding.
 
 ```kotlin
-StyledVerticalScrollbarContainer(
+StyledVerticalScrollContainer(
     modifier = Modifier
         .fillMaxSize()
         .padding(paddingValues)
@@ -39,7 +42,7 @@ trailing spacers are needed.
 
 `StyledLazyColumn`, `StyledLazyRow`, `StyledLazyVerticalGrid` and
 `StyledLazyHorizontalGrid` also accept `contentPadding`. Do not wrap them in a
-scrollbar container: they already manage scrolling and scrollbars.
+scroll container: they already manage scrolling and scrollbars.
 `StyledVerticalScrollbarLayout` and `StyledHorizontalScrollbarLayout` only
 decorate content that manages its own scrolling; set content padding on that
 scrollable content instead.
@@ -48,7 +51,7 @@ scrollable content instead.
 
 The global `StyledTheme.behavior.showScrollbars` policy controls indicators
 throughout the theme subtree. It defaults to visible on desktop and web and
-hidden on mobile. The low-level container functions keep `showScrollbar = true`
+hidden on mobile. The scroll-container functions keep `showScrollbar = true`
 as their local default; the theme policy can still hide their indicators without
 disabling scrolling or reserving scrollbar gutter space. The same policy is
 used by scrollable navigation, popup menus, tab rows and lazy layouts.

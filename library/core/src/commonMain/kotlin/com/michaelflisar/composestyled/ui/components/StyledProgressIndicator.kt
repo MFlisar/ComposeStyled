@@ -55,8 +55,8 @@ object StyledProgressIndicator {
 @Composable
 fun StyledProgressIndicator(
     type: StyledProgressIndicator.Type,
-    progress: Float? = null,
     modifier: Modifier = Modifier,
+    progress: Float? = null,
     color: Color = StyledTheme.colorScheme.primary,
     trackColor: Color = color.copy(alpha = 0.24f),
     strokeWidth: Dp = 4.dp,
@@ -72,9 +72,9 @@ fun StyledProgressIndicator(
 }
 
 @Composable
-fun CircularProgressIndicator(
-    progress: Float? = null,
+fun StyledCircularProgressIndicator(
     modifier: Modifier = Modifier,
+    progress: Float? = null,
     color: Color = StyledTheme.colorScheme.primary,
     trackColor: Color = color.copy(alpha = 0.24f),
     strokeWidth: Dp = 4.dp,
@@ -88,9 +88,9 @@ fun CircularProgressIndicator(
 )
 
 @Composable
-fun LinearProgressIndicator(
-    progress: Float? = null,
+fun StyledLinearProgressIndicator(
     modifier: Modifier = Modifier,
+    progress: Float? = null,
     color: Color = StyledTheme.colorScheme.primary,
     trackColor: Color = color.copy(alpha = 0.24f),
     strokeWidth: Dp = 4.dp,

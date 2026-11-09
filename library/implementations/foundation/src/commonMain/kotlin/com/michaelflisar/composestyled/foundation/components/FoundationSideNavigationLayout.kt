@@ -57,10 +57,11 @@ import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.ui.components.StyledSideNavigation
 import com.michaelflisar.composestyled.ui.components.StyledSideNavigationDefaults
 import com.michaelflisar.composestyled.ui.components.StyledIconButton
+import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.ui.components.StyledIconButtonDefaults
 import com.michaelflisar.composestyled.ui.internal.LocalStyledSelectionColors
 import com.michaelflisar.composestyled.ui.internal.StyledSelectionColors
-import com.michaelflisar.composestyled.ui.layout.StyledVerticalScrollbarContainer
+import com.michaelflisar.composestyled.ui.layout.StyledVerticalScrollContainer
 
 @InternalComposeStyledApi
 val LocalSideNavigationLayout = compositionLocalOf<SideNavigationLayoutInfo?> { null }
@@ -158,7 +159,7 @@ fun FoundationSideNavigationLayout(
                                 ) {
                                     StyledIconButton(
                                         onClick = { onExpandedChange(!expanded) },
-                                        role = StyledIconButton.Role.Tertiary,
+                                        variant = StyledButton.Variant.Plain,
                                         customization = StyledIconButtonDefaults.customize(
                                             CustomColors(
                                                 filledBackground = CustomColors.Primary.filledBackground,
@@ -213,7 +214,7 @@ fun FoundationSideNavigationLayout(
                     )
                 }
                 if (scrollable) {
-                    StyledVerticalScrollbarContainer(
+                    StyledVerticalScrollContainer(
                         modifier = Modifier.weight(1f).fillMaxWidth(),
                         scrollState = scrollState,
                         showScrollbar = showScrollbar,

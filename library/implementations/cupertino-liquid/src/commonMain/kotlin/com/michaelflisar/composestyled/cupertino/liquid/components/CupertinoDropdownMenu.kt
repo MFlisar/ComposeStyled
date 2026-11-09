@@ -13,7 +13,7 @@ import androidx.compose.ui.window.PopupProperties
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.cupertino.liquid.liquidGlass
 import com.michaelflisar.composestyled.ui.components.StyledPopupMenu
-import com.michaelflisar.composestyled.ui.components.StyledDropdownMenuItem
+import com.michaelflisar.composestyled.ui.components.StyledPopupMenuItemRenderer
 import com.michaelflisar.composestyled.foundation.components.FoundationPopupMenu
 import com.michaelflisar.composestyled.foundation.components.FoundationDropdownMenu
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
@@ -30,6 +30,7 @@ class CupertinoLiquidPopupMenu internal constructor() : StyledPopupMenu.Implemen
         modifier: Modifier,
         offset: DpOffset,
         placement: StyledPopupMenu.Placement,
+        horizontalAlignment: StyledPopupMenu.HorizontalAlignment,
         properties: PopupProperties,
         scrollState: ScrollState,
         style: com.michaelflisar.composestyled.ui.components.StyledPopup.Style,
@@ -43,6 +44,7 @@ class CupertinoLiquidPopupMenu internal constructor() : StyledPopupMenu.Implemen
             modifier = modifier.liquidGlass(style.shape, style.containerColor),
             offset = offset,
             placement = placement,
+            horizontalAlignment = horizontalAlignment,
             properties = properties,
             scrollState = scrollState,
             style = style.copy(
@@ -70,8 +72,8 @@ class CupertinoLiquidPopupMenu internal constructor() : StyledPopupMenu.Implemen
 class CupertinoLiquidDropdownMenu internal constructor() :
     FoundationDropdownMenu(hoverAlpha = 0.06f, pressedAlpha = 0.14f) {
 
-    override val defaults: StyledDropdownMenuItem.Defaults
-        @Composable get() = StyledDropdownMenuItem.Defaults(
+    override val defaults: StyledPopupMenuItemRenderer.Defaults
+        @Composable get() = StyledPopupMenuItemRenderer.Defaults(
             minHeight = StyledTheme.sizes.minimumInteractiveSize,
             itemPadding = PaddingValues(horizontal = StyledTheme.padding.small),
             itemShape = StyledTheme.shapes.small,

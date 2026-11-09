@@ -47,11 +47,17 @@ object PastelThemes {
         Color(0xFF4D7FAE), Color(0xFF8FC4F2),
         Color(0xFFB56645), Color(0xFFF0A47F),
     )
+    val cloud = createStyledThemeColors(
+        themeId, "cloud", "Cloud",
+        Color(0xFF68727F), Color(0xFFC1C8D1),
+        Color(0xFF6F8795), Color(0xFFB8CED8),
+        Color(0xFF88796E), Color(0xFFD4C1B5),
+    )
 
     val collection = StyledThemeColorsCollection(
         id = themeId,
         name = "Pastel",
-        themes = listOf(mint, rose, lavender, peach, sky, lemon),
+        themes = listOf(mint, rose, lavender, peach, sky, lemon, cloud),
         matchingPlatforms = Platform.entries.toSet(),
     )
 }

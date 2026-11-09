@@ -20,6 +20,7 @@ import com.michaelflisar.composestyled.material3.components.Material3Button
 import com.michaelflisar.composestyled.material3.components.Material3Card
 import com.michaelflisar.composestyled.material3.components.Material3Checkbox
 import com.michaelflisar.composestyled.material3.components.Material3Chip
+import com.michaelflisar.composestyled.material3.components.Material3Clickable
 import com.michaelflisar.composestyled.material3.layout.Material3Dialog
 import com.michaelflisar.composestyled.material3.layout.Material3BottomSheet
 import com.michaelflisar.composestyled.material3.components.Material3DropdownMenu
@@ -127,6 +128,7 @@ fun material3ThemeDefinition(): StyledThemeDefinition {
 fun StyledRegistry.Builder.registerMaterial3Components() {
     register(Material3Badge.create())
     register(Material3Button.create())
+    register(Material3Clickable.create())
     register(Material3Dialog.create())
     register(Material3BottomSheet.create())
     register(Material3Chip.create())

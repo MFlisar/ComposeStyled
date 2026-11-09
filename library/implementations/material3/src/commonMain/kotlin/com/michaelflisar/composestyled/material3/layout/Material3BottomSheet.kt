@@ -18,7 +18,7 @@ class Material3BottomSheet internal constructor() : FoundationBottomSheet() {
             edgeMargin = if (StyledTheme.platform.isDesktopOrWeb()) 24.dp else 16.dp,
         )
     override val verticalActions = false
-    override val roleMapping = Material3Dialog.DefaultRoleMapping
+    override val presentationMapping = Material3Dialog.DefaultPresentationMapping
     override val actionSpacing
         @Composable get() = 8.dp
     override val actionRowSpacing

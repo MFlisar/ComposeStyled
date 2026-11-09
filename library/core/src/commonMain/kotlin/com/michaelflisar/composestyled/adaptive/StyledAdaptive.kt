@@ -63,7 +63,9 @@ data class StyledAdaptiveInfo(
     val navigationMode: StyledNavigationMode,
     val masterDetailMode: StyledAdaptiveMasterDetailMode,
     val dialogStyle: StyledDialog.Style,
-)
+) {
+    val isLandscape: Boolean = context.windowSize.width > context.windowSize.height
+}
 
 /** Whether master and detail content occupy one pane or appear side by side. */
 enum class StyledAdaptiveMasterDetailMode {

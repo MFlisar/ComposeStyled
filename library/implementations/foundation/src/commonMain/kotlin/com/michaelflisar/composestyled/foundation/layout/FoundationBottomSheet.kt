@@ -8,7 +8,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
-import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.ui.layout.StyledBottomSheet
 import com.michaelflisar.composestyled.ui.layout.StyledBottomSheetDefaults
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
@@ -19,7 +18,7 @@ abstract class FoundationBottomSheet : StyledBottomSheet.Implementation {
     protected open val fullscreenActionsInToolbar: Boolean = true
     protected open val centeredTitle: Boolean = false
     protected open val positiveActionFirst: Boolean = false
-    protected open val roleMapping: (StyledButton.Role) -> StyledDialog.ButtonPresentation =
+    protected open val presentationMapping: (StyledDialog.ActionSlot) -> StyledDialog.ButtonPresentation =
         { StyledDialog.ButtonPresentation.Text }
     protected open val actionSpacing: Dp
         @Composable get() = StyledTheme.spacing.small
@@ -57,7 +56,7 @@ abstract class FoundationBottomSheet : StyledBottomSheet.Implementation {
             verticalActions = verticalActions, positiveActionFirst = positiveActionFirst,
             fullscreenActionsInToolbar = fullscreenActionsInToolbar,
             centeredTitle = centeredTitle,
-            roleMapping = roleMapping,
+            presentationMapping = presentationMapping,
             actionSpacing = actionSpacing, actionRowSpacing = actionRowSpacing,
             stackPositiveActionFirst = stackPositiveActionFirst,
             footerTopPadding = footerTopPadding,

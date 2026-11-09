@@ -9,6 +9,7 @@ import com.michaelflisar.composestyled.ui.icons.material3.outlined.MaterialIcons
 import com.michaelflisar.composestyled.ui.icons.material3.outlined.MaterialIconsArrowBack
 import com.michaelflisar.composestyled.ui.icons.material3.outlined.MaterialIconsArrowForward
 import com.michaelflisar.composestyled.ui.icons.material3.outlined.MaterialIconsCheck
+import com.michaelflisar.composestyled.ui.icons.material3.outlined.MaterialIconsChevronLeft
 import com.michaelflisar.composestyled.ui.icons.material3.outlined.MaterialIconsChevronRight
 import com.michaelflisar.composestyled.ui.icons.material3.outlined.MaterialIconsClear
 import com.michaelflisar.composestyled.ui.icons.material3.outlined.MaterialIconsClose
@@ -53,6 +54,7 @@ object Material3OutlinedIconSet : StyledIconSet {
         StyledIcons.Name.Search to MaterialIconsSearch.toIconComposable(),
         StyledIcons.Name.NavigateForward to MaterialIconsArrowForward.toIconComposable(),
         StyledIcons.Name.Submenu to MaterialIconsChevronRight.toIconComposable(),
+        StyledIcons.Name.SubmenuBack to MaterialIconsChevronLeft.toIconComposable(),
         StyledIcons.Name.Refresh to MaterialIconsRefresh.toIconComposable(),
         StyledIcons.Name.Save to MaterialIconsSave.toIconComposable(),
         StyledIcons.Name.Home to MaterialIconsHome.toIconComposable(),

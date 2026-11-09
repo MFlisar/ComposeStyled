@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.only
@@ -85,7 +86,6 @@ import com.michaelflisar.composestyled.platform.SystemBarStyleEffect
 import com.michaelflisar.composestyled.platform.systemBarIconStyleFor
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
-import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.ui.components.StyledCenterAlignedTopBar
 import com.michaelflisar.composestyled.ui.components.StyledSurface
 import com.michaelflisar.composestyled.ui.components.StyledTopBar
@@ -118,7 +118,7 @@ internal fun FoundationDialogSheet(
     verticalActions: Boolean,
     fullscreenActionsInToolbar: Boolean,
     centeredTitle: Boolean,
-    roleMapping: (StyledButton.Role) -> StyledDialog.ButtonPresentation,
+    presentationMapping: (StyledDialog.ActionSlot) -> StyledDialog.ButtonPresentation,
     positiveActionFirst: Boolean,
     actionSpacing: Dp,
     actionRowSpacing: Dp,
@@ -170,7 +170,34 @@ internal fun FoundationDialogSheet(
             regularViewportHeight * maxHeightFraction,
             (regularViewportHeight - with(density) { edgeMargin.toPx() }).coerceAtLeast(0f),
         )
-        val sheetHeight = if (options.expandToFullscreen) viewportHeight else regularSheetHeight
+        val contentMaxHeight = if (options.expandToFullscreen) viewportHeight else regularSheetHeight
+        var footerHeight by remember { mutableIntStateOf(0) }
+        var headerHeight by remember { mutableIntStateOf(0) }
+        var measuredContentHeight by remember { mutableIntStateOf(0) }
+        val fixedButtons = options.fixedButtons && !buttons.isEmpty
+        val contentPadding = StyledTheme.spacing.large
+        val topCornerHeight = remember(shape, regularSheetWidth, contentMaxHeight, density, layoutDirection) {
+            val outline = shape.createOutline(
+                Size(with(density) { regularSheetWidth.toPx() }, contentMaxHeight), layoutDirection, density,
+            )
+            if (outline is Outline.Rounded) {
+                maxOf(outline.roundRect.topLeftCornerRadius.y, outline.roundRect.topRightCornerRadius.y)
+            } else 0f
+        }
+        val protectedHeight = if (title != null) {
+            maxOf(headerHeight + with(density) { contentPadding.toPx() }, topCornerHeight)
+        } else topCornerHeight
+        val minimumSheetHeight = if (fixedButtons) protectedHeight + footerHeight else 0f
+        val measuredSheetHeight = if (measuredContentHeight == 0) {
+            contentMaxHeight
+        } else {
+            maxOf(measuredContentHeight.toFloat(), minimumSheetHeight)
+        }
+        val sheetHeight = if (options.expandToFullscreen) {
+            viewportHeight
+        } else {
+            minOf(contentMaxHeight, measuredSheetHeight)
+        }
         val peekOffset = (sheetHeight - regularViewportHeight * options.peekHeightFraction).coerceAtLeast(0f)
         val drag = rememberSaveable(
             options.initiallyExpanded,
@@ -233,22 +260,7 @@ internal fun FoundationDialogSheet(
                 }
             }
         }
-        var footerHeight by remember { mutableIntStateOf(0) }
-        var headerHeight by remember { mutableIntStateOf(0) }
-        val fixedButtons = options.fixedButtons && !buttons.isEmpty
         val visibleHeight = (sheetHeight - drag.offset).coerceAtLeast(0f)
-        val topCornerHeight = remember(shape, sheetWidth, sheetHeight, density, layoutDirection) {
-            val outline = shape.createOutline(
-                Size(with(density) { sheetWidth.toPx() }, sheetHeight), layoutDirection, density,
-            )
-            if (outline is Outline.Rounded) {
-                maxOf(outline.roundRect.topLeftCornerRadius.y, outline.roundRect.topRightCornerRadius.y)
-            } else 0f
-        }
-        val contentPadding = StyledTheme.spacing.large
-        val protectedHeight = if (title != null) {
-            maxOf(headerHeight + with(density) { contentPadding.toPx() }, topCornerHeight)
-        } else topCornerHeight
         val footerOffset = (protectedHeight + footerHeight - visibleHeight).coerceAtLeast(0f)
         val bottomInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom)
         val footerInsets = if (modal && options.expandToFullscreen) {
@@ -285,7 +297,7 @@ internal fun FoundationDialogSheet(
                         .align(Alignment.TopCenter)
                         .width(sheetWidth)
                         .offset { IntOffset(0, sheetTop.roundToInt()) }
-                        .height(with(density) { sheetHeight.toDp() })
+                        .heightIn(max = with(density) { contentMaxHeight.toDp() })
                         .nestedScroll(connection)
                         .draggable(
                             state = rememberDraggableState { drag.drag(it) },
@@ -302,17 +314,22 @@ internal fun FoundationDialogSheet(
                     color = containerColor,
                     shadowElevation = 8.dp,
                 ) {
-                    Box(Modifier.fillMaxSize()) {
+                    Box(Modifier.fillMaxWidth()) {
                         Column(
                             Modifier.windowInsetsPadding(sheetHorizontalInsets)
-                                .height(
-                                    with(density) {
-                                        (if (fixedButtons) maxOf(
-                                            visibleHeight,
-                                            protectedHeight + footerHeight,
-                                        ) else sheetHeight).toDp()
+                                .then(
+                                    if (options.expandToFullscreen) {
+                                        Modifier.height(with(density) { contentMaxHeight.toDp() })
+                                    } else {
+                                        Modifier.heightIn(
+                                            min = with(density) {
+                                                minOf(minimumSheetHeight, contentMaxHeight).toDp()
+                                            },
+                                            max = with(density) { contentMaxHeight.toDp() },
+                                        )
                                     },
-                                ).then(if (fixedButtons) Modifier else Modifier.windowInsetsPadding(bottomInsets)),
+                                ).then(if (fixedButtons) Modifier else Modifier.windowInsetsPadding(bottomInsets))
+                                .onSizeChanged { measuredContentHeight = it.height },
                         ) {
                             AnimatedVisibility(
                                 visible = fullscreenToolbarVisible,
@@ -325,7 +342,7 @@ internal fun FoundationDialogSheet(
                                             buttons.negative,
                                             StyledDialog.ActionSlot.Negative,
                                             StyledDialog.Context.FullscreenAction,
-                                            autoPresentation = roleMapping(StyledButton.Role.Secondary),
+                                            autoPresentation = presentationMapping(StyledDialog.ActionSlot.Negative),
                                         )
                                     }
                                 }
@@ -335,7 +352,7 @@ internal fun FoundationDialogSheet(
                                             buttons.positive,
                                             StyledDialog.ActionSlot.Positive,
                                             StyledDialog.Context.FullscreenAction,
-                                            autoPresentation = roleMapping(StyledButton.Role.Primary),
+                                            autoPresentation = presentationMapping(StyledDialog.ActionSlot.Positive),
                                         )
                                     }
                                 }
@@ -368,13 +385,15 @@ internal fun FoundationDialogSheet(
                                                 )
                                             }.semantics {
                                                 if (options.gesturesEnabled && visible) {
-                                                    expand {
-                                                        drag.animateTo(scope, 0f)
-                                                        true
-                                                    }
-                                                    collapse {
-                                                        drag.animateTo(scope, peekOffset)
-                                                        true
+                                                    if (peekOffset > 0f) {
+                                                        expand {
+                                                            drag.animateTo(scope, 0f)
+                                                            true
+                                                        }
+                                                        collapse {
+                                                            drag.animateTo(scope, peekOffset)
+                                                            true
+                                                        }
                                                     }
                                                     if (options.dismissOnSwipe) {
                                                         dismiss { dismissRequest(); true }
@@ -402,7 +421,10 @@ internal fun FoundationDialogSheet(
                                     }
                                 }
                             }
-                            Column(Modifier.weight(1f).fillMaxWidth()) {
+                            Column(
+                                Modifier.then(if (options.expandToFullscreen) Modifier.weight(1f) else Modifier)
+                                    .fillMaxWidth(),
+                            ) {
                                 content(
                                     PaddingValues(
                                         start = contentPadding,
@@ -516,9 +538,9 @@ private class SheetDragState(
     private var options: StyledDialog.SheetOptions,
     initiallyExpanded: Boolean,
 ) {
-    var isExpanded by mutableStateOf(initiallyExpanded)
+    var isExpanded by mutableStateOf(initiallyExpanded || peekOffset <= 0f)
         private set
-    var offset by mutableFloatStateOf(if (initiallyExpanded) 0f else peekOffset)
+    var offset by mutableFloatStateOf(if (isExpanded) 0f else peekOffset)
         private set
     private var settling: Job? = null
 
@@ -533,6 +555,7 @@ private class SheetDragState(
         this.height = height
         this.peekOffset = peekOffset
         this.options = options
+        if (peekOffset <= 0f) isExpanded = true
         offset = if (isExpanded) 0f else peekOffset
     }
 

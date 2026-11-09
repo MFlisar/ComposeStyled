@@ -12,10 +12,12 @@ navigation and action slots. Themes render that default with the bar's actual
 containers. An explicitly supplied role is preserved and uses its normal
 theme mapping instead of the context-specific default.
 
-System-bar styling is caller-directed. To match status-bar icons to this bar,
-call `SystemBarStyleEffect` from the containing screen using the same
-`containerColor` and the actual background beneath translucent colors. The bar
-does not change system-bar appearance or its own inset handling.
+System-bar styling is caller-directed. From the containing Scaffold, call
+`SystemBarStyleEffectIfNeeded` with this bar's `containerColor` as
+`statusBarColor`; pass the actual Scaffold container as `backgroundColor` when
+it differs from the theme surface. If the bar has an explicit `contentColor`,
+pass it as `statusBarContentColor` as well. The bar does not change system-bar
+appearance or its own inset handling.
 
 ## Expandable top bars
 

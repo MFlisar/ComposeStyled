@@ -1,18 +1,22 @@
 # AKTUELLES
 
+[ ] Farben korrigieren (Input clear in dark theme bspw.)
+    expandable top app bar in fullscreen dialog in material3 => schneidet text ab wegen manueller implementierung vermutlich
+    => prüfen
+
 [x] Starter-Template: Transparenz, Content-Rendering und Statusbar testen
 
     [ ] bei ausgeblendeter Toolbar testen, ob und wie sich die Statusbar-Farbe unabhängig davon ändern lässt.
     [ ] bei ausgeblendeter bottom bar: wie verhält sich nav bar? sollte vermutlich dann scrim behalten oder?
 
-[ ] Toolbar Dialog: Fullscreen-Modus berücksichtigen (System-Bar-Abstand aktuell vorhanden)
 [ ] Side Navigation an Toolbar ausrichten
-[ ] Styled*-Klassen:
-  - Einheitlichen Dokumentations Header nutzen:
-  - Enthält gewünschtes Design pro Theme
-  - Enthält Theme-Regeln
-  - ...
-  - Als Single Source of Truth evaluieren
+
+### meine Compose* Libraries
+
+[ ] ComposeDialogs
+[ ] ComposePreferences vermutlich einfach neu machen?
+    Weil es ja nur die neue UI und kleine composables oder Dialoge sind
+[ ] ComposeChangelog
 
 ### Demo App
 
@@ -33,26 +37,6 @@
 
 [ ] drawer?
 
-### meine Compose* Libraries
-
-  <details>
-
-    - Dialoge zunächst direkt integrieren?
-    - Changelog zunächst direkt integrieren?
-    - preferences zunächst direkt integrieren?
-
-    ALLES IN TOOLBOX vorerst implementieren?
-
-    - Später mögliche Aufteilung:
-      - compose-dialog
-      - compose-changelog
-      - compose-preference
-
-    - Als Extension-Modul veröffentlichen.
-    - UI von Styled-Implementierungen trennen (ähnlich ComposeTable).
-
-  </details>
-
 ### TOOLBOX - APP
 
   <details>
@@ -67,5 +51,4 @@
 
   </details>
     
-
 

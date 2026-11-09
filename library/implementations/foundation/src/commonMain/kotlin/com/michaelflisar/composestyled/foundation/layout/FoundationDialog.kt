@@ -1,6 +1,8 @@
 package com.michaelflisar.composestyled.foundation.layout
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
@@ -9,8 +11,15 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.ExperimentalTransitionApi
+import androidx.compose.animation.core.rememberTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.ui.backhandler.BackHandler
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -30,10 +39,12 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -42,6 +53,8 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.customActions
+import androidx.compose.ui.semantics.dialog
+import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.TextStyle
@@ -54,7 +67,6 @@ import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.platform.SystemBarStyleEffect
 import com.michaelflisar.composestyled.platform.systemBarIconStyleFor
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
-import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.ui.components.StyledCenterAlignedTopBar
 import com.michaelflisar.composestyled.ui.components.StyledExpandableTopBar
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
@@ -67,6 +79,7 @@ import com.michaelflisar.composestyled.ui.internal.DialogButton
 import com.michaelflisar.composestyled.ui.internal.DIALOG_VISIBILITY_ANIMATION_DURATION_MILLIS
 import com.michaelflisar.composestyled.ui.internal.edgeToEdgeDialogProperties
 import com.michaelflisar.composestyled.ui.internal.dialogInput
+import com.michaelflisar.composestyled.ui.layout.LocalFullscreenDialogEntry
 
 @InternalComposeStyledApi
 abstract class FoundationDialog : StyledDialog.Implementation {
@@ -75,7 +88,7 @@ abstract class FoundationDialog : StyledDialog.Implementation {
     protected abstract val fullscreenActionsInToolbar: Boolean
     protected open val centeredTitle: Boolean = false
     protected open val positiveActionFirst: Boolean = false
-    protected open val roleMapping: (StyledButton.Role) -> StyledDialog.ButtonPresentation =
+    protected open val presentationMapping: (StyledDialog.ActionSlot) -> StyledDialog.ButtonPresentation =
         { StyledDialog.ButtonPresentation.Text }
     protected open val alertPadding: Dp
         @Composable get() = StyledTheme.spacing.large
@@ -141,6 +154,21 @@ abstract class FoundationDialog : StyledDialog.Implementation {
             )
             return
         }
+        if (style is StyledDialog.Style.Fullscreen && LocalFullscreenDialogEntry.current != null) {
+            FullscreenOverlay(
+                visible = visible,
+                onDismissRequest = onDismissRequest,
+                modifier = modifier,
+                properties = properties,
+                shape = RectangleShape,
+                title = title,
+                buttons = buttons,
+                content = content,
+                animation = style.animation,
+                expandableHeader = style.expandableHeader,
+            )
+            return
+        }
         val shape: Shape
         val maxWidth: Dp
         val maxHeightFraction: Float
@@ -201,7 +229,7 @@ abstract class FoundationDialog : StyledDialog.Implementation {
                         verticalActions = verticalAlertActions,
                         fullscreenActionsInToolbar = fullscreenActionsInToolbar,
                         centeredTitle = centeredTitle,
-                        roleMapping = roleMapping,
+                        presentationMapping = presentationMapping,
                         positiveActionFirst = positiveActionFirst,
                         actionSpacing = actionSpacing,
                         actionRowSpacing = actionRowSpacing,
@@ -219,57 +247,12 @@ abstract class FoundationDialog : StyledDialog.Implementation {
                         if (style is StyledDialog.Style.Fullscreen) {
                             val transition = remember { MutableTransitionState(false) }
                             LaunchedEffect(visible) { transition.targetState = visible }
-                            val duration = DIALOG_VISIBILITY_ANIMATION_DURATION_MILLIS
                             AnimatedVisibility(
                                 visibleState = transition,
                                 modifier = bounds.then(modifier)
                                     .dialogInput(properties.dismissOnBackPress, onDismissRequest),
-                                enter = when (val animation = style.animation) {
-                                    StyledDialog.FullscreenAnimation.Fade ->
-                                        fadeIn(tween(durationMillis = duration))
-                                    is StyledDialog.FullscreenAnimation.Slide ->
-                                        when (animation.direction) {
-                                            StyledDialog.FullscreenAnimation.SlideDirection.FromLeft ->
-                                                slideInHorizontally(
-                                                    animationSpec = tween(durationMillis = duration),
-                                                ) { -it }
-                                            StyledDialog.FullscreenAnimation.SlideDirection.FromRight ->
-                                                slideInHorizontally(
-                                                    animationSpec = tween(durationMillis = duration),
-                                                ) { it }
-                                            StyledDialog.FullscreenAnimation.SlideDirection.FromTop ->
-                                                slideInVertically(
-                                                    animationSpec = tween(durationMillis = duration),
-                                                ) { -it }
-                                            StyledDialog.FullscreenAnimation.SlideDirection.FromBottom ->
-                                                slideInVertically(
-                                                    animationSpec = tween(durationMillis = duration),
-                                                ) { it }
-                                        }
-                                },
-                                exit = when (val animation = style.animation) {
-                                    StyledDialog.FullscreenAnimation.Fade ->
-                                        fadeOut(tween(durationMillis = duration))
-                                    is StyledDialog.FullscreenAnimation.Slide ->
-                                        when (animation.direction) {
-                                            StyledDialog.FullscreenAnimation.SlideDirection.FromLeft ->
-                                                slideOutHorizontally(
-                                                    animationSpec = tween(durationMillis = duration),
-                                                ) { -it }
-                                            StyledDialog.FullscreenAnimation.SlideDirection.FromRight ->
-                                                slideOutHorizontally(
-                                                    animationSpec = tween(durationMillis = duration),
-                                                ) { it }
-                                            StyledDialog.FullscreenAnimation.SlideDirection.FromTop ->
-                                                slideOutVertically(
-                                                    animationSpec = tween(durationMillis = duration),
-                                                ) { -it }
-                                            StyledDialog.FullscreenAnimation.SlideDirection.FromBottom ->
-                                                slideOutVertically(
-                                                    animationSpec = tween(durationMillis = duration),
-                                                ) { it }
-                                        }
-                                },
+                                enter = fullscreenEnterTransition(style.animation),
+                                exit = fullscreenExitTransition(style.animation),
                             ) {
                                 Fullscreen(
                                     Modifier.fillMaxSize(), shape, title, buttons, content,
@@ -292,6 +275,7 @@ abstract class FoundationDialog : StyledDialog.Implementation {
                             )
                         }
                     }
+
                 }
             }
         }
@@ -385,6 +369,64 @@ abstract class FoundationDialog : StyledDialog.Implementation {
     }
 
     @Composable
+    @OptIn(ExperimentalComposeUiApi::class, ExperimentalTransitionApi::class)
+    private fun FullscreenOverlay(
+        visible: Boolean,
+        onDismissRequest: () -> Unit,
+        modifier: Modifier,
+        properties: StyledDialog.Properties,
+        shape: Shape,
+        title: (@Composable () -> Unit)?,
+        buttons: StyledDialog.Buttons,
+        content: @Composable ColumnScope.(PaddingValues) -> Unit,
+        animation: StyledDialog.FullscreenAnimation,
+        expandableHeader: StyledDialog.Style.Fullscreen.ExpandableHeader?,
+    ) {
+        val transitionState = remember { MutableTransitionState(false) }
+        LaunchedEffect(visible) { transitionState.targetState = visible }
+        val transition = rememberTransition(transitionState, label = "fullscreenDialog")
+        val scrimAlpha by transition.animateFloat(
+            transitionSpec = { tween(durationMillis = DIALOG_VISIBILITY_ANIMATION_DURATION_MILLIS) },
+            label = "fullscreenDialogScrim",
+        ) { targetState -> if (targetState) FULLSCREEN_DIALOG_SCRIM_ALPHA else 0f }
+
+        BackHandler(
+            enabled = properties.dismissOnBackPress,
+            onBack = onDismissRequest,
+        )
+        Box(Modifier.fillMaxSize().semantics { dialog() }) {
+            Box(
+                Modifier.fillMaxSize()
+                    .background(Color.Black.copy(alpha = scrimAlpha))
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = {},
+                    )
+                    .semantics { hideFromAccessibility() },
+            )
+            transition.AnimatedVisibility(
+                visible = { it },
+                modifier = Modifier.fillMaxSize()
+                    .then(modifier)
+                    .dialogInput(properties.dismissOnBackPress, onDismissRequest),
+                enter = fullscreenEnterTransition(animation),
+                exit = fullscreenExitTransition(animation),
+            ) {
+                Fullscreen(
+                    Modifier.fillMaxSize(),
+                    shape,
+                    title,
+                    buttons,
+                    content,
+                    edgeToEdge = true,
+                    expandableHeader = expandableHeader,
+                )
+            }
+        }
+    }
+
+    @Composable
     @OptIn(ExperimentalFoundationApi::class)
     private fun Fullscreen(
         modifier: Modifier,
@@ -434,7 +476,7 @@ abstract class FoundationDialog : StyledDialog.Implementation {
                         DialogButton(
                             buttons.negative, StyledDialog.ActionSlot.Negative,
                             StyledDialog.Context.FullscreenAction,
-                            autoPresentation = roleMapping(StyledButton.Role.Secondary),
+                            autoPresentation = presentationMapping(StyledDialog.ActionSlot.Negative),
                         )
                     }
                 }
@@ -443,7 +485,7 @@ abstract class FoundationDialog : StyledDialog.Implementation {
                         DialogButton(
                             buttons.positive, StyledDialog.ActionSlot.Positive,
                             StyledDialog.Context.FullscreenAction,
-                            autoPresentation = roleMapping(StyledButton.Role.Primary),
+                            autoPresentation = presentationMapping(StyledDialog.ActionSlot.Positive),
                         )
                     }
                     if (expandable && (!expanded || title == null)) {
@@ -536,6 +578,46 @@ abstract class FoundationDialog : StyledDialog.Implementation {
                         stackPositiveFirst = stackPositiveActionFirst,
                     )
                 }
+            }
+        }
+    }
+
+    private val FULLSCREEN_DIALOG_SCRIM_ALPHA = 0.32f
+
+    private fun fullscreenEnterTransition(
+        animation: StyledDialog.FullscreenAnimation,
+    ): EnterTransition {
+        val duration = DIALOG_VISIBILITY_ANIMATION_DURATION_MILLIS
+        return when (animation) {
+            StyledDialog.FullscreenAnimation.Fade -> fadeIn(tween(durationMillis = duration))
+            is StyledDialog.FullscreenAnimation.Slide -> when (animation.direction) {
+                StyledDialog.FullscreenAnimation.SlideDirection.FromLeft ->
+                    slideInHorizontally(animationSpec = tween(durationMillis = duration)) { -it }
+                StyledDialog.FullscreenAnimation.SlideDirection.FromRight ->
+                    slideInHorizontally(animationSpec = tween(durationMillis = duration)) { it }
+                StyledDialog.FullscreenAnimation.SlideDirection.FromTop ->
+                    slideInVertically(animationSpec = tween(durationMillis = duration)) { -it }
+                StyledDialog.FullscreenAnimation.SlideDirection.FromBottom ->
+                    slideInVertically(animationSpec = tween(durationMillis = duration)) { it }
+            }
+        }
+    }
+
+    private fun fullscreenExitTransition(
+        animation: StyledDialog.FullscreenAnimation,
+    ): ExitTransition {
+        val duration = DIALOG_VISIBILITY_ANIMATION_DURATION_MILLIS
+        return when (animation) {
+            StyledDialog.FullscreenAnimation.Fade -> fadeOut(tween(durationMillis = duration))
+            is StyledDialog.FullscreenAnimation.Slide -> when (animation.direction) {
+                StyledDialog.FullscreenAnimation.SlideDirection.FromLeft ->
+                    slideOutHorizontally(animationSpec = tween(durationMillis = duration)) { -it }
+                StyledDialog.FullscreenAnimation.SlideDirection.FromRight ->
+                    slideOutHorizontally(animationSpec = tween(durationMillis = duration)) { it }
+                StyledDialog.FullscreenAnimation.SlideDirection.FromTop ->
+                    slideOutVertically(animationSpec = tween(durationMillis = duration)) { -it }
+                StyledDialog.FullscreenAnimation.SlideDirection.FromBottom ->
+                    slideOutVertically(animationSpec = tween(durationMillis = duration)) { it }
             }
         }
     }

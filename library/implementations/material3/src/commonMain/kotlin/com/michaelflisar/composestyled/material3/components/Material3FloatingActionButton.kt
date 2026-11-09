@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
-import com.michaelflisar.composestyled.UpdateStyledThemeLocals
+import com.michaelflisar.composestyled.material3.ProvideStyledLocals
 import com.michaelflisar.composestyled.ui.components.StyledFloatingActionButton
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 
@@ -42,7 +42,7 @@ class Material3FloatingActionButton internal constructor() : StyledFloatingActio
         interactionSource: MutableInteractionSource?,
         content: @Composable () -> Unit,
     ) {
-        UpdateStyledThemeLocals(contentColor = contentColor) {
+        ProvideStyledLocals(contentColor = contentColor) {
             when (variant) {
                 StyledFloatingActionButton.Variant.Small -> SmallFloatingActionButton(
                     onClick = onClick,

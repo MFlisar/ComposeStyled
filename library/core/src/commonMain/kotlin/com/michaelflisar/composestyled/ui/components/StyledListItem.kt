@@ -5,14 +5,11 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
-import com.michaelflisar.composestyled.classes.ColorToken
-import com.michaelflisar.composestyled.classes.asColorToken
 import com.michaelflisar.composestyled.registry.LocalStyledRegistry
 import com.michaelflisar.composestyled.registry.StyledComponent
 import com.michaelflisar.composestyled.registry.StyledComponentWithDefaults
@@ -54,18 +51,6 @@ object StyledListItem {
     }
 
     // -------------
-    // 4) customization
-    // -------------
-
-    @Immutable
-    class Customization internal constructor(
-        val containerColor: ColorToken?,
-        val contentColor: ColorToken?,
-        val supportingColor: ColorToken?,
-        val border: ColorToken?,
-    )
-
-    // -------------
     // 5) implementation
     // -------------
 
@@ -86,7 +71,10 @@ object StyledListItem {
             minHeight: Dp,
             contentPadding: PaddingValues,
             spacing: Dp,
-            customization: Customization?,
+            containerColor: Color,
+            contentColor: Color,
+            supportingColor: Color,
+            borderColor: Color,
             leading: (@Composable () -> Unit)?,
             actions: (@Composable RowScope.() -> Unit)?,
             content: Content,
@@ -110,25 +98,6 @@ object StyledListItemDefaults {
 
     val spacing: Dp
         @Composable get() = LocalStyledRegistry.current[StyledListItem.DefaultsKey].spacing
-
-    fun customize(
-        containerColor: ColorToken? = null,
-        contentColor: ColorToken? = null,
-        supportingColor: ColorToken? = null,
-        border: ColorToken? = null,
-    ) = StyledListItem.Customization(containerColor, contentColor, supportingColor, border)
-
-    fun customize(
-        containerColor: Color,
-        contentColor: Color = Color.Unspecified,
-        supportingColor: Color = Color.Unspecified,
-        border: Color = Color.Unspecified,
-    ) = customize(
-        containerColor.asColorToken(),
-        contentColor.asColorToken(),
-        supportingColor.asColorToken(),
-        border.asColorToken(),
-    )
 }
 
 // -------------------------
@@ -143,12 +112,15 @@ fun StyledListItem(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource? = null,
-    // defaults / customisation
+    // defaults / colors
     shape: Shape = StyledListItemDefaults.shape,
     minHeight: Dp = StyledListItemDefaults.minHeight,
     contentPadding: PaddingValues = StyledListItemDefaults.contentPadding,
     spacing: Dp = StyledListItemDefaults.spacing,
-    customization: StyledListItem.Customization? = null,
+    containerColor: Color = Color.Unspecified,
+    contentColor: Color = Color.Unspecified,
+    supportingColor: Color = Color.Unspecified,
+    borderColor: Color = Color.Unspecified,
     // content
     supporting: (@Composable () -> Unit)? = null,
     overline: (@Composable () -> Unit)? = null,
@@ -158,7 +130,7 @@ fun StyledListItem(
     LocalStyledRegistry.current[StyledListItem.Key].Render(
         onClick, modifier, enabled, interactionSource, shape,
         minHeight, contentPadding, spacing,
-        customization, leading, actions,
+        containerColor, contentColor, supportingColor, borderColor, leading, actions,
         StyledListItem.Content.Semantic(headline, supporting, overline),
     )
 }
@@ -173,12 +145,15 @@ fun StyledListItem(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource? = null,
-    // defaults / customisation
+    // defaults / colors
     shape: Shape = StyledListItemDefaults.shape,
     minHeight: Dp = StyledListItemDefaults.minHeight,
     contentPadding: PaddingValues = StyledListItemDefaults.contentPadding,
     spacing: Dp = StyledListItemDefaults.spacing,
-    customization: StyledListItem.Customization? = null,
+    containerColor: Color = Color.Unspecified,
+    contentColor: Color = Color.Unspecified,
+    supportingColor: Color = Color.Unspecified,
+    borderColor: Color = Color.Unspecified,
     // content
     leading: (@Composable () -> Unit)? = null,
     actions: (@Composable RowScope.() -> Unit)? = null,
@@ -187,6 +162,7 @@ fun StyledListItem(
     LocalStyledRegistry.current[StyledListItem.Key].Render(
         onClick, modifier, enabled, interactionSource, shape,
         minHeight, contentPadding, spacing,
-        customization, leading, actions, StyledListItem.Content.Custom(content),
+        containerColor, contentColor, supportingColor, borderColor,
+        leading, actions, StyledListItem.Content.Custom(content),
     )
 }

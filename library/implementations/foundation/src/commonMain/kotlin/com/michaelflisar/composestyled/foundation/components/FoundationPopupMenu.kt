@@ -1,5 +1,9 @@
 package com.michaelflisar.composestyled.foundation.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -11,13 +15,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.movableContentOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
@@ -35,7 +44,7 @@ import com.michaelflisar.composestyled.ui.components.StyledPopup
 import com.michaelflisar.composestyled.ui.components.StyledPopupDefaults
 import com.michaelflisar.composestyled.ui.components.StyledPopupMenu
 import com.michaelflisar.composestyled.ui.components.StyledSurface
-import com.michaelflisar.composestyled.ui.layout.StyledVerticalScrollbarContainer
+import com.michaelflisar.composestyled.ui.layout.StyledVerticalScrollContainer
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
@@ -50,6 +59,7 @@ class FoundationPopupMenu : StyledPopupMenu.Implementation {
         modifier: Modifier,
         offset: DpOffset,
         placement: StyledPopupMenu.Placement,
+        horizontalAlignment: StyledPopupMenu.HorizontalAlignment,
         properties: PopupProperties,
         scrollState: ScrollState,
         style: StyledPopup.Style,
@@ -63,9 +73,32 @@ class FoundationPopupMenu : StyledPopupMenu.Implementation {
                     offset = offset,
                     isVisible = expanded,
                     placement = placement,
+                    horizontalAlignment = horizontalAlignment,
                     parentWindowOriginOnScreen = style.parentWindowOriginOnScreen,
                 )
             val menuSize = remember { mutableStateOf(IntSize.Zero) }
+            val menuTransitionState = remember { MutableTransitionState(false) }
+            menuTransitionState.targetState = expanded && menuSize.value != IntSize.Zero
+            val animation = style.animation.forPlacement(
+                isAboveAnchor = positionProvider.isAboveAnchor(menuSize.value.height),
+            )
+            val shadowUnfoldEnabled =
+                animation.shadowEnterSpec != null && animation.shadowExitSpec != null
+            val shadowScale by animateFloatAsState(
+                targetValue = if (shadowUnfoldEnabled && menuTransitionState.targetState) {
+                    1f
+                } else if (shadowUnfoldEnabled) {
+                    0f
+                } else {
+                    1f
+                },
+                animationSpec = if (menuTransitionState.targetState) {
+                    animation.shadowEnterSpec ?: tween(0)
+                } else {
+                    animation.shadowExitSpec ?: tween(0)
+                },
+                label = "popupMenuShadowScale",
+            )
             val outsideTapBounds = positionProvider.outsideTapBounds()
             StyledPopup(
                 visible = expanded,
@@ -157,7 +190,21 @@ class FoundationPopupMenu : StyledPopupMenu.Implementation {
                         } else {
                             style.maxHeight
                         }
-                        StyledSurface(
+                        val currentPopupContent =
+                            rememberUpdatedState<@Composable () -> Unit> {
+                                PopupMenuContent(
+                                    scrollState = scrollState,
+                                    style = style,
+                                    maxHeight = maxHeight,
+                                    contentPadding = contentPadding,
+                                    header = header,
+                                    content = content,
+                                )
+                            }
+                        val popupContent = remember {
+                            movableContentOf { currentPopupContent.value() }
+                        }
+                        Box(
                             modifier = Modifier
                                 .offset { positionProvider.menuPosition(menuSize.value) }
                                 .then(modifier)
@@ -168,20 +215,65 @@ class FoundationPopupMenu : StyledPopupMenu.Implementation {
                                 .graphicsLayer {
                                     alpha = if (menuSize.value == IntSize.Zero) 0f else 1f
                                 },
-                            shape = style.shape,
-                            color = style.containerColor,
-                            contentColor = style.contentColor,
-                            shadowElevation = style.shadowElevation,
-                            border = style.border,
                         ) {
-                            PopupMenuContent(
-                                scrollState = scrollState,
-                                style = style,
-                                maxHeight = maxHeight,
-                                contentPadding = contentPadding,
-                                header = header,
-                                content = content,
-                            )
+                            if (menuSize.value == IntSize.Zero) {
+                                StyledSurface(
+                                    modifier = Modifier,
+                                    shape = style.shape,
+                                    color = style.containerColor,
+                                    contentColor = style.contentColor,
+                                    shadowElevation = style.shadowElevation,
+                                    border = style.border,
+                                ) {
+                                    popupContent()
+                                }
+                            } else {
+                                Box(
+                                    modifier = Modifier.requiredSize(
+                                        width = with(LocalDensity.current) {
+                                            menuSize.value.width.toDp()
+                                        },
+                                        height = with(LocalDensity.current) {
+                                            menuSize.value.height.toDp()
+                                        },
+                                    ),
+                                ) {
+                                    if (shadowUnfoldEnabled) {
+                                        StyledSurface(
+                                            modifier = Modifier.fillMaxSize().graphicsLayer {
+                                                scaleY = shadowScale
+                                                transformOrigin = TransformOrigin(
+                                                    pivotFractionX = 0.5f,
+                                                    pivotFractionY = animation.shadowOriginY,
+                                                )
+                                            },
+                                            shape = style.shape,
+                                            color = Color.Transparent,
+                                            contentColor = style.contentColor,
+                                            shadowElevation = style.shadowElevation,
+                                            border = null,
+                                        ) {}
+                                    }
+                                    AnimatedVisibility(
+                                        visibleState = menuTransitionState,
+                                        enter = animation.enter,
+                                        exit = animation.exit,
+                                    ) {
+                                        StyledSurface(
+                                            modifier = Modifier.fillMaxSize(),
+                                            shape = style.shape,
+                                            color = style.containerColor,
+                                            contentColor = style.contentColor,
+                                            shadowElevation = if (shadowUnfoldEnabled) {
+                                                0.dp
+                                            } else {
+                                                style.shadowElevation
+                                            },
+                                            border = style.border,
+                                        ) { popupContent() }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -193,7 +285,12 @@ class FoundationPopupMenu : StyledPopupMenu.Implementation {
             visible = expanded,
             onDismissRequest = onDismissRequest,
             modifier = modifier,
-            popupPositionProvider = StyledPopupDefaults.positionProvider(offset, expanded, placement),
+            popupPositionProvider = StyledPopupDefaults.positionProvider(
+                offset = offset,
+                isVisible = expanded,
+                placement = placement,
+                horizontalAlignment = horizontalAlignment,
+            ),
             properties = properties,
             style = style,
         ) {
@@ -218,9 +315,9 @@ private fun PopupMenuContent(
     header: (@Composable () -> Unit)?,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    Column(Modifier.heightIn(max = maxHeight)) {
+    Column(Modifier.fillMaxWidth().heightIn(max = maxHeight)) {
         header?.invoke()
-        StyledVerticalScrollbarContainer(
+        StyledVerticalScrollContainer(
             modifier = Modifier.weight(1f, fill = false).fillMaxWidth(),
             scrollState = scrollState,
         ) {

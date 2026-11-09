@@ -39,7 +39,7 @@ data class StyledColorScheme(
     internal val tertiaryDef: Definition = secondaryDef,
     internal val tertiarySurfaceDef: Definition = secondarySurfaceDef,
 ) {
-    /** A foreground/background color pair for one semantic role. */
+    /** A semantic color role with a color and its default foreground color. */
     @Immutable
     data class Definition(
         val color: Color,

@@ -10,10 +10,12 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.BoxScope
@@ -58,6 +60,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
@@ -73,6 +76,7 @@ import com.michaelflisar.composestyled.classes.IconComposable
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.ui.components.StyledIcon
 import com.michaelflisar.composestyled.ui.components.StyledIconButton
+import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.ui.components.StyledSurface
 import com.michaelflisar.composestyled.ui.internal.DialogActions
 import com.michaelflisar.composestyled.ui.internal.StyledPointerCursor
@@ -81,6 +85,10 @@ import com.michaelflisar.composestyled.ui.layout.LocalFloatingDialogEntry
 import com.michaelflisar.composestyled.ui.layout.LocalFloatingDialogHost
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
 import com.michaelflisar.composestyled.ui.primitives.StyledText
+
+private class FloatingWindowOutsideClickActions {
+    var minimize: (() -> Unit)? = null
+}
 
 @Composable
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class, InternalComposeStyledApi::class)
@@ -108,303 +116,395 @@ internal fun FoundationFloatingDialog(
     val host = LocalFloatingDialogHost.current
     val entry = LocalFloatingDialogEntry.current
     var dragInProgress by remember { mutableStateOf(false) }
-    BoxWithConstraints(Modifier.safeDrawingPadding().imePadding().fillMaxSize()) {
-        requireFloatingWindowSize(initialSize, minSize, edgeMargin)
-        requireFloatingPosition(style.initialPosition, "initialPosition")
-        style.initialBubblePosition?.let {
-            requireFloatingPosition(it, "initialBubblePosition")
+    var minimized by rememberSaveable { mutableStateOf(initiallyMinimized) }
+    val outsideClickActions = remember { FloatingWindowOutsideClickActions() }
+    BoxWithConstraints(Modifier.fillMaxSize()) {
+        val backgroundMode = style.backgroundMode
+        val interceptOutsideClick =
+            backgroundMode != StyledDialog.FloatingWindowBackgroundMode.Interactive
+        val showScrim = when (backgroundMode) {
+            StyledDialog.FloatingWindowBackgroundMode.Interactive -> false
+            is StyledDialog.FloatingWindowBackgroundMode.Block -> backgroundMode.showScrim
+            is StyledDialog.FloatingWindowBackgroundMode.Minimize -> backgroundMode.showScrim
+            is StyledDialog.FloatingWindowBackgroundMode.Dismiss -> backgroundMode.showScrim
         }
-        val areaWidth = (maxWidth - edgeMargin * 2).coerceAtLeast(0.dp)
-        val areaHeight = (maxHeight - edgeMargin * 2).coerceAtLeast(0.dp)
-        val effectiveMin = DpSize(
-            minSize.width.coerceAtMost(areaWidth),
-            minSize.height.coerceAtMost(areaHeight),
-        )
-        val startSize = DpSize(
-            initialSize.width.coerceIn(effectiveMin.width, areaWidth),
-            initialSize.height.coerceIn(effectiveMin.height, areaHeight),
-        )
-        val bubbleSize = DpSize(48.dp, 48.dp)
-        val availableSpace = DpSize(areaWidth, areaHeight)
-        val startPosition = style.initialPosition.resolve(
-            availableSpace,
-            startSize,
-            edgeMargin,
-            density,
-            layoutDirection,
-        ).clamp(edgeMargin, areaWidth, areaHeight, startSize)
-        val startBubblePosition = style.initialBubblePosition?.resolve(
-            availableSpace,
-            bubbleSize,
-            edgeMargin,
-            density,
-            layoutDirection,
-        )?.clamp(edgeMargin, areaWidth, areaHeight, bubbleSize) ?: DpOffset(
-            startPosition.x + (startSize.width - bubbleSize.width) / 2f,
-            startPosition.y + (startSize.height - bubbleSize.height) / 2f,
-        ).clamp(edgeMargin, areaWidth, areaHeight, bubbleSize)
-        var windowSize by rememberSaveable(stateSaver = DpSizeSaver) {
-            mutableStateOf(startSize)
-        }
-        var windowPosition by rememberSaveable(stateSaver = DpOffsetSaver) {
-            mutableStateOf(startPosition)
-        }
-        var bubblePosition by rememberSaveable(stateSaver = DpOffsetSaver) {
-            mutableStateOf(startBubblePosition)
-        }
-        var hasBubblePosition by rememberSaveable {
-            mutableStateOf(style.initialBubblePosition != null || initiallyMinimized)
-        }
-        var minimized by rememberSaveable { mutableStateOf(initiallyMinimized) }
-        var maximized by rememberSaveable { mutableStateOf(false) }
-        SideEffect {
-            val boundedSize = DpSize(
-                windowSize.width.coerceIn(effectiveMin.width, areaWidth),
-                windowSize.height.coerceIn(effectiveMin.height, areaHeight),
+        if (interceptOutsideClick && !minimized) {
+            Box(
+                Modifier.matchParentSize()
+                    .then(
+                        if (showScrim) Modifier.background(Color.Black.copy(alpha = 0.32f))
+                        else Modifier,
+                    )
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = {
+                            when (backgroundMode) {
+                                StyledDialog.FloatingWindowBackgroundMode.Interactive -> Unit
+                                is StyledDialog.FloatingWindowBackgroundMode.Block -> Unit
+                                is StyledDialog.FloatingWindowBackgroundMode.Minimize ->
+                                    outsideClickActions.minimize?.invoke()
+                                is StyledDialog.FloatingWindowBackgroundMode.Dismiss ->
+                                    onDismissRequest()
+                            }
+                        },
+                    )
+                    .semantics { hideFromAccessibility() },
             )
-            val boundedPosition = windowPosition.clamp(edgeMargin, areaWidth, areaHeight, boundedSize)
-            val boundedBubble = bubblePosition.clamp(
+        }
+        BoxWithConstraints(Modifier.safeDrawingPadding().imePadding().fillMaxSize()) {
+            requireFloatingWindowSize(initialSize, minSize, edgeMargin)
+            requireFloatingPosition(style.initialPosition, "initialPosition")
+            style.initialBubblePosition?.let {
+                requireFloatingPosition(it, "initialBubblePosition")
+            }
+            val areaWidth = (maxWidth - edgeMargin * 2).coerceAtLeast(0.dp)
+            val areaHeight = (maxHeight - edgeMargin * 2).coerceAtLeast(0.dp)
+            val effectiveMin = DpSize(
+                minSize.width.coerceAtMost(areaWidth),
+                minSize.height.coerceAtMost(areaHeight),
+            )
+            val startSize = DpSize(
+                initialSize.width.coerceIn(effectiveMin.width, areaWidth),
+                initialSize.height.coerceIn(effectiveMin.height, areaHeight),
+            )
+            val bubbleSize = DpSize(48.dp, 48.dp)
+            val availableSpace = DpSize(areaWidth, areaHeight)
+            val startPosition = style.initialPosition.resolve(
+                availableSpace,
+                startSize,
                 edgeMargin,
-                areaWidth,
-                areaHeight,
-                DpSize(48.dp, 48.dp),
-            )
-            if (boundedSize != windowSize) windowSize = boundedSize
-            if (boundedPosition != windowPosition) windowPosition = boundedPosition
-            if (boundedBubble != bubblePosition) bubblePosition = boundedBubble
-        }
-
-        val targetSize = when {
-            minimized -> bubbleSize
-            maximized -> DpSize(areaWidth, areaHeight)
-            else -> windowSize
-        }
-        val targetPosition = when {
-            minimized -> bubblePosition
-            maximized -> DpOffset(edgeMargin, edgeMargin)
-            else -> windowPosition
-        }
-        val visualSize = DpSize(
-            animateDpAsState(
-                targetSize.width,
-                if (dragInProgress) snap() else tween(220),
-                label = "floatingWindowWidth",
-            ).value,
-            animateDpAsState(
-                targetSize.height,
-                if (dragInProgress) snap() else tween(220),
-                label = "floatingWindowHeight",
-            ).value,
-        )
-        val visualPosition = DpOffset(
-            animateDpAsState(
-                targetPosition.x,
-                if (dragInProgress) snap() else tween(220),
-                label = "floatingWindowX",
-            ).value,
-            animateDpAsState(
-                targetPosition.y,
-                if (dragInProgress) snap() else tween(220),
-                label = "floatingWindowY",
-            ).value,
-        )
-        val bubble = style.bubble
-        val bubbleColor = bubble.containerColor ?: StyledTheme.colorScheme.surfaceVariant
-        val windowContentColor = StyledTheme.contentColorFor(containerColor)
-        val bubbleContentColor = bubble.contentColor ?: if (bubble.containerColor != null) {
-            StyledTheme.contentColorFor(bubbleColor)
-        } else {
-            windowContentColor
-        }
-        val visualColor by animateColorAsState(
-            if (minimized) bubbleColor else containerColor,
-            tween(220),
-            label = "floatingWindowColor",
-        )
-        val visualHeaderColor by animateColorAsState(
-            if (minimized) bubbleColor else StyledTheme.colorScheme.surfaceVariant,
-            tween(220),
-            label = "floatingWindowHeaderColor",
-        )
-        val visualContentColor by animateColorAsState(
-            if (minimized) bubbleContentColor else windowContentColor,
-            tween(220),
-            label = "floatingWindowContentColor",
-        )
-        val borderColor = bubble.borderColor ?: Color.Transparent
-        val visualBorderColor by animateColorAsState(
-            if (minimized) borderColor else borderColor.copy(alpha = 0f),
-            tween(220),
-            label = "floatingWindowBorderColor",
-        )
-        val visualShape = animatedWindowShape(shape, bubble.shape ?: shape, minimized, visualSize)
-        val visualElevation by animateDpAsState(
-            if (minimized) bubble.shadowElevation ?: 12.dp else 12.dp,
-            tween(220),
-            label = "floatingWindowElevation",
-        )
-
-        if (properties.dismissOnBackPress && !minimized) {
-            BackHandler(onBack = onDismissRequest)
-        }
-        val bringToFrontModifier = Modifier.pointerInput(host, entry) {
-            if (host != null && entry != null) {
-                awaitEachGesture {
-                    awaitFirstDown(pass = PointerEventPass.Initial)
-                    host.bringToFront(entry)
-                }
+                density,
+                layoutDirection,
+            ).clamp(edgeMargin, areaWidth, areaHeight, startSize)
+            val startBubblePosition = style.initialBubblePosition?.resolve(
+                availableSpace,
+                bubbleSize,
+                edgeMargin,
+                density,
+                layoutDirection,
+            )?.clamp(edgeMargin, areaWidth, areaHeight, bubbleSize) ?: DpOffset(
+                startPosition.x + (startSize.width - bubbleSize.width) / 2f,
+                startPosition.y + (startSize.height - bubbleSize.height) / 2f,
+            ).clamp(edgeMargin, areaWidth, areaHeight, bubbleSize)
+            var windowSize by rememberSaveable(stateSaver = DpSizeSaver) {
+                mutableStateOf(startSize)
             }
-        }
-        Box(
-            Modifier
-                .offset(visualPosition.x, visualPosition.y)
-                .size(visualSize)
-                .then(bringToFrontModifier),
-        ) {
-            StyledSurface(
-                modifier = Modifier.fillMaxSize().then(modifier),
-                shape = visualShape,
-                color = visualColor,
-                contentColor = visualContentColor,
-                border = if (bubble.borderColor != null) BorderStroke(1.dp, visualBorderColor) else null,
-                shadowElevation = visualElevation,
+            var windowPositionFraction by rememberSaveable(
+                stateSaver = FloatingPositionFractionSaver,
             ) {
-                Column(Modifier.fillMaxSize()) {
-                    Row(
-                        Modifier.fillMaxWidth().height(if (minimized) 48.dp else 44.dp)
-                            .background(visualHeaderColor),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Box(
-                            Modifier.weight(1f).fillMaxHeight()
-                            .pointerInput(style.draggable, minimized, maximized) {
-                                if (style.draggable && !maximized) {
-                                    detectDragGestures(
-                                        onDragStart = {
-                                            dragInProgress = true
-                                        },
-                                        onDragEnd = { dragInProgress = false },
-                                        onDragCancel = { dragInProgress = false },
-                                        ) { change, dragAmount ->
-                                            change.consume()
-                                            val delta = with(density) {
-                                                DpOffset(dragAmount.x.toDp(), dragAmount.y.toDp())
-                                            }
-                                            if (minimized) {
-                                                bubblePosition = DpOffset(
-                                                    bubblePosition.x + delta.x,
-                                                    bubblePosition.y + delta.y,
-                                                ).clamp(edgeMargin, areaWidth, areaHeight, bubbleSize)
-                                            } else {
-                                                windowPosition = DpOffset(
-                                                    windowPosition.x + delta.x,
-                                                    windowPosition.y + delta.y,
-                                                ).clamp(edgeMargin, areaWidth, areaHeight, windowSize)
-                                            }
-                                        }
-                                    }
-                                }
-                                .combinedClickable(
-                                    enabled = minimized || style.showMaximizeButton,
-                                    interactionSource = null,
-                                    indication = if (minimized) LocalIndication.current else null,
-                                    onClick = {
-                                        if (minimized) {
-                                            minimized = false
-                                        }
-                                    },
-                                    onDoubleClick = {
-                                        if (style.showMaximizeButton && !minimized) {
-                                            maximized = !maximized
-                                        }
-                                    },
-                                )
-                                .padding(
-                                    horizontal = if (minimized) 0.dp else StyledTheme.spacing.large,
-                                ),
-                            contentAlignment = if (minimized) {
-                                Alignment.Center
-                            } else {
-                                Alignment.CenterStart
-                            },
-                        ) {
-                            ProvideWindowTitle(title, minimized, style.icon)
-                        }
-                        if (!minimized) {
-                            if (style.showMinimizeButton) {
-                                WindowControlButton("Minimize", minimizeIcon) {
-                                    if (!hasBubblePosition) {
-                                        bubblePosition = DpOffset(
-                                            targetPosition.x + (targetSize.width - bubbleSize.width) / 2f,
-                                            targetPosition.y + (targetSize.height - bubbleSize.height) / 2f,
-                                        ).clamp(edgeMargin, areaWidth, areaHeight, bubbleSize)
-                                        hasBubblePosition = true
-                                    }
-                                    minimized = true
-                                }
-                            }
-                            if (style.showMaximizeButton) {
-                                WindowControlButton(
-                                    if (maximized) "Restore" else "Maximize",
-                                    if (maximized) restoreIcon else maximizeIcon,
-                                ) { maximized = !maximized }
-                            }
-                            if (style.showCloseButton) {
-                                WindowControlButton("Close", closeIcon, onDismissRequest)
-                            }
-                        }
-                    }
-                    Column(
-                        Modifier.fillMaxWidth()
-                            .weight(1f)
-                            .then(
-                                if (minimized) Modifier.height(0.dp).alpha(0f)
-                                else Modifier,
-                            ),
-                    ) {
-                        content(PaddingValues(StyledTheme.spacing.large))
-                    }
-                    if (!minimized && !buttons.isEmpty) {
-                        DialogActions(
-                            buttons,
-                            StyledDialog.Context.DialogAction,
-                            Modifier.fillMaxWidth().padding(
-                                start = StyledTheme.spacing.large,
-                                end = StyledTheme.spacing.large,
-                                bottom = StyledTheme.spacing.medium,
-                            ),
-                            positiveFirst = positiveActionFirst,
-                            itemSpacing = actionSpacing,
-                            rowSpacing = actionRowSpacing,
-                            stackPositiveFirst = stackPositiveActionFirst,
+                mutableStateOf(startPosition.toFraction(availableSpace, startSize, edgeMargin))
+            }
+            var bubblePositionFraction by rememberSaveable(
+                stateSaver = FloatingPositionFractionSaver,
+            ) {
+                mutableStateOf(startBubblePosition.toFraction(availableSpace, bubbleSize, edgeMargin))
+            }
+            var hasBubblePosition by rememberSaveable {
+                mutableStateOf(style.initialBubblePosition != null || initiallyMinimized)
+            }
+            var maximized by rememberSaveable { mutableStateOf(false) }
+            val windowPosition = windowPositionFraction.toPosition(availableSpace, windowSize, edgeMargin)
+            val bubblePosition = bubblePositionFraction.toPosition(availableSpace, bubbleSize, edgeMargin)
+            SideEffect {
+                val boundedSize = DpSize(
+                    windowSize.width.coerceIn(effectiveMin.width, areaWidth),
+                    windowSize.height.coerceIn(effectiveMin.height, areaHeight),
+                )
+                if (boundedSize != windowSize) windowSize = boundedSize
+            }
+    
+            val targetSize = when {
+                minimized -> bubbleSize
+                maximized -> DpSize(areaWidth, areaHeight)
+                else -> windowSize
+            }
+            val targetPosition = when {
+                minimized -> bubblePosition
+                maximized -> DpOffset(edgeMargin, edgeMargin)
+                else -> windowPosition
+            }
+            fun minimizeWindow() {
+                if (!hasBubblePosition) {
+                    bubblePositionFraction = DpOffset(
+                        targetPosition.x + (targetSize.width - bubbleSize.width) / 2f,
+                        targetPosition.y + (targetSize.height - bubbleSize.height) / 2f,
+                    ).clamp(edgeMargin, areaWidth, areaHeight, bubbleSize)
+                        .toFraction(
+                            availableSpace,
+                            bubbleSize,
+                            edgeMargin,
+                            bubblePositionFraction,
                         )
+                    hasBubblePosition = true
+                }
+                minimized = true
+            }
+            SideEffect { outsideClickActions.minimize = ::minimizeWindow }
+            val visualSize = DpSize(
+                animateDpAsState(
+                    targetSize.width,
+                    if (dragInProgress) snap() else tween(220),
+                    label = "floatingWindowWidth",
+                ).value,
+                animateDpAsState(
+                    targetSize.height,
+                    if (dragInProgress) snap() else tween(220),
+                    label = "floatingWindowHeight",
+                ).value,
+            )
+            val visualPosition = DpOffset(
+                animateDpAsState(
+                    targetPosition.x,
+                    if (dragInProgress) snap() else tween(220),
+                    label = "floatingWindowX",
+                ).value,
+                animateDpAsState(
+                    targetPosition.y,
+                    if (dragInProgress) snap() else tween(220),
+                    label = "floatingWindowY",
+                ).value,
+            )
+            val bubble = style.bubble
+            val bubbleColor = bubble.containerColor ?: StyledTheme.colorScheme.surfaceVariant
+            val windowContentColor = StyledTheme.contentColorFor(containerColor)
+            val bubbleContentColor = bubble.contentColor ?: if (bubble.containerColor != null) {
+                StyledTheme.contentColorFor(bubbleColor)
+            } else {
+                windowContentColor
+            }
+            val visualColor by animateColorAsState(
+                if (minimized) bubbleColor else containerColor,
+                tween(220),
+                label = "floatingWindowColor",
+            )
+            val visualHeaderColor by animateColorAsState(
+                if (minimized) bubbleColor else StyledTheme.colorScheme.surfaceVariant,
+                tween(220),
+                label = "floatingWindowHeaderColor",
+            )
+            val visualHeaderContentColor by animateColorAsState(
+                if (minimized) bubbleContentColor else
+                    StyledTheme.contentColorFor(StyledTheme.colorScheme.surfaceVariant),
+                tween(220),
+                label = "floatingWindowHeaderContentColor",
+            )
+            val visualContentColor by animateColorAsState(
+                if (minimized) bubbleContentColor else windowContentColor,
+                tween(220),
+                label = "floatingWindowContentColor",
+            )
+            val borderColor = bubble.borderColor ?: Color.Transparent
+            val visualBorderColor by animateColorAsState(
+                if (minimized) borderColor else borderColor.copy(alpha = 0f),
+                tween(220),
+                label = "floatingWindowBorderColor",
+            )
+            val visualShape = animatedWindowShape(shape, bubble.shape ?: shape, minimized, visualSize)
+            val visualElevation by animateDpAsState(
+                if (minimized) bubble.shadowElevation ?: 12.dp else 12.dp,
+                tween(220),
+                label = "floatingWindowElevation",
+            )
+    
+            if (properties.dismissOnBackPress && !minimized) {
+                BackHandler(onBack = onDismissRequest)
+            }
+            val bringToFrontModifier = Modifier.pointerInput(host, entry) {
+                if (host != null && entry != null) {
+                    awaitEachGesture {
+                        awaitFirstDown(pass = PointerEventPass.Initial)
+                        host.bringToFront(entry)
                     }
                 }
             }
-            if (style.resizable && !maximized && !minimized) {
-                FloatingResizeHandles(
-                    onDragStart = { edge ->
-                        dragInProgress = true
-                        host?.activePointerCursor = edge.pointerCursor
-                    },
-                    onDragEnd = {
-                        dragInProgress = false
-                        host?.activePointerCursor = null
-                    },
-                    onDragCancel = {
-                        dragInProgress = false
-                        host?.activePointerCursor = null
-                    },
-                    onDrag = { edge, deltaX, deltaY ->
-                        val delta = with(density) { DpOffset(deltaX.toDp(), deltaY.toDp()) }
-                        val resized = resizeWindow(
-                            edge, windowPosition, windowSize, delta, effectiveMin,
-                            DpSize(areaWidth, areaHeight), edgeMargin,
-                        )
-                        windowPosition = resized.first
-                        windowSize = resized.second
-                    },
-                )
+            Box(
+                Modifier
+                    .offset(visualPosition.x, visualPosition.y)
+                    .size(visualSize)
+                    .then(bringToFrontModifier),
+            ) {
+                StyledSurface(
+                    modifier = Modifier.fillMaxSize().then(modifier),
+                    shape = visualShape,
+                    color = visualColor,
+                    contentColor = visualContentColor,
+                    border = if (bubble.borderColor != null) BorderStroke(1.dp, visualBorderColor) else null,
+                    shadowElevation = visualElevation,
+                ) {
+                    Column(Modifier.fillMaxSize()) {
+                        Row(
+                            Modifier.fillMaxWidth().height(if (minimized) 48.dp else 44.dp)
+                                .background(visualHeaderColor),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Box(
+                                Modifier.weight(1f).fillMaxHeight()
+                                .pointerInput(style.draggable, minimized, maximized, availableSpace, windowSize, edgeMargin) {
+                                    if (style.draggable && !maximized) {
+                                        detectDragGestures(
+                                            onDragStart = {
+                                                dragInProgress = true
+                                            },
+                                            onDragEnd = { dragInProgress = false },
+                                            onDragCancel = { dragInProgress = false },
+                                            ) { change, dragAmount ->
+                                                change.consume()
+                                                val delta = with(density) {
+                                                    DpOffset(dragAmount.x.toDp(), dragAmount.y.toDp())
+                                                }
+                                                if (minimized) {
+                                                    val position = bubblePositionFraction.toPosition(
+                                                        availableSpace,
+                                                        bubbleSize,
+                                                        edgeMargin,
+                                                    )
+                                                    bubblePositionFraction = DpOffset(
+                                                        position.x + delta.x,
+                                                        position.y + delta.y,
+                                                    ).clamp(edgeMargin, areaWidth, areaHeight, bubbleSize)
+                                                        .toFraction(
+                                                            availableSpace,
+                                                            bubbleSize,
+                                                            edgeMargin,
+                                                            bubblePositionFraction,
+                                                        )
+                                                } else {
+                                                    val position = windowPositionFraction.toPosition(
+                                                        availableSpace,
+                                                        windowSize,
+                                                        edgeMargin,
+                                                    )
+                                                    windowPositionFraction = DpOffset(
+                                                        position.x + delta.x,
+                                                        position.y + delta.y,
+                                                    ).clamp(edgeMargin, areaWidth, areaHeight, windowSize)
+                                                        .toFraction(
+                                                            availableSpace,
+                                                            windowSize,
+                                                            edgeMargin,
+                                                            windowPositionFraction,
+                                                        )
+                                                }
+                                            }
+                                        }
+                                    }
+                                    .combinedClickable(
+                                        enabled = minimized || style.showMaximizeButton,
+                                        interactionSource = null,
+                                        indication = if (minimized) LocalIndication.current else null,
+                                        onClick = {
+                                            if (minimized) {
+                                                minimized = false
+                                            }
+                                        },
+                                        onDoubleClick = {
+                                            if (style.showMaximizeButton && !minimized) {
+                                                maximized = !maximized
+                                            }
+                                        },
+                                    )
+                                    .padding(
+                                        horizontal = if (minimized) 0.dp else StyledTheme.spacing.large,
+                                    ),
+                                contentAlignment = if (minimized) {
+                                    Alignment.Center
+                                } else {
+                                    Alignment.CenterStart
+                                },
+                            ) {
+                                UpdateStyledThemeLocals(contentColor = visualHeaderContentColor) {
+                                    ProvideWindowTitle(title, minimized, style.icon)
+                                }
+                            }
+                            if (!minimized) {
+                                if (style.showMinimizeButton) {
+                                    WindowControlButton(
+                                        "Minimize",
+                                        minimizeIcon,
+                                        visualHeaderContentColor,
+                                    ) {
+                                        minimizeWindow()
+                                    }
+                                }
+                                if (style.showMaximizeButton) {
+                                    WindowControlButton(
+                                        if (maximized) "Restore" else "Maximize",
+                                        if (maximized) restoreIcon else maximizeIcon,
+                                        visualHeaderContentColor,
+                                    ) { maximized = !maximized }
+                                }
+                                if (style.showCloseButton) {
+                                    WindowControlButton(
+                                        "Close",
+                                        closeIcon,
+                                        visualHeaderContentColor,
+                                        onDismissRequest,
+                                    )
+                                }
+                            }
+                        }
+                        Column(
+                            Modifier.fillMaxWidth()
+                                .weight(1f)
+                                .then(
+                                    if (minimized) Modifier.height(0.dp).alpha(0f)
+                                    else Modifier,
+                                ),
+                        ) {
+                            content(PaddingValues(StyledTheme.spacing.large))
+                        }
+                        if (!minimized && !buttons.isEmpty) {
+                            DialogActions(
+                                buttons,
+                                StyledDialog.Context.DialogAction,
+                                Modifier.fillMaxWidth().padding(
+                                    start = StyledTheme.spacing.large,
+                                    end = StyledTheme.spacing.large,
+                                    bottom = StyledTheme.spacing.medium,
+                                ),
+                                positiveFirst = positiveActionFirst,
+                                itemSpacing = actionSpacing,
+                                rowSpacing = actionRowSpacing,
+                                stackPositiveFirst = stackPositiveActionFirst,
+                            )
+                        }
+                    }
+                }
+                if (style.resizable && !maximized && !minimized) {
+                    FloatingResizeHandles(
+                        onDragStart = { edge ->
+                            dragInProgress = true
+                            host?.activePointerCursor = edge.pointerCursor
+                        },
+                        onDragEnd = {
+                            dragInProgress = false
+                            host?.activePointerCursor = null
+                        },
+                        onDragCancel = {
+                            dragInProgress = false
+                            host?.activePointerCursor = null
+                        },
+                        onDrag = { edge, deltaX, deltaY ->
+                            val delta = with(density) { DpOffset(deltaX.toDp(), deltaY.toDp()) }
+                            val resized = resizeWindow(
+                                edge,
+                                windowPositionFraction.toPosition(availableSpace, windowSize, edgeMargin),
+                                windowSize,
+                                delta,
+                                effectiveMin,
+                                DpSize(areaWidth, areaHeight), edgeMargin,
+                            )
+                            windowPositionFraction = resized.first.toFraction(
+                                availableSpace,
+                                resized.second,
+                                edgeMargin,
+                                windowPositionFraction,
+                            )
+                            windowSize = resized.second
+                        },
+                    )
+                }
             }
         }
     }
@@ -462,16 +562,18 @@ private fun ProvideWindowTitle(
 private fun WindowControlButton(
     description: String,
     icon: IconComposable,
+    tint: Color,
     onClick: () -> Unit,
 ) {
     StyledIconButton(
         onClick = onClick,
         modifier = Modifier.size(36.dp).semantics { contentDescription = description },
-        role = StyledIconButton.Role.Tertiary,
+        variant = StyledButton.Variant.Plain,
         icon = icon,
         contentDescription = description,
         iconSize = 16.dp,
         iconPaddingValues = androidx.compose.foundation.layout.PaddingValues(0.dp),
+        tint = tint,
     )
 }
 
@@ -539,12 +641,42 @@ private enum class ResizeEdge(
     BottomRight(right = true, bottom = true, pointerCursor = StyledPointerCursor.ResizeNorthWestSouthEast),
 }
 
-private data class DpOffset(val x: Dp, val y: Dp) {
+internal data class DpOffset(val x: Dp, val y: Dp) {
     fun clamp(margin: Dp, maxWidth: Dp, maxHeight: Dp, size: DpSize) = DpOffset(
         x.coerceIn(margin, margin + (maxWidth - size.width).coerceAtLeast(0.dp)),
         y.coerceIn(margin, margin + (maxHeight - size.height).coerceAtLeast(0.dp)),
     )
 }
+
+internal data class FloatingPositionFraction(val x: Float, val y: Float) {
+    fun toPosition(availableSpace: DpSize, itemSize: DpSize, margin: Dp) = DpOffset(
+        margin + (availableSpace.width - itemSize.width).coerceAtLeast(0.dp) * x.coerceIn(0f, 1f),
+        margin + (availableSpace.height - itemSize.height).coerceAtLeast(0.dp) * y.coerceIn(0f, 1f),
+    )
+}
+
+internal fun DpOffset.toFraction(
+    availableSpace: DpSize,
+    itemSize: DpSize,
+    margin: Dp,
+    previous: FloatingPositionFraction = FloatingPositionFraction(0f, 0f),
+) = FloatingPositionFraction(
+    x = normalizedCoordinate(
+        position = x,
+        margin = margin,
+        range = (availableSpace.width - itemSize.width).coerceAtLeast(0.dp),
+        previous = previous.x,
+    ),
+    y = normalizedCoordinate(
+        position = y,
+        margin = margin,
+        range = (availableSpace.height - itemSize.height).coerceAtLeast(0.dp),
+        previous = previous.y,
+    ),
+)
+
+private fun normalizedCoordinate(position: Dp, margin: Dp, range: Dp, previous: Float) =
+    if (range > 0.dp) ((position - margin) / range).coerceIn(0f, 1f) else previous
 
 private fun StyledDialog.FloatingPosition.resolve(
     availableSpace: DpSize,
@@ -573,9 +705,15 @@ private val DpSizeSaver: Saver<DpSize, List<Float>> = Saver(
     restore = { DpSize(it[0].dp, it[1].dp) },
 )
 
-private val DpOffsetSaver: Saver<DpOffset, List<Float>> = Saver(
-    save = { listOf(it.x.value, it.y.value) },
-    restore = { DpOffset(it[0].dp, it[1].dp) },
+private val FloatingPositionFractionSaver: Saver<FloatingPositionFraction, List<Float>> = Saver(
+    save = { listOf(1f, it.x, it.y) },
+    restore = {
+        if (it.size == 3 && it[0] == 1f) {
+            FloatingPositionFraction(it[1], it[2])
+        } else {
+            null
+        }
+    },
 )
 
 private fun resizeWindow(

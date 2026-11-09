@@ -16,9 +16,10 @@ val scaffoldColor = StyledTheme.colorScheme.surface
 val topBarColor = StyledTheme.colorScheme.primarySurface
 val bottomBarColor = StyledTheme.colorScheme.surfaceVariant
 
-SystemBarStyleEffect(
-    statusBar = systemBarIconStyleFor(topBarColor, scaffoldColor),
-    navigationBar = systemBarIconStyleFor(bottomBarColor, scaffoldColor),
+SystemBarStyleEffectIfNeeded(
+    statusBarColor = topBarColor,
+    navigationBarColor = bottomBarColor,
+    backgroundColor = scaffoldColor,
 )
 
 StyledScaffold(
@@ -101,7 +102,7 @@ horizontal padding (including side navigation) and padding for opaque bars on
 the viewport. Continue consuming the complete Scaffold padding on the content
 root so nested layouts do not apply the same insets again.
 
-`StyledVerticalScrollbarContainer` applies `contentPadding` inside its scrolling
+`StyledVerticalScrollContainer` applies `contentPadding` inside its scrolling
 content. This lets items scroll behind the overlay while keeping the first and
 last items fully reachable outside the bars at the scroll limits. Lazy lists
 can use the same split with their own `contentPadding`.
@@ -200,25 +201,31 @@ system bars outside the navigation slot.
 
 `StyledScaffold`, `StyledTopBar`, and `StyledBottomNavigationBar` do not
 automatically change system bars or report colors. Call
-`SystemBarStyleEffect` where the caller owns the window and pass styles computed
-from the same colors used by the visible bars. In the example above, a single
-effect controls both bars. For a transparent or semi-transparent bar,
-`systemBarIconStyleFor(color, background)` composites over the supplied
-underlay; use the Scaffold's actual container color as `background`. If no
-toolbar is present, use the Scaffold color for `statusBar`.
+`SystemBarStyleEffectIfNeeded` where the caller owns the window and pass the
+colors rendered behind each bar. It applies contrast-aware icon styles only in
+normal window mode. Its `backgroundColor` defaults to the theme surface; pass
+the Scaffold's actual container color when it differs. For a transparent or
+semi-transparent bar, `systemBarIconStyleFor(color, background)` composites the
+bar color over that underlay. If no toolbar is present, use the Scaffold color
+for `statusBarColor`. When the bar uses an explicit content color, pass it as
+`statusBarContentColor` or `navigationBarContentColor` so system-bar icons follow
+the same foreground; for a translucent theme role, derive it from the opaque
+role color with `StyledTheme.contentColorFor(roleColor)`.
+
+Use the lower-level `SystemBarStyleEffect` when you need explicit
+`SystemBarIconStyle` values or different window-mode behavior.
 
 On Android 10+, a styled bar also disables Android's contrast scrim
 (`isStatusBarContrastEnforced` / `isNavigationBarContrastEnforced`), so the bar
 color drawn behind three-button navigation stays visible. The previous values
 are restored when the effect leaves composition.
 
-The effect does not inspect window mode. Use `rememberWindowEnvironment()` to
-inspect `WindowEnvironment.mode` (`Normal`, `MultiWindow`, `PictureInPicture`,
-`Unknown`, or `Unsupported`) and decide whether to call the effect. Android
-reports split-screen and floating/freeform as `MultiWindow`; iOS reports
-reduced scene/window bounds where it can identify them. The effect restores the
-prior icon appearance when it leaves composition. Avoid overlapping effects
-that control the same bar in one native window.
+`SystemBarStyleEffect` does not inspect window mode; use
+`rememberWindowEnvironment()` to decide whether to call it. Android reports
+split-screen and floating/freeform as `MultiWindow`; iOS reports reduced
+scene/window bounds where it can identify them. The effect restores the prior
+icon appearance when it leaves composition. Avoid overlapping effects that
+control the same bar in one native window.
 
 On Android, the effect changes only icon appearance. It does not change bar
 backgrounds, insets, edge-to-edge behavior, or the OS contrast scrim.

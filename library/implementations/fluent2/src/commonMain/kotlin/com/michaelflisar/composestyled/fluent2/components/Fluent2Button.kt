@@ -42,6 +42,7 @@ import com.michaelflisar.composestyled.fluent2.FluentButtonColors
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.runtime.LocalStyledContext
 import com.michaelflisar.composestyled.runtime.StyledContext
+import com.michaelflisar.composestyled.tokens.LocalStyledContentColor
 import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
 import com.michaelflisar.composestyled.ui.components.StyledSnackbar
@@ -52,7 +53,7 @@ import com.michaelflisar.composestyled.ui.specials.StyledSidePane
 import com.michaelflisar.composestyled.ui.specials.StyledSwipeRevealActionBox
 
 class Fluent2Button internal constructor(
-    val roleMapping: RoleMapping,
+    val variantMapping: VariantMapping,
 ) : StyledButton.Implementation {
 
     override val defaults: StyledButton.Defaults
@@ -66,41 +67,44 @@ class Fluent2Button internal constructor(
 
         @Composable
         fun create(
-            roleMapping: RoleMapping = DefaultRoleMapping,
-        ) = remember(roleMapping) {
-            Fluent2Button(roleMapping)
+            variantMapping: VariantMapping = DefaultVariantMapping,
+        ) = remember(variantMapping) {
+            Fluent2Button(variantMapping)
         }
 
         // -------------
         // 2) mapping
         // -------------
 
-        typealias RoleMapping = (StyledButton.Role, StyledContext) -> Variant
+        typealias VariantMapping = (StyledButton.Variant, StyledContext) -> Variant
 
-        val DefaultRoleMapping: RoleMapping = { role, context ->
+        @OptIn(InternalComposeStyledApi::class)
+        val DefaultVariantMapping: VariantMapping = { variant, context ->
             when {
-                role == StyledButton.Role.Default && context is StyledDialog.ActionContext ->
+                variant == StyledButton.Variant.Auto &&
+                    context == StyledButton.Context.Dropdown -> Variant.Outline
+                variant == StyledButton.Variant.Auto && context is StyledDialog.ActionContext ->
                     when (context.slot) {
                         StyledDialog.ActionSlot.Positive -> Variant.Primary
                         StyledDialog.ActionSlot.Negative -> Variant.Secondary
                         StyledDialog.ActionSlot.Neutral -> Variant.Subtle
                     }
-                role == StyledButton.Role.Default &&
+                variant == StyledButton.Variant.Auto &&
                     context == StyledGroupBox.Context.Clickable -> Variant.Outline
-                role == StyledButton.Role.Default &&
+                variant == StyledButton.Variant.Auto &&
                     context == StyledSwipeRevealActionBox.Context.RevealAction -> Variant.Transparent
-                role == StyledButton.Role.Default &&
+                variant == StyledButton.Variant.Auto &&
                     context == StyledSidePane.Context.IconSlot -> Variant.Transparent
-                role == StyledButton.Role.Default &&
+                variant == StyledButton.Variant.Auto &&
                     context == StyledSnackbar.Context.SnackbarAction -> Variant.Transparent
-                role == StyledButton.Role.Default &&
+                variant == StyledButton.Variant.Auto &&
                     (context is StyledTopBar.Context ||
                         context == StyledMenuBar.Context.MenuItem) -> Variant.Transparent
-                else -> when (role) {
-                    StyledButton.Role.Default,
-                    StyledButton.Role.Primary -> Variant.Primary
-                    StyledButton.Role.Secondary -> Variant.Secondary
-                    StyledButton.Role.Tertiary -> Variant.Subtle
+                else -> when (variant) {
+                    StyledButton.Variant.Auto,
+                    StyledButton.Variant.Filled -> Variant.Primary
+                    StyledButton.Variant.Outlined -> Variant.Outline
+                    StyledButton.Variant.Plain -> Variant.Transparent
                 }
             }
         }
@@ -117,7 +121,7 @@ class Fluent2Button internal constructor(
     @OptIn(InternalComposeStyledApi::class)
     @Composable
     override fun Render(
-        role: StyledButton.Role,
+        variant: StyledButton.Variant,
         onClick: () -> Unit,
         modifier: Modifier,
         enabled: Boolean,
@@ -129,16 +133,16 @@ class Fluent2Button internal constructor(
         val context = LocalStyledContext.current
         Fluent2Button(
             onClick = onClick,
-            variant = roleMapping(role, context),
+            variant = variantMapping(variant, context),
             modifier = modifier,
             enabled = enabled,
             shape = shape,
             interactionSource = interactionSource,
             customization = customization,
-            defaultContentColor = if (role == StyledButton.Role.Default &&
+            defaultContentColor = if (variant == StyledButton.Variant.Auto &&
                 (context is StyledTopBar.Context ||
                     context == StyledMenuBar.Context.MenuItem)
-            ) StyledTheme.currentContentColor else null,
+            ) LocalStyledContentColor.current else null,
             content = content,
         )
     }
@@ -263,7 +267,7 @@ private fun Fluent2Button(
     }
 }
 
-private fun Modifier.fluentFocusIndicator(
+internal fun Modifier.fluentFocusIndicator(
     shape: Shape,
     outer: Color,
     inner: Color,

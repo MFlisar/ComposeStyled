@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.Dp
 import com.michaelflisar.composestyled.UpdateStyledThemeLocals
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
+import com.michaelflisar.composestyled.tokens.LocalStyledContentColor
 import com.michaelflisar.composestyled.ui.components.StyledSideNavigation
 import com.michaelflisar.composestyled.ui.components.StyledSideNavigationDefaults
 import com.michaelflisar.composestyled.ui.internal.LocalStyledSelectionColors
@@ -116,7 +117,7 @@ abstract class FoundationSideNavigation(
         val colors = LocalStyledSelectionColors.current
         val base = (if (selected) colors?.selectedContentColor else colors?.unselectedContentColor)
             ?.takeUnless { it == Color.Unspecified }
-            ?: if (selected) StyledTheme.colorScheme.primary else StyledTheme.currentContentColor
+            ?: if (selected) StyledTheme.colorScheme.primary else LocalStyledContentColor.current
         val foreground = if (enabled) base else base.copy(
             alpha = base.alpha * StyledTheme.colorScheme.disableFactors.content,
         )

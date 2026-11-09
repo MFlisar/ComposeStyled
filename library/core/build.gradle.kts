@@ -98,6 +98,7 @@ kotlin {
             // Compose + AndroidX
             api(libs.jetbrains.compose.components.resources)
             api(libs.jetbrains.compose.foundation)
+            implementation(libs.jetbrains.compose.ui.backhandler)
             api(libs.jetbrains.kotlinx.coroutines.core)
             api(libs.jetbrains.kotlinx.datetime)
 

@@ -41,6 +41,7 @@ class FoundationChip internal constructor(
     @Composable
     override fun Render(
         variant: StyledChip.Variant,
+        selectable: Boolean,
         selected: Boolean,
         onClick: () -> Unit,
         modifier: Modifier,
@@ -53,24 +54,32 @@ class FoundationChip internal constructor(
     ) {
         val colors = StyledTheme.colorScheme
         val source = interactionSource ?: remember { MutableInteractionSource() }
-        val active = variant == StyledChip.Variant.Selectable && selected
-        val contentColor = if (active) {
-            customization?.selectedContent?.resolve() ?: colors.onSecondarySurface
-        } else {
-            customization?.content?.resolve() ?: colors.onSurface
+        val active = selectable && selected
+        val filled = variant == StyledChip.Variant.Filled ||
+            (variant == StyledChip.Variant.Auto && !selectable)
+        val unselectedContainer = if (selectable) colors.surfaceVariant else colors.secondarySurface
+        val unselectedContent = if (selectable) colors.onSurfaceVariant else colors.onSecondarySurface
+        val customContainer = customization?.container?.resolve()
+        val customBorder = customization?.border?.resolve()
+        val contentColor = when {
+            active -> customization?.selectedContent?.resolve() ?: colors.onSecondarySurface
+            filled -> customization?.content?.resolve() ?: unselectedContent
+            else -> customization?.content?.resolve() ?: colors.onSurface
         }
-        val containerColor = if (active) {
-            customization?.selectedContainer?.resolve() ?: colors.secondarySurface
-        } else {
-            customization?.container?.resolve() ?: Color.Transparent
+        val containerColor = when {
+            active -> customization?.selectedContainer?.resolve() ?: colors.secondarySurface
+            customContainer != null -> customContainer
+            filled -> unselectedContainer
+            else -> Color.Transparent
         }
         val contentAlpha = if (enabled) 1f else colors.disableFactors.content
         val containerAlpha = if (enabled) 1f else colors.disableFactors.default
         val outlineAlpha = if (enabled) 1f else colors.disableFactors.outline
-        val borderColor = if (active) {
-            customization?.selectedBorder?.resolve()
-        } else {
-            customization?.border?.resolve() ?: colors.outline
+        val borderColor = when {
+            active -> customization?.selectedBorder?.resolve()
+            customBorder != null -> customBorder
+            filled -> null
+            else -> colors.outline
         }
         val itemModifier = modifier
             .defaultMinSize(minHeight = 32.dp)
@@ -88,7 +97,7 @@ class FoundationChip internal constructor(
                 }
             )
             .then(
-                if (variant == StyledChip.Variant.Selectable) {
+                if (selectable) {
                     Modifier.selectable(
                         selected = selected,
                         enabled = enabled,

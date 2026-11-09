@@ -5,11 +5,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Badge
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.foundation.components.FoundationBadgeLayout
-import com.michaelflisar.composestyled.material3.CopyMaterialThemeLocals
+import com.michaelflisar.composestyled.material3.ProvideStyledLocals
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.ui.components.StyledBadge
 
@@ -73,14 +69,11 @@ class Material3Badge internal constructor() : StyledBadge.Implementation {
                     Badge(modifier = Modifier.matchParentSize())
                     if (badge != null) {
                         Box(Modifier.padding(contentPadding)) {
-                            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onError) {
-                                ProvideTextStyle(textStyle) {
-                                    CopyMaterialThemeLocals(
-                                        contentColor = LocalContentColor.current,
-                                        content = badge,
-                                    )
-                                }
-                            }
+                            ProvideStyledLocals(
+                                contentColor = StyledTheme.colorScheme.onError,
+                                textStyle = textStyle,
+                                content = badge,
+                            )
                         }
                     }
                 }

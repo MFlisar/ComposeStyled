@@ -1,14 +1,14 @@
 # Number picker
 
 `StyledNumberPicker` is a compound control built from `StyledInput` and
-`StyledIconButton` with an explicit Tertiary role, so it follows the active theme without a separate
-renderer registration. Supply a `NumberParser` for parsing, formatting and step
-changes, and a `NumberValidator` for input validation. It supports controlled
-values, a `MutableState` overload, optional increment/decrement buttons and
-wrapping between the values in `overrun`. Inputs use `StyledInput` for the default style and `StyledAlternativeInput` for
-the alternative style. Number pickers provide matching
-`StyledNumberPicker` and `StyledAlternativeNumberPicker` functions, each with
-controlled and `MutableState` value overloads.
+`StyledIconButton` with an explicit Tertiary role, so it follows the active
+theme without a separate renderer registration. Supply a `NumberParser` for
+parsing, formatting and step changes, and a `NumberValidator` for input
+validation. It supports controlled values, a `MutableState` overload, optional
+increment/decrement buttons and wrapping between the values in `overrun`.
+Number pickers accept the input `Auto`, `Filled` and `Outlined` variants;
+`Auto` follows the filled Material 3 default, and
+`StyledOutlinedNumberPicker` fixes the input style to `Outlined`.
 
 Supported numeric types are `Int`, `Long`, `Float` and `Double`. Byte, Short and
 custom Number subclasses are rejected with `IllegalArgumentException`, including

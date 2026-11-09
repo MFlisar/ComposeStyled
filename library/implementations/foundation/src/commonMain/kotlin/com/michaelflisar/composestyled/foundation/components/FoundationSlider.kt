@@ -73,17 +73,22 @@ class FoundationSlider : StyledSlider.Implementation {
         val density = LocalDensity.current
         val thumbRadiusPx = with(density) { 10.dp.toPx() }
         val source = interactionSource ?: remember { MutableInteractionSource() }
+        var dragPosition by remember { mutableFloatStateOf(value) }
+        var dragOutput by remember { mutableFloatStateOf(value) }
         val dragState = rememberDraggableState { delta ->
             val usableWidth = width - thumbRadiusPx * 2f
             if (usableWidth > 0f) {
-                currentOnValueChange(
-                    snap(
-                        currentValue + delta / usableWidth *
-                            (valueRange.endInclusive - valueRange.start),
-                        valueRange,
-                        steps,
-                    )
+                dragPosition += delta / usableWidth *
+                    (valueRange.endInclusive - valueRange.start)
+                val value = snap(
+                    dragPosition,
+                    valueRange,
+                    steps,
                 )
+                if (value != dragOutput) {
+                    dragOutput = value
+                    currentOnValueChange(value)
+                }
             }
         }
         val dragged by source.collectIsDraggedAsState()
@@ -99,6 +104,10 @@ class FoundationSlider : StyledSlider.Implementation {
                 enabled = enabled,
                 interactionSource = source,
                 reverseDirection = layoutDirection == LayoutDirection.Rtl,
+                onDragStarted = {
+                    dragPosition = currentValue
+                    dragOutput = currentValue
+                },
                 onDragStopped = { currentOnValueChangeFinished?.invoke() },
             )
             .pointerInput(enabled, valueRange, steps) {

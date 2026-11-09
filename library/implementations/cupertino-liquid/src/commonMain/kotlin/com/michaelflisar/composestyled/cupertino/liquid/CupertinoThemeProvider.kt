@@ -9,6 +9,7 @@ import com.michaelflisar.composestyled.cupertino.liquid.components.CupertinoLiqu
 import com.michaelflisar.composestyled.cupertino.liquid.components.CupertinoLiquidButton
 import com.michaelflisar.composestyled.cupertino.liquid.components.CupertinoLiquidCard
 import com.michaelflisar.composestyled.cupertino.liquid.components.CupertinoLiquidChip
+import com.michaelflisar.composestyled.cupertino.liquid.components.CupertinoLiquidClickable
 import com.michaelflisar.composestyled.cupertino.liquid.components.CupertinoLiquidCheckbox
 import com.michaelflisar.composestyled.cupertino.liquid.components.CupertinoLiquidDropdownMenu
 import com.michaelflisar.composestyled.cupertino.liquid.components.CupertinoLiquidFloatingActionButton
@@ -73,6 +74,7 @@ fun cupertinoLiquidThemeDefinition(): StyledThemeDefinition {
 fun StyledRegistry.Builder.registerCupertinoLiquidComponents() {
     register(CupertinoLiquidBadge.create())
     register(CupertinoLiquidButton.create())
+    register(CupertinoLiquidClickable.create())
     register(CupertinoLiquidDialog.create())
     register(CupertinoLiquidBottomSheet.create())
     register(CupertinoLiquidChip.create())

@@ -9,7 +9,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.michaelflisar.composestyled.StyledTheme
+import com.michaelflisar.composestyled.material3.ProvideStyledLocals
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
+import com.michaelflisar.composestyled.tokens.LocalStyledContentColor
 import com.michaelflisar.composestyled.ui.internal.LocalStyledSelectionColors
 import com.michaelflisar.composestyled.ui.components.StyledTab
 
@@ -40,7 +42,16 @@ class Material3Tab internal constructor() : StyledTab.Implementation {
         val resolvedUnselectedContentColor = unselectedContentColor
             .takeUnless { it == Color.Unspecified }
             ?: selectionColors?.unselectedContentColor?.takeUnless { it == Color.Unspecified }
-            ?: StyledTheme.currentContentColor
+            ?: LocalStyledContentColor.current
+        val styledContentColor = (if (selected) {
+            resolvedSelectedContentColor
+        } else {
+            resolvedUnselectedContentColor
+        }).let { color ->
+            if (enabled) color else color.copy(
+                alpha = color.alpha * StyledTheme.colorScheme.disableFactors.content,
+            )
+        }
         Tab(
             selected = selected,
             onClick = onClick,
@@ -50,7 +61,13 @@ class Material3Tab internal constructor() : StyledTab.Implementation {
             selectedContentColor = resolvedSelectedContentColor,
             unselectedContentColor = resolvedUnselectedContentColor,
             interactionSource = interactionSource,
-            content = content,
+            content = {
+                ProvideStyledLocals(
+                    contentColor = styledContentColor,
+                    textStyle = StyledTheme.typography.labelLarge,
+                    content = { content() },
+                )
+            },
         )
     }
 }

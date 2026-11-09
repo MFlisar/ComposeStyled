@@ -1,11 +1,13 @@
 package com.michaelflisar.composestyled.ui.internal
 
 import androidx.compose.runtime.MutableState
+import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.utils.number.NumberUtil
 import kotlin.math.abs
 import kotlin.math.floor
 import kotlin.math.round
 
+@OptIn(InternalComposeStyledApi::class)
 internal class SliderScale<T>(
     val range: ClosedRange<T>,
     stepSize: T?,
@@ -119,6 +121,7 @@ internal class SliderScale<T>(
 }
 
 // MutableState is invariant: retain the caller's concrete standard range type on writeback.
+@OptIn(InternalComposeStyledApi::class)
 @Suppress("UNCHECKED_CAST")
 internal fun <T, R : ClosedRange<T>> rangeLike(template: R, start: T, end: T): R
     where T : Number, T : Comparable<T> {

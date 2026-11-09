@@ -69,6 +69,7 @@ fun StyledExpandableTopBar(
     val animatedTitleStyle = lerp(expandedTitleStyle, compactTitleStyle, fraction)
     val animatedContainerColor = lerpColor(expandedContainerColor, containerColor, fraction)
     val animatedContentColor = lerpColor(expandedContentColor, contentColor, fraction)
+    val titleStyleWithContentColor = animatedTitleStyle.copy(color = animatedContentColor)
     val density = LocalDensity.current
     val topInsetPx = windowInsets.getTop(density)
     val bottomInsetPx = windowInsets.getBottom(density)
@@ -167,7 +168,8 @@ fun StyledExpandableTopBar(
                             },
                         ) {
                             UpdateStyledThemeLocals(
-                                textStyle = animatedTitleStyle,
+                                contentColor = animatedContentColor,
+                                textStyle = titleStyleWithContentColor,
                                 content = title,
                             )
                         }

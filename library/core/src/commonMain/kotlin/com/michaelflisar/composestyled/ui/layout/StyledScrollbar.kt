@@ -130,9 +130,9 @@ fun StyledScrollbarIndicator(
 }
 
 /**
- * Adds shared vertical scrollbar layout to content that manages its own
- * scrolling. The container adds only the optional gutter; content controls
- * its own scrolling and sizing.
+ * Adds scrollbar layout to content that manages its own vertical scrolling.
+ * Use [StyledVerticalScrollContainer] when this composable should provide the
+ * scrolling instead.
  */
 @Composable
 fun StyledVerticalScrollbarLayout(
@@ -157,9 +157,9 @@ fun StyledVerticalScrollbarLayout(
 }
 
 /**
- * Adds shared horizontal scrollbar layout to content that manages its own
- * scrolling. The container adds only the optional gutter; content controls
- * its own scrolling and sizing.
+ * Adds scrollbar layout to content that manages its own horizontal scrolling.
+ * Use [StyledHorizontalScrollContainer] when this composable should provide
+ * the scrolling instead.
  */
 @Composable
 fun StyledHorizontalScrollbarLayout(
@@ -256,14 +256,16 @@ private fun ScrollbarContainer(
 
 /**
  * Scrolls row content horizontally and shows a matching scrollbar when the
- * local setting and the active theme allow it. The default local setting is on.
- * Do not wrap Styled lazy rows or horizontal grids, which already use the
- * shared scrollbar layout when the theme enables scrollbars.
+ * local setting and the active theme allow it (the local default is on). Use
+ * this when the container should provide scrolling; use
+ * [StyledHorizontalScrollbarLayout] for content that already manages its own
+ * scrolling. Do not wrap Styled lazy rows or horizontal grids, which already
+ * use the shared scrollbar layout.
  * [contentPadding] is applied inside the scrollable content, so start/end
  * padding scrolls with the content rather than reducing the viewport.
  */
 @Composable
-fun StyledHorizontalScrollbarContainer(
+fun StyledHorizontalScrollContainer(
     modifier: Modifier = Modifier,
     alignment: Alignment.Horizontal = Alignment.End,
     scrollState: ScrollState = rememberScrollState(),
@@ -290,14 +292,16 @@ fun StyledHorizontalScrollbarContainer(
 
 /**
  * Scrolls column content vertically and shows a matching scrollbar when the
- * local setting and the active theme allow it. The default local setting is on.
- * Do not wrap Styled lazy columns or vertical grids, which already use the
- * shared scrollbar layout when the theme enables scrollbars.
+ * local setting and the active theme allow it (the local default is on). Use
+ * this when the container should provide scrolling; use
+ * [StyledVerticalScrollbarLayout] for content that already manages its own
+ * scrolling. Do not wrap Styled lazy columns or vertical grids, which already
+ * use the shared scrollbar layout.
  * [contentPadding] is applied inside the scrollable content, so top/bottom
  * padding scrolls with the content rather than reducing the viewport.
  */
 @Composable
-fun StyledVerticalScrollbarContainer(
+fun StyledVerticalScrollContainer(
     modifier: Modifier = Modifier,
     alignment: Alignment.Vertical = Alignment.Bottom,
     scrollState: ScrollState = rememberScrollState(),

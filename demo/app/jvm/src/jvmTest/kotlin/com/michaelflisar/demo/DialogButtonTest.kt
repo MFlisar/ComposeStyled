@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -21,9 +22,11 @@ import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.click
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performMouseInput
 import androidx.compose.ui.test.performTouchInput
@@ -46,12 +49,17 @@ import com.michaelflisar.composestyled.material3.components.Material3IconButton
 import com.michaelflisar.composestyled.material3.layout.Material3Dialog
 import com.michaelflisar.composestyled.material3.rememberMaterial3ThemeProvider
 import com.michaelflisar.composestyled.platform.Platform
+import com.michaelflisar.composestyled.platform.PlatformDefaults
 import com.michaelflisar.composestyled.registry.StyledRegistry
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.runtime.LocalStyledContext
 import com.michaelflisar.composestyled.runtime.StyledContext
 import com.michaelflisar.composestyled.themes.StyledThemeAppearance
+import com.michaelflisar.composestyled.tokens.LocalStyledContentColor
+import com.michaelflisar.composestyled.tokens.LocalStyledTextStyle
+import com.michaelflisar.composestyled.tokens.StyledTypography
 import com.michaelflisar.composestyled.ui.components.StyledButton
+import com.michaelflisar.composestyled.ui.components.StyledIcon
 import com.michaelflisar.composestyled.ui.components.StyledIconButton
 import com.michaelflisar.composestyled.ui.layout.StyledBottomSheet
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
@@ -61,6 +69,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
+import org.junit.Assume.assumeTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
@@ -117,50 +126,62 @@ class DialogButtonTest(private val theme: Int) {
     }
 
     @Test
-    fun iconMappingsRespectDialogContextsWithoutChangingStandaloneButtons() {
-        val primary = StyledIconButton.Role.Primary
+    fun iconButtonVariantsRespectDialogContexts() {
+        val filled = StyledButton.Variant.Filled
         assertEquals(
             Material3IconButton.Variant.Filled,
-            Material3IconButton.DefaultRoleMapping(primary, StyledContext.Default),
+            Material3IconButton.DefaultVariantMapping(filled, StyledContext.Default),
         )
         assertEquals(
-            CupertinoFlatIconButton.Variant.FilledTonal,
-            CupertinoFlatIconButton.DefaultRoleMapping(primary, StyledContext.Default),
+            CupertinoFlatIconButton.Variant.Filled,
+            CupertinoFlatIconButton.DefaultVariantMapping(filled, StyledContext.Default),
         )
         assertEquals(
             Fluent2IconButton.Variant.Filled,
-            Fluent2IconButton.DefaultRoleMapping(primary, StyledContext.Default),
+            Fluent2IconButton.DefaultVariantMapping(filled, StyledContext.Default),
+        )
+        assertEquals(
+            Material3IconButton.Variant.Standard,
+            Material3IconButton.DefaultVariantMapping(StyledButton.Variant.Auto, StyledContext.Default),
+        )
+        assertEquals(
+            CupertinoFlatIconButton.Variant.FilledTonal,
+            CupertinoFlatIconButton.DefaultVariantMapping(StyledButton.Variant.Auto, StyledContext.Default),
+        )
+        assertEquals(
+            Fluent2IconButton.Variant.Filled,
+            Fluent2IconButton.DefaultVariantMapping(StyledButton.Variant.Auto, StyledContext.Default),
         )
         for (context in StyledDialog.Context.entries) {
             assertEquals(
                 Material3IconButton.Variant.Standard,
-                Material3IconButton.DefaultRoleMapping(StyledIconButton.Role.Default, context),
+                Material3IconButton.DefaultVariantMapping(StyledButton.Variant.Auto, context),
             )
             assertEquals(
                 CupertinoFlatIconButton.Variant.Standard,
-                CupertinoFlatIconButton.DefaultRoleMapping(StyledIconButton.Role.Default, context),
+                CupertinoFlatIconButton.DefaultVariantMapping(StyledButton.Variant.Auto, context),
             )
             assertEquals(
                 Fluent2IconButton.Variant.Standard,
-                Fluent2IconButton.DefaultRoleMapping(StyledIconButton.Role.Default, context),
+                Fluent2IconButton.DefaultVariantMapping(StyledButton.Variant.Auto, context),
             )
             assertEquals(
                 Material3IconButton.Variant.Filled,
-                Material3IconButton.DefaultRoleMapping(primary, context),
+                Material3IconButton.DefaultVariantMapping(filled, context),
             )
             assertEquals(
-                CupertinoFlatIconButton.Variant.FilledTonal,
-                CupertinoFlatIconButton.DefaultRoleMapping(primary, context),
+                CupertinoFlatIconButton.Variant.Filled,
+                CupertinoFlatIconButton.DefaultVariantMapping(filled, context),
             )
             assertEquals(
                 Fluent2IconButton.Variant.Filled,
-                Fluent2IconButton.DefaultRoleMapping(primary, context),
+                Fluent2IconButton.DefaultVariantMapping(filled, context),
             )
         }
     }
 
     @Test
-    fun dialogDefaultRolesUseThemeAndActionSlotPolicies() {
+    fun dialogAutoVariantsUseThemeAndActionSlotPolicies() {
         val expectedFluentVariants = mapOf(
             StyledDialog.ActionSlot.Positive to Fluent2Button.Variant.Primary,
             StyledDialog.ActionSlot.Negative to Fluent2Button.Variant.Secondary,
@@ -171,19 +192,19 @@ class DialogButtonTest(private val theme: Int) {
                 val actionContext = StyledDialog.ActionContext(context, slot)
                 assertEquals(
                     Material3Button.Variant.Text,
-                    Material3Button.DefaultRoleMapping(StyledButton.Role.Default, actionContext),
+                    Material3Button.DefaultVariantMapping(StyledButton.Variant.Auto, actionContext),
                 )
                 assertEquals(
                     CupertinoFlatButton.Variant.Plain,
-                    CupertinoFlatButton.DefaultRoleMapping(StyledButton.Role.Default, actionContext),
+                    CupertinoFlatButton.DefaultVariantMapping(StyledButton.Variant.Auto, actionContext),
                 )
                 assertEquals(
                     expectedFluentVariants.getValue(slot),
-                    Fluent2Button.DefaultRoleMapping(StyledButton.Role.Default, actionContext),
+                    Fluent2Button.DefaultVariantMapping(StyledButton.Variant.Auto, actionContext),
                 )
                 assertEquals(
                     Material3Button.Variant.Primary,
-                    Material3Button.DefaultRoleMapping(StyledButton.Role.Primary, actionContext),
+                    Material3Button.DefaultVariantMapping(StyledButton.Variant.Filled, actionContext),
                 )
             }
         }
@@ -340,12 +361,100 @@ class DialogButtonTest(private val theme: Int) {
     }
 
     @Test
+    fun floatingWindowScrimMinimizesOnOutsideClickAndRestoresBackgroundInteraction() =
+        runDesktopComposeUiTest(width = 1000, height = 800) {
+            val state = dialogStateOf(true)
+            var backgroundClicks = 0
+            setContent {
+                Theme {
+                    Box(Modifier.fillMaxSize()) {
+                        StyledButton(onClick = { backgroundClicks++ }) {
+                            StyledText("Background action")
+                        }
+                        StyledDialog(
+                            state = state,
+                            style = StyledDialog.Style.FloatingWindow(
+                                backgroundMode = StyledDialog.FloatingWindowBackgroundMode.Minimize(
+                                    showScrim = true,
+                                ),
+                                icon = icon,
+                            ),
+                            title = { StyledText("Inspector") },
+                        ) {
+                            StyledText("Floating body")
+                        }
+                    }
+                }
+            }
+
+            val backgroundCenter = onNodeWithText("Background action")
+                .fetchSemanticsNode().boundsInRoot.center
+            onRoot().performTouchInput { click(backgroundCenter) }
+            mainClock.advanceTimeBy(300)
+            waitForIdle()
+            onNodeWithContentDescription("Restore window").assertIsDisplayed()
+            runOnIdle {
+                assertEquals(0, backgroundClicks)
+                assertTrue(state.visible)
+            }
+
+            onRoot().performTouchInput { click(backgroundCenter) }
+            runOnIdle { assertEquals(1, backgroundClicks) }
+        }
+
+    @Test
+    fun floatingWindowOutsideClickCanBeBlockedOrDismissed() =
+        runDesktopComposeUiTest(width = 1000, height = 800) {
+            val state = dialogStateOf(true)
+            var behavior by mutableStateOf<StyledDialog.FloatingWindowBackgroundMode>(
+                StyledDialog.FloatingWindowBackgroundMode.Block(showScrim = true),
+            )
+            var backgroundClicks = 0
+            setContent {
+                Theme {
+                    Box(Modifier.fillMaxSize()) {
+                        StyledButton(onClick = { backgroundClicks++ }) {
+                            StyledText("Background action")
+                        }
+                        StyledDialog(
+                            state = state,
+                            style = StyledDialog.Style.FloatingWindow(
+                                backgroundMode = behavior,
+                            ),
+                        ) {
+                            StyledText("Floating body")
+                        }
+                    }
+                }
+            }
+
+            val backgroundCenter = onNodeWithText("Background action")
+                .fetchSemanticsNode().boundsInRoot.center
+            onRoot().performTouchInput { click(backgroundCenter) }
+            runOnIdle {
+                assertEquals(0, backgroundClicks)
+                assertTrue(state.visible)
+                behavior = StyledDialog.FloatingWindowBackgroundMode.Dismiss(showScrim = true)
+                state.show()
+            }
+            waitForIdle()
+            onRoot().performTouchInput { click(backgroundCenter) }
+            runOnIdle {
+                assertEquals(0, backgroundClicks)
+                assertFalse(state.visible)
+            }
+        }
+
+    @Test
     fun floatingWindowUsesItsNestedThemeColors() = runDesktopComposeUiTest(
         width = 1000, height = 800,
     ) {
         var expectedColor by mutableStateOf(Color.Unspecified)
         var expectedHeaderColor by mutableStateOf(Color.Unspecified)
+        var expectedHeaderContentColor by mutableStateOf(Color.Unspecified)
         var expectedContentColor by mutableStateOf(Color.Unspecified)
+        var titleContentColor by mutableStateOf(Color.Unspecified)
+        var minimizeIconTint by mutableStateOf(Color.Unspecified)
         var bubble by mutableStateOf(StyledDialog.BubbleConfig())
         val state = dialogStateOf(true)
         val tintedIcon: IconComposable = { _, modifier, tint ->
@@ -357,13 +466,21 @@ class DialogButtonTest(private val theme: Int) {
                 rememberFluent2ThemeProvider(),
                 themeAppearance = StyledThemeAppearance.Light,
             ) {
-                Theme(appearance = StyledThemeAppearance.Dark) {
+                Theme(
+                    customization = {
+                        register(RecordingStyledIcon { description, tint ->
+                            if (description == "Minimize") minimizeIconTint = tint
+                        })
+                    },
+                    appearance = StyledThemeAppearance.Dark,
+                ) {
                     expectedColor = if (theme == 0) {
                         MaterialTheme.colorScheme.surfaceContainerHigh
                     } else {
                         StyledTheme.colorScheme.surface
                     }
                     expectedHeaderColor = StyledTheme.colorScheme.surfaceVariant
+                    expectedHeaderContentColor = StyledTheme.contentColorFor(expectedHeaderColor)
                     expectedContentColor = StyledTheme.contentColorFor(expectedColor)
                     StyledDialog(
                         state = state,
@@ -375,12 +492,21 @@ class DialogButtonTest(private val theme: Int) {
                             icon = tintedIcon,
                             bubble = bubble,
                         ),
+                        title = {
+                            val contentColor = LocalStyledContentColor.current
+                            SideEffect { titleContentColor = contentColor }
+                            StyledText("Inspector")
+                        },
                     ) {}
                 }
             }
         }
 
         waitForIdle()
+        runOnIdle {
+            assertEquals(expectedHeaderContentColor, titleContentColor)
+            assertEquals(expectedHeaderContentColor, minimizeIconTint)
+        }
         val image = onNodeWithTag("Floating window").captureToImage().toPixelMap()
         assertEquals(expectedColor, image[300, 150])
         onNodeWithContentDescription("Minimize").performClick()
@@ -438,6 +564,86 @@ class DialogButtonTest(private val theme: Int) {
     }
 
     @Test
+    fun fullscreenToolbarIconsInheritTitleContentColor() = runDesktopComposeUiTest(
+        width = 1000, height = 800,
+    ) {
+        assumeTrue("Fluent 2 keeps fullscreen actions in the footer", theme != 2)
+
+        var titleContentColor by mutableStateOf(Color.Unspecified)
+        val tintedIcon: IconComposable = { _, modifier, tint ->
+            Box(modifier.background(tint).testTag("fullscreen toolbar icon"))
+        }
+        setContent {
+            Theme {
+                StyledDialog(
+                    state = dialogStateOf(true),
+                    style = StyledDialog.Style.Fullscreen(),
+                    title = {
+                        val contentColor = LocalStyledContentColor.current
+                        SideEffect { titleContentColor = contentColor }
+                        StyledText("Settings")
+                    },
+                    buttons = StyledDialog.Buttons(
+                        positive = StyledDialog.Button(
+                            {}, "Save", tintedIcon, StyledDialog.ButtonPresentation.Icon,
+                        ),
+                    ),
+                ) { StyledText("Body") }
+            }
+        }
+
+        @Test
+        fun expandableFullscreenTitleUsesHeaderContentColor() = runDesktopComposeUiTest(
+            width = 1000, height = 800,
+        ) {
+            var titleStyleColor by mutableStateOf(Color.Unspecified)
+            var titleContentColor by mutableStateOf(Color.Unspecified)
+            var expectedContentColor by mutableStateOf(Color.Unspecified)
+            setContent {
+                val baseTypography = PlatformDefaults.typography(Platform.JvmWindows)
+                val typography = baseTypography.copy(
+                    headlineMedium = baseTypography.headlineMedium.copy(color = Color.Red),
+                )
+                Theme(typography = typography) {
+                    val headerContentColor = StyledTheme.contentColorFor(StyledTheme.colorScheme.surface)
+                    SideEffect { expectedContentColor = headerContentColor }
+                    StyledDialog(
+                        state = dialogStateOf(true),
+                        style = StyledDialog.Style.Fullscreen(
+                            expandableHeader = StyledDialog.Style.Fullscreen.ExpandableHeader(),
+                        ),
+                        title = {
+                            val styleColor = LocalStyledTextStyle.current.color
+                            val contentColor = LocalStyledContentColor.current
+                            SideEffect {
+                                titleStyleColor = styleColor
+                                titleContentColor = contentColor
+                            }
+                            StyledText("Expandable title")
+                        },
+                    ) { StyledText("Body") }
+                }
+            }
+
+            onNodeWithText("Expandable title").assertIsDisplayed()
+            runOnIdle {
+                assertEquals(expectedContentColor, titleContentColor)
+                assertEquals(expectedContentColor, titleStyleColor)
+            }
+        }
+
+        val iconNode = onNodeWithTag("fullscreen toolbar icon", useUnmergedTree = true)
+        iconNode.assertIsDisplayed()
+        val icon = iconNode.captureToImage().toPixelMap()
+        runOnIdle {
+            assertEquals(
+                titleContentColor,
+                icon[icon.width / 2, icon.height / 2],
+            )
+        }
+    }
+
+    @Test
     fun explicitIconWorksInEveryDialogAndEmbeddedSheetWithRegistryContext() =
         runDesktopComposeUiTest(width = 1000, height = 800) {
             var style by mutableStateOf<StyledDialog.Style>(styles.first())
@@ -467,7 +673,7 @@ class DialogButtonTest(private val theme: Int) {
                                 assertEquals(StyledContext.Default, LocalStyledContext.current)
                                 StyledIconButton(
                                     onClick = {},
-                                    role = StyledIconButton.Role.Primary,
+                                    variant = StyledButton.Variant.Filled,
                                     icon = icon,
                                     contentDescription = "Body action",
                                 )
@@ -660,6 +866,7 @@ class DialogButtonTest(private val theme: Int) {
     private fun Theme(
         customization: (@Composable StyledRegistry.Builder.() -> Unit)? = null,
         appearance: StyledThemeAppearance = StyledThemeAppearance.System,
+        typography: StyledTypography? = null,
         content: @Composable () -> Unit,
     ) {
         val provider: StyledThemeProvider = when (theme) {
@@ -671,25 +878,49 @@ class DialogButtonTest(private val theme: Int) {
             Platform.JvmWindows,
             provider,
             themeAppearance = appearance,
+            typography = typography ?: PlatformDefaults.typography(Platform.JvmWindows),
             customization = customization,
             content = content,
         )
     }
 
+    private class RecordingStyledIcon(
+        private val record: (String?, Color) -> Unit,
+    ) : StyledIcon.Implementation {
+        override val key
+            get() = StyledIcon.Key
+
+        @Composable
+        override fun Render(
+            icon: IconComposable,
+            modifier: Modifier,
+            contentDescription: String?,
+            tint: Color,
+        ) {
+            SideEffect { record(contentDescription, tint) }
+            com.michaelflisar.composestyled.classes.IconComposable(
+                icon = icon,
+                contentDescription = contentDescription,
+                modifier = modifier,
+                tint = tint,
+            )
+        }
+    }
+
     @Composable
     private fun RecordingIcons(record: (StyledContext) -> Unit): StyledIconButton.Implementation =
         when (theme) {
-            0 -> Material3IconButton.create { role, context ->
+            0 -> Material3IconButton.create { variant, context ->
                 record(context)
-                Material3IconButton.DefaultRoleMapping(role, context)
+                Material3IconButton.DefaultVariantMapping(variant, context)
             }
-            1 -> CupertinoFlatIconButton.create { role, context ->
+            1 -> CupertinoFlatIconButton.create { variant, context ->
                 record(context)
-                CupertinoFlatIconButton.DefaultRoleMapping(role, context)
+                CupertinoFlatIconButton.DefaultVariantMapping(variant, context)
             }
-            else -> Fluent2IconButton.create { role, context ->
+            else -> Fluent2IconButton.create { variant, context ->
                 record(context)
-                Fluent2IconButton.DefaultRoleMapping(role, context)
+                Fluent2IconButton.DefaultVariantMapping(variant, context)
             }
         }
 }

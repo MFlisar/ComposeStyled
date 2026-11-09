@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -47,18 +48,35 @@ class CupertinoLiquidListItem internal constructor() : StyledListItem.Implementa
         minHeight: Dp,
         contentPadding: PaddingValues,
         spacing: Dp,
-        customization: StyledListItem.Customization?,
+        containerColor: Color,
+        contentColor: Color,
+        supportingColor: Color,
+        borderColor: Color,
         leading: (@Composable () -> Unit)?,
         actions: (@Composable RowScope.() -> Unit)?,
         content: StyledListItem.Content,
     ) {
         FoundationListItem(
-            onClick, modifier, enabled, interactionSource, shape,
-            minHeight, 60.dp, 76.dp, contentPadding, spacing,
-            customization, leading, actions, content,
-            containerColor = StyledTheme.colorScheme.surface,
-            contentColor = StyledTheme.colorScheme.onSurface,
-            supportingColor = StyledTheme.colorScheme.onSurfaceVariant,
+            onClick = onClick,
+            modifier = modifier,
+            enabled = enabled,
+            interactionSource = interactionSource,
+            shape = shape,
+            minHeight = minHeight,
+            twoLineMinHeight = 60.dp,
+            threeLineMinHeight = 76.dp,
+            contentPadding = contentPadding,
+            spacing = spacing,
+            containerColor = containerColor,
+            contentColor = contentColor,
+            supportingColor = supportingColor,
+            borderColor = borderColor,
+            leading = leading,
+            actions = actions,
+            content = content,
+            defaultContainerColor = StyledTheme.colorScheme.surface,
+            defaultContentColor = StyledTheme.colorScheme.onSurface,
+            defaultSupportingColor = StyledTheme.supportingOnColor(StyledTheme.colorScheme.surface),
             headlineStyle = StyledTheme.typography.bodyLarge,
             supportingStyle = StyledTheme.typography.bodySmall,
             overlineStyle = StyledTheme.typography.labelSmall,

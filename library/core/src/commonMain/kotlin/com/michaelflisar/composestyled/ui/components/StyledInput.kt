@@ -51,7 +51,7 @@ object StyledInput {
     // -------------
 
     val Key = StyledKey<Implementation>("StyledInput")
-        val DefaultsKey = StyledKey<Defaults>("StyledInputDefaults")
+    val DefaultsKey = StyledKey<Defaults>("StyledInputDefaults")
     // -------------
     // 2) defaults
     // -------------
@@ -69,12 +69,14 @@ object StyledInput {
     // 3) roles / variants / context
     // -------------
 
-    enum class Variant { Default, Alternative }
+    enum class Variant { Auto, Filled, Outlined }
 
     enum class Context : StyledContext {
         LeadingContent,
         TrailingContent,
         NumberPicker,
+        /** The input is used to filter dropdown items. */
+        DropdownFilter,
     }
 
     // -------------
@@ -198,6 +200,7 @@ object StyledInputDefaults {
         } else null
     }
 
+    @OptIn(InternalComposeStyledApi::class)
     @Composable
     internal fun <T : Number> trailingNumericIcon(
         value: T,
@@ -247,11 +250,13 @@ fun StyledInput(
         onValueChange = { value.value = TextFieldValue(it) },
     ),
     supportingText: @Composable (() -> Unit)? = null,
+    variant: StyledInput.Variant = StyledInput.Variant.Auto,
 ) {
     StyledInput(
         value = value.value,
         onValueChange = { value.value = it },
         modifier = modifier,
+        variant = variant,
         enabled = enabled,
         readOnly = readOnly,
         interactionEnabled = interactionEnabled,
@@ -304,11 +309,128 @@ fun StyledInput(
         onValueChange = { onValueChange(TextFieldValue(it)) },
     ),
     supportingText: @Composable (() -> Unit)? = null,
+    variant: StyledInput.Variant = StyledInput.Variant.Auto,
 ) {
     StyledInputImpl(
         value = value,
         onValueChange = onValueChange,
         modifier = modifier,
+        variant = variant,
+        enabled = enabled,
+        readOnly = readOnly,
+        interactionEnabled = interactionEnabled,
+        isError = isError,
+        errorMessage = errorMessage,
+        singleLine = singleLine,
+        minLines = minLines,
+        maxLines = maxLines,
+        shape = shape,
+        customization = customization,
+        textStyle = textStyle,
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
+        visualTransformation = visualTransformation,
+        interactionSource = interactionSource,
+        label = label,
+        placeholder = placeholder,
+        leadingIcon = leadingIcon,
+        trailingIcon = trailingIcon,
+        supportingText = supportingText,
+    )
+}
+
+/** State-backed [TextFieldValue] input with a fixed outlined style. */
+@Composable
+@kotlin.jvm.JvmName("StyledOutlinedInputTextFieldValueState")
+fun StyledOutlinedInput(
+    value: MutableState<TextFieldValue>,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    readOnly: Boolean = false,
+    interactionEnabled: Boolean = enabled,
+    isError: Boolean = false,
+    errorMessage: String? = null,
+    singleLine: Boolean = true,
+    minLines: Int = 1,
+    maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
+    shape: Shape = StyledInputDefaults.shape,
+    customization: StyledInput.Customization? = null,
+    textStyle: TextStyle = StyledTheme.typography.bodyMedium,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    interactionSource: MutableInteractionSource? = null,
+    label: @Composable (() -> Unit)? = null,
+    placeholder: @Composable (() -> Unit)? = null,
+    leadingIcon: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = StyledInputDefaults.trailingIcon(
+        value = value.value.text,
+        onValueChange = { value.value = TextFieldValue(it) },
+    ),
+    supportingText: @Composable (() -> Unit)? = null,
+) {
+    StyledOutlinedInput(
+        value = value.value,
+        onValueChange = { value.value = it },
+        modifier = modifier,
+        enabled = enabled,
+        readOnly = readOnly,
+        interactionEnabled = interactionEnabled,
+        isError = isError,
+        errorMessage = errorMessage,
+        singleLine = singleLine,
+        minLines = minLines,
+        maxLines = maxLines,
+        shape = shape,
+        customization = customization,
+        textStyle = textStyle,
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
+        visualTransformation = visualTransformation,
+        interactionSource = interactionSource,
+        label = label,
+        placeholder = placeholder,
+        leadingIcon = leadingIcon,
+        trailingIcon = trailingIcon,
+        supportingText = supportingText,
+    )
+}
+
+/** Controlled [TextFieldValue] input with a fixed outlined style. */
+@Composable
+fun StyledOutlinedInput(
+    value: TextFieldValue,
+    onValueChange: (TextFieldValue) -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    readOnly: Boolean = false,
+    interactionEnabled: Boolean = enabled,
+    isError: Boolean = false,
+    errorMessage: String? = null,
+    singleLine: Boolean = true,
+    minLines: Int = 1,
+    maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
+    shape: Shape = StyledInputDefaults.shape,
+    customization: StyledInput.Customization? = null,
+    textStyle: TextStyle = StyledTheme.typography.bodyMedium,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    interactionSource: MutableInteractionSource? = null,
+    label: @Composable (() -> Unit)? = null,
+    placeholder: @Composable (() -> Unit)? = null,
+    leadingIcon: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = StyledInputDefaults.trailingIcon(
+        value = value.text,
+        onValueChange = { onValueChange(TextFieldValue(it)) },
+    ),
+    supportingText: @Composable (() -> Unit)? = null,
+) {
+    StyledInput(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = modifier,
+        variant = StyledInput.Variant.Outlined,
         enabled = enabled,
         readOnly = readOnly,
         interactionEnabled = interactionEnabled,
@@ -359,11 +481,13 @@ fun StyledInput(
         onValueChange = { value.value = it }
     ),
     supportingText: @Composable (() -> Unit)? = null,
+    variant: StyledInput.Variant = StyledInput.Variant.Auto,
 ) {
     StyledInput(
         value = value.value,
         onValueChange = { value.value = it },
         modifier = modifier,
+        variant = variant,
         enabled = enabled,
         readOnly = readOnly,
         isError = isError,
@@ -415,11 +539,13 @@ fun StyledInput(
         onValueChange = onValueChange
     ),
     supportingText: @Composable (() -> Unit)? = null,
+    variant: StyledInput.Variant = StyledInput.Variant.Auto,
 ) {
     StyledInputImpl(
         value = value,
         onValueChange = onValueChange,
         modifier = modifier,
+        variant = variant,
         enabled = enabled,
         readOnly = readOnly,
         interactionEnabled = interactionEnabled,
@@ -440,13 +566,12 @@ fun StyledInput(
         leadingIcon = leadingIcon,
         trailingIcon = trailingIcon,
         supportingText = supportingText,
-        variant = StyledInput.Variant.Default,
     )
 }
 
-/** State-backed input using the active theme's alternative input treatment. */
+/** State-backed input with a fixed outlined style. */
 @Composable
-fun StyledAlternativeInput(
+fun StyledOutlinedInput(
     value: MutableState<String>,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
@@ -472,7 +597,7 @@ fun StyledAlternativeInput(
     ),
     supportingText: @Composable (() -> Unit)? = null,
 ) {
-    StyledAlternativeInput(
+    StyledOutlinedInput(
         value = value.value,
         onValueChange = { value.value = it },
         modifier = modifier,
@@ -498,9 +623,9 @@ fun StyledAlternativeInput(
     )
 }
 
-/** Controlled string input using the active theme's alternative input treatment. */
+/** Controlled string input with a fixed outlined style. */
 @Composable
-fun StyledAlternativeInput(
+fun StyledOutlinedInput(
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -552,10 +677,11 @@ fun StyledAlternativeInput(
         leadingIcon = leadingIcon,
         trailingIcon = trailingIcon,
         supportingText = supportingText,
-        variant = StyledInput.Variant.Alternative,
+        variant = StyledInput.Variant.Outlined,
     )
 }
 
+@OptIn(InternalComposeStyledApi::class)
 @Composable
 fun <T : Number> StyledInput(
     value: MutableState<T>,
@@ -585,6 +711,7 @@ fun <T : Number> StyledInput(
         onValueChange = { value.value = it }
     ),
     supportingText: @Composable (() -> Unit)? = null,
+    variant: StyledInput.Variant = StyledInput.Variant.Auto,
 ) {
     StyledInput(
         value = value.value,
@@ -593,6 +720,7 @@ fun <T : Number> StyledInput(
             value.value = it ?: NumberUtil.zero(value.value)
         },
         modifier = modifier,
+        variant = variant,
         enabled = enabled,
         readOnly = readOnly,
         isError = isError,
@@ -615,6 +743,7 @@ fun <T : Number> StyledInput(
     )
 }
 
+@OptIn(InternalComposeStyledApi::class)
 @Composable
 fun <T : Number> StyledInput(
     value: T,
@@ -644,11 +773,13 @@ fun <T : Number> StyledInput(
         onValueChange = { onValueChange(it) }
     ),
     supportingText: @Composable (() -> Unit)? = null,
+    variant: StyledInput.Variant = StyledInput.Variant.Auto,
 ) {
     StyledInputImpl(
         value = value,
         onValueChange = onValueChange,
         modifier = modifier,
+        variant = variant,
         enabled = enabled,
         readOnly = readOnly,
         isError = isError,
@@ -668,12 +799,13 @@ fun <T : Number> StyledInput(
         leadingIcon = leadingIcon,
         trailingIcon = trailingIcon,
         supportingText = supportingText,
-        variant = StyledInput.Variant.Default,
     )
 }
 
+/** State-backed numeric input with a fixed outlined style. */
+@OptIn(InternalComposeStyledApi::class)
 @Composable
-fun <T : Number> StyledAlternativeInput(
+fun <T : Number> StyledOutlinedInput(
     value: MutableState<T>,
     modifier: Modifier = Modifier,
     valid: MutableState<Boolean> = remember { mutableStateOf(true) },
@@ -702,7 +834,7 @@ fun <T : Number> StyledAlternativeInput(
     ),
     supportingText: @Composable (() -> Unit)? = null,
 ) {
-    StyledAlternativeInput(
+    StyledOutlinedInput(
         value = value.value,
         onValueChange = {
             valid.value = it != null
@@ -731,8 +863,10 @@ fun <T : Number> StyledAlternativeInput(
     )
 }
 
+/** Controlled numeric input with a fixed outlined style. */
+@OptIn(InternalComposeStyledApi::class)
 @Composable
-fun <T : Number> StyledAlternativeInput(
+fun <T : Number> StyledOutlinedInput(
     value: T,
     onValueChange: (T?) -> Unit = {},
     modifier: Modifier = Modifier,
@@ -784,10 +918,11 @@ fun <T : Number> StyledAlternativeInput(
         leadingIcon = leadingIcon,
         trailingIcon = trailingIcon,
         supportingText = supportingText,
-        variant = StyledInput.Variant.Alternative,
+        variant = StyledInput.Variant.Outlined,
     )
 }
 
+@OptIn(InternalComposeStyledApi::class)
 @Composable
 fun <T : Number> StyledOptionalInput(
     value: MutableState<T?>,
@@ -818,6 +953,7 @@ fun <T : Number> StyledOptionalInput(
         onValueChange = { value.value = it }
     ),
     supportingText: @Composable (() -> Unit)? = null,
+    variant: StyledInput.Variant = StyledInput.Variant.Auto,
 ) {
     StyledOptionalInput(
         value = value.value,
@@ -827,6 +963,7 @@ fun <T : Number> StyledOptionalInput(
             value.value = it
         },
         modifier = modifier,
+        variant = variant,
         enabled = enabled,
         readOnly = readOnly,
         isError = isError,
@@ -849,6 +986,7 @@ fun <T : Number> StyledOptionalInput(
     )
 }
 
+@OptIn(InternalComposeStyledApi::class)
 @Composable
 fun <T : Number> StyledOptionalInput(
     value: T?,
@@ -879,12 +1017,14 @@ fun <T : Number> StyledOptionalInput(
         onValueChange = { onValueChange(it) }
     ),
     supportingText: @Composable (() -> Unit)? = null,
+    variant: StyledInput.Variant = StyledInput.Variant.Auto,
 ) {
     StyledOptionalInputImpl(
         value = value,
         sample = sample,
         onValueChange = onValueChange,
         modifier = modifier,
+        variant = variant,
         enabled = enabled,
         readOnly = readOnly,
         isError = isError,
@@ -904,12 +1044,13 @@ fun <T : Number> StyledOptionalInput(
         leadingIcon = leadingIcon,
         trailingIcon = trailingIcon,
         supportingText = supportingText,
-        variant = StyledInput.Variant.Default,
     )
 }
 
+/** State-backed optional numeric input with a fixed outlined style. */
+@OptIn(InternalComposeStyledApi::class)
 @Composable
-fun <T : Number> StyledAlternativeOptionalInput(
+fun <T : Number> StyledOutlinedOptionalInput(
     value: MutableState<T?>,
     sample: T,
     modifier: Modifier = Modifier,
@@ -939,7 +1080,7 @@ fun <T : Number> StyledAlternativeOptionalInput(
     ),
     supportingText: @Composable (() -> Unit)? = null,
 ) {
-    StyledAlternativeOptionalInput(
+    StyledOutlinedOptionalInput(
         value = value.value,
         sample = sample,
         onValueChange = {
@@ -971,8 +1112,10 @@ fun <T : Number> StyledAlternativeOptionalInput(
 
 // -------------------------
 
+/** Controlled optional numeric input with a fixed outlined style. */
+@OptIn(InternalComposeStyledApi::class)
 @Composable
-fun <T : Number> StyledAlternativeOptionalInput(
+fun <T : Number> StyledOutlinedOptionalInput(
     value: T?,
     sample: T,
     onValueChange: (T?) -> Unit = {},
@@ -1026,7 +1169,7 @@ fun <T : Number> StyledAlternativeOptionalInput(
         leadingIcon = leadingIcon,
         trailingIcon = trailingIcon,
         supportingText = supportingText,
-        variant = StyledInput.Variant.Alternative,
+        variant = StyledInput.Variant.Outlined,
     )
 }
 
@@ -1039,7 +1182,7 @@ private fun StyledInputImpl(
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    variant: StyledInput.Variant = StyledInput.Variant.Default,
+    variant: StyledInput.Variant = StyledInput.Variant.Auto,
     enabled: Boolean = true,
     readOnly: Boolean = false,
     interactionEnabled: Boolean = enabled,
@@ -1115,7 +1258,7 @@ private fun StyledInputImpl(
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
     modifier: Modifier = Modifier,
-    variant: StyledInput.Variant = StyledInput.Variant.Default,
+    variant: StyledInput.Variant = StyledInput.Variant.Auto,
     enabled: Boolean = true,
     readOnly: Boolean = false,
     interactionEnabled: Boolean = enabled,
@@ -1137,7 +1280,7 @@ private fun StyledInputImpl(
     trailingIcon: @Composable (() -> Unit)? = null,
     supportingText: @Composable (() -> Unit)? = null,
 ) {
-    require(minLines > 0 && maxLines >= minLines) {
+    require(minLines in 1..maxLines) {
         "minLines must be positive and maxLines must be at least minLines"
     }
     val scopedLeadingIcon: (@Composable () -> Unit)? = leadingIcon?.let { content ->
@@ -1195,7 +1338,7 @@ private fun StyledInputImpl(
 private fun StyledInputImpl(
     value: MutableState<String>,
     modifier: Modifier = Modifier,
-    variant: StyledInput.Variant = StyledInput.Variant.Default,
+    variant: StyledInput.Variant = StyledInput.Variant.Auto,
     enabled: Boolean = true,
     readOnly: Boolean = false,
     isError: Boolean = false,
@@ -1246,12 +1389,13 @@ private fun StyledInputImpl(
     )
 }
 
+@OptIn(InternalComposeStyledApi::class)
 @Composable
 private fun <T : Number> StyledInputImpl(
     value: T,
     onValueChange: (T?) -> Unit = {},
     modifier: Modifier = Modifier,
-    variant: StyledInput.Variant = StyledInput.Variant.Default,
+    variant: StyledInput.Variant = StyledInput.Variant.Auto,
     enabled: Boolean = true,
     readOnly: Boolean = false,
     isError: Boolean = false,
@@ -1312,13 +1456,14 @@ private fun <T : Number> StyledInputImpl(
     )
 }
 
+@OptIn(InternalComposeStyledApi::class)
 @Composable
 private fun <T : Number> StyledOptionalInputImpl(
     value: T?,
     sample: T,
     onValueChange: (T?) -> Unit = {},
     modifier: Modifier = Modifier,
-    variant: StyledInput.Variant = StyledInput.Variant.Default,
+    variant: StyledInput.Variant = StyledInput.Variant.Auto,
     enabled: Boolean = true,
     readOnly: Boolean = false,
     isError: Boolean = false,
@@ -1380,12 +1525,13 @@ private fun <T : Number> StyledOptionalInputImpl(
     )
 }
 
+@OptIn(InternalComposeStyledApi::class)
 @Composable
 private fun <T : Number> StyledInputImpl(
     value: MutableState<T>,
     modifier: Modifier = Modifier,
     valid: MutableState<Boolean> = remember { mutableStateOf(true) },
-    variant: StyledInput.Variant = StyledInput.Variant.Default,
+    variant: StyledInput.Variant = StyledInput.Variant.Auto,
     enabled: Boolean = true,
     readOnly: Boolean = false,
     isError: Boolean = false,
@@ -1441,13 +1587,14 @@ private fun <T : Number> StyledInputImpl(
     )
 }
 
+@OptIn(InternalComposeStyledApi::class)
 @Composable
 private fun <T : Number> StyledOptionalInputImpl(
     value: MutableState<T?>,
     sample: T,
     modifier: Modifier = Modifier,
     valid: MutableState<Boolean> = remember { mutableStateOf(true) },
-    variant: StyledInput.Variant = StyledInput.Variant.Default,
+    variant: StyledInput.Variant = StyledInput.Variant.Auto,
     enabled: Boolean = true,
     readOnly: Boolean = false,
     isError: Boolean = false,

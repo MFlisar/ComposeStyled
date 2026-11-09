@@ -9,6 +9,7 @@ import com.michaelflisar.composestyled.cupertino.flat.components.CupertinoFlatBo
 import com.michaelflisar.composestyled.cupertino.flat.components.CupertinoFlatButton
 import com.michaelflisar.composestyled.cupertino.flat.components.CupertinoFlatCard
 import com.michaelflisar.composestyled.cupertino.flat.components.CupertinoFlatChip
+import com.michaelflisar.composestyled.cupertino.flat.components.CupertinoFlatClickable
 import com.michaelflisar.composestyled.cupertino.flat.components.CupertinoFlatCheckbox
 import com.michaelflisar.composestyled.cupertino.flat.components.CupertinoFlatDropdownMenu
 import com.michaelflisar.composestyled.cupertino.flat.components.CupertinoFlatFloatingActionButton
@@ -73,6 +74,7 @@ fun cupertinoFlatThemeDefinition(): StyledThemeDefinition {
 fun StyledRegistry.Builder.registerCupertinoFlatComponents() {
     register(CupertinoFlatBadge.create())
     register(CupertinoFlatButton.create())
+    register(CupertinoFlatClickable.create())
     register(CupertinoFlatDialog.create())
     register(CupertinoFlatBottomSheet.create())
     register(CupertinoFlatChip.create())

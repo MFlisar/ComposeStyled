@@ -106,6 +106,16 @@ modules:
     - artifact-id: theme-nature
       description: nature color themes
       path: library/themes/nature
+    - artifact-id: styled-composedialog
+      description: a styled implementation for ComposeDialogs
+      path: library/libraries/composedialogs
+    - artifact-id: styled-composepreferences
+      description: a styled implementation for ComposePreferences
+      path: library/libraries/composepreferences
+    - artifact-id: styled-composetable
+      description: a styled implementation for ComposeTable
+      path: library/libraries/composetable
+
   # XCFrameworks [name, path, targets (ios, macos)]
   xcframeworks: []
 

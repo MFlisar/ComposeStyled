@@ -13,8 +13,8 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.StyledTheme
-import com.michaelflisar.composestyled.classes.CustomColors
 import com.michaelflisar.composestyled.classes.ColorToken
+import com.michaelflisar.composestyled.classes.CustomColors
 import com.michaelflisar.composestyled.classes.IconComposable
 import com.michaelflisar.composestyled.classes.asColorToken
 import com.michaelflisar.composestyled.registry.LocalStyledRegistry
@@ -44,19 +44,7 @@ object StyledIconButton {
     )
 
     // -------------
-    // 3) roles / variants / context
-    // -------------
-
-    enum class Role {
-        /** Lets the active theme choose a style that fits the current context. */
-        Default,
-        Primary,
-        Secondary,
-        Tertiary,
-    }
-
-    // -------------
-    // 4) customization
+    // 3) customization
     // -------------
 
     @Immutable
@@ -66,7 +54,7 @@ object StyledIconButton {
     )
 
     // -------------
-    // 5) implementation
+    // 4) implementation
     // -------------
 
     interface Implementation : StyledComponent<Implementation>, StyledComponentWithDefaults<Defaults> {
@@ -78,7 +66,7 @@ object StyledIconButton {
 
         @Composable
         fun Render(
-            role: Role,
+            variant: StyledButton.Variant,
             onClick: () -> Unit,
             modifier: Modifier,
             enabled: Boolean,
@@ -124,14 +112,14 @@ object StyledIconButtonDefaults {
 // public API
 // -------------------------
 
-/** A theme-rendered icon-only action button with an explicit semantic [role]. */
+/** A theme-rendered icon-only action button; [variant] defaults to a context-aware style. */
 @Composable
 fun StyledIconButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource? = null,
-    role: StyledIconButton.Role = StyledIconButton.Role.Default,
+    variant: StyledButton.Variant = StyledButton.Variant.Auto,
     // defaults / customisation
     shape: Shape = StyledIconButtonDefaults.shape(),
     customization: StyledIconButton.Customization? = null,
@@ -139,7 +127,7 @@ fun StyledIconButton(
     content: @Composable () -> Unit,
 ) {
     StyledIconButtonImpl(
-        role = role,
+        variant = variant,
         onClick = onClick,
         modifier = modifier,
         enabled = enabled,
@@ -150,14 +138,16 @@ fun StyledIconButton(
     )
 }
 
-/** Convenience overload that renders [icon] with its accessibility description and optional padding. */
+/**
+ * Convenience overload that renders [icon] with its accessibility description and optional padding.
+ */
 @Composable
 fun StyledIconButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource? = null,
-    role: StyledIconButton.Role = StyledIconButton.Role.Default,
+    variant: StyledButton.Variant = StyledButton.Variant.Auto,
     // defaults / customisation
     shape: Shape = StyledIconButtonDefaults.shape(),
     customization: StyledIconButton.Customization? = null,
@@ -169,7 +159,7 @@ fun StyledIconButton(
     tint: Color? = null,
 ) {
     StyledIconButtonImpl(
-        role = role,
+        variant = variant,
         onClick = onClick,
         modifier = modifier,
         enabled = enabled,
@@ -190,13 +180,121 @@ fun StyledIconButton(
     )
 }
 
+/** A theme-rendered filled icon button. Its visual variant is fixed. */
+@Composable
+fun StyledIconFilledButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    interactionSource: MutableInteractionSource? = null,
+    shape: Shape = StyledIconButtonDefaults.shape(),
+    customization: StyledIconButton.Customization? = null,
+    content: @Composable () -> Unit,
+) {
+    StyledIconButton(
+        onClick = onClick,
+        modifier = modifier,
+        enabled = enabled,
+        interactionSource = interactionSource,
+        variant = StyledButton.Variant.Filled,
+        shape = shape,
+        customization = customization,
+        content = content,
+    )
+}
+
+/** A theme-rendered filled icon button for an [icon] with optional padding. */
+@Composable
+fun StyledIconFilledButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    interactionSource: MutableInteractionSource? = null,
+    shape: Shape = StyledIconButtonDefaults.shape(),
+    customization: StyledIconButton.Customization? = null,
+    icon: IconComposable,
+    contentDescription: String? = null,
+    iconSize: Dp? = StyledTheme.sizes.iconSize,
+    iconPaddingValues: PaddingValues = PaddingValues(0.dp),
+    tint: Color? = null,
+) {
+    StyledIconButton(
+        onClick = onClick,
+        modifier = modifier,
+        enabled = enabled,
+        interactionSource = interactionSource,
+        variant = StyledButton.Variant.Filled,
+        shape = shape,
+        customization = customization,
+        icon = icon,
+        contentDescription = contentDescription,
+        iconSize = iconSize,
+        iconPaddingValues = iconPaddingValues,
+        tint = tint,
+    )
+}
+
+/** A theme-rendered outlined icon button. Its visual variant is fixed. */
+@Composable
+fun StyledIconOutlinedButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    interactionSource: MutableInteractionSource? = null,
+    shape: Shape = StyledIconButtonDefaults.shape(),
+    customization: StyledIconButton.Customization? = null,
+    content: @Composable () -> Unit,
+) {
+    StyledIconButton(
+        onClick = onClick,
+        modifier = modifier,
+        enabled = enabled,
+        interactionSource = interactionSource,
+        variant = StyledButton.Variant.Outlined,
+        shape = shape,
+        customization = customization,
+        content = content,
+    )
+}
+
+/** A theme-rendered outlined icon button for an [icon] with optional padding. */
+@Composable
+fun StyledIconOutlinedButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    interactionSource: MutableInteractionSource? = null,
+    shape: Shape = StyledIconButtonDefaults.shape(),
+    customization: StyledIconButton.Customization? = null,
+    icon: IconComposable,
+    contentDescription: String? = null,
+    iconSize: Dp? = StyledTheme.sizes.iconSize,
+    iconPaddingValues: PaddingValues = PaddingValues(0.dp),
+    tint: Color? = null,
+) {
+    StyledIconButton(
+        onClick = onClick,
+        modifier = modifier,
+        enabled = enabled,
+        interactionSource = interactionSource,
+        variant = StyledButton.Variant.Outlined,
+        shape = shape,
+        customization = customization,
+        icon = icon,
+        contentDescription = contentDescription,
+        iconSize = iconSize,
+        iconPaddingValues = iconPaddingValues,
+        tint = tint,
+    )
+}
+
 // -------------------------
 // private API
 // -------------------------
 
 @Composable
 private fun StyledIconButtonImpl(
-    role: StyledIconButton.Role,
+    variant: StyledButton.Variant,
     onClick: () -> Unit,
     modifier: Modifier,
     enabled: Boolean,
@@ -208,7 +306,7 @@ private fun StyledIconButtonImpl(
     val buttonModifier = modifier.withStyledInputPointerIcon()
     val buttonEnabled = enabled && LocalStyledInputEnabled.current
     LocalStyledRegistry.current[StyledIconButton.Key].Render(
-        role = role,
+        variant = variant,
         onClick = onClick,
         modifier = buttonModifier,
         enabled = buttonEnabled,

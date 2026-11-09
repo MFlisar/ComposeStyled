@@ -26,7 +26,8 @@ object StyledCard {
     // -------------
 
     val Key = StyledKey<Implementation>("StyledCard")
-        val DefaultsKey = StyledKey<Defaults>("StyledCardDefaults")
+    val DefaultsKey = StyledKey<Defaults>("StyledCardDefaults")
+
     // -------------
     // 2) defaults
     // -------------
@@ -41,10 +42,7 @@ object StyledCard {
     // 3) roles / variants / context
     // -------------
 
-    enum class Variant {
-        Standard,
-        Alternative,
-    }
+    enum class Variant { Auto, Filled, Outlined }
 
     // -------------
     // 4) customization
@@ -109,7 +107,6 @@ object StyledCardDefaults {
         border: ColorToken,
         elevation: Dp? = null,
     ) = StyledCard.Customization(colors, border, elevation)
-
 }
 
 // -------------------------
@@ -127,10 +124,11 @@ fun StyledCard(
     enabled: Boolean = true,
     applyContentPadding: Boolean = true,
     interactionSource: MutableInteractionSource? = null,
+    variant: StyledCard.Variant = StyledCard.Variant.Auto,
     content: @Composable () -> Unit,
 ) {
     StyledCardImpl(
-        variant = StyledCard.Variant.Standard,
+        variant = variant,
         modifier = modifier,
         shape = shape,
         contentPadding = contentPadding,
@@ -143,9 +141,9 @@ fun StyledCard(
     )
 }
 
-/** Alternative-style variant of [StyledCard]. */
+/** Outlined-style variant of [StyledCard]. */
 @Composable
-fun StyledAlternativeCard(
+fun StyledOutlinedCard(
     modifier: Modifier = Modifier,
     shape: Shape = StyledCardDefaults.shape,
     contentPadding: PaddingValues = StyledCardDefaults.contentPadding,
@@ -157,7 +155,7 @@ fun StyledAlternativeCard(
     content: @Composable () -> Unit,
 ) {
     StyledCardImpl(
-        variant = StyledCard.Variant.Alternative,
+        variant = StyledCard.Variant.Outlined,
         modifier = modifier,
         shape = shape,
         contentPadding = contentPadding,

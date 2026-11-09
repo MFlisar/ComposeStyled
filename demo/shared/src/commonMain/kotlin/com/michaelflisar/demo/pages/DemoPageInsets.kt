@@ -30,10 +30,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.classes.toIconComposable
-import com.michaelflisar.composestyled.platform.SystemBarStyleEffect
-import com.michaelflisar.composestyled.platform.WindowMode
-import com.michaelflisar.composestyled.platform.rememberWindowEnvironment
-import com.michaelflisar.composestyled.platform.systemBarIconStyleFor
+import com.michaelflisar.composestyled.platform.SystemBarStyleEffectIfNeeded
 import com.michaelflisar.composestyled.ui.components.StyledBottomNavigationBar
 import com.michaelflisar.composestyled.ui.components.StyledFloatingActionButton
 import com.michaelflisar.composestyled.ui.components.StyledIcon
@@ -46,7 +43,7 @@ import com.michaelflisar.composestyled.ui.layout.StyledColumn
 import com.michaelflisar.composestyled.ui.layout.StyledRow
 import com.michaelflisar.composestyled.ui.layout.StyledScaffold
 import com.michaelflisar.composestyled.ui.layout.StyledScaffoldDefaults
-import com.michaelflisar.composestyled.ui.layout.StyledVerticalScrollbarContainer
+import com.michaelflisar.composestyled.ui.layout.StyledVerticalScrollContainer
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 import kotlin.math.roundToInt
 
@@ -84,18 +81,11 @@ internal fun DemoPageInsets(
     val zeroInsets = WindowInsets(0, 0, 0, 0)
     val defaultContentInsets = StyledScaffoldDefaults.contentWindowInsets
 
-    if (rememberWindowEnvironment().mode == WindowMode.Normal) {
-        SystemBarStyleEffect(
-            statusBar = systemBarIconStyleFor(
-                if (showTopBar.value) TopBarColor else ScaffoldPaddingColor,
-                ScaffoldPaddingColor,
-            ),
-            navigationBar = systemBarIconStyleFor(
-                if (showBottomBar.value) BottomBarColor else ScaffoldPaddingColor,
-                ScaffoldPaddingColor,
-            ),
-        )
-    }
+    SystemBarStyleEffectIfNeeded(
+        statusBarColor = if (showTopBar.value) TopBarColor else ScaffoldPaddingColor,
+        navigationBarColor = if (showBottomBar.value) BottomBarColor else ScaffoldPaddingColor,
+        backgroundColor = ScaffoldPaddingColor,
+    )
 
     StyledScaffold(
         modifier = Modifier.fillMaxSize(),
@@ -222,7 +212,7 @@ private fun InsetsContent(
                     .then(if (nestedInsets) Modifier.windowInsetsPadding(WindowInsets.safeDrawing) else Modifier)
                     .background(NestedContentColor),
             ) {
-                StyledVerticalScrollbarContainer(
+                StyledVerticalScrollContainer(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(StyledTheme.padding.content),

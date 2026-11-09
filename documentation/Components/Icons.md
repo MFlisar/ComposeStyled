@@ -16,9 +16,11 @@ StyledIcon(
 
 The Core set contains `Add`, `NavigateBack`, `Cancel`, `Check`, `Clear`,
 `Close`, `Delete`, `Dropdown`, `Edit`, `Menu`, `More`, `Remove`, `Search`,
-`NavigateForward`, `Submenu`, `Refresh`, `Save`, `Home`, `Settings`, `Account`,
-`Notifications`, `Info`, `Help`, `Favorite`, `Share`, `Filter`, `Sort`, `Copy`,
-`Paste` and `Cut`. The IDs are semantic: `Remove` is a minus action while
+`NavigateForward`, `Submenu`, `SubmenuBack`, `Refresh`, `Save`, `Home`,
+`Settings`, `Account`, `Notifications`, `Info`, `Help`, `Favorite`, `Share`,
+`Filter`, `Sort`, `Copy`, `Paste` and `Cut`. `Submenu` and `SubmenuBack` indicate
+entering a submenu and returning to its parent. The IDs are semantic:
+`Remove` is a minus action while
 `Delete` is destructive deletion. `StyledIcon` still accepts any
 `IconComposable`, so app-specific vectors, painters and resources can be used
 directly without registering them.
@@ -50,6 +52,7 @@ The iOS mapping is:
 | `NavigateBack` | `chevron.left` |
 | `NavigateForward` | `chevron.right` |
 | `Submenu` | `chevron.right` |
+| `SubmenuBack` | `chevron.left` |
 | `Cancel` | `xmark.circle` |
 | `Check` | `checkmark` |
 | `Clear` / `Close` | `xmark` |

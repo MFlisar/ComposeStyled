@@ -26,7 +26,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import com.michaelflisar.composestyled.UpdateStyledThemeLocals
 import com.michaelflisar.composestyled.StyledTheme
-import com.michaelflisar.composestyled.ui.components.StyledDropdownMenuItem
+import com.michaelflisar.composestyled.ui.components.StyledPopupMenuItemRenderer
 import com.michaelflisar.composestyled.ui.components.StyledMenuItemColors
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 
@@ -34,7 +34,7 @@ import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 abstract class FoundationDropdownMenu(
     private val hoverAlpha: Float,
     private val pressedAlpha: Float,
-) : StyledDropdownMenuItem.Implementation {
+) : StyledPopupMenuItemRenderer.Implementation {
     @Composable
     override fun Render(
         content: @Composable RowScope.() -> Unit,
@@ -47,6 +47,8 @@ abstract class FoundationDropdownMenu(
         shape: Shape,
         itemPadding: PaddingValues,
         minHeight: Dp,
+        horizontalArrangement: Arrangement.Horizontal,
+        verticalAlignment: Alignment.Vertical,
     ) {
         val source = interactionSource ?: remember { MutableInteractionSource() }
         val effectiveEnabled = enabled && onClick != null
@@ -72,8 +74,8 @@ abstract class FoundationDropdownMenu(
                     enabled = effectiveEnabled, role = Role.Button, onClick = onClick ?: {},
                 )
                 .padding(contentPadding),
-            horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
-            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = horizontalArrangement,
+            verticalAlignment = verticalAlignment,
         ) {
             UpdateStyledThemeLocals(
                 contentColor = foreground,

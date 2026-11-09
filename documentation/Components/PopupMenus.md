@@ -1,9 +1,66 @@
 # Popup Menus
 
-`StyledPopupContainer` is the single anchored-overlay container. It measures
-the anchor and supplies a scope for its `popup` slot. It does not own visibility
-or dismissal; compose either `StyledPopup` or `StyledPopupMenu` in the slot.
-Generic popups, menus and future tooltips use this same container.
+Use `StyledPopup` for arbitrary popup content and `StyledPopupMenu` for a
+button-triggered command menu. `StyledPopupMenu` is the menu entry point: its
+`StyledPopupMenuScope` provides standard menu rows while retaining escape
+hatches for custom composables.
+
+```kotlin
+StyledPopupMenu(
+    triggerContent = { StyledText("Actions") },
+) {
+    item("Save", onClick = { save() })
+    divider()
+    header("More")
+    item(
+        text = { StyledText("Export") },
+        onClick = { export() },
+        closeOnClick = false,
+    )
+    selection(
+        title = "Sort by",
+        items = listOf("Name", "Date"),
+        selectedIndex = sortIndex,
+        onSelectionChange = { sortIndex = it },
+    )
+    checkbox(
+        text = "Show hidden files",
+        checked = showHidden,
+        onCheckedChange = { showHidden = it },
+    )
+    custom {
+        StyledText("Custom row content")
+    }
+}
+```
+
+Simple `item` entries dismiss the menu after their callback by default.
+`closeOnClick = false` leaves the menu open. Use `checkbox` for checkable
+entries; these stay open by default. `header` and `divider` organize a menu,
+`selection` creates a submenu of options with a check mark on the selected item.
+It closes only that submenu after selection, leaving its parent menus open. Use
+the generic overload with `selected`, `label` and `onSelectionChange` for typed
+items. `submenu` creates a cascading submenu, and `custom` accepts arbitrary
+`RowScope` content with optional click behavior. Custom rows use medium theme
+spacing between children and center them vertically by default; configure
+`horizontalArrangement` or `verticalAlignment` when needed. `customColumn`
+inserts custom content directly into the popup column. Call `dismiss()` from a
+selection callback to close the complete menu hierarchy, or `dismissSubmenu()`
+to close only the current submenu and its descendants.
+
+The button-like menu trigger uses a `StyledButton` variant and supports
+`enabled`, `interactionSource`, `shape` and button `customization`. Its
+caller-owned `expanded` state is a `MutableState<Boolean>`; when omitted, the
+state is remembered. Menu width, shape, colors, offset, maximum height and
+animation can be configured through the `menu*` parameters. Set
+`menuHorizontalAlignment` to `StyledPopupMenu.HorizontalAlignment.End` to align
+the menu's logical end edge with its anchor; `Start` is the default.
+
+`StyledPopupContainer` is the shared anchored-overlay container. It measures
+the anchor and supplies a scope for its `popup` slot; it does not own visibility
+or dismissal. `StyledPopup` renders arbitrary content, while the
+`StyledPopupContainerScope.StyledPopupMenu` extension renders the same menu DSL
+inside a custom anchored popup:
 
 ```kotlin
 val infoExpanded = remember { mutableStateOf(false) }
@@ -28,9 +85,9 @@ StyledPopupContainer(
 )
 ```
 
-`StyledPopupMenu` is the menu-specific registered component and has
-`ColumnScope` content. Dismissal does not automatically select or close items,
-so callbacks update the caller-owned `expanded` state:
+For a custom-trigger menu, replace the `StyledPopup` slot with the scoped menu
+extension. This keeps menu behavior and dismissal consistent while letting the
+caller own the anchor:
 
 ```kotlin
 val menuExpanded = remember { mutableStateOf(false) }
@@ -41,10 +98,7 @@ StyledPopupContainer(
             expanded = menuExpanded.value,
             onDismissRequest = { menuExpanded.value = false },
         ) {
-            StyledDropdownMenuItem(
-                text = { StyledText("Action") },
-                onClick = { menuExpanded.value = false },
-            )
+            item("Action", onClick = { performAction() })
         }
     },
     content = {
@@ -55,157 +109,42 @@ StyledPopupContainer(
 )
 ```
 
-`StyledPopupMenu.WidthConfig.Auto(maxWidth = 280.dp, limitToContainerWidth = false)`
-wraps content with an optional width cap. `MatchParent(maxWidth = null)` matches
-the measured container width exactly, optionally capped; unlike the legacy
-minimum-width behavior it cannot grow beyond that width. Existing `MatchAnchor`,
-`AtLeastAnchor`, `WrapContent` and `Fixed` options are also available.
-Customize `offset`, `scrollState`, `maxHeight`, `shape`, `containerColor`,
-`contentColor`, `shadowElevation` and `border`. Material-only `tonalElevation`
-is replaced by explicit Styled colors; no tonal overlay is applied.
-Menu defaults are centralized in `StyledPopupMenuDefaults`, including width
-configuration, size limits, offset, shape, colors, shadow, border and content
-padding. Theme-dependent defaults are read from the current Styled locals.
-Popups use a fade-and-scale transition by default. Supply a
-`StyledPopup.Animation` with custom Compose `EnterTransition` and
-`ExitTransition` values to `StyledPopupMenu`; direct `StyledPopup` instances
-accept the same animation through `StyledPopupDefaults.style(animation = ...)`.
-Menu-bar popups use a short vertical unfold from the top without fading.
-Regular Foundation popups measure their content before starting the enter
-transition, avoiding a race between initial layout and animation.
-Full-window dismiss overlays keep a fade-only transition so their pointer bounds
-remain stable during animation.
-Cupertino Liquid popup menus use Liquid Glass without an additional drop
-shadow, regardless of the configured `shadowElevation`.
-The ComposeStyled-specific `outsideTapBehavior` is separate from the platform
-`PopupProperties` and defaults to `PlatformDefault`, preserving the platform
+This anchored overload supports a popup header, width and placement rules,
+horizontal alignment, scroll state, shape, colors, elevation, border, maximum
+height, content padding, outside-tap behavior and animation.
+`StyledPopupMenu.WidthConfig.Auto` wraps
+content with an optional width cap; `MatchParent` matches the measured anchor
+width (optionally capped). `MatchAnchor`, `AtLeastAnchor`, `WrapContent` and
+`Fixed` are also available. Anchored menus prefer opening below the anchor and
+move above it when needed. Submenus open beside their parent and flip to the
+opposite side when space is limited.
+
+Horizontal alignment is logical: `Start` aligns start edges and `End` aligns
+end edges, mirrored automatically in RTL. A positive horizontal `offset` moves
+toward logical `End`. If the preferred edge would place the menu outside the
+window, the opposite alignment is tried before the position is clamped. This
+alignment applies to anchor menus; submenu placement continues to open beside
+its parent.
+
+The default menu animation unfolds vertically away from its anchor. Customize
+it with `StyledPopup.Animation`; `StyledPopupDefaults.style(animation = ...)`
+configures the equivalent transition for generic popups. Menu-bar menus use a
+short vertical unfold from the top without fading. Regular Foundation popups
+measure content before starting the enter transition.
+
+`StyledPopupMenu.OutsideTapBehavior.PlatformDefault` preserves the platform
 popup's normal outside-tap behavior. `DismissAndConsume` uses a non-focusable,
-full-window overlay that closes on outside taps and consumes them instead of
-passing them to the background. This mode is suitable for menus that must stay
-open with the software keyboard visible. The overlay consumes the complete
-pointer gesture before requesting dismissal, so the same tap cannot activate
-background content, while the keyboard area remains outside the overlay's
-touchable dismissal bounds. If screen coordinates are unavailable, the menu
-uses the platform popup behavior instead. Anchored menus in overlay mode are
-positioned and height-limited inside the visible safe window bounds, accounting
-for system insets and the keyboard as those bounds change. On Android, the
-overlay window tracks the currently visible host bounds, leaving the keyboard
-interactive; its menu is remeasured after the available bounds or measured
-content size changes. The built-in
-`StyledSearchBar` suggestions use this mode; regular menus keep the platform's
-default popup behavior.
+full-window overlay when screen coordinates are available; it dismisses and
+consumes outside taps instead of activating background content. This is useful
+for menus that must stay open with the software keyboard visible. If screen
+coordinates are unavailable, the platform popup behavior is used instead.
+Anchored menus using the overlay are positioned and height-limited inside the
+visible safe window bounds, including system insets and the keyboard.
+`StyledSearchBar` suggestions use this mode; regular menus use the platform
+default.
 
-Use `StyledDropdownMenuItem(text = { StyledText("Action") }, onClick = { ... })`
-inside the menu. It supports `leadingIcon`, `trailingIcon`, `enabled`,
-`interactionSource`, `contentPadding`, outer `itemPadding` and `shape`.
-`StyledDropdownMenuItemDefaults.colors()` configures text and both icon colors,
-including independent disabled colors. Slots inherit Styled content locals.
-Items provide keyboard activation and hover/focus/press feedback.
-Single- and multi-select dropdowns use this same menu component.
-For custom row content, use `StyledDropdownMenuContent` with `RowScope` content.
-It uses the menu-item renderer and defaults, so custom rows share the standard
-item layout and styling. Its nullable `onClick` defaults to `null`; provide a
-callback to enable the same click, keyboard and interaction feedback as a
-regular item. Without a callback the content remains non-interactive and keeps
-its normal appearance; setting `enabled = false` applies the disabled appearance.
-Use `StyledDropdownMenuSectionHeader(text = { ... })` to label groups. It uses
-`labelLarge` typography and the theme's primary color by default, aligns its
-start inset with menu items, and exposes heading semantics. Styled locals carry
-its text style and color to nested content. Override `textStyle`, `contentColor`,
-`itemPadding` or `contentPadding` when a menu needs a different hierarchy.
-The menu's nullable `header` slot defaults to `null`. Material3 keeps its native
-`DropdownMenu` surface and uses the supplied `scrollState` for its scrollable
-content, including the header. Cupertino and Fluent2 keep the header above their
-scrollable list. Dropdown filters and multi-selection actions use that slot.
-`contentPadding` controls padding within the scrollable section.
-Use `StyledDropdownMenuDivider()` to separate groups with a horizontal divider
-and vertical spacing based on `StyledTheme.spacing.small`.
-
-Use `StyledPopupMenuSubmenu` for cascading menus. It composes a normal styled
-menu item as its anchor, opens a nested `StyledPopupMenu` beside that item, and
-flips to the opposite side when the preferred side does not fit. Submenus can
-nest recursively. The `dismiss` callback closes the entire menu hierarchy;
-`dismissSubmenu` closes only the current submenu and its descendants:
-
-```kotlin
-StyledPopupMenuSubmenu(
-    text = { StyledText("Export") },
-    leadingIcon = { StyledIcon(icon = StyledIcons.Share, contentDescription = null) },
-) { dismiss, dismissSubmenu ->
-    StyledDropdownMenuItem(
-        text = { StyledText("PDF") },
-        onClick = {
-            exportPdf()
-            dismiss()
-        },
-    )
-}
-```
-
-The submenu opens when its item is activated, including keyboard activation.
-Inside `StyledMenuBarItem`, root and nested menus additionally open after a
-brief hover delay and switch to hovered siblings; the regular
-`StyledDropdownButton` and standalone popup menus remain click-driven. Menu-bar
-popups are non-focusable by default so they do not capture focus and block
-hover over sibling triggers. Their vertical content padding matches the menu
-items' horizontal content padding, and menu-item minimum height is capped at
-36 dp. Hovering a nested popup keeps its
-full ancestor menu chain active. Clicking a menu-bar trigger or submenu anchor
-during its opening animation has no effect; clicking it after the animation
-completes closes that menu.
-
-When the menu content overflows, it displays a scrollbar indicator according
-to `StyledTheme.behavior.showScrollbars`. Hiding indicators globally leaves
-menus and dropdowns scrollable.
-
-`StyledDropdownButton(menuContent = ..., expanded = ...) { StyledText("Actions") }`
-combines a themed `StyledButton`, an animated expand icon and a Styled dropdown
-menu. `expanded` is optional caller-owned state; by default it is remembered.
-The `menuContent` slot has `ColumnScope` and receives a `dismiss` callback.
-Compose `StyledDropdownMenuItem`, `StyledHorizontalDivider` or arbitrary content
-directly; there is no separate entry model. Call `dismiss()` after an action to
-close the menu, or omit it to keep the menu open.
-The menu is hidden and closed when the button is disabled.
-An `onClick` overload performs a direct action without opening a menu.
-
-`StyledDropdownButton` defaults to `StyledButton.Role.Default`, so its theme can
-choose a style appropriate to a menu bar, modal or other surrounding context.
-Use `role` for an intentional explicit `Primary`, `Secondary` or `Tertiary`
-emphasis. The same generic API has both an `onClick` and a `menuContent`
-overload. Shared button parameters follow `StyledButton` ordering: action,
-modifier, enabled, interactionSource, role, shape, customization and content,
-with menu state/configuration where applicable.
-Button customization uses `shape`,
-`customization = StyledButtonDefaults.customize(...)` and `interactionSource` instead of
-Material button colors/elevation types. Menu width, shape, colors, offset and
-maximum height are separately adjustable with the `menu*` parameters.
-
-```kotlin
-StyledDropdownButton(
-    menuContent = { dismiss ->
-        StyledDropdownMenuItem(
-            text = { StyledText("Save") },
-            onClick = {
-                save()
-                dismiss()
-            },
-        )
-    },
-) {
-    StyledText("Actions")
-}
-```
-
-All theme definition factories expose `popup`, `popupMenu` and `dropdownMenuItem`
-renderer overrides. `popup` customizes generic overlays; Foundation-based
-menus in Cupertino and Fluent 2 delegate through it, while Material 3 menus use
-the `popupMenu` renderer and native `DropdownMenu`. Menu-item renderers ship fixed `StyledDropdownMenuItem.Defaults` (`minHeight`,
-`itemPadding`, `itemShape`); change them via
-`StyledTheme(customization = { update(StyledDropdownMenuItem.DefaultsKey) { copy(...) } })`;
-individual items can
-override these through `minHeight`, `itemPadding` and `shape`.
-Single- and multi-select dropdowns compose `StyledDropdownMenuItem` directly,
-inheriting the active renderer's styling and interaction behavior. Their
-radio-button and checkbox selection semantics are preserved.
-Foundation renderers contain no theme identity flags;
-Cupertino and Fluent 2 supply their own menu-item interaction styling.
+Menu content is scrollable when it exceeds the available height. Its scrollbar
+indicator follows `StyledTheme.behavior.showScrollbars`; hiding indicators does
+not disable scrolling. Material 3 uses its native dropdown-menu surface, while
+Foundation-based renderers share the popup layout. Popup-surface and menu-row
+renderers can be customized independently through the theme registry.

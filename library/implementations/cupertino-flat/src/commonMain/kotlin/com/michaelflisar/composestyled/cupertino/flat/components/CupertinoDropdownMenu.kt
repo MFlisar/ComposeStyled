@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.ui.components.StyledPopupMenu
-import com.michaelflisar.composestyled.ui.components.StyledDropdownMenuItem
+import com.michaelflisar.composestyled.ui.components.StyledPopupMenuItemRenderer
 import com.michaelflisar.composestyled.foundation.components.FoundationPopupMenu
 import com.michaelflisar.composestyled.foundation.components.FoundationDropdownMenu
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
@@ -28,8 +28,8 @@ class CupertinoFlatPopupMenu internal constructor() :
 class CupertinoFlatDropdownMenu internal constructor() :
     FoundationDropdownMenu(hoverAlpha = 0.06f, pressedAlpha = 0.14f) {
 
-    override val defaults: StyledDropdownMenuItem.Defaults
-        @Composable get() = StyledDropdownMenuItem.Defaults(
+    override val defaults: StyledPopupMenuItemRenderer.Defaults
+        @Composable get() = StyledPopupMenuItemRenderer.Defaults(
             minHeight = StyledTheme.sizes.minimumInteractiveSize,
             itemPadding = PaddingValues(horizontal = StyledTheme.padding.small),
             itemShape = StyledTheme.shapes.small,

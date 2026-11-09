@@ -8,8 +8,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
-import com.michaelflisar.composestyled.UpdateStyledThemeLocals
 import com.michaelflisar.composestyled.StyledTheme
+import com.michaelflisar.composestyled.material3.ProvideStyledLocals
 import com.michaelflisar.composestyled.ui.components.StyledSnackbar
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 
@@ -40,7 +40,7 @@ class Material3Snackbar internal constructor() : StyledSnackbar.Implementation {
         dismissAction: @Composable (() -> Unit)?,
         content: @Composable () -> Unit,
     ) {
-        UpdateStyledThemeLocals(
+        ProvideStyledLocals(
             contentColor = contentColor,
             textStyle = StyledTheme.typography.bodyMedium,
         ) {

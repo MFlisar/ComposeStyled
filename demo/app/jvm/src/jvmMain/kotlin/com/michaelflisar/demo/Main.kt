@@ -16,12 +16,8 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.ui.components.StyledButton
-import com.michaelflisar.composestyled.ui.components.StyledDropdownMenuDivider
-import com.michaelflisar.composestyled.ui.components.StyledDropdownMenuItem
 import com.michaelflisar.composestyled.ui.components.StyledIcon
-import com.michaelflisar.composestyled.ui.components.StyledPopupMenuSubmenu
 import com.michaelflisar.composestyled.ui.components.StyledMenuBar
-import com.michaelflisar.composestyled.ui.components.StyledMenuBarItem
 import com.michaelflisar.composestyled.ui.icons.StyledIcons
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.ui.state.KeyboardModifierState
@@ -69,143 +65,67 @@ private fun DemoDesktopMenuBar() {
     val status = remember { mutableStateOf("Ready") }
 
     StyledMenuBar {
-        StyledMenuBarItem(
-            menuContent = { dismissMenu ->
-                StyledDropdownMenuItem(
-                    text = { StyledText("New") },
-                    onClick = {
-                        status.value = "New document"
-                        dismissMenu()
-                    },
-                    leadingIcon = {
-                        StyledIcon(icon = StyledIcons.Add, contentDescription = null)
-                    },
+        menu("File") {
+            item(
+                "New",
+                onClick = { status.value = "New document" },
+                leadingIcon = { StyledIcon(icon = StyledIcons.Add, contentDescription = null) },
+            )
+            item(
+                "Open...",
+                onClick = { status.value = "Open document" },
+                leadingIcon = { StyledIcon(icon = StyledIcons.Edit, contentDescription = null) },
+            )
+            divider()
+            submenu("Export") {
+                item(
+                    "PDF",
+                    onClick = { status.value = "Exported PDF" },
+                    leadingIcon = { StyledIcon(icon = StyledIcons.Save, contentDescription = null) },
                 )
-                StyledDropdownMenuItem(
-                    text = { StyledText("Open...") },
-                    onClick = {
-                        status.value = "Open document"
-                        dismissMenu()
-                    },
-                    leadingIcon = {
-                        StyledIcon(icon = StyledIcons.Edit, contentDescription = null)
-                    },
-                )
-                StyledDropdownMenuDivider()
-                StyledPopupMenuSubmenu(
-                    text = { StyledText("Export") },
-                    //leadingIcon = {
-                    //    StyledIcon(icon = StyledIcons.Share, contentDescription = null)
-                    //},
-                ) { dismiss, _ ->
-                    StyledDropdownMenuItem(
-                        text = { StyledText("PDF") },
-                        onClick = {
-                            status.value = "Exported PDF"
-                            dismiss()
-                        },
-                        leadingIcon = {
-                            StyledIcon(icon = StyledIcons.Save, contentDescription = null)
-                        },
-                    )
-                    StyledPopupMenuSubmenu(
-                        text = { StyledText("More formats") },
-                    ) { dismiss, _ ->
-                        StyledDropdownMenuItem(
-                            text = { StyledText("PNG") },
-                            onClick = {
-                                status.value = "Exported PNG"
-                                dismiss()
-                            },
-                        )
-                        StyledDropdownMenuItem(
-                            text = { StyledText("SVG") },
-                            onClick = {
-                                status.value = "Exported SVG"
-                                dismiss()
-                            },
-                        )
-                    }
+                submenu("More formats") {
+                    item("PNG", onClick = { status.value = "Exported PNG" })
+                    item("SVG", onClick = { status.value = "Exported SVG" })
                 }
-            },
-        ) {
-            StyledText("File")
+            }
         }
 
-        StyledMenuBarItem(
+        menu(
+            text = "Edit",
             icon = StyledIcons.Edit,
-            menuContent = { dismissMenu ->
-                StyledDropdownMenuItem(
-                    text = { StyledText("Undo") },
-                    onClick = {
-                        status.value = "Undo"
-                        dismissMenu()
-                    },
-                    leadingIcon = {
-                        StyledIcon(icon = StyledIcons.NavigateBack, contentDescription = null)
-                    },
-                )
-                StyledDropdownMenuItem(
-                    text = { StyledText("Redo") },
-                    onClick = {
-                        status.value = "Redo"
-                        dismissMenu()
-                    },
-                    leadingIcon = {
-                        StyledIcon(icon = StyledIcons.NavigateForward, contentDescription = null)
-                    },
-                )
-                StyledDropdownMenuDivider()
-                StyledPopupMenuSubmenu(
-                    text = { StyledText("Find") },
-                    leadingIcon = {
-                        StyledIcon(icon = StyledIcons.Search, contentDescription = null)
-                    },
-                ) { dismiss, _ ->
-                    StyledDropdownMenuItem(
-                        text = { StyledText("Find") },
-                        onClick = {
-                            status.value = "Find"
-                            dismiss()
-                        },
-                    )
-                    StyledDropdownMenuItem(
-                        text = { StyledText("Replace") },
-                        onClick = {
-                            status.value = "Replace"
-                            dismiss()
-                        },
-                    )
-                }
-            }
         ) {
-            StyledText("Edit")
-        }
-
-        StyledButton(onClick = { status.value = "New document" }) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.small),
-                verticalAlignment = Alignment.CenterVertically,
+            item(
+                "Undo",
+                onClick = { status.value = "Undo" },
+                leadingIcon = {
+                    StyledIcon(icon = StyledIcons.NavigateBack, contentDescription = null)
+                },
+            )
+            item(
+                "Redo",
+                onClick = { status.value = "Redo" },
+                leadingIcon = {
+                    StyledIcon(icon = StyledIcons.NavigateForward, contentDescription = null)
+                },
+            )
+            divider()
+            submenu(
+                text = "Find",
+                leadingIcon = { StyledIcon(icon = StyledIcons.Search, contentDescription = null) },
             ) {
-                StyledIcon(icon = StyledIcons.Add, contentDescription = null)
-                StyledText("New")
+                item("Find", onClick = { status.value = "Find" })
+                item("Replace", onClick = { status.value = "Replace" })
             }
         }
-        StyledButton(onClick = { status.value = "Saved" }) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.small),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                StyledIcon(icon = StyledIcons.Save, contentDescription = null)
-                StyledText("Save")
-            }
-        }
 
-        Spacer(Modifier.weight(1f))
-        StyledText(
-            text = status.value,
-            style = StyledTheme.typography.labelMedium,
+        item(
+            "New",
+            onClick = { status.value = "New document" },
+            icon = StyledIcons.Add,
         )
+        item("Save", onClick = { status.value = "Saved" }, icon = StyledIcons.Save)
+        custom { Spacer(Modifier.weight(1f)) }
+        custom { StyledText(text = status.value, style = StyledTheme.typography.labelMedium) }
     }
 }
 

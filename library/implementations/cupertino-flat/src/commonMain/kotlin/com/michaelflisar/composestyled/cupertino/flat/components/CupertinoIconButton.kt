@@ -28,7 +28,9 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.UpdateStyledThemeLocals
 import com.michaelflisar.composestyled.StyledTheme
+import com.michaelflisar.composestyled.tokens.LocalStyledContentColor
 import com.michaelflisar.composestyled.ui.components.StyledIconButton
+import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.ui.components.StyledInput
 import com.michaelflisar.composestyled.ui.specials.StyledGroupBox
 import com.michaelflisar.composestyled.ui.specials.StyledSidePane
@@ -40,7 +42,7 @@ import com.michaelflisar.composestyled.ui.components.StyledSnackbar
 import com.michaelflisar.composestyled.ui.components.StyledTopBar
 
 class CupertinoFlatIconButton internal constructor(
-    val roleMapping: RoleMapping,
+    val variantMapping: VariantMapping,
 ) : StyledIconButton.Implementation {
 
     override val defaults: StyledIconButton.Defaults
@@ -54,18 +56,18 @@ class CupertinoFlatIconButton internal constructor(
 
         @Composable
         fun create(
-            roleMapping: RoleMapping = DefaultRoleMapping,
-        ) = remember(roleMapping) { CupertinoFlatIconButton(roleMapping) }
+            variantMapping: VariantMapping = DefaultVariantMapping,
+        ) = remember(variantMapping) { CupertinoFlatIconButton(variantMapping) }
 
         // -------------
         // 2) mapping
         // -------------
 
-        typealias RoleMapping = (StyledIconButton.Role, StyledContext) -> Variant
+        typealias VariantMapping = (StyledButton.Variant, StyledContext) -> Variant
 
-        val DefaultRoleMapping: RoleMapping = { role, context ->
+        val DefaultVariantMapping: VariantMapping = { variant, context ->
             when {
-                role == StyledIconButton.Role.Default &&
+                variant == StyledButton.Variant.Auto &&
                     (context is StyledDialog.ActionContext ||
                         context == StyledDialog.Context.DialogAction ||
                         context == StyledDialog.Context.FullscreenAction ||
@@ -75,11 +77,11 @@ class CupertinoFlatIconButton internal constructor(
                         context is StyledTopBar.Context ||
                         context == StyledGroupBox.Context.Clickable ||
                         context == StyledSidePane.Context.IconSlot) -> Variant.Standard
-                else -> when (role) {
-                    StyledIconButton.Role.Default,
-                    StyledIconButton.Role.Primary -> Variant.FilledTonal
-                    StyledIconButton.Role.Secondary -> Variant.Gray
-                    StyledIconButton.Role.Tertiary -> Variant.Standard
+                else -> when (variant) {
+                    StyledButton.Variant.Auto -> Variant.FilledTonal
+                    StyledButton.Variant.Filled -> Variant.Filled
+                    StyledButton.Variant.Outlined -> Variant.Outlined
+                    StyledButton.Variant.Plain -> Variant.Standard
                 }
             }
         }
@@ -96,7 +98,7 @@ class CupertinoFlatIconButton internal constructor(
     @OptIn(InternalComposeStyledApi::class)
     @Composable
     override fun Render(
-        role: StyledIconButton.Role,
+        variant: StyledButton.Variant,
         onClick: () -> Unit,
         modifier: Modifier,
         enabled: Boolean,
@@ -111,11 +113,13 @@ class CupertinoFlatIconButton internal constructor(
         val keyboardFocus = enabled && focused &&
                 LocalInputModeManager.current.inputMode == InputMode.Keyboard
         val context = LocalStyledContext.current
-        val variant = roleMapping(role, context)
-        val defaultContentColor = if (role == StyledIconButton.Role.Default &&
-            context is StyledTopBar.Context
-        ) StyledTheme.currentContentColor else null
-        val colors = cupertinoIconButtonColors(variant, enabled, customization, defaultContentColor)
+        val rendererVariant = variantMapping(variant, context)
+        val defaultContentColor = if (variant == StyledButton.Variant.Auto &&
+            (context is StyledTopBar.Context ||
+                context is StyledDialog.ActionContext &&
+                context.context == StyledDialog.Context.FullscreenAction)
+        ) LocalStyledContentColor.current else null
+        val colors = cupertinoIconButtonColors(rendererVariant, enabled, customization, defaultContentColor)
         val opacity by animateFloatAsState(
             targetValue = if (enabled && pressed) 0.55f else 1f,
             animationSpec = tween(if (!enabled) 0 else if (pressed) 60 else 180),
@@ -130,7 +134,7 @@ class CupertinoFlatIconButton internal constructor(
                     .clip(shape)
                     .background(colors.background, shape)
                     .then(
-                        if (variant == Variant.Outlined) {
+                        if (rendererVariant == Variant.Outlined) {
                             Modifier.border(1.dp, colors.border, shape)
                         } else {
                             Modifier

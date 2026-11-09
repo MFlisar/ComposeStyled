@@ -2,25 +2,26 @@ package com.michaelflisar.composestyled.ui.components
 
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
+import androidx.compose.animation.core.FiniteAnimationSpec
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalWindowInfo
@@ -53,12 +54,52 @@ object StyledPopup {
     // 5) implementation
     // -------------
 
-    /** Enter and exit transitions applied to popup content. */
+    /** Enter and exit transitions for popups below an anchor, with optional transitions above it. */
     @Stable
     data class Animation(
+        /** Enter transition when the popup is below its anchor. */
         val enter: EnterTransition,
+        /** Exit transition when the popup is below its anchor. */
         val exit: ExitTransition,
-    )
+        @InternalComposeStyledApi val shadowEnterSpec: FiniteAnimationSpec<Float>? = null,
+        @InternalComposeStyledApi val shadowExitSpec: FiniteAnimationSpec<Float>? = null,
+        @InternalComposeStyledApi val shadowOriginY: Float = 0f,
+        /** Above-anchor transition; defaults to [enter]. */
+        val enterAboveAnchor: EnterTransition = enter,
+        /** Above-anchor transition; defaults to [exit]. */
+        val exitAboveAnchor: ExitTransition = exit,
+        @InternalComposeStyledApi
+        val shadowEnterSpecAboveAnchor: FiniteAnimationSpec<Float>? = shadowEnterSpec,
+        @InternalComposeStyledApi
+        val shadowExitSpecAboveAnchor: FiniteAnimationSpec<Float>? = shadowExitSpec,
+        @InternalComposeStyledApi
+        val shadowOriginYAboveAnchor: Float = shadowOriginY,
+        @InternalComposeStyledApi
+        val contentRevealEnterSpec: FiniteAnimationSpec<Float>? = null,
+        @InternalComposeStyledApi
+        val contentRevealExitSpec: FiniteAnimationSpec<Float>? = null,
+        @InternalComposeStyledApi
+        val contentRevealEnterSpecAboveAnchor: FiniteAnimationSpec<Float>? =
+            contentRevealEnterSpec,
+        @InternalComposeStyledApi
+        val contentRevealExitSpecAboveAnchor: FiniteAnimationSpec<Float>? =
+            contentRevealExitSpec,
+    ) {
+        @InternalComposeStyledApi
+        fun forPlacement(isAboveAnchor: Boolean): Animation = if (isAboveAnchor) {
+            copy(
+                enter = enterAboveAnchor,
+                exit = exitAboveAnchor,
+                shadowEnterSpec = shadowEnterSpecAboveAnchor,
+                shadowExitSpec = shadowExitSpecAboveAnchor,
+                shadowOriginY = shadowOriginYAboveAnchor,
+                contentRevealEnterSpec = contentRevealEnterSpecAboveAnchor,
+                contentRevealExitSpec = contentRevealExitSpecAboveAnchor,
+            )
+        } else {
+            this
+        }
+    }
 
     /** Theme-resolved visual properties, animation and height limit for a popup. */
     @Stable
@@ -75,7 +116,9 @@ object StyledPopup {
         val parentWindowOriginOnScreen: IntOffset = IntOffset.Zero,
         @InternalComposeStyledApi
         val onTransitionFinished: ((Boolean) -> Unit)? = null,
-        val animation: Animation = StyledPopupDefaults.animation,
+        val animation: Animation = StyledPopupDefaults.Animations.unfoldAwayFromAnchor,
+        @InternalComposeStyledApi
+        val animationPlacementKnown: Boolean = true,
     ) {
         init {
             require(maxHeight.value.isFinite() && maxHeight > 0.dp) {
@@ -107,17 +150,54 @@ object StyledPopup {
 
 object StyledPopupDefaults {
 
-    /** Default fade-and-scale animation used by popups outside a menu bar. */
-    val animation = StyledPopup.Animation(
-        enter = fadeIn() + scaleIn(
-            initialScale = 0.8f,
-            transformOrigin = TransformOrigin.Center,
-        ),
-        exit = fadeOut() + scaleOut(
-            targetScale = 0.8f,
-            transformOrigin = TransformOrigin.Center,
-        ),
-    )
+    object Animations {
+
+        private const val unfoldEnterDurationMillis = 120
+        private const val unfoldExitDurationMillis = 90
+
+        val windowOverlayLifecycle = StyledPopup.Animation(
+            enter = expandVertically(
+                animationSpec = tween(unfoldEnterDurationMillis),
+                clip = false,
+            ),
+            exit = shrinkVertically(
+                animationSpec = tween(unfoldExitDurationMillis),
+                clip = false,
+            ),
+        )
+
+        val unfoldAwayFromAnchor = StyledPopup.Animation(
+            enter = expandVertically(
+                animationSpec = tween(unfoldEnterDurationMillis),
+                expandFrom = Alignment.Top,
+            ),
+            exit = shrinkVertically(
+                animationSpec = tween(unfoldExitDurationMillis),
+                shrinkTowards = Alignment.Top,
+            ),
+            shadowEnterSpec = tween(unfoldEnterDurationMillis),
+            shadowExitSpec = tween(unfoldExitDurationMillis),
+            shadowOriginY = 0f,
+            enterAboveAnchor = expandVertically(
+                animationSpec = tween(unfoldEnterDurationMillis),
+                expandFrom = Alignment.Bottom,
+            ),
+            exitAboveAnchor = shrinkVertically(
+                animationSpec = tween(unfoldExitDurationMillis),
+                shrinkTowards = Alignment.Bottom,
+            ),
+            shadowEnterSpecAboveAnchor = tween(unfoldEnterDurationMillis),
+            shadowExitSpecAboveAnchor = tween(unfoldExitDurationMillis),
+            shadowOriginYAboveAnchor = 1f,
+            contentRevealEnterSpec = tween(unfoldEnterDurationMillis),
+            contentRevealExitSpec = tween(unfoldExitDurationMillis),
+            contentRevealEnterSpecAboveAnchor = tween(unfoldEnterDurationMillis),
+            contentRevealExitSpecAboveAnchor = tween(unfoldExitDurationMillis),
+        )
+
+    }
+
+    val animation = Animations.unfoldAwayFromAnchor
 
     /** Builds Compose popup window properties with platform-friendly defaults. */
     @Composable
@@ -144,7 +224,7 @@ object StyledPopupDefaults {
         shadowElevation: Dp = 8.dp,
         border: BorderStroke? = null,
         maxHeight: Dp = 320.dp,
-        animation: StyledPopup.Animation = StyledPopupDefaults.animation,
+        animation: StyledPopup.Animation = Animations.unfoldAwayFromAnchor,
     ) = StyledPopup.Style(
         shape = shape,
         containerColor = containerColor,
@@ -160,20 +240,26 @@ object StyledPopupDefaults {
     fun positionProvider(
         offset: DpOffset = DpOffset(0.dp, 4.dp),
         placement: StyledPopupMenu.Placement = StyledPopupMenu.Placement.Anchor,
+        horizontalAlignment: StyledPopupMenu.HorizontalAlignment =
+            StyledPopupMenu.HorizontalAlignment.Start,
     ): PopupPositionProvider = positionProvider(
         offset = offset,
         isVisible = true,
         placement = placement,
+        horizontalAlignment = horizontalAlignment,
     )
 
     @Composable
     fun positionProvider(
         isVisible: Boolean,
         placement: StyledPopupMenu.Placement = StyledPopupMenu.Placement.Anchor,
+        horizontalAlignment: StyledPopupMenu.HorizontalAlignment =
+            StyledPopupMenu.HorizontalAlignment.Start,
     ): PopupPositionProvider = positionProvider(
         offset = DpOffset(0.dp, 4.dp),
         isVisible = isVisible,
         placement = placement,
+        horizontalAlignment = horizontalAlignment,
     )
 
     @Composable
@@ -181,18 +267,23 @@ object StyledPopupDefaults {
         offset: DpOffset,
         isVisible: Boolean,
         placement: StyledPopupMenu.Placement = StyledPopupMenu.Placement.Anchor,
+        horizontalAlignment: StyledPopupMenu.HorizontalAlignment =
+            StyledPopupMenu.HorizontalAlignment.Start,
     ): PopupPositionProvider {
         val density = LocalDensity.current
         val windowSize = LocalWindowInfo.current.containerSize
         // Recreate the provider when IME resizing changes the host window size.
-        return remember(density, offset, windowSize, isVisible, placement) {
+        val provider = remember(density, offset, windowSize, placement, horizontalAlignment) {
             AnchoredPopupPositionProvider(
                 with(density) {
                     IntOffset(offset.x.roundToPx(), offset.y.roundToPx())
                 },
                 placement,
+                horizontalAlignment,
             )
         }
+        SideEffect { provider.updateVisibility(isVisible) }
+        return provider
     }
 
     @InternalComposeStyledApi
@@ -201,6 +292,7 @@ object StyledPopupDefaults {
         offset: DpOffset,
         isVisible: Boolean,
         placement: StyledPopupMenu.Placement,
+        horizontalAlignment: StyledPopupMenu.HorizontalAlignment,
         parentWindowOriginOnScreen: IntOffset,
     ): WindowOverlayPositionProvider {
         val density = LocalDensity.current
@@ -222,6 +314,7 @@ object StyledPopupDefaults {
             offset,
             isVisible,
             placement,
+            horizontalAlignment,
             parentWindowOriginOnScreen,
         ) {
             WindowOverlayPositionProvider(
@@ -229,6 +322,7 @@ object StyledPopupDefaults {
                     IntOffset(offset.x.roundToPx(), offset.y.roundToPx())
                 },
                 placement,
+                horizontalAlignment,
                 parentWindowOriginOnScreen,
                 parentWindowSize,
                 visibleWindowBoundsOnScreen,
@@ -250,13 +344,15 @@ object StyledPopupDefaults {
 class WindowOverlayPositionProvider internal constructor(
     offset: IntOffset,
     placement: StyledPopupMenu.Placement,
+    horizontalAlignment: StyledPopupMenu.HorizontalAlignment,
     private val parentWindowOriginOnScreen: IntOffset,
     private val parentWindowSize: State<IntSize>,
     private val visibleWindowBoundsOnScreen: State<IntRect?>,
     private val safeDrawingInsets: State<IntRect>,
     private val geometryRevision: MutableState<Int>,
 ) : PopupPositionProvider {
-    private val anchoredPositionProvider = AnchoredPopupPositionProvider(offset, placement)
+    private val anchoredPositionProvider =
+        AnchoredPopupPositionProvider(offset, placement, horizontalAlignment)
     private val anchorBounds = mutableStateOf<IntRect?>(null)
     private val overlayOrigin = mutableStateOf(IntOffset.Zero)
     private val overlaySize = mutableStateOf(IntSize.Zero)
@@ -328,6 +424,22 @@ class WindowOverlayPositionProvider internal constructor(
             x = positionInParentWindow.x + availableBounds.left - origin.x,
             y = positionInParentWindow.y + availableBounds.top - origin.y,
         )
+    }
+
+    fun isAboveAnchor(menuHeight: Int): Boolean {
+        if (anchoredPositionProvider.placement == StyledPopupMenu.Placement.Submenu) {
+            return false
+        }
+        val bounds = anchorBounds.value ?: return false
+        val availableBounds = availableWindowBounds()
+        if (availableBounds.width <= 0 || availableBounds.height <= 0) {
+            return false
+        }
+        return anchoredPositionProvider.resolvePlacement(
+            anchorBounds = bounds.translate(-availableBounds.left, -availableBounds.top),
+            windowSize = IntSize(availableBounds.width, availableBounds.height),
+            menuHeight = menuHeight,
+        ) == VerticalPlacement.Above
     }
 
     fun maxHeightForMenu(
@@ -406,6 +518,7 @@ class WindowOverlayPositionProvider internal constructor(
  * Shows or hides a theme-rendered popup and reports dismissal through [onDismissRequest].
  * [animation] overrides the transitions in [style] for this popup.
  */
+@OptIn(InternalComposeStyledApi::class)
 @Composable
 fun StyledPopup(
     visible: Boolean,
@@ -417,13 +530,29 @@ fun StyledPopup(
     animation: StyledPopup.Animation = style.animation,
     content: @Composable () -> Unit,
 ) {
+    val anchoredPositionProvider = popupPositionProvider as? AnchoredPopupPositionProvider
+    SideEffect { anchoredPositionProvider?.updateVisibility(visible) }
+    val anchorPlacement =
+        anchoredPositionProvider?.verticalPlacement?.value
+    val resolvedAnimation = remember(
+        animation,
+        anchorPlacement,
+    ) {
+        animation.forPlacement(anchorPlacement == VerticalPlacement.Above)
+    }
     LocalStyledRegistry.current[StyledPopup.Key].Render(
         visible = visible,
         onDismissRequest = onDismissRequest,
         modifier = modifier,
         popupPositionProvider = popupPositionProvider,
         properties = properties,
-        style = style.copy(animation = animation),
+        style = style.copy(
+            animation = resolvedAnimation,
+            animationPlacementKnown =
+                anchoredPositionProvider == null ||
+                    anchoredPositionProvider.placement == StyledPopupMenu.Placement.Submenu ||
+                    anchorPlacement != null,
+        ),
         content = content,
     )
 }
@@ -459,11 +588,20 @@ fun StyledPopup(
  */
 private class AnchoredPopupPositionProvider(
     private val offset: IntOffset,
-    private val placement: StyledPopupMenu.Placement,
+    val placement: StyledPopupMenu.Placement,
+    private val horizontalAlignment: StyledPopupMenu.HorizontalAlignment,
 ) : PopupPositionProvider {
     private var lastAnchorBounds: IntRect? = null
     private var lastWindowSize: IntSize? = null
-    private var verticalPlacement: VerticalPlacement? = null
+    val verticalPlacement = mutableStateOf<VerticalPlacement?>(null)
+    private var wasVisible = false
+
+    fun updateVisibility(isVisible: Boolean) {
+        if (isVisible && !wasVisible) {
+            verticalPlacement.value = null
+        }
+        wasVisible = isVisible
+    }
 
     override fun calculatePosition(
         anchorBounds: IntRect,
@@ -500,19 +638,29 @@ private class AnchoredPopupPositionProvider(
             (if (rtl) anchorBounds.right - popupContentSize.width else anchorBounds.left) + dx
         val end =
             (if (rtl) anchorBounds.left else anchorBounds.right - popupContentSize.width) + dx
+        val preferred = if (horizontalAlignment == StyledPopupMenu.HorizontalAlignment.Start) {
+            start
+        } else {
+            end
+        }
+        val alternate = if (horizontalAlignment == StyledPopupMenu.HorizontalAlignment.Start) {
+            end
+        } else {
+            start
+        }
         val maxX = (windowSize.width - popupContentSize.width).coerceAtLeast(0)
         val x = when {
-            start in 0..maxX -> start
-            end in 0..maxX -> end
-            else -> start.coerceIn(0, maxX)
+            preferred in 0..maxX -> preferred
+            alternate in 0..maxX -> alternate
+            else -> preferred.coerceIn(0, maxX)
         }
         val below = anchorBounds.bottom + offset.y
         val above = anchorBounds.top - popupContentSize.height - offset.y
         val maxY = (windowSize.height - popupContentSize.height).coerceAtLeast(0)
         updatePlacementContext(anchorBounds, windowSize, popupContentSize.height)
-        val placement = verticalPlacement
+        val placement = verticalPlacement.value
             ?: preferredPlacement(anchorBounds, windowSize, popupContentSize.height)
-                .also { verticalPlacement = it }
+                .also { verticalPlacement.value = it }
         val y = when (placement) {
             VerticalPlacement.Below -> below
             VerticalPlacement.Above -> above
@@ -543,18 +691,19 @@ private class AnchoredPopupPositionProvider(
         }.coerceAtMost(requestedMaxHeight)
     }
 
-    private fun resolvePlacement(
+    fun resolvePlacement(
         anchorBounds: IntRect,
         windowSize: IntSize,
         menuHeight: Int,
     ): VerticalPlacement {
         updatePlacementContext(anchorBounds, windowSize, menuHeight)
-        return verticalPlacement ?: preferredPlacement(anchorBounds, windowSize, menuHeight)
-            .also { verticalPlacement = it }
+        return verticalPlacement.value
+            ?: preferredPlacement(anchorBounds, windowSize, menuHeight)
+                .also { verticalPlacement.value = it }
     }
 
     fun invalidatePlacement() {
-        verticalPlacement = null
+        verticalPlacement.value = null
     }
 
     private fun updatePlacementContext(
@@ -566,8 +715,8 @@ private class AnchoredPopupPositionProvider(
             lastAnchorBounds = anchorBounds
             lastWindowSize = windowSize
             val newPlacement = preferredPlacement(anchorBounds, windowSize, menuHeight)
-            if (verticalPlacement != newPlacement) {
-                verticalPlacement = newPlacement
+            if (verticalPlacement.value != newPlacement) {
+                verticalPlacement.value = newPlacement
             }
         }
     }

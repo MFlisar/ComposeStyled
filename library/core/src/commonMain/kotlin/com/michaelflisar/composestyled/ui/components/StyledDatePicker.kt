@@ -82,7 +82,7 @@ fun StyledDatePicker(
         ) {
             StyledButton(
                 onClick = { visibleMonth = shiftMonth(visibleMonth, -1) },
-                role = StyledButton.Role.Tertiary,
+                variant = StyledButton.Variant.Plain,
                 enabled = enabled,
                 modifier = Modifier.weight(1f).semantics {
                     contentDescription = "Previous month"
@@ -96,7 +96,7 @@ fun StyledDatePicker(
             )
             StyledButton(
                 onClick = { visibleMonth = shiftMonth(visibleMonth, 1) },
-                role = StyledButton.Role.Tertiary,
+                variant = StyledButton.Variant.Plain,
                 enabled = enabled,
                 modifier = Modifier.weight(1f).semantics {
                     contentDescription = "Next month"
@@ -141,7 +141,7 @@ fun StyledDatePicker(
                         if (date == value) {
                             StyledButton(
                                 onClick = { onValueChange(date) },
-                                role = StyledButton.Role.Primary,
+                                variant = StyledButton.Variant.Filled,
                                 modifier = dayModifier,
                                 enabled = enabled && inRange,
                             ) {
@@ -150,7 +150,7 @@ fun StyledDatePicker(
                         } else {
                             StyledButton(
                                 onClick = { onValueChange(date) },
-                                role = StyledButton.Role.Tertiary,
+                                variant = StyledButton.Variant.Plain,
                                 modifier = dayModifier,
                                 enabled = enabled && inRange,
                             ) {

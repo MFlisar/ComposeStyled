@@ -94,6 +94,9 @@ Fullscreen dialogs use a fade transition by default. Choose `Fade` or
 The slide direction identifies the entering edge (`FromLeft`, `FromRight`,
 `FromTop` or `FromBottom`); dismissal slides back toward that same edge. The
 default is `FromRight`.
+Fullscreen dialogs render in the theme's overlay host so the scrim and content
+share the same visibility transition: the scrim fades while the content fades
+or slides. Other modal styles retain their platform dialog window and scrim.
 
 Fullscreen dialogs can opt into a scroll-driven expandable header:
 
@@ -127,10 +130,18 @@ area to use for the double-click gesture.
 
 ### Floating windows
 
-`FloatingWindow` is non-modal: the underlying screen remains interactive. It is
-rendered in the automatically provided `StyledTheme` host, or in the nearest
-explicit `StyledFloatingHost` when you need to limit floating windows to a
-specific bounded area.
+`FloatingWindow` passes outside clicks through to the host content by default.
+Set `backgroundMode` to `StyledDialog.FloatingWindowBackgroundMode.Block`,
+`StyledDialog.FloatingWindowBackgroundMode.Minimize` or
+`StyledDialog.FloatingWindowBackgroundMode.Dismiss` to intercept clicks outside
+the expanded window. These modes each accept `showScrim` to optionally dim the
+host. `StyledDialog.FloatingWindowBackgroundMode.Interactive` has no scrim
+option and always passes outside clicks through. A scrim is shown only while
+the window is expanded and is removed when minimized. `Minimize` parks the
+window as a bubble without dismissing the dialog. The window is rendered in the
+automatically provided `StyledTheme` host, or in the nearest explicit
+`StyledFloatingHost` when you need to limit floating windows to a specific
+bounded area.
 
 ```kotlin
 StyledDialog(
@@ -148,6 +159,9 @@ StyledDialog(
             offset = DpOffset(24.dp, (-24).dp),
         ),
         initiallyMinimized = true,
+        backgroundMode = StyledDialog.FloatingWindowBackgroundMode.Minimize(
+            showScrim = true,
+        ),
         draggable = true,
         resizable = true,
         showMinimizeButton = true,
@@ -202,7 +216,11 @@ window.
 Window and bubble positions are remembered independently: clicking the bubble
 restores the window at its last window position, and minimizing again returns
 to the last bubble position, even after moving the expanded window. Dragging
-the bubble sets its new parking position.
+the bubble sets its new parking position. Each position is retained as a
+proportion of its movable range, so changing host bounds (for example, on
+rotation) adjusts the visible placement without replacing the saved relative
+position. The window size continues to be constrained independently to the
+current host bounds.
 On first minimize, the bubble is centered on the window. Both positions remain
 constrained to the host's available area. Header actions are enabled by default for minimize
 and close, and disabled by default for maximize. Closing calls
@@ -325,17 +343,21 @@ is 12 dp on desktop/web and 16 dp on mobile, `medium` is 6/8 dp, and `small`
 is 2/4 dp. These are layout gaps, not distances between visible text glyphs:
 buttons retain their own content padding and minimum interactive footprint.
 
-Toolbar dialogs, fullscreen dialogs, floating windows and both sheet types
-keep their intended workspace/viewport height. The renderer passes body-only
-`PaddingValues`; the caller applies them once. Fixed sheet footers include their
-measured height in the body's bottom padding, so scrollable content clears the
-footer without an extra gap above it. Without a footer, the body receives its
-ordinary bottom inset.
+Toolbar dialogs, fullscreen dialogs, floating windows and sheets configured with
+`expandToFullscreen` keep their intended workspace/viewport height. Regular
+bottom sheets wrap their measured title, body and actions up to the configured
+height limit and remeasure when body content changes. Scrollable content uses
+the available height up to that limit. The renderer passes body-only
+`PaddingValues`; the caller applies them once. Fixed sheet footers include
+their measured height in the body's bottom padding, so scrollable content
+clears the footer without an extra gap above it. Without a footer, the body
+receives its ordinary bottom inset.
 
 Short content in a height-filling workspace can therefore leave substantial
 free space above the footer. This is intentional workspace space, not an
-additional content-to-button padding. Use `Style.Dialog()` for a content-height
-confirmation instead of a workspace presentation when that is the intended UX.
+additional content-to-button padding. Regular bottom sheets instead fit short
+content; use `Style.Dialog()` for a content-height confirmation when an alert
+presentation is intended.
 
 ## State and ViewModels
 
@@ -397,10 +419,11 @@ The non-composable factories do not save state; use an appropriate
 ## Buttons and dismissal
 
 `positive`, `negative` and `neutral` use `StyledButton` or `StyledIconButton`.
-Their role defaults to `StyledButton.Role.Default`, allowing each theme to
-choose its contextual action style; set `role` explicitly only when you want a
-particular semantic emphasis. Explicit roles remain authoritative. All actions
-are optional and support disabled state.
+Their variant defaults to `StyledButton.Variant.Auto`, allowing each theme to
+choose its contextual action style. Set an explicit variant to keep a visual
+treatment fixed across action slots. Presentation (`Auto`, `Text` or `Icon`) is
+independent from the button variant. All actions are optional and support
+disabled state.
 
 ```kotlin
 StyledDialog.Button(
@@ -425,25 +448,25 @@ Automatic icons are limited to toolbar positions in `ToolbarDialog` and
 text for the positive action; Cupertino keeps both labeled. Fluent 2 places
 its actions in the footer and keeps `Auto` as text. Neutral footer actions,
 regular dialogs and both kinds of bottom sheets also keep `Auto` as text.
-No icons are inferred from positive/negative roles.
+No icon assets are inferred; the caller must supply an icon for icon presentation.
 
 Icon-only actions use the label as their accessibility description and tooltip.
 Both text and icon controls receive the modal action context, so registered
 button/icon-button replacements affect modal actions too.
 
-For theme-wide toolbar preferences, replace the modal renderer through
-`StyledTheme(customization)`:
+For theme-wide toolbar presentation preferences, replace the modal renderer
+through `StyledTheme(customization)`:
 
 ```kotlin
-register(Material3Dialog.create(roleMapping = { role ->
-    if (role == StyledButton.Role.Primary) StyledDialog.ButtonPresentation.Icon
-    else Material3Dialog.DefaultRoleMapping(role)
+register(Material3Dialog.create(presentationMapping = { slot ->
+    if (slot == StyledDialog.ActionSlot.Positive) StyledDialog.ButtonPresentation.Icon
+    else Material3Dialog.DefaultPresentationMapping(slot)
 }))
 ```
 
-`CupertinoFlatDialog.create` exposes the same mapping. It only resolves `Auto` at
-actual toolbar positions; explicit per-action `Text`/`Icon` always wins, and a
-missing optional icon still falls back to text.
+`CupertinoFlatDialog.create` exposes the same mapping. It only resolves `Auto`
+at actual toolbar positions; explicit per-action `Text`/`Icon` always wins,
+and a missing optional icon still falls back to text.
 
 The existing trailing-lambda constructor accepts arbitrary `RowScope` content.
 It remains a text-style action and is never automatically interpreted as an
@@ -512,10 +535,13 @@ Embedded sheets recalculate insets from their actual window bounds: a sheet at t
 window's bottom edge reserves navigation space, while one above that area does not.
 `peekHeightFraction` must be in `(0, 1]` and is clamped to the maximum sheet
 height. `maxHeightFraction` lives only on the style/defaults, not also on options.
-Sheets snap between peek and expanded positions. Downward swipes may dismiss
-independently of Back/outside-click policy. Nested scrolling expands the sheet
-before upward body scrolling; downward scrolling reaches the body's start
-before moving the sheet.
+Regular sheets wrap to their measured content up to `maxHeightFraction` and the
+top edge margin. If the measured sheet is no taller than the peek area, it is
+fully visible and treated as expanded; there is no separate collapsed position.
+Larger sheets snap between peek and expanded positions. Downward swipes may
+dismiss independently of Back/outside-click policy. Nested scrolling expands
+the sheet before upward body scrolling; downward scrolling reaches the body's
+start before moving the sheet.
 Clicking the drag handle toggles between peek and expanded positions when gestures
 are enabled and these positions differ; it does not dismiss the sheet.
 `expandToFullscreen` makes the expanded position fill the sheet viewport (the

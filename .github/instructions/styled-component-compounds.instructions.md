@@ -40,14 +40,15 @@ For Core component APIs and renderer implementation details, follow the
    concrete Cupertino, Fluent 2 or Material 3 implementations into `core`.
    If a part truly requires theme-specific rendering, give that part the
    registered component contract described in the Core guide.
-4. Reuse the **public Styled composable**, not just its tokens or renderer
-   defaults. Reading `StyledDropdownMenuItem.Implementation.defaults` and applying
-   them to a clickable `Box` is not equivalent to composing
-   `StyledDropdownMenuItem`: it bypasses native rendering, interaction feedback,
-   content locals and custom registry replacements. Selection dropdowns must
-   compose `StyledPopupMenu` and `StyledDropdownMenuItem`, just like standalone
-   menus and dropdown buttons. Keep selection, filtering and dismissal policy in
-   the compound; leave item rendering and interaction feedback to the renderer.
+4. Reuse the **public Styled API**, not just its tokens or renderer defaults.
+   Popup menu entries must use `StyledPopupMenuScope` operations rather than
+   internal menu-row helpers or a clickable `Box`; the scope routes entries
+   through the active renderer, preserving native rendering, interaction
+   feedback, content locals and custom registry replacements. Selection
+   dropdowns use `StyledPopupDropdown` or
+   `StyledPopupDropdownMultiSelect` and their content scopes. Keep selection,
+   filtering and dismissal policy in the dropdown; leave option rendering and
+   interaction feedback to the renderer.
 5. Add compound-specific selection semantics through the Styled control's
    modifier without attaching a second `clickable`, `selectable` or `toggleable`
    action. Preserve radio/checkbox roles, selected/checked state, keyboard

@@ -10,8 +10,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import com.michaelflisar.composestyled.UpdateStyledThemeLocals
 import com.michaelflisar.composestyled.StyledTheme
+import com.michaelflisar.composestyled.material3.ProvideStyledLocals
 import com.michaelflisar.composestyled.ui.components.StyledTopBar
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 
@@ -47,13 +47,13 @@ class Material3TopBar internal constructor() : StyledTopBar.Implementation {
             actionIconContentColor = contentColor,
         )
         val styledTitle: @Composable () -> Unit = {
-            UpdateStyledThemeLocals(
+            ProvideStyledLocals(
                 contentColor = contentColor,
                 textStyle = StyledTheme.typography.titleLarge,
                 content = title,
             )
         }
-        UpdateStyledThemeLocals(contentColor = contentColor) {
+        ProvideStyledLocals(contentColor = contentColor) {
             when (variant) {
                 StyledTopBar.Variant.Standard -> TopAppBar(
                     title = styledTitle,

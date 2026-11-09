@@ -7,14 +7,14 @@ import androidx.compose.material3.ElevatedAssistChip
 import androidx.compose.material3.ElevatedFilterChip
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.classes.IconComposable
-import com.michaelflisar.composestyled.material3.CopyMaterialThemeLocals
+import com.michaelflisar.composestyled.material3.ProvideStyledLocals
 import com.michaelflisar.composestyled.ui.components.StyledChip
 import com.michaelflisar.composestyled.ui.components.StyledIcon
 
@@ -42,16 +42,26 @@ class Material3Chip internal constructor(
         // 2) mapping
         // -------------
 
-        typealias VariantMapping = (StyledChip.Variant) -> Variant
+        typealias VariantMapping = (StyledChip.Variant, Boolean) -> Variant
 
         // non elevated chips have ui bug in m3:
         // if not selected they show a background behind the text when hovered
         // => although on android may not be a real problem
         // => but still android has desktop mode as well...
-        val DefaultVariantMapping: VariantMapping = { variant ->
+        val DefaultVariantMapping: VariantMapping = { variant, selectable ->
             when (variant) {
-                StyledChip.Variant.NonSelectable -> Variant.ElevatedAssist
-                StyledChip.Variant.Selectable -> Variant.ElevatedFilter
+                StyledChip.Variant.Auto,
+                StyledChip.Variant.Outlined -> if (selectable) {
+                    Variant.ElevatedFilter
+                } else {
+                    Variant.ElevatedAssist
+                }
+
+                StyledChip.Variant.Filled -> if (selectable) {
+                    Variant.FilledFilter
+                } else {
+                    Variant.FilledAssist
+                }
             }
         }
     }
@@ -61,12 +71,15 @@ class Material3Chip internal constructor(
         Filter,
         ElevatedAssist,
         ElevatedFilter,
+        FilledAssist,
+        FilledFilter,
 
     }
 
     @Composable
     override fun Render(
         variant: StyledChip.Variant,
+        selectable: Boolean,
         selected: Boolean,
         onClick: () -> Unit,
         modifier: Modifier,
@@ -77,25 +90,72 @@ class Material3Chip internal constructor(
         trailingIcon: IconComposable?,
         content: @Composable () -> Unit,
     ) {
-        val containerColor = customization?.container?.resolve() ?: Color.Unspecified
-        val contentColor = customization?.content?.resolve() ?: Color.Unspecified
+        val mappedVariant = variantMapping(variant, selectable)
+        val filledAssist = mappedVariant == Variant.FilledAssist
+        val filledFilter = mappedVariant == Variant.FilledFilter
+        val containerColor = customization?.container?.resolve()
+            ?: when {
+                filledAssist -> StyledTheme.colorScheme.secondarySurface
+                filledFilter -> StyledTheme.colorScheme.surfaceVariant
+                else -> Color.Unspecified
+            }
+        val contentColor = customization?.content?.resolve()
+            ?.takeUnless { it == Color.Unspecified }
+            ?: when {
+                filledAssist -> StyledTheme.colorScheme.onSecondarySurface
+                filledFilter -> StyledTheme.colorScheme.onSurfaceVariant
+                else -> Color.Unspecified
+            }
         val borderColor = customization?.border?.resolve() ?: Color.Unspecified
-        val selectedContainerColor = customization?.selectedContainer?.resolve() ?: Color.Unspecified
-        val selectedContentColor = customization?.selectedContent?.resolve() ?: Color.Unspecified
+        val selectedContainerColor = customization?.selectedContainer?.resolve()
+            ?: if (filledFilter) StyledTheme.colorScheme.secondarySurface else Color.Unspecified
+        val selectedContentColor = customization?.selectedContent?.resolve()
+            ?.takeUnless { it == Color.Unspecified }
+            ?: StyledTheme.colorScheme.onSecondarySurface
         val selectedBorderColor = customization?.selectedBorder?.resolve() ?: Color.Unspecified
+        val resolvedContentColor = if (selected) {
+            selectedContentColor
+        } else {
+            contentColor.takeUnless { it == Color.Unspecified } ?: StyledTheme.colorScheme.onSurface
+        }
+        val defaultIconColor = when {
+            filledAssist -> StyledTheme.colorScheme.onSecondarySurface
+            mappedVariant == Variant.Assist || mappedVariant == Variant.ElevatedAssist ->
+                StyledTheme.colorScheme.onSurfaceVariant
+            else -> StyledTheme.colorScheme.onSurfaceVariant
+        }
+        val resolvedIconColor = if (selected) {
+            selectedContentColor
+        } else {
+            contentColor.takeUnless { it == Color.Unspecified } ?: defaultIconColor
+        }
+        val styledSlotContentColor = styledChipSlotColor(resolvedContentColor, enabled)
+        val styledIconContentColor = styledChipSlotColor(resolvedIconColor, enabled)
+        val styledLeadingIconColor = if (
+            contentColor == Color.Unspecified &&
+            !selected &&
+            (mappedVariant == Variant.Assist || mappedVariant == Variant.ElevatedAssist)
+        ) {
+            styledChipSlotColor(StyledTheme.colorScheme.primary, enabled)
+        } else {
+            styledIconContentColor
+        }
         val label: @Composable () -> Unit = {
-            CopyMaterialThemeLocals(contentColor = LocalContentColor.current) {
+            ProvideStyledLocals(
+                contentColor = styledSlotContentColor,
+                textStyle = StyledTheme.typography.labelLarge,
+            ) {
                 content()
             }
         }
         val leadingIconSlot: (@Composable () -> Unit)? = leadingIcon?.let { icon ->
-            { ChipIcon(icon, 18.dp) }
+            { ChipIcon(icon, 18.dp, styledLeadingIconColor) }
         }
         val trailingIconSlot: (@Composable () -> Unit)? = trailingIcon?.let { icon ->
-            { ChipIcon(icon, 18.dp) }
+            { ChipIcon(icon, 18.dp, styledIconContentColor) }
         }
 
-        when (variantMapping(variant)) {
+        when (mappedVariant) {
             Variant.Assist -> {
                 val border = customization?.border?.resolve()?.let {
                     AssistChipDefaults.assistChipBorder(
@@ -135,6 +195,31 @@ class Material3Chip internal constructor(
                     leadingIcon = leadingIconSlot,
                     trailingIcon = trailingIconSlot,
                     colors = AssistChipDefaults.elevatedAssistChipColors(
+                        containerColor = containerColor,
+                        labelColor = contentColor,
+                        leadingIconContentColor = contentColor,
+                        trailingIconContentColor = contentColor,
+                    ),
+                    border = border,
+                    interactionSource = interactionSource,
+                )
+            }
+
+            Variant.FilledAssist -> {
+                val border = customization?.border?.resolve()?.let {
+                    AssistChipDefaults.assistChipBorder(
+                        enabled = enabled,
+                        borderColor = it,
+                    )
+                }
+                AssistChip(
+                    onClick = onClick,
+                    label = label,
+                    modifier = modifier,
+                    enabled = enabled,
+                    leadingIcon = leadingIconSlot,
+                    trailingIcon = trailingIconSlot,
+                    colors = AssistChipDefaults.assistChipColors(
                         containerColor = containerColor,
                         labelColor = contentColor,
                         leadingIconContentColor = contentColor,
@@ -210,16 +295,56 @@ class Material3Chip internal constructor(
                     interactionSource = interactionSource,
                 )
             }
+
+            Variant.FilledFilter -> {
+                val border = if (customization?.border != null || customization?.selectedBorder != null) {
+                    FilterChipDefaults.filterChipBorder(
+                        enabled = enabled,
+                        selected = selected,
+                        borderColor = borderColor,
+                        selectedBorderColor = selectedBorderColor,
+                    )
+                } else {
+                    null
+                }
+                FilterChip(
+                    selected = selected,
+                    onClick = onClick,
+                    label = label,
+                    modifier = modifier,
+                    enabled = enabled,
+                    leadingIcon = leadingIconSlot,
+                    trailingIcon = trailingIconSlot,
+                    colors = FilterChipDefaults.filterChipColors(
+                        containerColor = containerColor,
+                        labelColor = contentColor,
+                        iconColor = contentColor,
+                        selectedContainerColor = selectedContainerColor,
+                        selectedLabelColor = selectedContentColor,
+                        selectedLeadingIconColor = selectedContentColor,
+                        selectedTrailingIconColor = selectedContentColor,
+                    ),
+                    border = border,
+                    interactionSource = interactionSource,
+                )
+            }
         }
     }
 }
 
 @Composable
+private fun styledChipSlotColor(color: Color, enabled: Boolean) =
+    if (enabled) color else color.copy(
+        alpha = color.alpha * StyledTheme.colorScheme.disableFactors.content,
+    )
+
+@Composable
 private fun ChipIcon(
     icon: IconComposable,
     size: androidx.compose.ui.unit.Dp,
+    contentColor: Color,
 ) {
-    CopyMaterialThemeLocals(contentColor = LocalContentColor.current) {
+    ProvideStyledLocals(contentColor = contentColor) {
         StyledIcon(
             icon = icon,
             size = size,

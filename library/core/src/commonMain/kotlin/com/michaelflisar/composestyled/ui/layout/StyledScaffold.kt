@@ -89,6 +89,40 @@ object StyledScaffoldDefaults {
  * [contentWindowInsets]; apply it and consume it on the content root to protect nested layouts.
  * Side navigation is positioned at the start edge and handles its start safe-area inset itself,
  * while the scaffold consumes the top and bottom padding for the bars.
+ *
+ * A typical scaffold with a top bar and bottom navigation can style both system bars from the
+ * colors drawn behind them:
+ * ```
+ * val scaffoldColor = StyledTheme.colorScheme.surface
+ * val topBarColor = StyledTheme.colorScheme.primarySurface
+ * val bottomBarColor = StyledTheme.colorScheme.surfaceVariant
+ *
+ * SystemBarStyleEffectIfNeeded(
+ *     statusBarColor = topBarColor,
+ *     navigationBarColor = bottomBarColor,
+ *     backgroundColor = scaffoldColor,
+ * )
+ *
+ * StyledScaffold(
+ *     containerColor = scaffoldColor,
+ *     topBar = {
+ *         StyledTopBar(
+ *             containerColor = topBarColor,
+ *             title = { StyledText("My app") },
+ *         )
+ *     },
+ *     bottomBar = {
+ *         StyledBottomNavigationBar(containerColor = bottomBarColor) {
+ *             // Navigation bar items
+ *         }
+ *     },
+ * ) { paddingValues ->
+ *     StyledText(
+ *         text = "Content",
+ *         modifier = Modifier.padding(paddingValues).consumeWindowInsets(paddingValues),
+ *     )
+ * }
+ * ```
  */
 @Composable
 fun StyledScaffold(

@@ -18,7 +18,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.michaelflisar.composestyled.material3.CopyMaterialThemeLocals
+import com.michaelflisar.composestyled.material3.ProvideStyledLocals
+import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.ui.components.StyledTooltip
 import com.michaelflisar.composestyled.ui.components.StyledTooltipState
@@ -108,7 +109,10 @@ class Material3Tooltip internal constructor() : StyledTooltip.Implementation {
                     containerColor = containerColor,
                     shadowElevation = shadowElevation,
                 ) {
-                    CopyMaterialThemeLocals(contentColor = contentColor) {
+                    ProvideStyledLocals(
+                        contentColor = contentColor,
+                        textStyle = StyledTheme.typography.bodySmall,
+                    ) {
                         Box(Modifier.padding(contentPadding)) {
                             tooltip()
                         }

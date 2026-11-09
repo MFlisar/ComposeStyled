@@ -46,7 +46,7 @@ fun DialogButton(
                     onClick = button.onClick,
                     modifier = modifier,
                     enabled = button.enabled,
-                    role = button.role.toIconButtonRole(),
+                    variant = button.variant,
                     content = iconContent,
                 )
             }
@@ -54,17 +54,10 @@ fun DialogButton(
             onClick = button.onClick,
             modifier = modifier,
             enabled = button.enabled,
-            role = button.role,
+            variant = button.variant,
             content = button.content,
         )
     }
-}
-
-private fun StyledButton.Role.toIconButtonRole() = when (this) {
-    StyledButton.Role.Default -> StyledIconButton.Role.Default
-    StyledButton.Role.Primary -> StyledIconButton.Role.Primary
-    StyledButton.Role.Secondary -> StyledIconButton.Role.Secondary
-    StyledButton.Role.Tertiary -> StyledIconButton.Role.Tertiary
 }
 
 @InternalComposeStyledApi

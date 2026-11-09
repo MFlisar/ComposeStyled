@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -16,7 +15,8 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.foundation.components.FoundationListItem
-import com.michaelflisar.composestyled.material3.CopyMaterialThemeLocals
+import com.michaelflisar.composestyled.StyledTheme
+import com.michaelflisar.composestyled.material3.ProvideStyledLocals
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.ui.components.StyledListItem
 
@@ -51,7 +51,10 @@ class Material3ListItem internal constructor() : StyledListItem.Implementation {
         minHeight: Dp,
         contentPadding: PaddingValues,
         spacing: Dp,
-        customization: StyledListItem.Customization?,
+        containerColor: Color,
+        contentColor: Color,
+        supportingColor: Color,
+        borderColor: Color,
         leading: (@Composable () -> Unit)?,
         actions: (@Composable RowScope.() -> Unit)?,
         content: StyledListItem.Content,
@@ -67,31 +70,34 @@ class Material3ListItem internal constructor() : StyledListItem.Implementation {
                     ListItem(
                         modifier = bodyModifier.heightIn(min = minHeight),
                         headlineContent = {
-                            CopyMaterialThemeLocals(
-                                contentColor = LocalContentColor.current,
+                            ProvideStyledLocals(
+                                contentColor = foreground,
+                                textStyle = StyledTheme.typography.bodyLarge,
                                 content = semantic.headline,
                             )
                         },
                         supportingContent = semantic.supporting?.let { slot ->
                             {
-                                CopyMaterialThemeLocals(
-                                    contentColor = LocalContentColor.current,
+                                ProvideStyledLocals(
+                                    contentColor = secondary,
+                                    textStyle = StyledTheme.typography.bodyMedium,
                                     content = slot,
                                 )
                             }
                         },
                         overlineContent = semantic.overline?.let { slot ->
                             {
-                                CopyMaterialThemeLocals(
-                                    contentColor = LocalContentColor.current,
+                                ProvideStyledLocals(
+                                    contentColor = secondary,
+                                    textStyle = StyledTheme.typography.labelSmall,
                                     content = slot,
                                 )
                             }
                         },
                         leadingContent = leading?.let { slot ->
                             {
-                                CopyMaterialThemeLocals(
-                                    contentColor = LocalContentColor.current,
+                                ProvideStyledLocals(
+                                    contentColor = foreground,
                                     content = slot,
                                 )
                             }
@@ -108,15 +114,29 @@ class Material3ListItem internal constructor() : StyledListItem.Implementation {
             } else null
 
         FoundationListItem(
-            onClick, modifier, enabled, interactionSource, shape,
-            minHeight, 72.dp, 88.dp, contentPadding, spacing,
-            customization, leading, actions, content,
-            containerColor = MaterialTheme.colorScheme.surface,
-            contentColor = MaterialTheme.colorScheme.onSurface,
-            supportingColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            headlineStyle = MaterialTheme.typography.bodyLarge,
-            supportingStyle = MaterialTheme.typography.bodyMedium,
-            overlineStyle = MaterialTheme.typography.labelSmall,
+            onClick = onClick,
+            modifier = modifier,
+            enabled = enabled,
+            interactionSource = interactionSource,
+            shape = shape,
+            minHeight = minHeight,
+            twoLineMinHeight = 72.dp,
+            threeLineMinHeight = 88.dp,
+            contentPadding = contentPadding,
+            spacing = spacing,
+            containerColor = containerColor,
+            contentColor = contentColor,
+            supportingColor = supportingColor,
+            borderColor = borderColor,
+            leading = leading,
+            actions = actions,
+            content = content,
+            defaultContainerColor = StyledTheme.colorScheme.surface,
+            defaultContentColor = StyledTheme.colorScheme.onSurface,
+            defaultSupportingColor = StyledTheme.colorScheme.onSurfaceVariant,
+            headlineStyle = StyledTheme.typography.bodyLarge,
+            supportingStyle = StyledTheme.typography.bodyMedium,
+            overlineStyle = StyledTheme.typography.labelSmall,
             nativeContent = nativeContent,
         )
     }

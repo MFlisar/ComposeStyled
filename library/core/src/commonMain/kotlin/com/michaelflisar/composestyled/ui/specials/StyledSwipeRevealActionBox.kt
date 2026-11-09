@@ -550,7 +550,7 @@ private fun SwipeRevealActionButton(
                 modifier = Modifier.fillMaxHeight(),
                 onClick = onClick,
                 enabled = action.enabled && isRevealVisible,
-                role = StyledButton.Role.Default,
+                variant = StyledButton.Variant.Auto,
                 shape = RectangleShape,
                 customization = StyledButtonDefaults.customize(
                     colors = CustomColors(

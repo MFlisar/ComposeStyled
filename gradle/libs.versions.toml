@@ -1,6 +1,6 @@
 [versions]
 
-gradle = 				                "9.4.1"
+gradle = 				                "9.5.1"
 kotlin = 				                "2.4.21"
 ksp = 				                    "2.3.6"
 

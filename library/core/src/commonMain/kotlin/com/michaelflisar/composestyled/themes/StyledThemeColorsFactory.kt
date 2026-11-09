@@ -128,22 +128,24 @@ private fun definition(
     val onColor = originalColor.onColorByContrastRatio()
     val target = contrast.targetContrastRatio + 0.05f
 
-    if (maxOf(blackContrast, whiteContrast) >= target) {
-        return StyledColorScheme.Definition(originalColor, onColor)
+    val color = if (maxOf(blackContrast, whiteContrast) >= target) {
+        originalColor
+    } else {
+        val opposite = if (onColor == Color.Black) Color.White else Color.Black
+        var low = 0f
+        var high = 1f
+        repeat(24) {
+            val amount = (low + high) / 2f
+            if (blend(originalColor, opposite, amount).contrastRatio(onColor) >= target) {
+                high = amount
+            } else {
+                low = amount
+            }
+        }
+        blend(originalColor, opposite, high)
     }
 
-    val opposite = if (onColor == Color.Black) Color.White else Color.Black
-    var low = 0f
-    var high = 1f
-    repeat(24) {
-        val amount = (low + high) / 2f
-        if (blend(originalColor, opposite, amount).contrastRatio(onColor) >= target) {
-            high = amount
-        } else {
-            low = amount
-        }
-    }
-    return StyledColorScheme.Definition(blend(originalColor, opposite, high), onColor)
+    return StyledColorScheme.Definition(color, onColor)
 }
 
 private fun tintStatus(status: Color, primary: Color) = blend(status, primary, 0.06f)

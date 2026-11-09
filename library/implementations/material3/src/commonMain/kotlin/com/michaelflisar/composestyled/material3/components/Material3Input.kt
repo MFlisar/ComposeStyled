@@ -1,13 +1,11 @@
 package com.michaelflisar.composestyled.material3.components
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.TextField
@@ -26,10 +24,14 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.michaelflisar.composestyled.UpdateStyledThemeLocals
 import com.michaelflisar.composestyled.StyledTheme
+import com.michaelflisar.composestyled.material3.ProvideStyledLocals
+import com.michaelflisar.composestyled.tokens.LocalStyledContentColor
+import com.michaelflisar.composestyled.tokens.LocalStyledTextStyle
 import com.michaelflisar.composestyled.ui.components.StyledInput
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
+import com.michaelflisar.composestyled.runtime.LocalStyledContext
+import com.michaelflisar.composestyled.runtime.StyledContext
 
 class Material3Input internal constructor(
     val variantMapping: VariantMapping,
@@ -56,17 +58,22 @@ class Material3Input internal constructor(
         // 2) mapping
         // -------------
 
-        typealias VariantMapping = (StyledInput.Variant) -> Variant
+        typealias VariantMapping = (StyledInput.Variant, StyledContext) -> Variant
 
-        val DefaultVariantMapping: VariantMapping = { variant ->
-            when (variant) {
-                StyledInput.Variant.Default -> Variant.Default
-                StyledInput.Variant.Alternative -> Variant.Alternative
+        val DefaultVariantMapping: VariantMapping = { variant, context ->
+            when {
+                variant == StyledInput.Variant.Auto &&
+                    context == StyledInput.Context.DropdownFilter -> Variant.Outlined
+                else -> when (variant) {
+                    StyledInput.Variant.Auto,
+                    StyledInput.Variant.Filled -> Variant.Filled
+                    StyledInput.Variant.Outlined -> Variant.Outlined
+                }
             }
         }
     }
 
-    enum class Variant { Default, Alternative }
+    enum class Variant { Filled, Outlined }
 
     @Composable
     override fun topInsetToBorder(): Dp = minimizedLabelHalfHeight()
@@ -99,14 +106,17 @@ class Material3Input internal constructor(
         trailingIcon: @Composable (() -> Unit)?,
         supportingText: @Composable (() -> Unit)?,
     ) {
-        val mappedVariant = variantMapping(variant)
-        val filledBackground = if (mappedVariant == Variant.Alternative) {
+        val mappedVariant = variantMapping(variant, LocalStyledContext.current)
+        val resolvedInteractionSource = interactionSource ?: remember { MutableInteractionSource() }
+        val isFocused = resolvedInteractionSource.collectIsFocusedAsState().value
+        val isFieldEnabled = enabled && interactionEnabled
+        val filledBackground = if (mappedVariant == Variant.Filled) {
             customization?.colors?.filledBackground?.resolve()
                 ?.takeIf { it != Color.Unspecified } ?: StyledTheme.colorScheme.surfaceVariant
         } else {
             Color.Unspecified
         }
-        val contentColor = if (mappedVariant == Variant.Alternative) {
+        val contentColor = if (mappedVariant == Variant.Filled) {
             customization?.colors?.filledForeground?.resolve()
         } else {
             customization?.colors?.textForeground?.resolve()
@@ -114,15 +124,36 @@ class Material3Input internal constructor(
         val customBorder = customization?.border?.resolve()
             ?.takeIf { it != Color.Unspecified } ?: Color.Unspecified
         val textColor = contentColor.takeIf { it != Color.Unspecified }
-            ?: MaterialTheme.colorScheme.onSurface
+            ?: StyledTheme.colorScheme.onSurface
+        val iconContentColor = if (isFieldEnabled) {
+            textColor
+        } else {
+            textColor.copy(
+                alpha = textColor.alpha * StyledTheme.colorScheme.disableFactors.content,
+            )
+        }
         val unfocusedBorderColor = customBorder.takeIf { it != Color.Unspecified }
-            ?: MaterialTheme.colorScheme.outline
-        val unfocusedDecorationColor = MaterialTheme.colorScheme.onSurfaceVariant
+            ?: StyledTheme.colorScheme.outline
+        val unfocusedDecorationColor = StyledTheme.colorScheme.onSurfaceVariant
+        val disabledDecorationColor = unfocusedDecorationColor.copy(
+            alpha = unfocusedDecorationColor.alpha * StyledTheme.colorScheme.disableFactors.content,
+        )
+        val labelColor = when {
+            !isFieldEnabled -> disabledDecorationColor
+            isError -> StyledTheme.colorScheme.error
+            isFocused -> StyledTheme.colorScheme.primary
+            else -> unfocusedDecorationColor
+        }
+        val styledSupportingColor = when {
+            !isFieldEnabled -> disabledDecorationColor
+            isError -> StyledTheme.colorScheme.error
+            else -> unfocusedDecorationColor
+        }
         val fieldModifier = modifier.semantics {
             if (isError && errorMessage != null) error(errorMessage)
         }
         when (mappedVariant) {
-            Variant.Default -> OutlinedTextField(
+            Variant.Outlined -> OutlinedTextField(
                 value = value,
                 onValueChange = onValueChange,
                 modifier = fieldModifier,
@@ -137,12 +168,20 @@ class Material3Input internal constructor(
                 keyboardOptions = keyboardOptions,
                 keyboardActions = keyboardActions,
                 visualTransformation = visualTransformation,
-                interactionSource = interactionSource,
-                label = styledInputSlot(label),
-                placeholder = styledInputSlot(placeholder),
-                leadingIcon = styledInputSlot(leadingIcon),
-                trailingIcon = styledInputSlot(trailingIcon),
-                supportingText = styledInputSlot(supportingText),
+                interactionSource = resolvedInteractionSource,
+                label = styledInputSlot(label, labelColor, StyledTheme.typography.bodySmall),
+                placeholder = styledInputSlot(
+                    placeholder,
+                    if (isFieldEnabled) unfocusedDecorationColor else disabledDecorationColor,
+                    textStyle,
+                ),
+                leadingIcon = styledInputSlot(leadingIcon, iconContentColor),
+                trailingIcon = styledInputSlot(trailingIcon, iconContentColor),
+                supportingText = styledInputSlot(
+                    supportingText,
+                    styledSupportingColor,
+                    StyledTheme.typography.bodySmall,
+                ),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedContainerColor = Color.Unspecified,
                     unfocusedContainerColor = Color.Unspecified,
@@ -150,19 +189,34 @@ class Material3Input internal constructor(
                     errorContainerColor = Color.Unspecified,
                     focusedTextColor = contentColor,
                     unfocusedTextColor = contentColor,
-                    disabledTextColor = textColor,
+                    disabledTextColor = iconContentColor,
                     errorTextColor = contentColor,
+                    focusedLabelColor = StyledTheme.colorScheme.primary,
+                    unfocusedLabelColor = unfocusedDecorationColor,
+                    errorLabelColor = StyledTheme.colorScheme.error,
+                    focusedPlaceholderColor = unfocusedDecorationColor,
+                    unfocusedPlaceholderColor = unfocusedDecorationColor,
+                    errorPlaceholderColor = unfocusedDecorationColor,
+                    focusedSupportingTextColor = unfocusedDecorationColor,
+                    unfocusedSupportingTextColor = unfocusedDecorationColor,
+                    errorSupportingTextColor = StyledTheme.colorScheme.error,
+                    focusedLeadingIconColor = iconContentColor,
+                    unfocusedLeadingIconColor = iconContentColor,
+                    disabledLeadingIconColor = iconContentColor,
+                    errorLeadingIconColor = iconContentColor,
+                    focusedTrailingIconColor = iconContentColor,
+                    unfocusedTrailingIconColor = iconContentColor,
+                    disabledTrailingIconColor = iconContentColor,
+                    errorTrailingIconColor = iconContentColor,
                     focusedBorderColor = customBorder,
                     unfocusedBorderColor = unfocusedBorderColor,
-                    disabledBorderColor = if (isError) MaterialTheme.colorScheme.error else unfocusedBorderColor,
-                    disabledLabelColor = unfocusedDecorationColor,
-                    disabledPlaceholderColor = unfocusedDecorationColor,
-                    disabledLeadingIconColor = unfocusedDecorationColor,
-                    disabledTrailingIconColor = unfocusedDecorationColor,
-                    disabledSupportingTextColor = unfocusedDecorationColor,
+                    disabledBorderColor = if (isError) StyledTheme.colorScheme.error else unfocusedBorderColor,
+                    disabledLabelColor = disabledDecorationColor,
+                    disabledPlaceholderColor = disabledDecorationColor,
+                    disabledSupportingTextColor = disabledDecorationColor,
                 ),
             )
-            Variant.Alternative -> TextField(
+            Variant.Filled -> TextField(
                 value = value,
                 onValueChange = onValueChange,
                 modifier = fieldModifier,
@@ -177,12 +231,20 @@ class Material3Input internal constructor(
                 keyboardOptions = keyboardOptions,
                 keyboardActions = keyboardActions,
                 visualTransformation = visualTransformation,
-                interactionSource = interactionSource,
-                label = styledInputSlot(label),
-                placeholder = styledInputSlot(placeholder),
-                leadingIcon = styledInputSlot(leadingIcon),
-                trailingIcon = styledInputSlot(trailingIcon),
-                supportingText = styledInputSlot(supportingText),
+                interactionSource = resolvedInteractionSource,
+                label = styledInputSlot(label, labelColor, StyledTheme.typography.bodySmall),
+                placeholder = styledInputSlot(
+                    placeholder,
+                    if (isFieldEnabled) unfocusedDecorationColor else disabledDecorationColor,
+                    textStyle,
+                ),
+                leadingIcon = styledInputSlot(leadingIcon, iconContentColor),
+                trailingIcon = styledInputSlot(trailingIcon, iconContentColor),
+                supportingText = styledInputSlot(
+                    supportingText,
+                    styledSupportingColor,
+                    StyledTheme.typography.bodySmall,
+                ),
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = filledBackground,
                     unfocusedContainerColor = filledBackground,
@@ -190,16 +252,31 @@ class Material3Input internal constructor(
                     errorContainerColor = filledBackground,
                     focusedTextColor = contentColor,
                     unfocusedTextColor = contentColor,
-                    disabledTextColor = textColor,
+                    disabledTextColor = iconContentColor,
                     errorTextColor = contentColor,
+                    focusedLabelColor = StyledTheme.colorScheme.primary,
+                    unfocusedLabelColor = unfocusedDecorationColor,
+                    errorLabelColor = StyledTheme.colorScheme.error,
+                    focusedPlaceholderColor = unfocusedDecorationColor,
+                    unfocusedPlaceholderColor = unfocusedDecorationColor,
+                    errorPlaceholderColor = unfocusedDecorationColor,
+                    focusedSupportingTextColor = unfocusedDecorationColor,
+                    unfocusedSupportingTextColor = unfocusedDecorationColor,
+                    errorSupportingTextColor = StyledTheme.colorScheme.error,
+                    focusedLeadingIconColor = iconContentColor,
+                    unfocusedLeadingIconColor = iconContentColor,
+                    disabledLeadingIconColor = iconContentColor,
+                    errorLeadingIconColor = iconContentColor,
+                    focusedTrailingIconColor = iconContentColor,
+                    unfocusedTrailingIconColor = iconContentColor,
+                    disabledTrailingIconColor = iconContentColor,
+                    errorTrailingIconColor = iconContentColor,
                     focusedIndicatorColor = customBorder,
                     unfocusedIndicatorColor = unfocusedDecorationColor,
                     disabledIndicatorColor = unfocusedDecorationColor,
-                    disabledLabelColor = unfocusedDecorationColor,
-                    disabledPlaceholderColor = unfocusedDecorationColor,
-                    disabledLeadingIconColor = unfocusedDecorationColor,
-                    disabledTrailingIconColor = unfocusedDecorationColor,
-                    disabledSupportingTextColor = unfocusedDecorationColor,
+                    disabledLabelColor = disabledDecorationColor,
+                    disabledPlaceholderColor = disabledDecorationColor,
+                    disabledSupportingTextColor = disabledDecorationColor,
                 ),
             )
         }
@@ -207,12 +284,16 @@ class Material3Input internal constructor(
 }
 
 @OptIn(InternalComposeStyledApi::class)
-private fun styledInputSlot(content: (@Composable () -> Unit)?): (@Composable () -> Unit)? =
+private fun styledInputSlot(
+    content: (@Composable () -> Unit)?,
+    contentColor: Color? = null,
+    textStyle: TextStyle? = null,
+): (@Composable () -> Unit)? =
     if (content == null) null else {
         {
-            UpdateStyledThemeLocals(
-                contentColor = LocalContentColor.current,
-                textStyle = LocalTextStyle.current,
+            ProvideStyledLocals(
+                contentColor = contentColor ?: LocalStyledContentColor.current,
+                textStyle = textStyle ?: LocalStyledTextStyle.current,
                 content = content,
             )
         }
@@ -220,7 +301,7 @@ private fun styledInputSlot(content: (@Composable () -> Unit)?): (@Composable ()
 
 @Composable
 private fun minimizedLabelHalfHeight(): Dp {
-    val compositionLocalValue = MaterialTheme.typography.bodySmall.lineHeight
+    val compositionLocalValue = StyledTheme.typography.bodySmall.lineHeight
     val fallbackValue = 16.sp//TypeScaleTokens.BodySmallLineHeight
     val value = if (compositionLocalValue.isSp) compositionLocalValue else fallbackValue
     return with(LocalDensity.current) { value.toDp() / 2 }

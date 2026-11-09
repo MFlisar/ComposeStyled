@@ -27,7 +27,9 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.UpdateStyledThemeLocals
 import com.michaelflisar.composestyled.StyledTheme
+import com.michaelflisar.composestyled.tokens.LocalStyledContentColor
 import com.michaelflisar.composestyled.ui.components.StyledIconButton
+import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.ui.components.StyledInput
 import com.michaelflisar.composestyled.ui.components.StyledSnackbar
 import com.michaelflisar.composestyled.ui.components.StyledTopBar
@@ -41,7 +43,7 @@ import com.michaelflisar.composestyled.runtime.StyledContext
 import com.michaelflisar.composestyled.tokens.minimumInteractiveSize
 
 class Fluent2IconButton internal constructor(
-    val roleMapping: RoleMapping,
+    val variantMapping: VariantMapping,
 ) : StyledIconButton.Implementation {
 
     override val defaults: StyledIconButton.Defaults
@@ -55,18 +57,18 @@ class Fluent2IconButton internal constructor(
 
         @Composable
         fun create(
-            roleMapping: RoleMapping = DefaultRoleMapping,
-        ) = remember(roleMapping) { Fluent2IconButton(roleMapping) }
+            variantMapping: VariantMapping = DefaultVariantMapping,
+        ) = remember(variantMapping) { Fluent2IconButton(variantMapping) }
 
         // -------------
         // 2) mapping
         // -------------
 
-        typealias RoleMapping = (StyledIconButton.Role, StyledContext) -> Variant
+        typealias VariantMapping = (StyledButton.Variant, StyledContext) -> Variant
 
-        val DefaultRoleMapping: RoleMapping = { role, context ->
+        val DefaultVariantMapping: VariantMapping = { variant, context ->
             when {
-                role == StyledIconButton.Role.Default &&
+                variant == StyledButton.Variant.Auto &&
                     (context is StyledDialog.ActionContext ||
                         context is StyledTopBar.Context ||
                         context is StyledInput.Context ||
@@ -74,11 +76,11 @@ class Fluent2IconButton internal constructor(
                         context is StyledDialog.Context ||
                         context == StyledGroupBox.Context.Clickable ||
                         context == StyledSidePane.Context.IconSlot) -> Variant.Standard
-                else -> when (role) {
-                    StyledIconButton.Role.Default,
-                    StyledIconButton.Role.Primary -> Variant.Filled
-                    StyledIconButton.Role.Secondary -> Variant.FilledTonal
-                    StyledIconButton.Role.Tertiary -> Variant.Standard
+                else -> when (variant) {
+                    StyledButton.Variant.Auto,
+                    StyledButton.Variant.Filled -> Variant.Filled
+                    StyledButton.Variant.Outlined -> Variant.Outlined
+                    StyledButton.Variant.Plain -> Variant.Standard
                 }
             }
         }
@@ -94,7 +96,7 @@ class Fluent2IconButton internal constructor(
     @OptIn(InternalComposeStyledApi::class)
     @Composable
     override fun Render(
-        role: StyledIconButton.Role,
+        variant: StyledButton.Variant,
         onClick: () -> Unit,
         modifier: Modifier,
         enabled: Boolean,
@@ -110,12 +112,14 @@ class Fluent2IconButton internal constructor(
         val keyboardFocus = enabled && focused &&
                 LocalInputModeManager.current.inputMode == InputMode.Keyboard
         val context = LocalStyledContext.current
-        val variant = roleMapping(role, context)
-        val defaultContentColor = if (role == StyledIconButton.Role.Default &&
-            context is StyledTopBar.Context
-        ) StyledTheme.currentContentColor else null
+        val rendererVariant = variantMapping(variant, context)
+        val defaultContentColor = if (variant == StyledButton.Variant.Auto &&
+            (context is StyledTopBar.Context ||
+                context is StyledDialog.ActionContext &&
+                context.context == StyledDialog.Context.FullscreenAction)
+        ) LocalStyledContentColor.current else null
         val colors = FluentButtonColors.resolve(
-            variant = when (variant) {
+            variant = when (rendererVariant) {
                 Variant.Filled -> FluentButtonColors.Variant.Primary
                 Variant.FilledTonal -> FluentButtonColors.Variant.Secondary
                 Variant.Standard -> FluentButtonColors.Variant.Standard

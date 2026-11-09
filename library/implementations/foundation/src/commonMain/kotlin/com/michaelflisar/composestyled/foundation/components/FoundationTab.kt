@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.UpdateStyledThemeLocals
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
+import com.michaelflisar.composestyled.tokens.LocalStyledContentColor
 import com.michaelflisar.composestyled.ui.components.StyledTab
 import com.michaelflisar.composestyled.ui.internal.LocalStyledSelectionColors
 
@@ -56,7 +57,7 @@ class FoundationTab : StyledTab.Implementation {
         } else {
             selectionColors?.unselectedContentColor
                 ?.takeUnless { it == Color.Unspecified }
-                ?: StyledTheme.currentContentColor
+                ?: LocalStyledContentColor.current
         }
         val drawIndicator = selected && !LocalFoundationTabRowHasIndicator.current
         val baseColor = if (selected) resolvedSelectedContentColor else resolvedUnselectedContentColor

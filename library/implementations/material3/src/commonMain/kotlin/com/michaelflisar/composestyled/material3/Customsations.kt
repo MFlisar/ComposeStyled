@@ -9,34 +9,32 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import com.michaelflisar.composestyled.UpdateStyledThemeLocals
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
+import com.michaelflisar.composestyled.tokens.LocalStyledContentColor
+import com.michaelflisar.composestyled.tokens.LocalStyledTextStyle
 
-/**
- * setzt locals für Material als auch Styled!
- */
 @OptIn(InternalComposeStyledApi::class)
 @Composable
-internal fun CopyMaterialThemeLocals(
+internal fun ProvideStyledLocals(
     contentColor: Color? = null,
     textStyle: TextStyle? = null,
     content: @Composable () -> Unit,
 ) {
-    if (contentColor == null && textStyle == null) {
-        content()
-        return
-    }
-
-    UpdateStyledThemeLocals(
-        contentColor = contentColor,
-        textStyle = LocalTextStyle.current
+    val resolvedContentColor = contentColor
+        ?.takeUnless { it == Color.Unspecified }
+        ?: LocalStyledContentColor.current
+    val resolvedTextStyle = textStyle ?: LocalStyledTextStyle.current
+    CompositionLocalProvider(
+        LocalContentColor provides resolvedContentColor,
+        LocalTextStyle provides resolvedTextStyle,
     ) {
-        content()
+        UpdateStyledThemeLocals(
+            contentColor = resolvedContentColor,
+            textStyle = resolvedTextStyle,
+            content = content,
+        )
     }
 }
 
-/**
- * setzt locals für Material als auch Styled!
- */
-@OptIn(InternalComposeStyledApi::class)
 @Composable
 internal fun CopyStyledLocals(
     outline: Color? = null,
@@ -45,23 +43,20 @@ internal fun CopyStyledLocals(
     textStyle: TextStyle? = null,
     content: @Composable () -> Unit,
 ) {
-    if (outlineVariant == null && outline == null && contentColor == null && textStyle == null) {
-        content()
-        return
-    }
-    CompositionLocalProvider(
-        LocalContentColor provides (contentColor ?: LocalContentColor.current),
-        LocalTextStyle provides (textStyle ?: LocalTextStyle.current)
-    ) {
-        MaterialTheme(
-            colorScheme = MaterialTheme.colorScheme.let {
-                it.copy(
-                    outline = outline ?: it.outline,
-                    outlineVariant = outlineVariant ?: it.outlineVariant,
-                )
-            }
-        ) {
+    ProvideStyledLocals(contentColor, textStyle) {
+        if (outline == null && outlineVariant == null) {
             content()
+        } else {
+            MaterialTheme(
+                colorScheme = MaterialTheme.colorScheme.let {
+                    it.copy(
+                        outline = outline ?: it.outline,
+                        outlineVariant = outlineVariant ?: it.outlineVariant,
+                    )
+                }
+            ) {
+                content()
+            }
         }
     }
 }

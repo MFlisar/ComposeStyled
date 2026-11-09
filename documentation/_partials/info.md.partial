@@ -2,6 +2,18 @@ ComposeStyled is a Kotlin Multiplatform library for Compose. It provides
 themed UI components through a consistent API, making it easy to build
 applications with different design systems.
 
+**Design model**
+
+ComposeStyled's direction is to use Material 3 as the shared authoring model:
+think in familiar M3 component and style intents, then let the selected theme
+render them according to its platform conventions. The API model is M3-oriented,
+but Cupertino and Fluent 2 interfaces are not expected to look like Material.
+Explicit styles such as Filled and Outlined keep their intent by default, while
+Auto lets the active theme choose a context-appropriate style. This mapping can
+be customized per component and style through `StyledTheme(customization = ...)`
+by registering a renderer with an adjusted variant mapping; it can delegate to
+the default mapping for styles that should remain unchanged.
+
 **Main features**
 - `Styled*` components for common controls, navigation, and layouts
 - Ready-to-use themes and renderers for Material 3, Cupertino Flat, Cupertino Liquid, and Fluent 2

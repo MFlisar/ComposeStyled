@@ -9,6 +9,7 @@ import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.registry.LocalStyledRegistry
 import com.michaelflisar.composestyled.registry.StyledComponent
 import com.michaelflisar.composestyled.registry.StyledKey
+import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.ui.internal.SliderScale
 import com.michaelflisar.composestyled.utils.number.NumberUtil
 
@@ -49,6 +50,7 @@ object StyledSlider {
 // -------------------------
 
 /** Typed slider. Integral values use unit steps by default; Float/Double are continuous. */
+@OptIn(InternalComposeStyledApi::class)
 @Composable
 fun <T> StyledSlider(
     value: MutableState<T>,
@@ -76,6 +78,7 @@ fun <T> StyledSlider(
 }
 
 /** [stepSize] is a positive increment anchored at the start of [valueRange], not a tick count. */
+@OptIn(InternalComposeStyledApi::class)
 @Composable
 fun <T> StyledSlider(
     value: T,

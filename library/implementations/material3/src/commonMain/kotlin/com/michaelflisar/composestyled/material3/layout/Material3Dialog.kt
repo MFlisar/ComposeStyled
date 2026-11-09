@@ -19,12 +19,11 @@ import com.michaelflisar.composestyled.foundation.layout.FoundationDialogBounds
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
-import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.ui.internal.dialogInput
 
 @OptIn(InternalComposeStyledApi::class)
 class Material3Dialog internal constructor(
-    override val roleMapping: RoleMapping,
+    override val presentationMapping: PresentationMapping,
 ) : FoundationDialog() {
 
     override val defaults: StyledDialog.Defaults
@@ -61,18 +60,18 @@ class Material3Dialog internal constructor(
 
         @Composable
         fun create(
-            roleMapping: RoleMapping = DefaultRoleMapping,
-        ): Material3Dialog = remember(roleMapping) { Material3Dialog(roleMapping) }
+            presentationMapping: PresentationMapping = DefaultPresentationMapping,
+        ): Material3Dialog = remember(presentationMapping) { Material3Dialog(presentationMapping) }
 
         // -------------
         // 2) mapping
         // -------------
 
         /** Resolves Auto for actual toolbar actions only; missing icons fall back to text. */
-        typealias RoleMapping = (StyledButton.Role) -> StyledDialog.ButtonPresentation
+        typealias PresentationMapping = (StyledDialog.ActionSlot) -> StyledDialog.ButtonPresentation
 
-        val DefaultRoleMapping: RoleMapping = { role ->
-            if (role == StyledButton.Role.Secondary) StyledDialog.ButtonPresentation.Icon
+        val DefaultPresentationMapping: PresentationMapping = { slot ->
+            if (slot == StyledDialog.ActionSlot.Negative) StyledDialog.ButtonPresentation.Icon
             else StyledDialog.ButtonPresentation.Text
         }
     }

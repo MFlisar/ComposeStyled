@@ -8,11 +8,10 @@ import com.michaelflisar.composestyled.foundation.layout.FoundationDialog
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
-import com.michaelflisar.composestyled.ui.components.StyledButton
 
 @OptIn(InternalComposeStyledApi::class)
 class CupertinoLiquidDialog internal constructor(
-    override val roleMapping: RoleMapping,
+    override val presentationMapping: PresentationMapping,
 ) : FoundationDialog() {
 
     override val defaults: StyledDialog.Defaults
@@ -35,16 +34,16 @@ class CupertinoLiquidDialog internal constructor(
 
         @Composable
         fun create(
-            roleMapping: RoleMapping = DefaultRoleMapping,
-        ): CupertinoLiquidDialog = remember(roleMapping) { CupertinoLiquidDialog(roleMapping) }
+            presentationMapping: PresentationMapping = DefaultPresentationMapping,
+        ): CupertinoLiquidDialog = remember(presentationMapping) { CupertinoLiquidDialog(presentationMapping) }
 
         // -------------
         // 2) mapping
         // -------------
 
         /** Resolves Auto for actual toolbar actions only; missing icons fall back to text. */
-        typealias RoleMapping = (StyledButton.Role) -> StyledDialog.ButtonPresentation
+        typealias PresentationMapping = (StyledDialog.ActionSlot) -> StyledDialog.ButtonPresentation
 
-        val DefaultRoleMapping: RoleMapping = { StyledDialog.ButtonPresentation.Text }
+        val DefaultPresentationMapping: PresentationMapping = { StyledDialog.ButtonPresentation.Text }
     }
 }

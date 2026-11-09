@@ -3,6 +3,7 @@ package com.michaelflisar.composestyled.ui.components
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
@@ -10,11 +11,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import com.michaelflisar.composestyled.classes.ColorToken
 import com.michaelflisar.composestyled.classes.CustomColors
+import com.michaelflisar.composestyled.classes.IconComposable
 import com.michaelflisar.composestyled.classes.asColorToken
 import com.michaelflisar.composestyled.registry.LocalStyledRegistry
 import com.michaelflisar.composestyled.registry.StyledComponent
 import com.michaelflisar.composestyled.registry.StyledComponentWithDefaults
 import com.michaelflisar.composestyled.registry.StyledKey
+import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
+import com.michaelflisar.composestyled.runtime.LocalStyledContext
+import com.michaelflisar.composestyled.runtime.StyledContext
 import com.michaelflisar.composestyled.ui.components.StyledButton.Customization
 
 object StyledButton {
@@ -36,15 +41,21 @@ object StyledButton {
     )
 
     // -------------
-    // 3) roles / variants
+    // 3) variants / context
     // -------------
 
-    enum class Role {
+    enum class Variant {
         /** Lets the active theme choose a style that fits the current context. */
-        Default,
-        Primary,
-        Secondary,
-        Tertiary,
+        Auto,
+        Filled,
+        Outlined,
+        Plain,
+    }
+
+    @InternalComposeStyledApi
+    enum class Context : StyledContext {
+        Icon,
+        Dropdown,
     }
 
     // -------------
@@ -70,7 +81,7 @@ object StyledButton {
 
         @Composable
         fun Render(
-            role: Role,
+            variant: Variant,
             onClick: () -> Unit,
             modifier: Modifier,
             enabled: Boolean,
@@ -111,28 +122,86 @@ object StyledButtonDefaults {
 // public API
 // -------------------------
 
-/** A theme-rendered action button; [role] lets the active theme choose its visual emphasis. */
+/** A theme-rendered action button; [variant] defaults to a context-aware style. */
 @Composable
 fun StyledButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource? = null,
-    role: StyledButton.Role = StyledButton.Role.Default,
+    variant: StyledButton.Variant = StyledButton.Variant.Auto,
     // defaults / customisation
     shape: Shape = StyledButtonDefaults.shape,
     customization: Customization? = null,
     // content
+    leadingIcon: IconComposable? = null,
+    trailingIcon: IconComposable? = null,
     content: @Composable RowScope.() -> Unit,
 ) {
     StyledButtonImpl(
-        role = role,
+        variant = variant,
         onClick = onClick,
         modifier = modifier,
         enabled = enabled,
         interactionSource = interactionSource,
         shape = shape,
         customization = customization,
+        leadingIcon = leadingIcon,
+        trailingIcon = trailingIcon,
+        content = content,
+    )
+}
+
+/** A theme-rendered outlined action button. Its visual variant is fixed. */
+@Composable
+fun StyledOutlinedButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    interactionSource: MutableInteractionSource? = null,
+    shape: Shape = StyledButtonDefaults.shape,
+    customization: Customization? = null,
+    leadingIcon: IconComposable? = null,
+    trailingIcon: IconComposable? = null,
+    content: @Composable RowScope.() -> Unit,
+) {
+    StyledButton(
+        onClick = onClick,
+        modifier = modifier,
+        enabled = enabled,
+        interactionSource = interactionSource,
+        variant = StyledButton.Variant.Outlined,
+        shape = shape,
+        customization = customization,
+        leadingIcon = leadingIcon,
+        trailingIcon = trailingIcon,
+        content = content,
+    )
+}
+
+/** A theme-rendered plain/text action button. Its visual variant is fixed. */
+@Composable
+fun StyledTextButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    interactionSource: MutableInteractionSource? = null,
+    shape: Shape = StyledButtonDefaults.shape,
+    customization: Customization? = null,
+    leadingIcon: com.michaelflisar.composestyled.classes.IconComposable? = null,
+    trailingIcon: com.michaelflisar.composestyled.classes.IconComposable? = null,
+    content: @Composable RowScope.() -> Unit,
+) {
+    StyledButton(
+        onClick = onClick,
+        modifier = modifier,
+        enabled = enabled,
+        interactionSource = interactionSource,
+        variant = StyledButton.Variant.Plain,
+        shape = shape,
+        customization = customization,
+        leadingIcon = leadingIcon,
+        trailingIcon = trailingIcon,
         content = content,
     )
 }
@@ -141,26 +210,41 @@ fun StyledButton(
 // private API
 // -------------------------
 
+@OptIn(InternalComposeStyledApi::class)
 @Composable
 private fun StyledButtonImpl(
-    role: StyledButton.Role,
+    variant: StyledButton.Variant,
     onClick: () -> Unit,
     modifier: Modifier,
     enabled: Boolean,
     interactionSource: MutableInteractionSource?,
     shape: Shape,
     customization: Customization?,
+    leadingIcon: IconComposable?,
+    trailingIcon: IconComposable?,
     content: @Composable RowScope.() -> Unit,
 ) {
     val buttonModifier = modifier.withStyledInputPointerIcon()
     LocalStyledRegistry.current[StyledButton.Key].Render(
-        role = role,
+        variant = variant,
         onClick = onClick,
         modifier = buttonModifier,
         enabled = enabled,
         shape = shape,
         interactionSource = interactionSource,
         customization = customization,
-        content = content
+        content = {
+            leadingIcon?.let { icon ->
+                CompositionLocalProvider(LocalStyledContext provides StyledButton.Context.Icon) {
+                    StyledIcon(icon = icon)
+                }
+            }
+            content()
+            trailingIcon?.let { icon ->
+                CompositionLocalProvider(LocalStyledContext provides StyledButton.Context.Icon) {
+                    StyledIcon(icon = icon)
+                }
+            }
+        }
     )
 }

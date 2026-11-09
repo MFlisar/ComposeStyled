@@ -37,6 +37,7 @@ fun StyledPicker(
     enabled: Boolean = true,
     textStyle: TextStyle = StyledTheme.typography.bodyMedium,
     clickOnIconOnly: Boolean = StyledPickerDefaults.clickOnIconOnly,
+    variant: StyledInput.Variant = StyledInput.Variant.Auto,
 ) = StyledPickerImpl(
     value = value,
     onStartPicker = onStartPicker,
@@ -46,13 +47,13 @@ fun StyledPicker(
     label = label,
     enabled = enabled,
     textStyle = textStyle,
-    variant = StyledInput.Variant.Default,
+    variant = variant,
     clickOnIconOnly = clickOnIconOnly,
 )
 
-/** Alternative-style variant of [StyledPicker]. */
+/** Outlined-style variant of [StyledPicker]. */
 @Composable
-fun StyledAlternativePicker(
+fun StyledOutlinedPicker(
     value: String,
     onStartPicker: () -> Unit,
     icon: IconComposable,
@@ -72,7 +73,7 @@ fun StyledAlternativePicker(
         label = label,
         enabled = enabled,
         textStyle = textStyle,
-        variant = StyledInput.Variant.Alternative,
+        variant = StyledInput.Variant.Outlined,
         clickOnIconOnly = clickOnIconOnly,
     )
 }
@@ -91,7 +92,7 @@ private fun StyledPickerImpl(
     label: String = "",
     enabled: Boolean = true,
     textStyle: TextStyle = StyledTheme.typography.bodyMedium,
-    variant: StyledInput.Variant = StyledInput.Variant.Default,
+    variant: StyledInput.Variant = StyledInput.Variant.Auto,
     clickOnIconOnly: Boolean = StyledPickerDefaults.clickOnIconOnly,
 ) {
     val trailingIcon: @Composable () -> Unit = if (clickOnIconOnly) {
@@ -128,31 +129,18 @@ private fun StyledPickerImpl(
     val input: @Composable (Modifier) -> Unit = { inputModifier ->
         val inputLabel: (@Composable () -> Unit)? =
             if (label.isNotEmpty()) ({ StyledText(label) }) else null
-        if (variant == StyledInput.Variant.Alternative) {
-            StyledAlternativeInput(
-                value = value,
-                onValueChange = {},
-                modifier = inputModifier,
-                enabled = enabled,
-                readOnly = true,
-                interactionEnabled = false,
-                textStyle = textStyle,
-                label = inputLabel,
-                trailingIcon = trailingIcon,
-            )
-        } else {
-            StyledInput(
-                value = value,
-                onValueChange = {},
-                modifier = inputModifier,
-                enabled = enabled,
-                readOnly = true,
-                interactionEnabled = false,
-                textStyle = textStyle,
-                label = inputLabel,
-                trailingIcon = trailingIcon,
-            )
-        }
+        StyledInput(
+            value = value,
+            onValueChange = {},
+            modifier = inputModifier,
+            variant = variant,
+            enabled = enabled,
+            readOnly = true,
+            interactionEnabled = false,
+            textStyle = textStyle,
+            label = inputLabel,
+            trailingIcon = trailingIcon,
+        )
     }
 
     if (!clickOnIconOnly) {

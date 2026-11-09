@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -17,7 +16,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.isSpecified
 import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.ui.components.StyledCard
-import com.michaelflisar.composestyled.material3.CopyMaterialThemeLocals
+import com.michaelflisar.composestyled.StyledTheme
+import com.michaelflisar.composestyled.material3.ProvideStyledLocals
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 
 class Material3Card internal constructor(
@@ -49,8 +49,9 @@ class Material3Card internal constructor(
 
         val DefaultVariantMapping: VariantMapping = { variant ->
             when (variant) {
-                StyledCard.Variant.Standard -> Variant.Filled
-                StyledCard.Variant.Alternative -> Variant.Outlined
+                StyledCard.Variant.Auto,
+                StyledCard.Variant.Filled -> Variant.Filled
+                StyledCard.Variant.Outlined -> Variant.Outlined
             }
         }
     }
@@ -76,16 +77,22 @@ class Material3Card internal constructor(
             ?.takeIf { it != Color.Unspecified } ?: Color.Unspecified
         val textForeground = customization?.colors?.textForeground?.resolve()
             ?.takeIf { it != Color.Unspecified } ?: Color.Unspecified
+        val contentColor = when (mapped) {
+            Variant.Filled -> filledForeground.takeUnless { it == Color.Unspecified }
+                ?: StyledTheme.colorScheme.onSurface
+            Variant.Outlined -> textForeground.takeUnless { it == Color.Unspecified }
+                ?: StyledTheme.colorScheme.onSurface
+        }
         val customBorder = customization?.border?.resolve()
             ?.takeIf { it != Color.Unspecified }
             ?.let { BorderStroke(1.dp, it) }
         val colors = when (mapped) {
             Variant.Filled -> CardDefaults.cardColors(
                 containerColor = filledBackground,
-                contentColor = filledForeground,
+                contentColor = contentColor,
             )
             Variant.Outlined -> CardDefaults.outlinedCardColors(
-                contentColor = textForeground,
+                contentColor = contentColor,
             )
         }
         val customElevation = customization?.elevation?.takeIf { it.isSpecified }
@@ -103,7 +110,7 @@ class Material3Card internal constructor(
             Variant.Outlined -> CardDefaults.outlinedCardElevation()
         }
         val cardContent: @Composable ColumnScope.() -> Unit = {
-            CopyMaterialThemeLocals(contentColor = LocalContentColor.current, content = content)
+            ProvideStyledLocals(contentColor = contentColor, content = content)
         }
         // A custom border is supported by Card; retain the mapped colors and elevation.
 

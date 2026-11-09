@@ -6,7 +6,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.michaelflisar.composestyled.classes.ColorToken
-import com.michaelflisar.composestyled.classes.asColorToken
+import com.michaelflisar.composestyled.classes.asColorTokenOrNull
 import com.michaelflisar.composestyled.classes.IconComposable
 import com.michaelflisar.composestyled.registry.LocalStyledRegistry
 import com.michaelflisar.composestyled.registry.StyledComponent
@@ -25,8 +25,10 @@ object StyledChip {
     // -------------
 
     enum class Variant {
-        NonSelectable,
-        Selectable,
+        /** Lets the active theme choose its default treatment. */
+        Auto,
+        Filled,
+        Outlined,
     }
 
     // -------------
@@ -54,6 +56,7 @@ object StyledChip {
         @Composable
         fun Render(
             variant: Variant,
+            selectable: Boolean,
             selected: Boolean,
             onClick: () -> Unit,
             modifier: Modifier,
@@ -81,16 +84,13 @@ object StyledChipDefaults {
         selectedContent: Color = Color.Unspecified,
         selectedBorder: Color = Color.Unspecified,
     ) = StyledChip.Customization(
-        container = container.asTokenOrNull(),
-        content = content.asTokenOrNull(),
-        border = border.asTokenOrNull(),
-        selectedContainer = selectedContainer.asTokenOrNull(),
-        selectedContent = selectedContent.asTokenOrNull(),
-        selectedBorder = selectedBorder.asTokenOrNull(),
+        container = container.asColorTokenOrNull(),
+        content = content.asColorTokenOrNull(),
+        border = border.asColorTokenOrNull(),
+        selectedContainer = selectedContainer.asColorTokenOrNull(),
+        selectedContent = selectedContent.asColorTokenOrNull(),
+        selectedBorder = selectedBorder.asColorTokenOrNull(),
     )
-
-    private fun Color.asTokenOrNull(): ColorToken? =
-        takeIf { it != Color.Unspecified }?.asColorToken()
 }
 
 // -------------------------
@@ -104,6 +104,7 @@ fun StyledChip(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource? = null,
+    variant: StyledChip.Variant = StyledChip.Variant.Auto,
     // defaults / customisation
     customization: StyledChip.Customization? = null,
     // content
@@ -111,12 +112,38 @@ fun StyledChip(
     trailingIcon: IconComposable? = null,
     content: @Composable () -> Unit,
 ) = StyledChipImpl(
-    variant = StyledChip.Variant.NonSelectable,
+    variant = variant,
+    selectable = false,
     selected = false,
     onClick = onClick,
     modifier = modifier,
     enabled = enabled,
     interactionSource = interactionSource,
+    customization = customization,
+    leadingIcon = leadingIcon,
+    trailingIcon = trailingIcon,
+    content = content,
+)
+
+/** An outlined-style variant of [StyledChip]. */
+@Composable
+fun StyledOutlinedChip(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    interactionSource: MutableInteractionSource? = null,
+    // defaults / customisation
+    customization: StyledChip.Customization? = null,
+    // content
+    leadingIcon: IconComposable? = null,
+    trailingIcon: IconComposable? = null,
+    content: @Composable () -> Unit,
+) = StyledChip(
+    onClick = onClick,
+    modifier = modifier,
+    enabled = enabled,
+    interactionSource = interactionSource,
+    variant = StyledChip.Variant.Outlined,
     customization = customization,
     leadingIcon = leadingIcon,
     trailingIcon = trailingIcon,
@@ -131,6 +158,7 @@ fun StyledSelectableChip(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource? = null,
+    variant: StyledChip.Variant = StyledChip.Variant.Auto,
     // defaults / customisation
     customization: StyledChip.Customization? = null,
     // content
@@ -138,12 +166,40 @@ fun StyledSelectableChip(
     trailingIcon: IconComposable? = null,
     content: @Composable () -> Unit,
 ) = StyledChipImpl(
-    variant = StyledChip.Variant.Selectable,
+    variant = variant,
+    selectable = true,
     selected = selected,
     onClick = onClick,
     modifier = modifier,
     enabled = enabled,
     interactionSource = interactionSource,
+    customization = customization,
+    leadingIcon = leadingIcon,
+    trailingIcon = trailingIcon,
+    content = content,
+)
+
+/** An outlined-style variant of [StyledSelectableChip]. */
+@Composable
+fun StyledOutlinedSelectableChip(
+    onClick: () -> Unit,
+    selected: Boolean,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    interactionSource: MutableInteractionSource? = null,
+    // defaults / customisation
+    customization: StyledChip.Customization? = null,
+    // content
+    leadingIcon: IconComposable? = null,
+    trailingIcon: IconComposable? = null,
+    content: @Composable () -> Unit,
+) = StyledSelectableChip(
+    onClick = onClick,
+    selected = selected,
+    modifier = modifier,
+    enabled = enabled,
+    interactionSource = interactionSource,
+    variant = StyledChip.Variant.Outlined,
     customization = customization,
     leadingIcon = leadingIcon,
     trailingIcon = trailingIcon,
@@ -157,6 +213,7 @@ fun StyledSelectableChip(
 @Composable
 private fun StyledChipImpl(
     variant: StyledChip.Variant,
+    selectable: Boolean,
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier,
@@ -169,6 +226,7 @@ private fun StyledChipImpl(
 ) {
     LocalStyledRegistry.current[StyledChip.Key].Render(
         variant = variant,
+        selectable = selectable,
         selected = selected,
         onClick = onClick,
         modifier = modifier,

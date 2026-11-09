@@ -3,6 +3,7 @@ package com.michaelflisar.composestyled.utils.number
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
+import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 
 /** Parsing, normalization, formatting and stepping operations for one numeric type. */
 @Stable
@@ -20,6 +21,7 @@ class NumberParser<T : Number>(
  * Supports `Int`, `Long`, `Float` and `Double`; [commas] controls decimal rounding and defaults
  * to two places for decimal types and none for integral types.
  */
+@OptIn(InternalComposeStyledApi::class)
 @Composable
 fun <T : Number> rememberNumberParser(
     sample: T,

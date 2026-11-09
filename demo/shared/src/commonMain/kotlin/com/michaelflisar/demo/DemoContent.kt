@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -20,45 +21,48 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.classes.toIconComposable
 import com.michaelflisar.composestyled.platform.Platform
 import com.michaelflisar.composestyled.platform.PlatformDefaults
-import com.michaelflisar.composestyled.platform.SystemBarStyleEffect
-import com.michaelflisar.composestyled.platform.WindowMode
+import com.michaelflisar.composestyled.platform.SystemBarStyleEffectIfNeeded
 import com.michaelflisar.composestyled.platform.currentPlatform
-import com.michaelflisar.composestyled.platform.rememberWindowEnvironment
-import com.michaelflisar.composestyled.platform.systemBarIconStyleFor
 import com.michaelflisar.composestyled.themes.StyledThemeAppearance
-import com.michaelflisar.composestyled.themes.StyledThemeColors
-import com.michaelflisar.composestyled.themes.StyledThemeColorsCollection
 import com.michaelflisar.composestyled.themes.StyledThemeContrast
 import com.michaelflisar.composestyled.themes.StyledThemeVariant
 import com.michaelflisar.composestyled.themes.rememberThemeColors
 import com.michaelflisar.composestyled.ui.components.StyledButton
-import com.michaelflisar.composestyled.ui.components.StyledDropdownIndex
 import com.michaelflisar.composestyled.ui.components.StyledSurface
 import com.michaelflisar.composestyled.ui.layout.StyledColumn
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
 import com.michaelflisar.composestyled.ui.layout.StyledGrid
 import com.michaelflisar.composestyled.ui.layout.StyledScaffold
-import com.michaelflisar.composestyled.ui.layout.StyledVerticalScrollbarContainer
+import com.michaelflisar.composestyled.ui.layout.StyledVerticalScrollContainer
 import com.michaelflisar.composestyled.ui.primitives.StyledText
-import com.michaelflisar.composestyled.ui.specials.StyledThemeColorsPicker
 import com.michaelflisar.composestyled.ui.state.rememberDialogState
+import com.michaelflisar.composetable.styled.StyledTableUIProvider
 import com.michaelflisar.demo.custom.StyledCustomComponent
 import com.michaelflisar.demo.helper.DemoTopBar
 import com.michaelflisar.demo.helper.SubTitle
 import kotlin.math.ceil
+
+fun init() {
+
+    // in styled we need to init libraries
+    StyledTableUIProvider.install()
+}
 
 
 @Composable
 fun DemoContent(
     menuBar: @Composable (() -> Unit)? = null,
 ) {
+    LaunchedEffect(Unit) {
+        init()
+    }
 
     // 1) Host platform
     val hostPlatform = currentPlatform()
@@ -123,7 +127,7 @@ fun DemoContent(
                              // e.g. on android, this makes EVERY button everywhere an outlined button!
                              register(
                                  Material3Button.create(
-                                     roleMapping = { role, context -> Material3Button.Variant.Outlined }
+                                     variantMapping = { variant, context -> Material3Button.Variant.Outlined }
                                  )
                              )
                          }
@@ -148,17 +152,26 @@ fun DemoContent(
                     val pages = remember {
                         Definitions.createMainPages { selectedDemo.value = -1 }
                     }
+                    val libraryPages = remember {
+                        Definitions.createLibraryPages { selectedDemo.value = -1 }
+                    }
                     demoStateHolder.SaveableStateProvider(selectedDemo.value) {
                         when (selectedDemo.value) {
                             -1 -> {
                                 SelectDemo(
                                     pages = pages.map { it.first },
+                                    libraryDemos = libraryPages.map { it.first },
                                     selectedDemo = selectedDemo
                                 )
                             }
 
+                            in pages.indices -> {
+                                pages[selectedDemo.value].second.invoke()
+                            }
+
                             else -> {
-                                pages.getOrNull(selectedDemo.value)?.second?.invoke()
+                                libraryPages.getOrNull(selectedDemo.value - pages.size)
+                                    ?.second?.invoke()
                             }
                         }
                     }
@@ -189,19 +202,21 @@ fun DemoContent(
                         shadowElevation = 20.dp,
                     ),
                     initialBubblePosition = StyledDialog.FloatingPosition(
-                        alignment = Alignment.BottomStart,
-                        offset = DpOffset(16.dp, (-48).dp)
-                    )
+                        alignment = Alignment.TopEnd
+                    ),
+                    backgroundMode = StyledDialog.FloatingWindowBackgroundMode.Minimize(
+                        showScrim = true,
+                    ),
                 ),
                 title = { StyledText("Setup") },
             ) { contentPadding ->
-                StyledVerticalScrollbarContainer {
+                StyledVerticalScrollContainer {
                     StyledColumn(
                         itemSpacing = StyledTheme.spacing.medium,
                         modifier = Modifier.padding(contentPadding),
                     ) {
                         if (showSetupPanel) {
-                            DemoThemeSetup(
+                            DemoSetup(
                                 platforms = Platform.entries.map { it.name },
                                 implementations = Definitions.ImplementationCollections.map { it.first },
                                 themeCollections = Definitions.ThemeCollections,
@@ -226,17 +241,16 @@ fun DemoContent(
 @Composable
 private fun SelectDemo(
     pages: List<String>,
+    libraryDemos: List<String>,
     selectedDemo: MutableState<Int>,
 ) {
     val scaffoldColor = StyledTheme.colorScheme.surface
     val topBarColor = StyledTheme.colorScheme.primary
-    if (rememberWindowEnvironment().mode == WindowMode.Normal) {
-        SystemBarStyleEffect(
-            statusBar = systemBarIconStyleFor(topBarColor, scaffoldColor),
-            navigationBar = systemBarIconStyleFor(scaffoldColor, scaffoldColor),
-        )
-    }
-
+    SystemBarStyleEffectIfNeeded(
+        statusBarColor = topBarColor,
+        navigationBarColor = scaffoldColor,
+        backgroundColor = scaffoldColor,
+    )
     StyledScaffold(
         containerColor = scaffoldColor,
         topBar = {
@@ -253,16 +267,19 @@ private fun SelectDemo(
                 .padding(StyledTheme.padding.content),
             itemSpacing = StyledTheme.spacing.medium,
         ) {
-            StyledText("Choose a demo", style = StyledTheme.typography.titleLarge)
+            StyledText("Demos", style = StyledTheme.typography.titleLarge)
 
             val cols = 2
+            val rowHeight = 64.dp
 
-            val rows = ceil(pages.size / cols.toFloat()).toInt()
+            val cellShape = RoundedCornerShape(size = 8.dp)
+
+            val rows = ceil(pages.size.toFloat() / cols.toFloat()).toInt()
             StyledGrid(
                 columns = cols,
                 rows = rows,
                 modifier = Modifier.fillMaxWidth()
-                    .height(240.dp),
+                    .height(rowHeight * rows),
                 spacing = StyledTheme.spacing.medium,
                 contentPadding = PaddingValues(0.dp),
             ) { row, column ->
@@ -271,54 +288,34 @@ private fun SelectDemo(
                     StyledButton(
                         modifier = Modifier.fillMaxSize(),
                         onClick = { selectedDemo.value = demoIndex },
-                        shape = RectangleShape
+                        shape = cellShape,
                     ) {
-                        StyledText(pages[demoIndex])
+                        StyledText(pages[demoIndex], textAlign = TextAlign.Center)
+                    }
+                }
+            }
+
+            StyledText("Libraries", style = StyledTheme.typography.titleLarge)
+
+            val rows2 = ceil(libraryDemos.size.toFloat() / cols.toFloat()).toInt()
+            StyledGrid(
+                columns = cols,
+                rows = rows2,
+                modifier = Modifier.fillMaxWidth().height(rowHeight * rows2),
+                spacing = StyledTheme.spacing.medium,
+                contentPadding = PaddingValues(0.dp),
+            ) { row, column ->
+                val demoIndex = row * 2 + column
+                if (demoIndex < libraryDemos.size) {
+                    StyledButton(
+                        modifier = Modifier.fillMaxSize(),
+                        onClick = { selectedDemo.value = pages.size + demoIndex },
+                        shape = cellShape,
+                    ) {
+                        StyledText(libraryDemos[demoIndex])
                     }
                 }
             }
         }
     }
-}
-
-@Composable
-fun DemoThemeSetup(
-    platforms: List<String>,
-    implementations: List<String>,
-    themeCollections: List<StyledThemeColorsCollection>,
-    selectedPlatformIndex: MutableState<Int>,
-    selectedImplementationIndex: MutableState<Int>,
-    themeColors: MutableState<StyledThemeColors>,
-    themeVariant: MutableState<StyledThemeVariant>,
-    themeAppearance: MutableState<StyledThemeAppearance>,
-    themeContrast: MutableState<StyledThemeContrast>,
-) {
-    SubTitle("Platform")
-    StyledDropdownIndex(
-        modifier = Modifier.fillMaxWidth(),
-        items = platforms,
-        selectedIndex = selectedPlatformIndex
-    )
-
-    SubTitle("Implementation")
-    StyledDropdownIndex(
-        modifier = Modifier.fillMaxWidth(),
-        items = implementations,
-        selectedIndex = selectedImplementationIndex,
-    )
-
-    SubTitle("Theme colors")
-    StyledThemeColorsPicker(
-        themeColors = themeColors,
-        themeVariant = themeVariant,
-        themeAppearance = themeAppearance,
-        themeContrast = themeContrast,
-        modifier = Modifier.fillMaxWidth(),
-        collections = themeCollections,
-    )
-
-    SubTitle("Theme Name")
-    StyledText(
-        text = "${platforms[selectedPlatformIndex.value]} => ${StyledTheme.themeName}"
-    )
 }
