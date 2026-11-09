@@ -6,6 +6,18 @@ ComposeStyled is a Kotlin Multiplatform library for Compose. It provides
 themed UI components through a consistent API, making it easy to build
 applications with different design systems.
 
+**Design model**
+
+ComposeStyled's direction is to use Material 3 as the shared authoring model:
+think in familiar M3 component and style intents, then let the selected theme
+render them according to its platform conventions. The API model is M3-oriented,
+but Cupertino and Fluent 2 interfaces are not expected to look like Material.
+Explicit styles such as Filled and Outlined keep their intent by default, while
+Auto lets the active theme choose a context-appropriate style. This mapping can
+be customized per component and style through `StyledTheme(customization = ...)`
+by registering a renderer with an adjusted variant mapping; it can delegate to
+the default mapping for styles that should remain unchanged.
+
 **Main features**
 - `Styled*` components for common controls, navigation, and layouts
 - Ready-to-use themes and renderers for Material 3, Cupertino Flat, Cupertino Liquid, and Fluent 2
@@ -48,6 +60,9 @@ applications with different design systems.
 | theme-material3 | material3 color themes |
 | theme-pastel | pastel color themes |
 | theme-nature | nature color themes |
+| styled-composedialog | a styled implementation for ComposeDialogs |
+| styled-composepreferences | a styled implementation for ComposePreferences |
+| styled-composetable | a styled implementation for ComposeTable |
 
 # :arrow_right: Versions
 
@@ -59,9 +74,11 @@ applications with different design systems.
 
 > :warning: Following experimental annotations are used:
 > - **OptIn**
+>   - `` (1x)
+>   - `androidx.compose.animation.core.ExperimentalTransitionApi` (1x)
 >   - `androidx.compose.foundation.ExperimentalFoundationApi` (3x)
 >   - `androidx.compose.material3.ExperimentalMaterial3Api` (5x)
->   - `androidx.compose.ui.ExperimentalComposeUiApi` (4x)
+>   - `androidx.compose.ui.ExperimentalComposeUiApi` (7x)
 >   - `dev.chrisbanes.haze.ExperimentalHazeApi` (1x)
 >   - `kotlinx.cinterop.ExperimentalForeignApi` (3x)
 >
@@ -98,6 +115,9 @@ composestyled-theme-fluent2 = { module = "io.github.mflisar.composestyled:theme-
 composestyled-theme-material3 = { module = "io.github.mflisar.composestyled:theme-material3", version.ref = "composestyled" }
 composestyled-theme-pastel = { module = "io.github.mflisar.composestyled:theme-pastel", version.ref = "composestyled" }
 composestyled-theme-nature = { module = "io.github.mflisar.composestyled:theme-nature", version.ref = "composestyled" }
+composestyled-styled-composedialog = { module = "io.github.mflisar.composestyled:styled-composedialog", version.ref = "composestyled" }
+composestyled-styled-composepreferences = { module = "io.github.mflisar.composestyled:styled-composepreferences", version.ref = "composestyled" }
+composestyled-styled-composetable = { module = "io.github.mflisar.composestyled:styled-composetable", version.ref = "composestyled" }
 ```
 
 And then use the definitions in your projects **build.gradle.kts** file like following:
@@ -117,6 +137,9 @@ implementation(libs.composestyled.theme.fluent2)
 implementation(libs.composestyled.theme.material3)
 implementation(libs.composestyled.theme.pastel)
 implementation(libs.composestyled.theme.nature)
+implementation(libs.composestyled.styled.composedialog)
+implementation(libs.composestyled.styled.composepreferences)
+implementation(libs.composestyled.styled.composetable)
 ```
 
 </details>
@@ -146,6 +169,9 @@ implementation("io.github.mflisar.composestyled:theme-fluent2:${composestyled}")
 implementation("io.github.mflisar.composestyled:theme-material3:${composestyled}")
 implementation("io.github.mflisar.composestyled:theme-pastel:${composestyled}")
 implementation("io.github.mflisar.composestyled:theme-nature:${composestyled}")
+implementation("io.github.mflisar.composestyled:styled-composedialog:${composestyled}")
+implementation("io.github.mflisar.composestyled:styled-composepreferences:${composestyled}")
+implementation("io.github.mflisar.composestyled:styled-composetable:${composestyled}")
 ```
 
 </details>
