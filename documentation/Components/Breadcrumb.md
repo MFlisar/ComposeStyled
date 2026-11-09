@@ -32,8 +32,8 @@ val preferenceState = rememberPreferenceScreenState()
 
 Column {
     PreferenceBreadcrumb(state = preferenceState, rootLabel = "Settings")
-    PreferenceScreen(state = preferenceState) {
-        PreferenceGroup(title = "Display") {
+    StyledPreferenceScreen(state = preferenceState) {
+        StyledPreferenceGroup(title = "Display") {
             // Preference content
         }
     }

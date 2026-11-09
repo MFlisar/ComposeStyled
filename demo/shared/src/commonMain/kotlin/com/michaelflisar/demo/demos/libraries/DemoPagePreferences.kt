@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import com.michaelflisar.composepreferences.styled.navigation.PreferenceBreadcrumb
 import com.michaelflisar.composepreferences.styled.PreferenceFilter
 import com.michaelflisar.composepreferences.styled.PreferenceOpenGroupHeaderStyle
-import com.michaelflisar.composepreferences.styled.layout.PreferenceScreen
+import com.michaelflisar.composepreferences.styled.layout.StyledPreferenceScreen
 import com.michaelflisar.composepreferences.styled.StyledPreferenceBool
 import com.michaelflisar.composepreferences.styled.StyledPreferenceCustomItem
 import com.michaelflisar.composepreferences.styled.StyledPreferenceInfo
@@ -24,8 +24,8 @@ import com.michaelflisar.composepreferences.styled.StyledPreferenceList
 import com.michaelflisar.composepreferences.styled.StyledPreferenceListMultiSelect
 import com.michaelflisar.composepreferences.styled.StyledPreferenceNumber
 import com.michaelflisar.composepreferences.styled.StyledPreferenceSplitSwitch
-import com.michaelflisar.composepreferences.styled.layout.PreferenceGroup
-import com.michaelflisar.composepreferences.styled.layout.PreferenceSection
+import com.michaelflisar.composepreferences.styled.layout.StyledPreferenceGroup
+import com.michaelflisar.composepreferences.styled.layout.StyledPreferenceSection
 import com.michaelflisar.composepreferences.styled.rememberPreferenceFilter
 import com.michaelflisar.composepreferences.styled.layout.rememberPreferenceScreenState
 import com.michaelflisar.composepreferences.styled.rememberPreferenceStyle
@@ -178,13 +178,13 @@ internal fun DemoPagePreferences(onBack: () -> Unit) {
             )
 
             // 3) Preference Screen
-            PreferenceScreen(
+            StyledPreferenceScreen(
                 modifier = Modifier.weight(1f),
                 state = preferenceState,
                 filter = filter,
                 style = preferenceStyle
             ) {
-                PreferenceSection(
+                StyledPreferenceSection(
                     title = "General",
                     isExpandable = false,
                     filterTags = listOf("Basics", "Preferences"),
@@ -214,17 +214,18 @@ internal fun DemoPagePreferences(onBack: () -> Unit) {
                     )
                 }
 
-                PreferenceSection(
+                StyledPreferenceSection(
                     title = "Section with groups",
                     isExpandable = false,
                     filterTags = listOf("Basics", "Preferences"),
                 ) {
-                    PreferenceGroup(
+                    StyledPreferenceGroup(
                         title = "Appearance",
                         subtitle = "Customize theme colors, typography, and layout",
+                        icon = StyledIcons.Settings,
                         filterTags = listOf("Visuals", "Theme", "Design"),
                     ) {
-                        PreferenceSection(
+                        StyledPreferenceSection(
                             title = "Theme Colors",
                             filterTags = listOf("Palette", "Brand", "Background", "Foreground"),
                         ) {
@@ -261,7 +262,7 @@ internal fun DemoPagePreferences(onBack: () -> Unit) {
                                 filterTags = listOf("Text", "Contrast", "Accessibility"),
                             )
                         }
-                        PreferenceSection(
+                        StyledPreferenceSection(
                             title = "Typography & Layout",
                             filterTags = listOf("Font", "Text", "Spacing", "Density"),
                         ) {
@@ -292,12 +293,12 @@ internal fun DemoPagePreferences(onBack: () -> Unit) {
                         }
                     }
 
-                    PreferenceGroup(
+                    StyledPreferenceGroup(
                         title = "Privacy & Data",
                         subtitle = "Manage sync and diagnostic information",
                         filterTags = listOf("Account", "Cloud", "Diagnostics"),
                     ) {
-                        PreferenceSection(
+                        StyledPreferenceSection(
                             title = "Data & Privacy",
                             filterTags = listOf("Permissions", "Telemetry"),
                         ) {
@@ -317,12 +318,12 @@ internal fun DemoPagePreferences(onBack: () -> Unit) {
                     }
                 }
 
-                PreferenceGroup(
+                StyledPreferenceGroup(
                     title = "Advanced",
                     subtitle = "Developer options and custom settings",
                     filterTags = listOf("Developer", "Expert"),
                 ) {
-                    PreferenceSection(
+                    StyledPreferenceSection(
                         title = "Developer Options",
                         isExpandable = false,
                         filterTags = listOf("Debug", "Testing"),
@@ -360,7 +361,7 @@ internal fun DemoPagePreferences(onBack: () -> Unit) {
                     }
                 }
 
-                PreferenceSection(
+                StyledPreferenceSection(
                     title = "More",
                     isExpandable = true,
                     isInitiallyExpanded = false,

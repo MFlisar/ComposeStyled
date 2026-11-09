@@ -25,8 +25,8 @@ Column {
         label = { StyledText("Search preferences") },
     )
     PreferenceBreadcrumb(state = preferenceState)
-    PreferenceScreen(state = preferenceState, filter = filter) {
-        PreferenceSection(
+    StyledPreferenceScreen(state = preferenceState, filter = filter) {
+        StyledPreferenceSection(
             title = "General",
             filterTags = listOf("Account"),
         ) {
@@ -41,8 +41,11 @@ Column {
                 title = "Appearance",
             )
         }
-        PreferenceGroup(title = "Colors") {
-            PreferenceSection(title = "Toolbar") {
+        StyledPreferenceGroup(
+            title = "Colors",
+            icon = StyledIcons.Settings,
+        ) {
+            StyledPreferenceSection(title = "Toolbar") {
                 StyledPreferenceInputText(
                     value = rememberSaveable { mutableStateOf("Blue") },
                     title = "Toolbar color",
@@ -59,7 +62,7 @@ caller.
 
 ## Sections, groups and state
 
-`PreferenceSection` expands or collapses its children in the current list by
+`StyledPreferenceSection` expands or collapses its children in the current list by
 default. Its rows animate vertically during expansion and collapse, and stay
 clipped to the animated content area until the transition finishes. Set
 `isExpandable = false` on a section to keep its rows visible without an expand
@@ -72,12 +75,14 @@ overload that requires a caller-owned `MutableState<Boolean>` as `expanded`.
 These overloads are mutually exclusive: a section uses either caller-owned
 state or its own state initialized by `isInitiallyExpanded`. Internally managed
 state resets to `isInitiallyExpanded` when its group page is closed.
-`PreferenceGroup` opens a separate list level with a slide transition. The root
+`StyledPreferenceGroup` opens a separate list level with a slide transition. The root
 list preserves its scroll position, while each group page starts at the top when
 opened; leaving a group resets its scroll position and internally managed
 section expansion state for the next visit. Caller-owned `expanded` state
 remains under the caller's control.
-`rememberPreferenceScreenState()` can be supplied to `PreferenceScreen` when the
+Groups can also display an optional leading `IconComposable` through the `icon`
+parameter.
+`rememberPreferenceScreenState()` can be supplied to `StyledPreferenceScreen` when the
 navigation stack also needs to be hoisted.
 Pass the same state to `PreferenceBreadcrumb` to place a breadcrumb anywhere
 around the screen. Its group segments navigate directly to that level; the
@@ -204,7 +209,7 @@ route. Matching result paths remain informational.
 ## Styling
 
 Create a `PreferenceStyle` with `rememberPreferenceStyle` and pass it to
-`PreferenceScreen`. It has separate `item` and `section` configs
+`StyledPreferenceScreen`. It has separate `item` and `section` configs
 (`PreferenceItemStyle` and `PreferenceSectionStyle`) for colors, shape, content
 padding, minimum row height and text styles. Group entries use the item config
 and respect a surrounding section's shape; their opened content uses the item
@@ -266,11 +271,11 @@ val preferenceStyle = rememberPreferenceStyle(
     section = PreferenceStyleDefaults.section(isExpandable = false),
 )
 
-PreferenceScreen(style = preferenceStyle) {
-    PreferenceSection(title = "Always visible") {
+StyledPreferenceScreen(style = preferenceStyle) {
+    StyledPreferenceSection(title = "Always visible") {
         // Preference rows
     }
-    PreferenceSection(title = "Expandable", isExpandable = true) {
+    StyledPreferenceSection(title = "Expandable", isExpandable = true) {
         // Preference rows
     }
 }

@@ -11,6 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import com.michaelflisar.composestyled.classes.IconComposable
 import com.michaelflisar.composepreferences.styled.internal.LocalPreferenceRuntime
 import com.michaelflisar.composepreferences.styled.internal.PreferenceAncestor
 import com.michaelflisar.composepreferences.styled.internal.PreferenceEntry
@@ -22,11 +23,12 @@ import com.michaelflisar.composestyled.ui.icons.StyledIcons
 
 /** A navigable preference group whose children are shown on a separate animated list level. */
 @Composable
-fun PreferenceGroup(
+fun StyledPreferenceGroup(
     title: String,
     subtitle: String? = null,
     modifier: Modifier = Modifier.Companion,
     key: String? = null,
+    icon: IconComposable? = null,
     filterTags: List<String> = emptyList(),
     isEnabled: @Composable () -> Boolean = { true },
     isVisible: @Composable () -> Boolean = { true },
@@ -86,6 +88,7 @@ fun PreferenceGroup(
             PreferenceRowContent(
                 title = title,
                 subtitle = subtitle,
+                icon = icon,
                 trailing = {
                     StyledIcon(
                         icon = StyledIcons.Submenu,
@@ -113,6 +116,7 @@ fun PreferenceGroup(
                 content()
             }
         }
+
         if (parent.isFiltering) {
             groupContent()
         } else if (groupIsCurrentPage && visible) {

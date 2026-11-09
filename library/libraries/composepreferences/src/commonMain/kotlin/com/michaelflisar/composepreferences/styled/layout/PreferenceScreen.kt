@@ -84,14 +84,14 @@ private val PreferenceScreenStateSaver: Saver<PreferenceScreenState, List<Any>> 
     },
 )
 
-/** Remembers navigation state for a [PreferenceScreen]. */
+/** Remembers navigation state for a [StyledPreferenceScreen]. */
 @Composable
 fun rememberPreferenceScreenState(): PreferenceScreenState =
     rememberSaveable(saver = PreferenceScreenStateSaver) { PreferenceScreenState() }
 
 /** Hosts nested preference lists, filtering and navigation state. */
 @Composable
-fun PreferenceScreen(
+fun StyledPreferenceScreen(
     modifier: Modifier = Modifier,
     state: PreferenceScreenState = rememberPreferenceScreenState(),
     filterQuery: String? = null,
@@ -114,7 +114,7 @@ fun PreferenceScreen(
 
 /** Hosts nested preferences using a saveable filter state. */
 @Composable
-fun PreferenceScreen(
+fun StyledPreferenceScreen(
     filter: PreferenceFilter,
     modifier: Modifier = Modifier,
     state: PreferenceScreenState = rememberPreferenceScreenState(),

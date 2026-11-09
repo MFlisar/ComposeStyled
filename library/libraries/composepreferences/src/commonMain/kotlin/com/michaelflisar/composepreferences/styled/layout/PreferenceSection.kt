@@ -33,6 +33,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import com.michaelflisar.composestyled.classes.IconComposable
 import com.michaelflisar.composepreferences.styled.internal.LocalPreferenceRuntime
 import com.michaelflisar.composepreferences.styled.internal.PreferenceAncestor
 import com.michaelflisar.composepreferences.styled.internal.PreferenceEntry
@@ -45,7 +46,7 @@ import kotlin.collections.plus
 
 /** An expandable group of related preferences. */
 @Composable
-fun PreferenceSection(
+fun StyledPreferenceSection(
     title: String,
     subtitle: String? = null,
     modifier: Modifier = Modifier,
@@ -74,7 +75,7 @@ fun PreferenceSection(
 
 /** A preference section whose expanded state is controlled by the caller. */
 @Composable
-fun PreferenceSection(
+fun StyledPreferenceSection(
     title: String,
     expanded: MutableState<Boolean>,
     subtitle: String? = null,
@@ -369,6 +370,7 @@ internal fun PreferenceRowContent(
     title: String,
     subtitle: String?,
     modifier: Modifier = Modifier,
+    icon: IconComposable? = null,
     trailing: (@Composable RowScope.(textStyle: TextStyle) -> Unit)? = null,
     enabled: Boolean,
     clickable: Boolean,
@@ -385,6 +387,7 @@ internal fun PreferenceRowContent(
     PreferenceStyledRow(
         title = title,
         subtitle = subtitle,
+        icon = icon,
         trailing = trailing?.let { content ->
             {
                 content(titleStyle)

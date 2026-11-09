@@ -8,7 +8,7 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 
-/** Search query and options shared by the preference filter field and [com.michaelflisar.composepreferences.styled.layout.PreferenceScreen]. */
+/** Search query and options shared by the preference filter field and [com.michaelflisar.composepreferences.styled.layout.StyledPreferenceScreen]. */
 @Stable
 class PreferenceFilter internal constructor(
     query: String,
@@ -55,7 +55,7 @@ private val PreferenceFilterSaver: Saver<PreferenceFilter, List<String>> = Saver
 )
 
 /**
- * Remembers saveable query and filtering options for a [com.michaelflisar.composepreferences.styled.layout.PreferenceScreen].
+ * Remembers saveable query and filtering options for a [com.michaelflisar.composepreferences.styled.layout.StyledPreferenceScreen].
  *
  * The initial values are used only when creating a new filter; restored values take precedence.
  */
