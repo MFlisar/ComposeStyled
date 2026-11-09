@@ -37,15 +37,16 @@ callbacks: `StyledTheme(customization = ...)` replaces or adds renderers
 `update(DefaultsKey) { copy(...) }` (register first, then update). `StyledTheme`
 provides the active theme, tokens and registry through CompositionLocals;
 public `Styled*` composables resolve their renderer from that registry.
-`demo/shared` is a multiplatform consumer and usage reference, while
-`demo/app/compose` contains the platform launchers. Keep public API examples and
-behavior descriptions in the corresponding `documentation/Components/` files;
-use `documentation/_partials/usage.md.partial` for the general usage overview.
+`demo/shared` is a multiplatform consumer and usage reference, while the
+platform launchers live in `demo/app/android`, `demo/app/jvm` and
+`demo/app/wasm`. Keep public API examples and behavior descriptions in the
+corresponding `documentation/Components/` files; use
+`documentation/_partials/usage.md.partial` for the general usage overview.
 
-`settings.gradle.kts` uses `configs/library-config.yml` and the kmp-devtools
-settings plugin to include library modules. Project paths follow the configured
-library name (`:composestyled:...` here). Demo projects are included
-only when `CI` is not `"true"`.
+`settings.gradle.kts` uses `.config.yml` and the kmp-devtools settings plugin to
+include library modules. Project paths follow the configured library name
+(`:composestyled:...` here). Demo projects are included only when `CI` is not
+`"true"`.
 
 ## Repository-specific conventions
 

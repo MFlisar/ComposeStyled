@@ -20,7 +20,7 @@ suspend fun main() {
 
 /** ATTENTION:
  * must match the div ids in index.html
- * [demo\app\compose\src\wasmJsMain\resources\index.html]
+ * [demo\app\wasm\src\wasmJsMain\resources\index.html]
  */
 data class IndexConfig(
     val contentDivId: String = "content",

@@ -45,9 +45,9 @@ apps:
     namespace: com.michaelflisar.composestyled.demo
     version-name: 1.0.0
     module-paths:
-      - demo/app/wasm
-      - demo/app/jvm
       - demo/app/android
+      - demo/app/jvm
+      - demo/app/wasm
       - demo/shared
     # optional - if set, the app will be published to the homepage and linked in the readme
     publish:

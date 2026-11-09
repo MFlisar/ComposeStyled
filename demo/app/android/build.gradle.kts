@@ -15,8 +15,6 @@ plugins {
     // --
     // build tools
     alias(mflisar.plugins.kmpdevtools.buildplugin)
-    // others
-    alias(libs.plugins.launch4j)
 }
 
 // ------------------------
