@@ -164,9 +164,12 @@ route. Matching result paths remain informational.
 
 ## Preference types
 
-- `StyledPreferenceItem` is the standard row with optional icon, trailing slot
-  and inline content; `StyledPreferenceCustom` gives custom content and optional
-  padding.
+- `StyledPreferenceItem` is the standard row with optional icon, trailing
+  `content` and optional `inlineContent`. Use either slot or both.
+- `StyledPreferenceCustomItem` renders a complete preference item with
+  caller-defined content and the active preference item's default shape,
+  colors, padding and minimum height. It has no title or subtitle; use
+  `filterTags` when it should match preference searches.
 - `StyledPreferenceInfo` is non-interactive; use `StyledPreferenceItem` with
   `onClick` for caller-defined actions.
 - `StyledPreferenceBool` renders a switch or checkbox and can make either the
@@ -278,9 +281,9 @@ The screen style also configures outer padding, reserved leading-icon space,
 and color overrides; individual controls expose their relevant `Styled*`
 variants and customization options.
 
-`reserveLeadingIconSpace` defaults to `true`, so rows without a leading icon,
-including `StyledPreferenceCustom`, keep the same alignment by rendering
-`StyledIcons.Empty`. Set it to `false` in `rememberPreferenceStyle` to remove
+`reserveLeadingIconSpace` defaults to `true`, so standard rows without a leading
+icon keep the same alignment by rendering `StyledIcons.Empty`. Set
+`reserveLeadingIconSpace` to `false` in `rememberPreferenceStyle` to remove
 that reserved space.
 
 Use `PreferenceStyleDefaults.openedGroupHeader(...)` to customize the back

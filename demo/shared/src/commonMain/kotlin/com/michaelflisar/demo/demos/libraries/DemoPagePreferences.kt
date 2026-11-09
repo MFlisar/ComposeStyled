@@ -16,6 +16,7 @@ import com.michaelflisar.composepreferences.styled.PreferenceFilter
 import com.michaelflisar.composepreferences.styled.PreferenceOpenGroupHeaderStyle
 import com.michaelflisar.composepreferences.styled.layout.PreferenceScreen
 import com.michaelflisar.composepreferences.styled.StyledPreferenceBool
+import com.michaelflisar.composepreferences.styled.StyledPreferenceCustomItem
 import com.michaelflisar.composepreferences.styled.StyledPreferenceInfo
 import com.michaelflisar.composepreferences.styled.StyledPreferenceInputText
 import com.michaelflisar.composepreferences.styled.StyledPreferenceItem
@@ -341,12 +342,21 @@ internal fun DemoPagePreferences(onBack: () -> Unit) {
                         )
                         StyledPreferenceItem(
                             title = "Custom Content",
-                            subtitle = "Inline content keeps its preference heading",
-                            inlineContent = {
-                                StyledText("This row can include caller-defined content.")
+                            subtitle = "Trailing and inline content can be combined",
+                            content = {
+                                StyledText("Trailing")
                             },
-                            filterTags = listOf("Example", "Inline"),
+                            inlineContent = {
+                                StyledText("This content appears below the preference heading.")
+                            },
+                            filterTags = listOf("Example", "Inline", "Trailing"),
                         )
+                        StyledPreferenceCustomItem(
+                            filterTags = listOf("Example", "Custom"),
+                        ) {
+                            StyledText("This item owns its complete content layout.")
+                            StyledText("It has no built-in title or subtitle.")
+                        }
                     }
                 }
 

@@ -22,7 +22,7 @@ fun StyledPreferenceItem(
     key: String? = null,
     icon: IconComposable? = null,
     iconContentDescription: String? = null,
-    trailing: (@Composable RowScope.() -> Unit)? = null,
+    content: (@Composable RowScope.() -> Unit)? = null,
     inlineContent: (@Composable ColumnScope.() -> Unit)? = null,
     onClick: (() -> Unit)? = null,
     enabled: Boolean = true,
@@ -51,7 +51,7 @@ fun StyledPreferenceItem(
             subtitle = subtitle,
             icon = icon,
             iconContentDescription = iconContentDescription,
-            trailing = trailing,
+            trailing = content,
             inlineContent = inlineContent,
             onClick = onClick,
             enabled = visuals.enabled,
@@ -66,6 +66,7 @@ fun StyledPreferenceItem(
             contentColor = contentColor,
             supportingColor = supportingColor,
             titleStyle = titleStyle,
+            subtitleStyle = subtitleStyle,
         )
     }
 }
