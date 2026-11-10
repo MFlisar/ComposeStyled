@@ -239,6 +239,11 @@ internal fun DemoPagePreferences(onBack: () -> Unit) {
                                     clickBehavior =
                                         PreferenceList.Presentation.Dropdown.ClickBehavior.DropdownOnly,
                                 ),
+                                itemLeadingContent = { color ->
+                                    //if (color == primaryColor.value) {
+                                        StyledIcon(icon = StyledIcons.Check)
+                                    //}
+                                },
                             )
                             PreferenceList(
                                 items = secondaryColors,

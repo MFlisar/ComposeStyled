@@ -13,9 +13,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import com.michaelflisar.composepreferences.styled.internal.BaseDialogPreference
 import com.michaelflisar.composepreferences.styled.internal.LocalPreferenceStyle
 import com.michaelflisar.composepreferences.styled.internal.PreferenceEntry
@@ -27,8 +30,8 @@ import com.michaelflisar.composestyled.tokens.LocalStyledTextStyle
 import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.ui.components.StyledButtonDefaults
 import com.michaelflisar.composestyled.ui.components.StyledCheckbox
+import com.michaelflisar.composestyled.ui.components.StyledIcon
 import com.michaelflisar.composestyled.ui.components.StyledPopupDropdown
-import com.michaelflisar.composestyled.ui.components.StyledPopupDropdownDefaults
 import com.michaelflisar.composestyled.ui.components.StyledPopupDropdownMultiSelect
 import com.michaelflisar.composestyled.ui.components.StyledPopupDropdownMultiSelectDefaults
 import com.michaelflisar.composestyled.ui.components.StyledInput
@@ -37,6 +40,7 @@ import com.michaelflisar.composestyled.ui.components.StyledPopupMenu
 import com.michaelflisar.composestyled.ui.components.StyledRadioButton
 import com.michaelflisar.composestyled.ui.layout.StyledColumn
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
+import com.michaelflisar.composestyled.ui.layout.StyledRow
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.ui.state.rememberDialogState
 import com.michaelflisar.composestyled.utils.PointerInputBlocker
@@ -83,6 +87,7 @@ fun <T : Any> PreferenceList(
     isVisible: @Composable () -> Boolean = { true },
     dropdownCustomization: StyledButton.Customization? = null,
     shape: Shape? = null,
+    itemLeadingContent: (@Composable (T) -> Unit)? = null,
 ) {
     PreferenceList(
         items = items,
@@ -102,6 +107,7 @@ fun <T : Any> PreferenceList(
         isVisible = isVisible,
         dropdownCustomization = dropdownCustomization,
         shape = shape,
+        itemLeadingContent = itemLeadingContent,
     )
 }
 
@@ -125,6 +131,7 @@ fun <T : Any> PreferenceList(
     isVisible: @Composable () -> Boolean = { true },
     dropdownCustomization: StyledButton.Customization? = null,
     shape: Shape? = null,
+    itemLeadingContent: (@Composable (T) -> Unit)? = null,
 ) {
     val dialog = rememberDialogState()
     val strings = LocalPreferenceStrings.current
@@ -174,11 +181,28 @@ fun <T : Any> PreferenceList(
                             customization = dropdownCustomization
                                 ?: visuals.style.toDropdownCustomization(),
                             shape = effectiveShape,
-                            content = StyledPopupDropdownDefaults.defaultRenderer(
-                                mapper = { item -> itemText(item) },
-                                textStyle = textStyle,
-                                dropdownTextStyle = dropdownTextStyle,
-                            ),
+                            content = {
+                                selection { item ->
+                                    if (item != null) {
+                                        PreferenceListDropdownItem(
+                                            item = item,
+                                            itemText = itemText,
+                                            itemLeadingContent = itemLeadingContent,
+                                            textStyle = textStyle,
+                                        )
+                                    }
+                                }
+                                item { item, selected ->
+                                    PreferenceListDropdownItem(
+                                        item = item,
+                                        itemText = itemText,
+                                        itemLeadingContent = itemLeadingContent,
+                                        textStyle = dropdownTextStyle,
+                                        selected = selected,
+                                        modifier = Modifier.fillMaxWidth(),
+                                    )
+                                }
+                            },
                             onSelectionChange = { _, item -> onValueChange(item) },
                             popupWidthConfig = StyledPopupMenu.WidthConfig.WrapContent,
                             popupHorizontalAlignment = StyledPopupMenu.HorizontalAlignment.End,
@@ -201,7 +225,12 @@ fun <T : Any> PreferenceList(
             enabled = enabled,
             isEnabled = isEnabled,
             isVisible = isVisible,
-            trailing = { StyledText(itemText(selected)) },
+            trailing = {
+                StyledRow(itemSpacing = StyledTheme.spacing.medium) {
+                    itemLeadingContent?.invoke(selected)
+                    StyledText(itemText(selected))
+                }
+            },
             onOpen = { query = "" },
         ) { dialogItems, dialogState, padding, visuals ->
             StyledColumn(
@@ -229,6 +258,9 @@ fun <T : Any> PreferenceList(
                                 onClick = {
                                     onValueChange(item)
                                     dialogState.dismiss()
+                                },
+                                leading = itemLeadingContent?.let { leadingContent ->
+                                    { leadingContent(item) }
                                 },
                                 actions = {
                                     StyledRadioButton(
@@ -271,6 +303,7 @@ fun <T : Any> PreferenceListMultiSelect(
     isVisible: @Composable () -> Boolean = { true },
     dropdownCustomization: StyledButton.Customization? = null,
     shape: Shape? = null,
+    itemLeadingContent: (@Composable (T) -> Unit)? = null,
 ) {
     PreferenceListMultiSelect(
         items = items,
@@ -290,6 +323,7 @@ fun <T : Any> PreferenceListMultiSelect(
         isVisible = isVisible,
         dropdownCustomization = dropdownCustomization,
         shape = shape,
+        itemLeadingContent = itemLeadingContent,
     )
 }
 
@@ -313,6 +347,7 @@ fun <T : Any> PreferenceListMultiSelect(
     isVisible: @Composable () -> Boolean = { true },
     dropdownCustomization: StyledButton.Customization? = null,
     shape: Shape? = null,
+    itemLeadingContent: (@Composable (T) -> Unit)? = null,
 ) {
     val dialog = rememberDialogState()
     val strings = LocalPreferenceStrings.current
@@ -369,12 +404,36 @@ fun <T : Any> PreferenceListMultiSelect(
                             customization = dropdownCustomization
                                 ?: visuals.style.toDropdownCustomization(),
                             shape = effectiveShape,
-                            content = StyledPopupDropdownMultiSelectDefaults.defaultRenderer(
-                                mapper = { item -> itemText(item) },
-                                formatter = { it.joinToString(", ") },
-                                textStyle = textStyle,
-                                dropdownTextStyle = dropdownTextStyle,
-                            ),
+                            content = {
+                                selection { selectedItems ->
+                                    StyledRow(itemSpacing = 0.dp) {
+                                        selectedItems.forEachIndexed { index, item ->
+                                            if (index > 0) {
+                                                StyledText(", ", style = textStyle)
+                                            }
+                                            StyledRow(itemSpacing = StyledTheme.spacing.medium) {
+                                                itemLeadingContent?.invoke(item)
+                                                StyledText(
+                                                    itemText(item),
+                                                    color = Color.Unspecified,
+                                                    style = textStyle,
+                                                    maxLines = 1,
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                                item { item, isSelected ->
+                                    PreferenceListDropdownItem(
+                                        item = item,
+                                        itemText = itemText,
+                                        itemLeadingContent = itemLeadingContent,
+                                        textStyle = dropdownTextStyle,
+                                        selected = isSelected,
+                                        modifier = Modifier.fillMaxWidth(),
+                                    )
+                                }
+                            },
                             actions = StyledPopupDropdownMultiSelectDefaults.defaultActions(),
                             onSelectionChange = { _, next -> onValueChange(next) },
                             popupWidthConfig = StyledPopupMenu.WidthConfig.WrapContent,
@@ -412,7 +471,19 @@ fun <T : Any> PreferenceListMultiSelect(
                     ),
                 )
             },
-            trailing = { StyledText(selectedText) },
+            trailing = {
+                StyledRow(itemSpacing = 0.dp) {
+                    selected.forEachIndexed { index, item ->
+                        if (index > 0) {
+                            StyledText(", ")
+                        }
+                        StyledRow(itemSpacing = StyledTheme.spacing.medium) {
+                            itemLeadingContent?.invoke(item)
+                            StyledText(itemText(item))
+                        }
+                    }
+                }
+            },
             onOpen = {
                 draft = selected
                 query = ""
@@ -449,6 +520,9 @@ fun <T : Any> PreferenceListMultiSelect(
                                     }
                                 },
                                 enabled = visuals.enabled,
+                                leading = itemLeadingContent?.let { leadingContent ->
+                                    { leadingContent(item) }
+                                },
                                 actions = {
                                     StyledCheckbox(
                                         checked = checked,
@@ -482,6 +556,35 @@ private fun <T : Any> PreferenceList.Filter<T>.test(
     item: T,
     itemText: (T) -> String,
 ): Boolean = matches?.invoke(query, item) ?: itemText(item).contains(query, ignoreCase = true)
+
+@Composable
+private fun <T : Any> PreferenceListDropdownItem(
+    item: T,
+    itemText: (T) -> String,
+    itemLeadingContent: (@Composable (T) -> Unit)?,
+    textStyle: TextStyle,
+    selected: Boolean = false,
+    modifier: Modifier = Modifier,
+) {
+    StyledRow(
+        modifier = modifier,
+        itemSpacing = StyledTheme.spacing.medium,
+    ) {
+        itemLeadingContent?.invoke(item)
+        StyledText(
+            text = itemText(item),
+            modifier = Modifier.weight(1f),
+            color = if (selected) StyledTheme.colorScheme.primary else Color.Unspecified,
+            fontWeight = if (selected && textStyle.fontWeight == null) {
+                FontWeight.Bold
+            } else {
+                null
+            },
+            style = textStyle,
+            maxLines = 1,
+        )
+    }
+}
 
 private fun PreferenceStyle.toDropdownCustomization(): StyledButton.Customization {
     val contentColor = trailingStyle.contentColor ?: item.colors.contentColor

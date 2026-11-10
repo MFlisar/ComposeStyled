@@ -187,9 +187,13 @@ route. Matching result paths remain informational.
   after the leading icon, and spans to the trailing current-value label.
 - `PreferenceList` and `PreferenceListMultiSelect` support dialog
   and dropdown presentations. Pass a `PreferenceList.Filter` to enable
-  option filtering. Dropdown presentation keeps the standard preference row
-  and places a plain text-style dropdown in its trailing content. The trigger
-  uses the active theme's `StyledButton` typography, with
+  option filtering. `itemText` maps an option to its displayed and, by default,
+  filtered text. Use `itemLeadingContent` for optional per-option leading
+  content, such as a `StyledIcon`; it appears beside options in the open list
+  and beside selected values when the list is closed, in either the preference
+  row or the dropdown trigger. Dropdown presentation keeps the standard
+  preference row and places a plain text-style dropdown in its trailing
+  content. The trigger uses the active theme's `StyledButton` typography, with
   `PreferenceTrailingStyle.textStyle` applied as an override to the value and
   option text.
   `dropdownCustomization` can override the button's text foreground color.
