@@ -32,11 +32,11 @@ import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import com.michaelflisar.composepreferences.styled.LocalStyledPreferenceStrings
+import com.michaelflisar.composepreferences.styled.LocalPreferenceStrings
 import com.michaelflisar.composepreferences.styled.PreferenceFilter
 import com.michaelflisar.composepreferences.styled.PreferenceOpenGroupHeaderStyle
 import com.michaelflisar.composepreferences.styled.PreferenceStyle
-import com.michaelflisar.composepreferences.styled.StyledPreferenceStrings
+import com.michaelflisar.composepreferences.styled.PreferenceStrings
 import com.michaelflisar.composepreferences.styled.internal.LocalPreferenceRuntime
 import com.michaelflisar.composepreferences.styled.internal.LocalPreferenceStyle
 import com.michaelflisar.composepreferences.styled.internal.PreferenceFilterResultTracker
@@ -84,20 +84,20 @@ private val PreferenceScreenStateSaver: Saver<PreferenceScreenState, List<Any>> 
     },
 )
 
-/** Remembers navigation state for a [StyledPreferenceScreen]. */
+/** Remembers navigation state for a [PreferenceScreen]. */
 @Composable
 fun rememberPreferenceScreenState(): PreferenceScreenState =
     rememberSaveable(saver = PreferenceScreenStateSaver) { PreferenceScreenState() }
 
 /** Hosts nested preference lists, filtering and navigation state. */
 @Composable
-fun StyledPreferenceScreen(
+fun PreferenceScreen(
     modifier: Modifier = Modifier,
     state: PreferenceScreenState = rememberPreferenceScreenState(),
     filterQuery: String? = null,
     includeHierarchyInFilter: Boolean = true,
     style: PreferenceStyle = rememberPreferenceStyle(),
-    strings: StyledPreferenceStrings = StyledPreferenceStrings.ENGLISH,
+    strings: PreferenceStrings = PreferenceStrings.ENGLISH,
     content: @Composable () -> Unit,
 ) {
     PreferenceScreenImpl(
@@ -114,12 +114,12 @@ fun StyledPreferenceScreen(
 
 /** Hosts nested preferences using a saveable filter state. */
 @Composable
-fun StyledPreferenceScreen(
+fun PreferenceScreen(
     filter: PreferenceFilter,
     modifier: Modifier = Modifier,
     state: PreferenceScreenState = rememberPreferenceScreenState(),
     style: PreferenceStyle = rememberPreferenceStyle(),
-    strings: StyledPreferenceStrings = StyledPreferenceStrings.ENGLISH,
+    strings: PreferenceStrings = PreferenceStrings.ENGLISH,
     content: @Composable () -> Unit,
 ) {
     PreferenceScreenImpl(
@@ -143,7 +143,7 @@ private fun PreferenceScreenImpl(
     filterScope: PreferenceFilter.Scope,
     includeHierarchyInFilter: Boolean,
     style: PreferenceStyle,
-    strings: StyledPreferenceStrings,
+    strings: PreferenceStrings,
     content: @Composable () -> Unit,
 ) {
     val saveableStateHolder = rememberSaveableStateHolder()
@@ -156,7 +156,7 @@ private fun PreferenceScreenImpl(
 
     CompositionLocalProvider(
         LocalPreferenceStyle provides style,
-        LocalStyledPreferenceStrings provides strings,
+        LocalPreferenceStrings provides strings,
     ) {
         val lastNonEmptyQuery = remember { mutableStateOf(query) }
         if (query.isNotEmpty()) {

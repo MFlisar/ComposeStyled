@@ -2,7 +2,7 @@ package com.michaelflisar.composepreferences.styled.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.michaelflisar.composepreferences.styled.LocalStyledPreferenceStrings
+import com.michaelflisar.composepreferences.styled.LocalPreferenceStrings
 import com.michaelflisar.composepreferences.styled.PreferenceFilter
 import com.michaelflisar.composepreferences.styled.layout.PreferenceScreenState
 import com.michaelflisar.composestyled.classes.IconComposable
@@ -22,7 +22,7 @@ fun PreferenceBreadcrumb(
     separatorIcon: IconComposable = StyledIcons.Submenu,
     filter: PreferenceFilter? = null,
 ) {
-    val strings = LocalStyledPreferenceStrings.current
+    val strings = LocalPreferenceStrings.current
     val routes = state.routes
     val activeFilter = filter?.takeIf { it.query.isNotBlank() }
     val isGlobalFilter = activeFilter?.scope == PreferenceFilter.Scope.Global

@@ -144,7 +144,7 @@ internal val LocalPreferenceStyle =
 @Composable
 internal fun currentPreferenceRuntime(): PreferenceRuntime =
     checkNotNull(LocalPreferenceRuntime.current) {
-        "Preference composables must be called within StyledPreferenceScreen."
+        "Preference composables must be called within PreferenceScreen."
     }
 
 internal data class PreferenceEntryVisuals(

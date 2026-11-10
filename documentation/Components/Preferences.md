@@ -5,7 +5,7 @@ sections, nested groups and preference composables directly; the framework keeps
 navigation, filtering, row styling and visibility/enabled dependencies consistent.
 Preference components are provided in the
 `com.michaelflisar.composepreferences.styled` package and use the
-`StyledPreference*` naming pattern.
+`Preference*` naming pattern.
 
 ## Basic screen
 
@@ -25,28 +25,28 @@ Column {
         label = { StyledText("Search preferences") },
     )
     PreferenceBreadcrumb(state = preferenceState)
-    StyledPreferenceScreen(state = preferenceState, filter = filter) {
-        StyledPreferenceSection(
+    PreferenceScreen(state = preferenceState, filter = filter) {
+        PreferenceSection(
             title = "General",
             filterTags = listOf("Account"),
         ) {
-            StyledPreferenceBool(
+            PreferenceBool(
                 value = notifications,
                 title = "Notifications",
                 subtitle = "Show updates and reminders",
             )
-            StyledPreferenceList(
+            PreferenceList(
                 items = listOf("System", "Light", "Dark"),
                 selected = appearance,
                 title = "Appearance",
             )
         }
-        StyledPreferenceGroup(
+        PreferenceGroup(
             title = "Colors",
             icon = StyledIcons.Settings,
         ) {
-            StyledPreferenceSection(title = "Toolbar") {
-                StyledPreferenceInputText(
+            PreferenceSection(title = "Toolbar") {
+                PreferenceInputText(
                     value = rememberSaveable { mutableStateOf("Blue") },
                     title = "Toolbar color",
                 )
@@ -62,7 +62,7 @@ caller.
 
 ## Sections, groups and state
 
-`StyledPreferenceSection` expands or collapses its children in the current list by
+`PreferenceSection` expands or collapses its children in the current list by
 default. Its rows animate vertically during expansion and collapse, and stay
 clipped to the animated content area until the transition finishes. Set
 `isExpandable = false` on a section to keep its rows visible without an expand
@@ -75,14 +75,14 @@ overload that requires a caller-owned `MutableState<Boolean>` as `expanded`.
 These overloads are mutually exclusive: a section uses either caller-owned
 state or its own state initialized by `isInitiallyExpanded`. Internally managed
 state resets to `isInitiallyExpanded` when its group page is closed.
-`StyledPreferenceGroup` opens a separate list level with a slide transition. The root
+`PreferenceGroup` opens a separate list level with a slide transition. The root
 list preserves its scroll position, while each group page starts at the top when
 opened; leaving a group resets its scroll position and internally managed
 section expansion state for the next visit. Caller-owned `expanded` state
 remains under the caller's control.
 Groups can also display an optional leading `IconComposable` through the `icon`
 parameter.
-`rememberPreferenceScreenState()` can be supplied to `StyledPreferenceScreen` when the
+`rememberPreferenceScreenState()` can be supplied to `PreferenceScreen` when the
 navigation stack also needs to be hoisted.
 Pass the same state to `PreferenceBreadcrumb` to place a breadcrumb anywhere
 around the screen. Its group segments navigate directly to that level; the
@@ -127,7 +127,7 @@ Their enabled and visible state is inherited by descendants. A preference can
 define additional composable dependencies, for example:
 
 ```kotlin
-StyledPreferenceBool(
+PreferenceBool(
     value = advanced,
     title = "Advanced option",
     isEnabled = { accountEnabled.value },
@@ -169,24 +169,24 @@ route. Matching result paths remain informational.
 
 ## Preference types
 
-- `StyledPreferenceItem` is the standard row with optional icon, trailing
+- `PreferenceItem` is the standard row with optional icon, trailing
   `content` and optional `inlineContent`. Use either slot or both.
-- `StyledPreferenceCustomItem` renders a complete preference item with
+- `PreferenceCustomItem` renders a complete preference item with
   caller-defined content and the active preference item's default shape,
   colors, padding and minimum height. It has no title or subtitle; use
   `filterTags` when it should match preference searches.
-- `StyledPreferenceInfo` is non-interactive; use `StyledPreferenceItem` with
+- `PreferenceInfo` is non-interactive; use `PreferenceItem` with
   `onClick` for caller-defined actions.
-- `StyledPreferenceBool` renders a switch or checkbox and can make either the
-  whole row or only the control toggle. `StyledPreferenceSplitSwitch` and
-  `StyledPreferenceSplitCheckbox` separate navigation from the trailing toggle
+- `PreferenceBool` renders a switch or checkbox and can make either the
+  whole row or only the control toggle. `PreferenceSplitSwitch` and
+  `PreferenceSplitCheckbox` separate navigation from the trailing toggle
   action.
-- `StyledPreferenceInputText` and `StyledPreferenceInputNumber` edit in dialogs.
-  `StyledPreferenceNumber` uses a number-picker dialog or an inline slider. The
+- `PreferenceInputText` and `PreferenceInputNumber` edit in dialogs.
+  `PreferenceNumber` uses a number-picker dialog or an inline slider. The
   slider sits below the title and supporting text, aligned with the text column
   after the leading icon, and spans to the trailing current-value label.
-- `StyledPreferenceList` and `StyledPreferenceListMultiSelect` support dialog
-  and dropdown presentations. Pass a `StyledPreferenceList.Filter` to enable
+- `PreferenceList` and `PreferenceListMultiSelect` support dialog
+  and dropdown presentations. Pass a `PreferenceList.Filter` to enable
   option filtering. Dropdown presentation keeps the standard preference row
   and places a plain text-style dropdown in its trailing content. The trigger
   uses the active theme's `StyledButton` typography, with
@@ -197,8 +197,8 @@ route. Matching result paths remain informational.
   trailing dropdown clickable, configure `clickBehavior` on `Presentation.Dropdown`:
 
   ```kotlin
-  presentation = StyledPreferenceList.Presentation.Dropdown(
-      clickBehavior = StyledPreferenceList.Presentation.Dropdown.ClickBehavior.DropdownOnly,
+  presentation = PreferenceList.Presentation.Dropdown(
+      clickBehavior = PreferenceList.Presentation.Dropdown.ClickBehavior.DropdownOnly,
   )
   ```
 - Text/number editors, sliders and dialog-based selections show their current
@@ -209,7 +209,7 @@ route. Matching result paths remain informational.
 ## Styling
 
 Create a `PreferenceStyle` with `rememberPreferenceStyle` and pass it to
-`StyledPreferenceScreen`. It has separate `item` and `section` configs
+`PreferenceScreen`. It has separate `item` and `section` configs
 (`PreferenceItemStyle` and `PreferenceSectionStyle`) for colors, shape, content
 padding, minimum row height and text styles. Group entries use the item config
 and respect a surrounding section's shape; their opened content uses the item
@@ -271,11 +271,11 @@ val preferenceStyle = rememberPreferenceStyle(
     section = PreferenceStyleDefaults.section(isExpandable = false),
 )
 
-StyledPreferenceScreen(style = preferenceStyle) {
-    StyledPreferenceSection(title = "Always visible") {
+PreferenceScreen(style = preferenceStyle) {
+    PreferenceSection(title = "Always visible") {
         // Preference rows
     }
-    StyledPreferenceSection(title = "Expandable", isExpandable = true) {
+    PreferenceSection(title = "Expandable", isExpandable = true) {
         // Preference rows
     }
 }

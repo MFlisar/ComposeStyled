@@ -19,7 +19,7 @@ import com.michaelflisar.composestyled.ui.state.rememberDialogState
 
 /** Opens a text editor dialog from a preference row. */
 @Composable
-fun StyledPreferenceInputText(
+fun PreferenceInputText(
     value: MutableState<String>,
     title: String,
     modifier: Modifier = Modifier,
@@ -33,7 +33,7 @@ fun StyledPreferenceInputText(
     variant: StyledInput.Variant = StyledInput.Variant.Auto,
     customization: StyledInput.Customization? = null,
 ) {
-    StyledPreferenceInputText(
+    PreferenceInputText(
         value = value.value,
         onValueChange = { value.value = it },
         title = title,
@@ -52,7 +52,7 @@ fun StyledPreferenceInputText(
 
 /** Controlled text editor dialog launched from a preference row. */
 @Composable
-fun StyledPreferenceInputText(
+fun PreferenceInputText(
     value: String,
     onValueChange: (String) -> Unit,
     title: String,
@@ -68,7 +68,7 @@ fun StyledPreferenceInputText(
     customization: StyledInput.Customization? = null,
 ) {
     val dialog = rememberDialogState()
-    val strings = LocalStyledPreferenceStrings.current
+    val strings = LocalPreferenceStrings.current
     var draft by rememberSaveable { mutableStateOf(value) }
     LaunchedEffect(value, dialog.visible) {
         if (dialog.visible) draft = value

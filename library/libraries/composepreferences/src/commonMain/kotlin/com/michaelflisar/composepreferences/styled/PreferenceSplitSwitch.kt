@@ -11,7 +11,7 @@ import com.michaelflisar.composestyled.ui.components.StyledSwitch
 
 /** Split destination and switch actions with independent hit targets. */
 @Composable
-fun StyledPreferenceSplitSwitch(
+fun PreferenceSplitSwitch(
     value: MutableState<Boolean>,
     title: String,
     onOpen: () -> Unit,
@@ -26,7 +26,7 @@ fun StyledPreferenceSplitSwitch(
     tint: Color? = null,
     onTint: Color? = null,
 ) {
-    StyledPreferenceSplitSwitch(
+    PreferenceSplitSwitch(
         value = value.value,
         onValueChange = { value.value = it },
         title = title,
@@ -45,7 +45,7 @@ fun StyledPreferenceSplitSwitch(
 
 /** Controlled split destination and switch actions. */
 @Composable
-fun StyledPreferenceSplitSwitch(
+fun PreferenceSplitSwitch(
     value: Boolean,
     onValueChange: (Boolean) -> Unit,
     title: String,

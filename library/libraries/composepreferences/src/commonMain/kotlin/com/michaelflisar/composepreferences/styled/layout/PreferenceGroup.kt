@@ -23,7 +23,7 @@ import com.michaelflisar.composestyled.ui.icons.StyledIcons
 
 /** A navigable preference group whose children are shown on a separate animated list level. */
 @Composable
-fun StyledPreferenceGroup(
+fun PreferenceGroup(
     title: String,
     subtitle: String? = null,
     modifier: Modifier = Modifier.Companion,

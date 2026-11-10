@@ -11,7 +11,7 @@ import com.michaelflisar.composepreferences.styled.internal.PreferenceSplit
 
 /** Split destination and checkbox actions with independent hit targets. */
 @Composable
-fun StyledPreferenceSplitCheckbox(
+fun PreferenceSplitCheckbox(
     value: MutableState<Boolean>,
     title: String,
     onOpen: () -> Unit,
@@ -26,7 +26,7 @@ fun StyledPreferenceSplitCheckbox(
     tint: Color? = null,
     onTint: Color? = null,
 ) {
-    StyledPreferenceSplitCheckbox(
+    PreferenceSplitCheckbox(
         value = value.value,
         onValueChange = { value.value = it },
         title = title,
@@ -45,7 +45,7 @@ fun StyledPreferenceSplitCheckbox(
 
 /** Controlled split destination and checkbox actions. */
 @Composable
-fun StyledPreferenceSplitCheckbox(
+fun PreferenceSplitCheckbox(
     value: Boolean,
     onValueChange: (Boolean) -> Unit,
     title: String,

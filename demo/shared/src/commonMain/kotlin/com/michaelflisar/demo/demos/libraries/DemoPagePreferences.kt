@@ -14,18 +14,18 @@ import androidx.compose.ui.unit.dp
 import com.michaelflisar.composepreferences.styled.navigation.PreferenceBreadcrumb
 import com.michaelflisar.composepreferences.styled.PreferenceFilter
 import com.michaelflisar.composepreferences.styled.PreferenceOpenGroupHeaderStyle
-import com.michaelflisar.composepreferences.styled.layout.StyledPreferenceScreen
-import com.michaelflisar.composepreferences.styled.StyledPreferenceBool
-import com.michaelflisar.composepreferences.styled.StyledPreferenceCustomItem
-import com.michaelflisar.composepreferences.styled.StyledPreferenceInfo
-import com.michaelflisar.composepreferences.styled.StyledPreferenceInputText
-import com.michaelflisar.composepreferences.styled.StyledPreferenceItem
-import com.michaelflisar.composepreferences.styled.StyledPreferenceList
-import com.michaelflisar.composepreferences.styled.StyledPreferenceListMultiSelect
-import com.michaelflisar.composepreferences.styled.StyledPreferenceNumber
-import com.michaelflisar.composepreferences.styled.StyledPreferenceSplitSwitch
-import com.michaelflisar.composepreferences.styled.layout.StyledPreferenceGroup
-import com.michaelflisar.composepreferences.styled.layout.StyledPreferenceSection
+import com.michaelflisar.composepreferences.styled.layout.PreferenceScreen
+import com.michaelflisar.composepreferences.styled.PreferenceBool
+import com.michaelflisar.composepreferences.styled.PreferenceCustomItem
+import com.michaelflisar.composepreferences.styled.PreferenceInfo
+import com.michaelflisar.composepreferences.styled.PreferenceInputText
+import com.michaelflisar.composepreferences.styled.PreferenceItem
+import com.michaelflisar.composepreferences.styled.PreferenceList
+import com.michaelflisar.composepreferences.styled.PreferenceListMultiSelect
+import com.michaelflisar.composepreferences.styled.PreferenceNumber
+import com.michaelflisar.composepreferences.styled.PreferenceSplitSwitch
+import com.michaelflisar.composepreferences.styled.layout.PreferenceGroup
+import com.michaelflisar.composepreferences.styled.layout.PreferenceSection
 import com.michaelflisar.composepreferences.styled.rememberPreferenceFilter
 import com.michaelflisar.composepreferences.styled.layout.rememberPreferenceScreenState
 import com.michaelflisar.composepreferences.styled.rememberPreferenceStyle
@@ -178,25 +178,25 @@ internal fun DemoPagePreferences(onBack: () -> Unit) {
             )
 
             // 3) Preference Screen
-            StyledPreferenceScreen(
+            PreferenceScreen(
                 modifier = Modifier.weight(1f),
                 state = preferenceState,
                 filter = filter,
                 style = preferenceStyle
             ) {
-                StyledPreferenceSection(
+                PreferenceSection(
                     title = "General",
                     isExpandable = false,
                     filterTags = listOf("Basics", "Preferences"),
                 ) {
-                    StyledPreferenceBool(
+                    PreferenceBool(
                         value = notifications,
                         title = "Notifications",
                         subtitle = "Show updates and reminders",
                         filterTags = listOf("Alerts"),
                         icon = StyledIcons.Notifications
                     )
-                    StyledPreferenceList(
+                    PreferenceList(
                         items = themeModes,
                         selected = themeMode,
                         title = "Theme mode",
@@ -204,7 +204,7 @@ internal fun DemoPagePreferences(onBack: () -> Unit) {
                         filterTags = listOf("Appearance", "Light", "Dark"),
                         icon = StyledIcons.Settings
                     )
-                    StyledPreferenceList(
+                    PreferenceList(
                         items = languages,
                         selected = language,
                         title = "Language",
@@ -214,47 +214,47 @@ internal fun DemoPagePreferences(onBack: () -> Unit) {
                     )
                 }
 
-                StyledPreferenceSection(
+                PreferenceSection(
                     title = "Section with groups",
                     isExpandable = false,
                     filterTags = listOf("Basics", "Preferences"),
                 ) {
-                    StyledPreferenceGroup(
+                    PreferenceGroup(
                         title = "Appearance",
                         subtitle = "Customize theme colors, typography, and layout",
                         icon = StyledIcons.Settings,
                         filterTags = listOf("Visuals", "Theme", "Design"),
                     ) {
-                        StyledPreferenceSection(
+                        PreferenceSection(
                             title = "Theme Colors",
                             filterTags = listOf("Palette", "Brand", "Background", "Foreground"),
                         ) {
-                            StyledPreferenceList(
+                            PreferenceList(
                                 items = brandColors,
                                 selected = primaryColor,
                                 title = "Primary Color",
                                 subtitle = "Main brand color for prominent actions",
                                 filterTags = listOf("Accent", "Brand", "Actions"),
-                                presentation = StyledPreferenceList.Presentation.Dropdown(
+                                presentation = PreferenceList.Presentation.Dropdown(
                                     clickBehavior =
-                                        StyledPreferenceList.Presentation.Dropdown.ClickBehavior.DropdownOnly,
+                                        PreferenceList.Presentation.Dropdown.ClickBehavior.DropdownOnly,
                                 ),
                             )
-                            StyledPreferenceList(
+                            PreferenceList(
                                 items = secondaryColors,
                                 selected = secondaryColor,
                                 title = "Secondary Color",
                                 subtitle = "Supporting accent for less prominent elements",
                                 filterTags = listOf("Accent", "Supporting", "Brand"),
                             )
-                            StyledPreferenceList(
+                            PreferenceList(
                                 items = backgroundColors,
                                 selected = backgroundColor,
                                 title = "Background Color",
                                 subtitle = "Default surface behind preference content",
                                 filterTags = listOf("Canvas", "Surface", "Dark mode"),
                             )
-                            StyledPreferenceList(
+                            PreferenceList(
                                 items = foregroundColors,
                                 selected = foregroundColor,
                                 title = "Foreground Color",
@@ -262,53 +262,53 @@ internal fun DemoPagePreferences(onBack: () -> Unit) {
                                 filterTags = listOf("Text", "Contrast", "Accessibility"),
                             )
                         }
-                        StyledPreferenceSection(
+                        PreferenceSection(
                             title = "Typography & Layout",
                             filterTags = listOf("Font", "Text", "Spacing", "Density"),
                         ) {
-                            StyledPreferenceNumber(
+                            PreferenceNumber(
                                 value = fontScale,
                                 title = "Font Scale",
                                 subtitle = "Adjust the overall text size",
-                                style = StyledPreferenceNumber.Style.Slider,
+                                style = PreferenceNumber.Style.Slider,
                                 valueRange = 0.75f..1.5f,
                                 stepSize = 0.05f,
                                 filterTags = listOf("Typography", "Accessibility", "Text size"),
                             )
-                            StyledPreferenceList(
+                            PreferenceList(
                                 items = densities,
                                 selected = density,
                                 title = "Layout Density",
                                 subtitle = "Choose the spacing between controls",
                                 filterTags = listOf("Compact", "Spacing"),
                             )
-                            StyledPreferenceListMultiSelect(
+                            PreferenceListMultiSelect(
                                 items = areas,
                                 selected = visibleAreas,
                                 title = "Visible Areas",
-                                presentation = StyledPreferenceList.Presentation.Dropdown(),
-                                filter = StyledPreferenceList.Filter(label = "Filter areas"),
+                                presentation = PreferenceList.Presentation.Dropdown(),
+                                filter = PreferenceList.Filter(label = "Filter areas"),
                                 filterTags = listOf("Navigation", "Menu"),
                             )
                         }
                     }
 
-                    StyledPreferenceGroup(
+                    PreferenceGroup(
                         title = "Privacy & Data",
                         subtitle = "Manage sync and diagnostic information",
                         filterTags = listOf("Account", "Cloud", "Diagnostics"),
                     ) {
-                        StyledPreferenceSection(
+                        PreferenceSection(
                             title = "Data & Privacy",
                             filterTags = listOf("Permissions", "Telemetry"),
                         ) {
-                            StyledPreferenceBool(
+                            PreferenceBool(
                                 value = cloudSync,
                                 title = "Cloud Sync",
                                 subtitle = "Keep preferences in sync across devices",
                                 filterTags = listOf("Backup", "Account"),
                             )
-                            StyledPreferenceBool(
+                            PreferenceBool(
                                 value = usageAnalytics,
                                 title = "Usage Analytics",
                                 subtitle = "Share anonymous diagnostics to improve the app",
@@ -318,30 +318,30 @@ internal fun DemoPagePreferences(onBack: () -> Unit) {
                     }
                 }
 
-                StyledPreferenceGroup(
+                PreferenceGroup(
                     title = "Advanced",
                     subtitle = "Developer options and custom settings",
                     filterTags = listOf("Developer", "Expert"),
                 ) {
-                    StyledPreferenceSection(
+                    PreferenceSection(
                         title = "Developer Options",
                         isExpandable = false,
                         filterTags = listOf("Debug", "Testing"),
                     ) {
-                        StyledPreferenceSplitSwitch(
+                        PreferenceSplitSwitch(
                             value = advancedMode,
                             title = "Advanced Mode",
                             subtitle = "Open details or toggle the mode",
                             onOpen = { detailDialog.show() },
                             filterTags = listOf("Experimental"),
                         )
-                        StyledPreferenceInputText(
+                        PreferenceInputText(
                             value = profileLabel,
                             title = "Profile Label",
                             subtitle = "Custom label used in the account menu",
                             filterTags = listOf("Account", "Name"),
                         )
-                        StyledPreferenceItem(
+                        PreferenceItem(
                             title = "Custom Content",
                             subtitle = "Trailing and inline content can be combined",
                             content = {
@@ -352,7 +352,7 @@ internal fun DemoPagePreferences(onBack: () -> Unit) {
                             },
                             filterTags = listOf("Example", "Inline", "Trailing"),
                         )
-                        StyledPreferenceCustomItem(
+                        PreferenceCustomItem(
                             filterTags = listOf("Example", "Custom"),
                         ) {
                             StyledText("This item owns its complete content layout.")
@@ -361,13 +361,13 @@ internal fun DemoPagePreferences(onBack: () -> Unit) {
                     }
                 }
 
-                StyledPreferenceSection(
+                PreferenceSection(
                     title = "More",
                     isExpandable = true,
                     isInitiallyExpanded = false,
                     filterTags = listOf("Debug", "Testing"),
                 ) {
-                    StyledPreferenceInfo(
+                    PreferenceInfo(
                         title = "More",
                         text = "Item in section that is not initially expanded"
                     )

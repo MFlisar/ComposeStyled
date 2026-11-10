@@ -14,7 +14,7 @@ import com.michaelflisar.composestyled.ui.components.StyledListItem
 
 /** A preference item whose entire content is caller-defined. */
 @Composable
-fun StyledPreferenceCustomItem(
+fun PreferenceCustomItem(
     modifier: Modifier = Modifier,
     key: String? = null,
     onClick: (() -> Unit)? = null,

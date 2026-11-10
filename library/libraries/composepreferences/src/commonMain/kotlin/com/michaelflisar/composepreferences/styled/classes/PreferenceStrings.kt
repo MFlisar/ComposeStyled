@@ -3,11 +3,11 @@ package com.michaelflisar.composepreferences.styled
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 
-internal val LocalStyledPreferenceStrings =
-    staticCompositionLocalOf { StyledPreferenceStrings.ENGLISH }
+internal val LocalPreferenceStrings =
+    staticCompositionLocalOf { PreferenceStrings.ENGLISH }
 
 @Immutable
-data class StyledPreferenceStrings(
+data class PreferenceStrings(
     val settings: String,
     val changelog: String,
     val proVersion: String,
@@ -22,7 +22,7 @@ data class StyledPreferenceStrings(
     val filtered: String,
 ) {
     companion object {
-        val ENGLISH = StyledPreferenceStrings(
+        val ENGLISH = PreferenceStrings(
             settings = "Settings",
             changelog = "Changelog",
             proVersion = "Pro Version",
@@ -37,7 +37,7 @@ data class StyledPreferenceStrings(
             filtered = "Filtered",
         )
 
-        val GERMAN = StyledPreferenceStrings(
+        val GERMAN = PreferenceStrings(
             settings = "Einstellungen",
             changelog = "Änderungsprotokoll",
             proVersion = "Pro-Version",

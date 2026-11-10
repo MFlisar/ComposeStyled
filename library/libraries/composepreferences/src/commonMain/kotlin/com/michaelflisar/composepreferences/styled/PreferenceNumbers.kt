@@ -33,7 +33,7 @@ import com.michaelflisar.composestyled.utils.rememberValidator
 /** Opens a numeric editor dialog from a preference row. */
 @OptIn(InternalComposeStyledApi::class)
 @Composable
-fun <T : Number> StyledPreferenceInputNumber(
+fun <T : Number> PreferenceInputNumber(
     value: MutableState<T>,
     title: String,
     modifier: Modifier = Modifier,
@@ -49,7 +49,7 @@ fun <T : Number> StyledPreferenceInputNumber(
     validator: Validator<T> = rememberValidator(value.value),
     inputVariant: StyledInput.Variant = StyledInput.Variant.Auto,
 ) {
-    StyledPreferenceInputNumber(
+    PreferenceInputNumber(
         value = value.value,
         onValueChange = { value.value = it },
         title = title,
@@ -71,7 +71,7 @@ fun <T : Number> StyledPreferenceInputNumber(
 /** Controlled numeric editor dialog launched from a preference row. */
 @OptIn(InternalComposeStyledApi::class)
 @Composable
-fun <T : Number> StyledPreferenceInputNumber(
+fun <T : Number> PreferenceInputNumber(
     value: T,
     onValueChange: (T) -> Unit,
     title: String,
@@ -93,7 +93,7 @@ fun <T : Number> StyledPreferenceInputNumber(
     LaunchedEffect(value, dialog.visible) {
         if (dialog.visible) draft = value
     }
-    val strings = LocalStyledPreferenceStrings.current
+    val strings = LocalPreferenceStrings.current
     BaseDialogPreference(
         data = draft,
         title = title,
@@ -138,8 +138,8 @@ fun <T : Number> StyledPreferenceInputNumber(
 }
 
 /** Numeric preference that edits inline with a slider or in a number-picker dialog. */
-object StyledPreferenceNumber {
-    /** Presentation used by [StyledPreferenceNumber]. */
+object PreferenceNumber {
+    /** Presentation used by [PreferenceNumber]. */
     sealed interface Style {
         data object Picker : Style
         data object Slider : Style
@@ -149,11 +149,11 @@ object StyledPreferenceNumber {
 /** Preference whose value is edited using an inline slider or a number-picker dialog. */
 @OptIn(InternalComposeStyledApi::class)
 @Composable
-fun <T> StyledPreferenceNumber(
+fun <T> PreferenceNumber(
     value: MutableState<T>,
     title: String,
     modifier: Modifier = Modifier,
-    style: StyledPreferenceNumber.Style = StyledPreferenceNumber.Style.Picker,
+    style: PreferenceNumber.Style = PreferenceNumber.Style.Picker,
     key: String? = null,
     subtitle: String? = null,
     icon: IconComposable? = null,
@@ -171,7 +171,7 @@ fun <T> StyledPreferenceNumber(
     tint: Color? = null,
     inputVariant: StyledInput.Variant = StyledInput.Variant.Auto,
 ) where T : Number, T : Comparable<T> {
-    StyledPreferenceNumber(
+    PreferenceNumber(
         value = value.value,
         onValueChange = { value.value = it },
         title = title,
@@ -193,15 +193,15 @@ fun <T> StyledPreferenceNumber(
     )
 }
 
-/** Controlled [StyledPreferenceNumber] overload. */
+/** Controlled [PreferenceNumber] overload. */
 @OptIn(InternalComposeStyledApi::class)
 @Composable
-fun <T> StyledPreferenceNumber(
+fun <T> PreferenceNumber(
     value: T,
     onValueChange: (T) -> Unit,
     title: String,
     modifier: Modifier = Modifier,
-    style: StyledPreferenceNumber.Style = StyledPreferenceNumber.Style.Picker,
+    style: PreferenceNumber.Style = PreferenceNumber.Style.Picker,
     key: String? = null,
     subtitle: String? = null,
     icon: IconComposable? = null,
@@ -221,8 +221,8 @@ fun <T> StyledPreferenceNumber(
     LaunchedEffect(value, dialog.visible) {
         if (dialog.visible) draft = value
     }
-    if (style == StyledPreferenceNumber.Style.Picker) {
-        val strings = LocalStyledPreferenceStrings.current
+    if (style == PreferenceNumber.Style.Picker) {
+        val strings = LocalPreferenceStrings.current
         BaseDialogPreference(
             data = draft,
             title = title,

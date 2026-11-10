@@ -15,7 +15,7 @@ import com.michaelflisar.composestyled.classes.IconComposable
 
 /** A standard preference row with a leading icon, title, supporting text and optional content below the text. */
 @Composable
-fun StyledPreferenceItem(
+fun PreferenceItem(
     title: String,
     subtitle: String? = null,
     modifier: Modifier = Modifier,

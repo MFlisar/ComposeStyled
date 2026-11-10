@@ -46,7 +46,7 @@ import kotlin.collections.plus
 
 /** An expandable group of related preferences. */
 @Composable
-fun StyledPreferenceSection(
+fun PreferenceSection(
     title: String,
     subtitle: String? = null,
     modifier: Modifier = Modifier,
@@ -75,7 +75,7 @@ fun StyledPreferenceSection(
 
 /** A preference section whose expanded state is controlled by the caller. */
 @Composable
-fun StyledPreferenceSection(
+fun PreferenceSection(
     title: String,
     expanded: MutableState<Boolean>,
     subtitle: String? = null,

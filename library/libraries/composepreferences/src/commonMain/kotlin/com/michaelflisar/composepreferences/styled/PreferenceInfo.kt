@@ -5,7 +5,7 @@ import androidx.compose.ui.Modifier
 
 /** Displays informational text without an interaction action. */
 @Composable
-fun StyledPreferenceInfo(
+fun PreferenceInfo(
     title: String,
     text: String? = null,
     modifier: Modifier = Modifier,
@@ -14,7 +14,7 @@ fun StyledPreferenceInfo(
     isEnabled: @Composable () -> Boolean = { true },
     isVisible: @Composable () -> Boolean = { true },
 ) {
-    StyledPreferenceItem(
+    PreferenceItem(
         title = title,
         subtitle = text,
         modifier = modifier,

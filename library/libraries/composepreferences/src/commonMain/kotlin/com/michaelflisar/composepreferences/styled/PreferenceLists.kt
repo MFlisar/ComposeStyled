@@ -41,7 +41,7 @@ import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.ui.state.rememberDialogState
 import com.michaelflisar.composestyled.utils.PointerInputBlocker
 
-object StyledPreferenceList {
+object PreferenceList {
     sealed class Presentation {
         data object Dialog : Presentation()
 
@@ -66,7 +66,7 @@ object StyledPreferenceList {
 
 /** Single-selection preference presented in a dialog or dropdown. */
 @Composable
-fun <T : Any> StyledPreferenceList(
+fun <T : Any> PreferenceList(
     items: List<T>,
     selected: MutableState<T>,
     title: String,
@@ -74,8 +74,8 @@ fun <T : Any> StyledPreferenceList(
     key: String? = null,
     subtitle: String? = null,
     icon: IconComposable? = null,
-    presentation: StyledPreferenceList.Presentation = StyledPreferenceList.Presentation.Dialog,
-    filter: StyledPreferenceList.Filter<T>? = null,
+    presentation: PreferenceList.Presentation = PreferenceList.Presentation.Dialog,
+    filter: PreferenceList.Filter<T>? = null,
     itemText: (T) -> String = { it.toString() },
     enabled: Boolean = true,
     filterTags: List<String> = emptyList(),
@@ -84,7 +84,7 @@ fun <T : Any> StyledPreferenceList(
     dropdownCustomization: StyledButton.Customization? = null,
     shape: Shape? = null,
 ) {
-    StyledPreferenceList(
+    PreferenceList(
         items = items,
         selected = selected.value,
         onValueChange = { selected.value = it },
@@ -107,7 +107,7 @@ fun <T : Any> StyledPreferenceList(
 
 /** Controlled single-selection preference. */
 @Composable
-fun <T : Any> StyledPreferenceList(
+fun <T : Any> PreferenceList(
     items: List<T>,
     selected: T,
     onValueChange: (T) -> Unit,
@@ -116,8 +116,8 @@ fun <T : Any> StyledPreferenceList(
     key: String? = null,
     subtitle: String? = null,
     icon: IconComposable? = null,
-    presentation: StyledPreferenceList.Presentation = StyledPreferenceList.Presentation.Dialog,
-    filter: StyledPreferenceList.Filter<T>? = null,
+    presentation: PreferenceList.Presentation = PreferenceList.Presentation.Dialog,
+    filter: PreferenceList.Filter<T>? = null,
     itemText: (T) -> String = { it.toString() },
     enabled: Boolean = true,
     filterTags: List<String> = emptyList(),
@@ -127,13 +127,13 @@ fun <T : Any> StyledPreferenceList(
     shape: Shape? = null,
 ) {
     val dialog = rememberDialogState()
-    val strings = LocalStyledPreferenceStrings.current
+    val strings = LocalPreferenceStrings.current
     var query by rememberSaveable { mutableStateOf("") }
     val dropdownExpanded = remember { mutableStateOf(false) }
     val effectiveShape = shape ?: checkNotNull(LocalPreferenceStyle.current).item.shape
 
     when (presentation) {
-        is StyledPreferenceList.Presentation.Dropdown -> PreferenceEntry(
+        is PreferenceList.Presentation.Dropdown -> PreferenceEntry(
             title = title,
             subtitle = subtitle ?: itemText(selected),
             filterTags = filterTags,
@@ -148,7 +148,7 @@ fun <T : Any> StyledPreferenceList(
                 modifier = modifier,
                 onClick =
                     if (presentation.clickBehavior ==
-                        StyledPreferenceList.Presentation.Dropdown.ClickBehavior.FullItem
+                        PreferenceList.Presentation.Dropdown.ClickBehavior.FullItem
                     ) {
                         { dropdownExpanded.value = true }
                     } else {
@@ -161,7 +161,7 @@ fun <T : Any> StyledPreferenceList(
                 trailing = {
                     val textStyle = LocalStyledTextStyle.current
                     val dropdownTextStyle = textStyle.copy(textAlign = TextAlign.Start)
-                    val blockDropdownInteraction = presentation.clickBehavior == StyledPreferenceList.Presentation.Dropdown.ClickBehavior.FullItem
+                    val blockDropdownInteraction = presentation.clickBehavior == PreferenceList.Presentation.Dropdown.ClickBehavior.FullItem
                     PointerInputBlocker(blocked = blockDropdownInteraction) {
                         StyledPopupDropdown(
                             items = items,
@@ -188,7 +188,7 @@ fun <T : Any> StyledPreferenceList(
             )
         }
 
-        StyledPreferenceList.Presentation.Dialog -> BaseDialogPreference(
+        PreferenceList.Presentation.Dialog -> BaseDialogPreference(
             data = items,
             title = title,
             subtitle = subtitle ?: itemText(selected),
@@ -254,7 +254,7 @@ fun <T : Any> StyledPreferenceList(
 
 /** Multi-selection preference presented in a dialog or dropdown. */
 @Composable
-fun <T : Any> StyledPreferenceListMultiSelect(
+fun <T : Any> PreferenceListMultiSelect(
     items: List<T>,
     selected: MutableState<List<T>>,
     title: String,
@@ -262,8 +262,8 @@ fun <T : Any> StyledPreferenceListMultiSelect(
     key: String? = null,
     subtitle: String? = null,
     icon: IconComposable? = null,
-    presentation: StyledPreferenceList.Presentation = StyledPreferenceList.Presentation.Dialog,
-    filter: StyledPreferenceList.Filter<T>? = null,
+    presentation: PreferenceList.Presentation = PreferenceList.Presentation.Dialog,
+    filter: PreferenceList.Filter<T>? = null,
     itemText: (T) -> String = { it.toString() },
     enabled: Boolean = true,
     filterTags: List<String> = emptyList(),
@@ -272,7 +272,7 @@ fun <T : Any> StyledPreferenceListMultiSelect(
     dropdownCustomization: StyledButton.Customization? = null,
     shape: Shape? = null,
 ) {
-    StyledPreferenceListMultiSelect(
+    PreferenceListMultiSelect(
         items = items,
         selected = selected.value,
         onValueChange = { selected.value = it },
@@ -295,7 +295,7 @@ fun <T : Any> StyledPreferenceListMultiSelect(
 
 /** Controlled multi-selection preference. */
 @Composable
-fun <T : Any> StyledPreferenceListMultiSelect(
+fun <T : Any> PreferenceListMultiSelect(
     items: List<T>,
     selected: List<T>,
     onValueChange: (List<T>) -> Unit,
@@ -304,8 +304,8 @@ fun <T : Any> StyledPreferenceListMultiSelect(
     key: String? = null,
     subtitle: String? = null,
     icon: IconComposable? = null,
-    presentation: StyledPreferenceList.Presentation = StyledPreferenceList.Presentation.Dialog,
-    filter: StyledPreferenceList.Filter<T>? = null,
+    presentation: PreferenceList.Presentation = PreferenceList.Presentation.Dialog,
+    filter: PreferenceList.Filter<T>? = null,
     itemText: (T) -> String = { it.toString() },
     enabled: Boolean = true,
     filterTags: List<String> = emptyList(),
@@ -315,7 +315,7 @@ fun <T : Any> StyledPreferenceListMultiSelect(
     shape: Shape? = null,
 ) {
     val dialog = rememberDialogState()
-    val strings = LocalStyledPreferenceStrings.current
+    val strings = LocalPreferenceStrings.current
     var draft by remember(selected) { mutableStateOf(selected) }
     var query by rememberSaveable { mutableStateOf("") }
     val dropdownExpanded = remember { mutableStateOf(false) }
@@ -326,7 +326,7 @@ fun <T : Any> StyledPreferenceListMultiSelect(
     val selectedText = selected.joinToString(", ", transform = itemText)
 
     when (presentation) {
-        is StyledPreferenceList.Presentation.Dropdown -> PreferenceEntry(
+        is PreferenceList.Presentation.Dropdown -> PreferenceEntry(
             title = title,
             subtitle = subtitle ?: selectedText,
             filterTags = filterTags,
@@ -342,7 +342,7 @@ fun <T : Any> StyledPreferenceListMultiSelect(
                 modifier = modifier,
                 onClick =
                     if (presentation.clickBehavior ==
-                        StyledPreferenceList.Presentation.Dropdown.ClickBehavior.FullItem
+                        PreferenceList.Presentation.Dropdown.ClickBehavior.FullItem
                     ) {
                         { dropdownExpanded.value = true }
                     } else {
@@ -355,7 +355,7 @@ fun <T : Any> StyledPreferenceListMultiSelect(
                     val textStyle = LocalStyledTextStyle.current
                     val dropdownTextStyle = textStyle.copy(textAlign = TextAlign.Start)
                     val blockDropdownInteraction = presentation.clickBehavior ==
-                        StyledPreferenceList.Presentation.Dropdown.ClickBehavior.FullItem
+                        PreferenceList.Presentation.Dropdown.ClickBehavior.FullItem
                     PointerInputBlocker(blocked = blockDropdownInteraction) {
                         StyledPopupDropdownMultiSelect(
                             items = items,
@@ -385,7 +385,7 @@ fun <T : Any> StyledPreferenceListMultiSelect(
             )
         }
 
-        StyledPreferenceList.Presentation.Dialog -> BaseDialogPreference(
+        PreferenceList.Presentation.Dialog -> BaseDialogPreference(
             data = items,
             title = title,
             subtitle = subtitle ?: selectedText,
@@ -470,14 +470,14 @@ fun <T : Any> StyledPreferenceListMultiSelect(
     }
 }
 
-private fun <T : Any> StyledPreferenceList.Filter<T>.toStyledFilter(
+private fun <T : Any> PreferenceList.Filter<T>.toStyledFilter(
     itemText: (T) -> String,
     label: String,
 ): StyledPopupDropdown.Filter<T> = StyledPopupDropdown.Filter(this.label ?: label) { query, item ->
     test(query, item, itemText)
 }
 
-private fun <T : Any> StyledPreferenceList.Filter<T>.test(
+private fun <T : Any> PreferenceList.Filter<T>.test(
     query: String,
     item: T,
     itemText: (T) -> String,

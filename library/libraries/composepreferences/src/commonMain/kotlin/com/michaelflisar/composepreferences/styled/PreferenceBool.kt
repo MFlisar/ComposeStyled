@@ -19,8 +19,8 @@ import com.michaelflisar.composestyled.ui.components.StyledCheckbox
 import com.michaelflisar.composestyled.ui.components.StyledSwitch
 import com.michaelflisar.composestyled.ui.components.StyledToggleBehavior
 
-/** Checkbox and switch presentations for [StyledPreferenceBool]. */
-object StyledPreferenceBool {
+/** Checkbox and switch presentations for [PreferenceBool]. */
+object PreferenceBool {
     enum class Style {
         Checkbox,
         Switch,
@@ -29,11 +29,11 @@ object StyledPreferenceBool {
 
 /** Boolean preference backed directly by [value]. */
 @Composable
-fun StyledPreferenceBool(
+fun PreferenceBool(
     value: MutableState<Boolean>,
     title: String,
     modifier: Modifier = Modifier,
-    style: StyledPreferenceBool.Style = StyledPreferenceBool.Style.Switch,
+    style: PreferenceBool.Style = PreferenceBool.Style.Switch,
     clickBehavior: StyledToggleBehavior = StyledToggleBehavior.FullItem,
     key: String? = null,
     subtitle: String? = null,
@@ -46,7 +46,7 @@ fun StyledPreferenceBool(
     contentPadding: PaddingValues? = null,
     shape: Shape? = null,
 ) {
-    StyledPreferenceBool(
+    PreferenceBool(
         value = value.value,
         onValueChange = { value.value = it },
         title = title,
@@ -68,12 +68,12 @@ fun StyledPreferenceBool(
 
 /** Controlled Boolean preference rendered with a switch or checkbox. */
 @Composable
-fun StyledPreferenceBool(
+fun PreferenceBool(
     value: Boolean,
     onValueChange: (Boolean) -> Unit,
     title: String,
     modifier: Modifier = Modifier,
-    style: StyledPreferenceBool.Style = StyledPreferenceBool.Style.Switch,
+    style: PreferenceBool.Style = PreferenceBool.Style.Switch,
     clickBehavior: StyledToggleBehavior = StyledToggleBehavior.FullItem,
     key: String? = null,
     subtitle: String? = null,
@@ -108,7 +108,7 @@ fun StyledPreferenceBool(
             onClick = rowClick,
             enabled = visuals.enabled,
             modifier = modifier.semantics(mergeDescendants = true) {
-                role = if (style == StyledPreferenceBool.Style.Switch) Role.Switch else Role.Checkbox
+                role = if (style == PreferenceBool.Style.Switch) Role.Switch else Role.Checkbox
                 toggleableState = if (value) ToggleableState.On else ToggleableState.Off
             },
             style = visuals.style,
@@ -118,7 +118,7 @@ fun StyledPreferenceBool(
             shape = shape,
             trailing = {
                 when (style) {
-                    StyledPreferenceBool.Style.Switch -> StyledSwitch(
+                    PreferenceBool.Style.Switch -> StyledSwitch(
                         checked = value,
                         onCheckedChange = if (clickBehavior == StyledToggleBehavior.FullItem) {
                             null
@@ -131,7 +131,7 @@ fun StyledPreferenceBool(
                         clickBehavior = StyledToggleBehavior.ControlOnly,
                     )
 
-                    StyledPreferenceBool.Style.Checkbox -> StyledCheckbox(
+                    PreferenceBool.Style.Checkbox -> StyledCheckbox(
                         checked = value,
                         onCheckedChange = if (clickBehavior == StyledToggleBehavior.FullItem) {
                             null
