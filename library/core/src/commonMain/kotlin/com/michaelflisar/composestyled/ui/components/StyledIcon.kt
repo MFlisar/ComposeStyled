@@ -4,16 +4,20 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.classes.IconComposable
+import com.michaelflisar.composestyled.classes.toIconComposable
 import com.michaelflisar.composestyled.tokens.LocalStyledContentColor
 import com.michaelflisar.composestyled.registry.LocalStyledRegistry
 import com.michaelflisar.composestyled.registry.StyledComponent
 import com.michaelflisar.composestyled.registry.StyledKey
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.runtime.LocalStyledContext
+import org.jetbrains.compose.resources.DrawableResource
 
 object StyledIcon {
 
@@ -78,3 +82,51 @@ fun StyledIcon(
         tint = tint,
     )
 }
+
+/** Adapts an [ImageVector] and renders it using the active theme's icon styling. */
+@Composable
+fun StyledIcon(
+    imageVector: ImageVector,
+    modifier: Modifier = Modifier,
+    contentDescription: String? = null,
+    size: Dp? = StyledIconDefaults.size,
+    tint: Color = LocalStyledContentColor.current,
+) = StyledIcon(
+    icon = imageVector.toIconComposable(),
+    modifier = modifier,
+    contentDescription = contentDescription,
+    size = size,
+    tint = tint,
+)
+
+/** Adapts a [Painter] and renders it using the active theme's icon styling. */
+@Composable
+fun StyledIcon(
+    painter: Painter,
+    modifier: Modifier = Modifier,
+    contentDescription: String? = null,
+    size: Dp? = StyledIconDefaults.size,
+    tint: Color = LocalStyledContentColor.current,
+) = StyledIcon(
+    icon = painter.toIconComposable(),
+    modifier = modifier,
+    contentDescription = contentDescription,
+    size = size,
+    tint = tint,
+)
+
+/** Loads a [DrawableResource] and renders it using the active theme's icon styling. */
+@Composable
+fun StyledIcon(
+    drawableResource: DrawableResource,
+    modifier: Modifier = Modifier,
+    contentDescription: String? = null,
+    size: Dp? = StyledIconDefaults.size,
+    tint: Color = LocalStyledContentColor.current,
+) = StyledIcon(
+    icon = drawableResource.toIconComposable(),
+    modifier = modifier,
+    contentDescription = contentDescription,
+    size = size,
+    tint = tint,
+)

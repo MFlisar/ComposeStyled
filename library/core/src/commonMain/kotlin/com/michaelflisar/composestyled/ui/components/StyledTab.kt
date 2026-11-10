@@ -35,7 +35,7 @@ object StyledTab {
             selectedContentColor: Color,
             unselectedContentColor: Color,
             interactionSource: MutableInteractionSource?,
-            content: @Composable ColumnScope.() -> Unit,
+            text: @Composable ColumnScope.() -> Unit,
         )
     }
 }
@@ -54,7 +54,7 @@ fun StyledTab(
     selectedContentColor: Color = Color.Unspecified,
     unselectedContentColor: Color = Color.Unspecified,
     interactionSource: MutableInteractionSource? = null,
-    content: @Composable ColumnScope.() -> Unit,
+    text: @Composable ColumnScope.() -> Unit,
 ) {
     LocalStyledRegistry.current[StyledTab.Key].Render(
         selected = selected,
@@ -64,6 +64,6 @@ fun StyledTab(
         selectedContentColor = selectedContentColor,
         unselectedContentColor = unselectedContentColor,
         interactionSource = interactionSource,
-        content = content,
+        text = text,
     )
 }

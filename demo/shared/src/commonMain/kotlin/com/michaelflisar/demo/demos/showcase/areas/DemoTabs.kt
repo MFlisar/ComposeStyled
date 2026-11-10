@@ -1,14 +1,17 @@
 package com.michaelflisar.demo.demos.showcase.areas
 
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.ui.components.StyledPrimaryScrollableTabRow
 import com.michaelflisar.composestyled.ui.components.StyledPrimaryTabRow
 import com.michaelflisar.composestyled.ui.components.StyledSecondaryScrollableTabRow
 import com.michaelflisar.composestyled.ui.components.StyledTab
 import com.michaelflisar.composestyled.ui.layout.StyledPagerDefaults
+import com.michaelflisar.composestyled.ui.primitives.StyledHorizontalDivider
 import com.michaelflisar.composestyled.utils.ExpandState
 import com.michaelflisar.demo.helper.RegionContainer
 import com.michaelflisar.demo.helper.SubTitle
@@ -18,6 +21,7 @@ internal fun DemoTabs(baseId: Int, expandState: ExpandState) {
     val tabs = listOf("Overview", "Details", "Settings")
     val selectedTabIndex1 = rememberSaveable { mutableIntStateOf(0) }
     val selectedTabIndex2 = rememberSaveable { mutableIntStateOf(0) }
+    val manyTabsScrollState = rememberScrollState()
     val manyTabs = listOf(
         "Overview", "Details", "Settings", "History", "Activity", "Members",
         "Permissions", "Notifications", "Integrations", "Billing", "Security",
@@ -58,7 +62,15 @@ internal fun DemoTabs(baseId: Int, expandState: ExpandState) {
         }
 
         SubTitle("Styled Primary Scrollable Tab Row")
-        StyledPrimaryScrollableTabRow(selectedTabIndex = selectedTabIndex2.intValue) {
+        StyledPrimaryScrollableTabRow(
+            selectedTabIndex = selectedTabIndex2.intValue,
+            scrollState = manyTabsScrollState,
+            edgePadding = 16.dp,
+            divider = {
+                StyledHorizontalDivider(color = StyledTheme.colorScheme.primary)
+            },
+            minTabWidth = 96.dp,
+        ) {
             manyTabs.forEachIndexed { index, title ->
                 StyledTab(
                     selected = selectedTabIndex2.intValue == index,

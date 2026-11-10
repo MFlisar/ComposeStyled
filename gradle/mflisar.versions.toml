@@ -13,12 +13,12 @@ composepreferences =   		"3.0.0"
 composethemer =   			"2.0.0"
 composecolors =             "2.0.0"
 
-composedialogs =   		    "5.0.0-alpha05"
+composedialogs =   		    "5.0.0-alpha06"
 composetable =              "0.0.1-alpha06"
 
 # plugins only
 kmpicon =                   "1.0.0"
-kmpdevtools =               "9.3.3" # use the "devTools" task to change the version
+kmpdevtools =               "9.3.4" # use the "devTools" task to change the version
 
 # demos
 democomposables =           "1.0.5"

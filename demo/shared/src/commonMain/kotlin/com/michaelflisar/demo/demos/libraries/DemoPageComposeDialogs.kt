@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.michaelflisar.composedialogs.dialogs.date.ui.DatePickerRange
 import com.michaelflisar.composedialogs.dialogs.date.ui.DatePickerSetup
-import com.michaelflisar.composedialogs.dialogs.frequency.FrequencyPickerType
+import com.michaelflisar.composedialogs.dialogs.frequency.classes.Frequency
 import com.michaelflisar.composedialogs.styled.StyledDialogInfo
 import com.michaelflisar.composedialogs.styled.StyledDialogInput
 import com.michaelflisar.composedialogs.styled.StyledDialogList
@@ -40,7 +40,6 @@ import com.michaelflisar.demo.helper.DemoTopBar
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
-import kotlinx.datetime.Month
 
 @Composable
 internal fun DemoPageComposeDialogs(onBack: () -> Unit) {
@@ -58,12 +57,9 @@ internal fun DemoPageComposeDialogs(onBack: () -> Unit) {
     val selectedColor = remember { mutableStateOf(initialColor) }
     val selectedDate = remember { mutableStateOf(LocalDate(2026, 11, 7)) }
     val selectedTime = remember { mutableStateOf(LocalTime(14, 45)) }
-    val selectedFrequencyType = remember { mutableStateOf(FrequencyPickerType.Daily) }
-    val selectedFrequencyTime = remember { mutableStateOf(LocalTime(8, 30)) }
-    val selectedFrequencyDayOfWeek = remember { mutableStateOf(DayOfWeek.MONDAY) }
-    val selectedFrequencyDayOfMonth = remember { mutableStateOf(1) }
-    val selectedFrequencyMonthOfYear = remember { mutableStateOf(Month.JANUARY) }
-    val selectedFrequencyInterval = remember { mutableStateOf<Int?>(1) }
+    val selectedFrequency = remember {
+        mutableStateOf<Frequency>(Frequency.Daily(time = LocalTime(8, 30), interval = 1))
+    }
     val input = remember { mutableStateOf("") }
     val number = remember { mutableStateOf(5) }
     val selectedItem = remember { mutableStateOf("") }
@@ -141,8 +137,8 @@ internal fun DemoPageComposeDialogs(onBack: () -> Unit) {
             StyledText("Selected date: ${selectedDate.value}")
             StyledText("Selected time: ${selectedTime.value}")
             StyledText(
-                "Selected frequency: ${selectedFrequencyType.value}, every " +
-                    "${selectedFrequencyInterval.value}, at ${selectedFrequencyTime.value}"
+                "Selected frequency: ${selectedFrequency.value.type}, every " +
+                    "${selectedFrequency.value.interval}, at ${selectedFrequency.value.time}"
             )
             StyledText("Selected list item: ${selectedItem.value}")
             StyledText("Selected number: ${number.value}")
@@ -167,12 +163,7 @@ internal fun DemoPageComposeDialogs(onBack: () -> Unit) {
     )
     StyledDialogFrequency(
         state = frequencyDialog,
-        selectedType = selectedFrequencyType,
-        selectedTime = selectedFrequencyTime,
-        selectedDayOfWeek = selectedFrequencyDayOfWeek,
-        selectedDayOfMonth = selectedFrequencyDayOfMonth,
-        selectedMonthOfYear = selectedFrequencyMonthOfYear,
-        selectedInterval = selectedFrequencyInterval,
+        frequency = selectedFrequency,
         style = dialogStyle,
         title = { StyledText("Set a frequency") },
         buttons = doneButton(),

@@ -21,9 +21,12 @@ The Core set contains `Add`, `NavigateBack`, `Cancel`, `Check`, `Clear`,
 `Filter`, `Sort`, `Copy`, `Paste` and `Cut`. `Submenu` and `SubmenuBack` indicate
 entering a submenu and returning to its parent. The IDs are semantic:
 `Remove` is a minus action while
-`Delete` is destructive deletion. `StyledIcon` still accepts any
-`IconComposable`, so app-specific vectors, painters and resources can be used
-directly without registering them.
+`Delete` is destructive deletion. `StyledIcon` accepts an `IconComposable`
+as well as direct `ImageVector`, `Painter` and `DrawableResource` inputs; on
+Android, it also accepts drawable resource IDs (`Int`). These direct overloads
+use the existing `toIconComposable()` adapters internally, so app-specific
+icons can be used without registering them. Other icon-taking components
+continue to accept `IconComposable`.
 
 Ready-to-use icon families live in separate modules:
 

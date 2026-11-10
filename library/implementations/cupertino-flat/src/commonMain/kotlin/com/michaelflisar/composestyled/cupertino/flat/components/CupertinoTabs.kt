@@ -4,8 +4,6 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.unit.Dp
-import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.foundation.components.FoundationTabRow
 import com.michaelflisar.composestyled.foundation.components.FoundationTab
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
@@ -13,18 +11,14 @@ import com.michaelflisar.composestyled.ui.components.StyledTabRow
 import com.michaelflisar.composestyled.ui.components.StyledTab
 
 @OptIn(InternalComposeStyledApi::class)
-class CupertinoFlatTabRow internal constructor(edgePadding: Dp) :
+class CupertinoFlatTabRow internal constructor() :
     StyledTabRow.Implementation by FoundationTabRow(
-        scrollableEdgePadding = edgePadding,
         indicatorAnimationSpec = tween(durationMillis = 180, easing = FastOutSlowInEasing),
     ) {
 
     companion object {
         @Composable
-        fun create(): CupertinoFlatTabRow {
-            val edgePadding = StyledTheme.padding.large
-            return remember(edgePadding) { CupertinoFlatTabRow(edgePadding) }
-        }
+        fun create() = remember { CupertinoFlatTabRow() }
     }
 }
 

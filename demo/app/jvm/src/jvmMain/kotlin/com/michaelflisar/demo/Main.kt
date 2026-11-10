@@ -1,21 +1,16 @@
 package com.michaelflisar.demo
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.michaelflisar.composestyled.StyledTheme
-import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.ui.components.StyledIcon
 import com.michaelflisar.composestyled.ui.components.StyledMenuBar
 import com.michaelflisar.composestyled.ui.icons.StyledIcons
@@ -81,7 +76,12 @@ private fun DemoDesktopMenuBar() {
                 item(
                     "PDF",
                     onClick = { status.value = "Exported PDF" },
-                    leadingIcon = { StyledIcon(icon = StyledIcons.Save, contentDescription = null) },
+                    leadingIcon = {
+                        StyledIcon(
+                            icon = StyledIcons.Save,
+                            contentDescription = null
+                        )
+                    },
                 )
                 submenu("More formats") {
                     item("PNG", onClick = { status.value = "Exported PNG" })

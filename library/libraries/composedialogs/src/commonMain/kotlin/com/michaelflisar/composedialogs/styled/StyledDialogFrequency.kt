@@ -2,12 +2,14 @@ package com.michaelflisar.composedialogs.styled
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import com.michaelflisar.composedialogs.dialogs.frequency.FrequencyIntervalInputType
 import com.michaelflisar.composedialogs.dialogs.frequency.FrequencyPicker
 import com.michaelflisar.composedialogs.dialogs.frequency.FrequencyPickerDefaults
 import com.michaelflisar.composedialogs.dialogs.frequency.FrequencyPickerTexts
-import com.michaelflisar.composedialogs.dialogs.frequency.FrequencyPickerType
-import com.michaelflisar.composedialogs.dialogs.frequency.FrequencyIntervalInputType
+import com.michaelflisar.composedialogs.dialogs.frequency.classes.Frequency
 import com.michaelflisar.composedialogs.dialogs.time.TimePickerDefaults
 import com.michaelflisar.composedialogs.dialogs.time.TimePickerSetup
 import com.michaelflisar.composedialogs.styled.provider.StyledFrequencyUIProvider
@@ -17,22 +19,15 @@ import com.michaelflisar.composestyled.ui.layout.StyledDialog
 import com.michaelflisar.composestyled.ui.layout.StyledDialogDefaults
 import com.michaelflisar.composestyled.ui.state.DialogState
 import kotlinx.datetime.DayOfWeek
-import kotlinx.datetime.LocalTime
-import kotlinx.datetime.Month
 
 /** Shows the ComposeDialogs frequency editor in a Styled dialog. */
 @Composable
 fun StyledDialogFrequency(
     state: DialogState,
-    selectedType: MutableState<FrequencyPickerType>,
-    selectedTime: MutableState<LocalTime>,
-    selectedDayOfWeek: MutableState<DayOfWeek>,
-    selectedDayOfMonth: MutableState<Int>,
-    selectedMonthOfYear: MutableState<Month>,
-    selectedInterval: MutableState<Int?>,
+    frequency: MutableState<Frequency>,
     modifier: Modifier = Modifier,
     texts: FrequencyPickerTexts = FrequencyPickerDefaults.texts(),
-    supportedTypes: List<FrequencyPickerType> = FrequencyPickerType.entries,
+    supportedTypes: List<Frequency.Type> = Frequency.Type.entries,
     firstDayOffset: DayOfWeek = DayOfWeek.MONDAY,
     intervalInputType: FrequencyIntervalInputType = FrequencyIntervalInputType.Input,
     timeSetup: TimePickerSetup = TimePickerDefaults.setup(),
@@ -43,7 +38,9 @@ fun StyledDialogFrequency(
     buttons: StyledDialog.Buttons = StyledDialog.Buttons(),
     onDismissRequest: () -> Unit = state::dismiss,
 ) {
-    val intervalIsValid = selectedInterval.value?.let { it > 0 } == true
+    val intervalIsValid = remember(frequency.value.interval) {
+        mutableStateOf(frequency.value.interval > 0)
+    }
     composeDialog(
         state = state,
         modifier = modifier,
@@ -51,24 +48,21 @@ fun StyledDialogFrequency(
         properties = properties,
         title = title,
         icon = icon,
-        buttons = buttons.withPositiveButtonEnabled(intervalIsValid),
+        buttons = buttons.withPositiveButtonEnabled(intervalIsValid.value),
         onDismissRequest = onDismissRequest,
     ) {
         if (state.visible) {
             FrequencyPicker(
                 uiProvider = StyledFrequencyUIProvider,
+                frequency = frequency,
                 texts = texts,
                 supportedTypes = supportedTypes,
                 firstDayOffset = firstDayOffset,
-                selectedType = selectedType,
-                selectedTime = selectedTime,
-                selectedDayOfWeek = selectedDayOfWeek,
-                selectedDayOfMonth = selectedDayOfMonth,
-                selectedMonthOfYear = selectedMonthOfYear,
-                selectedInterval = selectedInterval,
                 intervalInputType = intervalInputType,
                 timeSetup = timeSetup,
-            )
+            ) { isValid ->
+                intervalIsValid.value = isValid
+            }
         }
     }
 }

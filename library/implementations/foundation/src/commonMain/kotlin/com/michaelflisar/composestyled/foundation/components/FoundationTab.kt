@@ -38,7 +38,7 @@ class FoundationTab : StyledTab.Implementation {
         selectedContentColor: Color,
         unselectedContentColor: Color,
         interactionSource: MutableInteractionSource?,
-        content: @Composable ColumnScope.() -> Unit,
+        text: @Composable ColumnScope.() -> Unit,
     ) {
         val source = interactionSource ?: remember { MutableInteractionSource() }
         val focused by source.collectIsFocusedAsState()
@@ -106,7 +106,7 @@ class FoundationTab : StyledTab.Implementation {
                     ),
                 horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
-                content = content,
+                content = text,
             )
         }
     }

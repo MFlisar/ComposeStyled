@@ -20,20 +20,26 @@ uses the `com.michaelflisar.composedialogs.styled.provider` implementations.
 
 `StyledDialogDate` requires a `DatePickerRange` and `DatePickerSetup` from
 `ui-date` so callers can define the allowed years and localized formatting.
-`StyledDialogFrequency` takes the picker selection states directly, matching
-the UI module's stateless domain API. For example:
+`StyledDialogFrequency` takes one `MutableState<Frequency>` from
+`ui-frequency`; the immutable frequency model contains its type, interval, and
+type-specific date and time values. For example:
 
 ```kotlin
+val frequency = remember {
+    mutableStateOf<Frequency>(
+        Frequency.Daily(time = LocalTime(8, 30), interval = 1),
+    )
+}
+
 StyledDialogFrequency(
     state = frequencyDialog,
-    selectedType = selectedType,
-    selectedTime = selectedTime,
-    selectedDayOfWeek = selectedDayOfWeek,
-    selectedDayOfMonth = selectedDayOfMonth,
-    selectedMonthOfYear = selectedMonthOfYear,
-    selectedInterval = selectedInterval,
+    frequency = frequency,
 )
 ```
+
+Use `supportedTypes` to limit the available `Frequency.Type` choices. The
+dialog tracks interval validation from the picker and disables its positive
+action while the interval is invalid.
 
 The `StyledDialogInfo`, `StyledDialogInput`, `StyledDialogList`,
 `StyledDialogMenu`, `StyledDialogNumber`, and `StyledDialogProgress` APIs are

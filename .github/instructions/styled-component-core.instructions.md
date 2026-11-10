@@ -60,8 +60,12 @@ layouts and the consistency checklist, follow
    such as `Shape`, and `@Immutable` for customization whose immutable fields
    are guaranteed. Icon-taking APIs use `IconComposable` and name the parameter
    `icon`; do not expose direct `ImageVector`, `Painter`, raw composable-lambda
-   or resource overloads. Do not require every component to copy the full
-   button structure.
+   or resource overloads. The only exception is `StyledIcon`, which may
+   overload `icon` for `ImageVector`, `Painter`, `DrawableResource` and Android
+   drawable resource `Int`. These overloads must adapt through the existing
+   `toIconComposable()` functions and delegate to the `IconComposable`
+   overload; no other component may expose these overloads. Do not require
+   every component to copy the full button structure.
 3. Add the public `@Composable fun StyledX(...)` outside the object. Resolve
    `LocalStyledRegistry.current[StyledX.Key]` and forward arguments to `Render`.
    Keep theme-neutral work here: `StyledIcon` applies optional sizing to the

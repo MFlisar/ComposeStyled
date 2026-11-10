@@ -3,7 +3,6 @@ package com.michaelflisar.composestyled.material3.components
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.PrimaryScrollableTabRow
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.SecondaryScrollableTabRow
@@ -37,53 +36,38 @@ class Material3TabRow internal constructor() : StyledTabRow.Implementation {
         scrollable: Boolean,
         selectedTabIndex: Int,
         modifier: Modifier,
+        scrollState: ScrollState?,
         containerColor: Color,
         contentColor: Color,
-        content: @Composable () -> Unit,
+        edgePadding: Dp,
+        minTabWidth: Dp,
+        divider: @Composable () -> Unit,
+        tabs: @Composable () -> Unit,
     ) {
-        val scrollState = rememberScrollState()
         val resolvedContentColor = if (contentColor == Color.Unspecified) {
             StyledTheme.contentColorFor(containerColor)
         } else {
             contentColor
         }
-        val usesDefaultPalette = containerColor == StyledTheme.colorScheme.surface &&
-            resolvedContentColor == StyledTheme.colorScheme.onSurface
-        val defaultSelectedContentColor = StyledTheme.colorScheme.primary
-        val selectionColors = remember(
-            containerColor,
-            resolvedContentColor,
-            defaultSelectedContentColor,
-        ) {
-            StyledSelectionColors(
-                selectedContentColor = if (usesDefaultPalette) {
-                    defaultSelectedContentColor
-                } else {
-                    resolvedContentColor
-                },
-                unselectedContentColor = if (usesDefaultPalette) {
-                    resolvedContentColor
-                } else {
-                    resolvedContentColor.copy(alpha = resolvedContentColor.alpha * 0.74f)
-                },
-                indicatorColor = if (usesDefaultPalette) {
-                    defaultSelectedContentColor
-                } else {
-                    resolvedContentColor
-                },
-            )
-        }
+        val selectionColors = selectionColors(variant, containerColor, resolvedContentColor)
+        val indicatorColor = selectionColors.indicatorColor ?: resolvedContentColor
         CompositionLocalProvider(LocalStyledSelectionColors provides selectionColors) {
             when (variant) {
                 StyledTabRow.Variant.Primary -> {
                     if (scrollable) {
-                        ScrollableTabRowFrame(modifier, scrollState) {
+                        val activeScrollState = requireNotNull(scrollState) {
+                            "Scrollable tab rows require a ScrollState"
+                        }
+                        ScrollableTabRowFrame(modifier, activeScrollState) {
                             PrimaryScrollableTabRow(
                                 selectedTabIndex = selectedTabIndex,
                                 modifier = Modifier.fillMaxWidth(),
-                                scrollState = scrollState,
+                                scrollState = activeScrollState,
                                 containerColor = containerColor,
                                 contentColor = resolvedContentColor,
+                                edgePadding = edgePadding,
+                                divider = divider,
+                                minTabWidth = minTabWidth,
                                 indicator = {
                                     TabRowDefaults.PrimaryIndicator(
                                         modifier = Modifier.tabIndicatorOffset(
@@ -91,10 +75,10 @@ class Material3TabRow internal constructor() : StyledTabRow.Implementation {
                                             matchContentSize = true,
                                         ),
                                         width = Dp.Unspecified,
-                                        color = resolvedContentColor,
+                                        color = indicatorColor,
                                     )
                                 },
-                                tabs = content,
+                                tabs = tabs,
                             )
                         }
                     } else {
@@ -103,6 +87,7 @@ class Material3TabRow internal constructor() : StyledTabRow.Implementation {
                             modifier = modifier,
                             containerColor = containerColor,
                             contentColor = resolvedContentColor,
+                            divider = divider,
                             indicator = {
                                 TabRowDefaults.PrimaryIndicator(
                                     modifier = Modifier.tabIndicatorOffset(
@@ -110,33 +95,39 @@ class Material3TabRow internal constructor() : StyledTabRow.Implementation {
                                         matchContentSize = true,
                                     ),
                                     width = Dp.Unspecified,
-                                    color = resolvedContentColor,
+                                    color = indicatorColor,
                                 )
                             },
-                            tabs = content,
+                            tabs = tabs,
                         )
                     }
                 }
 
                 StyledTabRow.Variant.Secondary -> {
                     if (scrollable) {
-                        ScrollableTabRowFrame(modifier, scrollState) {
+                        val activeScrollState = requireNotNull(scrollState) {
+                            "Scrollable tab rows require a ScrollState"
+                        }
+                        ScrollableTabRowFrame(modifier, activeScrollState) {
                             SecondaryScrollableTabRow(
                                 selectedTabIndex = selectedTabIndex,
                                 modifier = Modifier.fillMaxWidth(),
-                                scrollState = scrollState,
+                                scrollState = activeScrollState,
                                 containerColor = containerColor,
                                 contentColor = resolvedContentColor,
+                                edgePadding = edgePadding,
+                                divider = divider,
+                                minTabWidth = minTabWidth,
                                 indicator = {
                                     TabRowDefaults.SecondaryIndicator(
                                         modifier = Modifier.tabIndicatorOffset(
                                             selectedTabIndex,
                                             matchContentSize = false,
                                         ),
-                                        color = resolvedContentColor,
+                                        color = indicatorColor,
                                     )
                                 },
-                                tabs = content,
+                                tabs = tabs,
                             )
                         }
                     } else {
@@ -145,21 +136,66 @@ class Material3TabRow internal constructor() : StyledTabRow.Implementation {
                             modifier = modifier,
                             containerColor = containerColor,
                             contentColor = resolvedContentColor,
+                            divider = divider,
                             indicator = {
                                 TabRowDefaults.SecondaryIndicator(
                                     modifier = Modifier.tabIndicatorOffset(
                                         selectedTabIndex,
                                         matchContentSize = false,
                                     ),
-                                    color = resolvedContentColor,
+                                    color = indicatorColor,
                                 )
                             },
-                            tabs = content,
+                            tabs = tabs,
                         )
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+@OptIn(InternalComposeStyledApi::class)
+private fun selectionColors(
+    variant: StyledTabRow.Variant,
+    containerColor: Color,
+    contentColor: Color,
+): StyledSelectionColors {
+    val defaultContainerColor = when (variant) {
+        StyledTabRow.Variant.Primary -> StyledTheme.colorScheme.primarySurface
+        StyledTabRow.Variant.Secondary -> StyledTheme.colorScheme.secondarySurface
+    }
+    val defaultContentColor = when (variant) {
+        StyledTabRow.Variant.Primary -> StyledTheme.colorScheme.onPrimarySurface
+        StyledTabRow.Variant.Secondary -> StyledTheme.colorScheme.onSecondarySurface
+    }
+    val usesDefaultPalette = containerColor == defaultContainerColor &&
+        contentColor == defaultContentColor
+    val defaultSelectedContentColor = StyledTheme.colorScheme.primary
+    return remember(
+        variant,
+        containerColor,
+        contentColor,
+        defaultSelectedContentColor,
+    ) {
+        StyledSelectionColors(
+            selectedContentColor = if (usesDefaultPalette) {
+                defaultSelectedContentColor
+            } else {
+                contentColor
+            },
+            unselectedContentColor = if (usesDefaultPalette) {
+                contentColor
+            } else {
+                contentColor.copy(alpha = contentColor.alpha * 0.74f)
+            },
+            indicatorColor = if (usesDefaultPalette) {
+                defaultSelectedContentColor
+            } else {
+                contentColor
+            },
+        )
     }
 }
 

@@ -7,7 +7,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.StyledTheme
-import com.michaelflisar.composestyled.classes.toIconComposable
 import com.michaelflisar.composestyled.ui.layout.StyledFlowRow
 import com.michaelflisar.composestyled.ui.icons.StyledIcons
 import com.michaelflisar.composestyled.ui.components.StyledIcon
@@ -52,15 +51,15 @@ internal fun DemoIcons(baseId: Int, expandState: ExpandState) {
             StyledIcon(icon = StyledIcons.Paste, contentDescription = "Paste")
             StyledIcon(icon = StyledIcons.Cut, contentDescription = "Cut")
         }
-        SubTitle("Custom IconComposable")
+        SubTitle("Custom Icons")
         StyledFlowRow(spacing = StyledTheme.spacing.medium) {
-            StyledIcon(icon = Icons.Default.Check.toIconComposable(), contentDescription = "Check")
-            StyledIcon(icon = Icons.Default.Add.toIconComposable(), contentDescription = "Add")
+            StyledIcon(imageVector = Icons.Default.Check, contentDescription = "Check")
+            StyledIcon(imageVector = Icons.Default.Add, contentDescription = "Add")
         }
         SubTitle("Icons with Customization")
         StyledFlowRow(spacing = StyledTheme.spacing.medium) {
-            StyledIcon(icon = Icons.Default.Check.toIconComposable(), tint = Color.Magenta, size = 32.dp, contentDescription = "Custom check")
-            StyledIcon(icon = Icons.Default.Add.toIconComposable(), tint = Color.Blue, size = 48.dp, contentDescription = "Custom add")
+            StyledIcon(imageVector = Icons.Default.Check, tint = Color.Magenta, size = 32.dp, contentDescription = "Custom check")
+            StyledIcon(imageVector = Icons.Default.Add, tint = Color.Blue, size = 48.dp, contentDescription = "Custom add")
         }
     }
 }

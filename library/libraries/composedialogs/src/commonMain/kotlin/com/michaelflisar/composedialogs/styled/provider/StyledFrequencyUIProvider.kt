@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
@@ -14,9 +15,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.michaelflisar.composedialogs.dialogs.frequency.FrequencyPickerType
 import com.michaelflisar.composedialogs.dialogs.frequency.FrequencyTextStyle
 import com.michaelflisar.composedialogs.dialogs.frequency.FrequencyUIProvider
+import com.michaelflisar.composedialogs.dialogs.frequency.classes.Frequency
 import com.michaelflisar.composedialogs.dialogs.time.TimePickerSetup
 import com.michaelflisar.composedialogs.styled.StyledDialogTime
 import com.michaelflisar.composestyled.StyledTheme
@@ -156,21 +157,38 @@ internal object StyledFrequencyUIProvider : FrequencyUIProvider {
 
     @Composable
     override fun TimeInput(
-        selectedTime: MutableState<LocalTime>,
+        selectedTime: LocalTime,
+        onTimeSelected: (LocalTime) -> Unit,
         title: String,
         setup: TimePickerSetup,
         modifier: Modifier,
     ) {
+        val currentSelectedTime = rememberUpdatedState(selectedTime)
+        val currentOnTimeSelected = rememberUpdatedState(onTimeSelected)
+        val selectedTimeState = remember {
+            // Bridge the value/callback API to StyledDialogTime's MutableState API.
+            object : MutableState<LocalTime> {
+                override var value: LocalTime
+                    get() = currentSelectedTime.value
+                    set(value) {
+                        currentOnTimeSelected.value(value)
+                    }
+
+                override fun component1(): LocalTime = value
+
+                override fun component2(): (LocalTime) -> Unit = { value = it }
+            }
+        }
         val dialogState = rememberDialogState()
         InputButton(
             modifier = modifier.fillMaxWidth(),
             title = title,
-            value = selectedTime.value.toString(),
+            value = selectedTime.toString(),
             onClick = dialogState::show,
         )
         StyledDialogTime(
             state = dialogState,
-            time = selectedTime,
+            time = selectedTimeState,
             setup = setup,
             title = { StyledText(title) },
         )
@@ -216,10 +234,10 @@ internal object StyledFrequencyUIProvider : FrequencyUIProvider {
     override fun FrequencyTypeDropdown(
         modifier: Modifier,
         title: String,
-        items: List<FrequencyPickerType>,
-        selected: FrequencyPickerType,
-        itemText: (FrequencyPickerType) -> String,
-        onItemSelected: (FrequencyPickerType) -> Unit,
+        items: List<Frequency.Type>,
+        selected: Frequency.Type,
+        itemText: (Frequency.Type) -> String,
+        onItemSelected: (Frequency.Type) -> Unit,
     ) {
         frequencyDropdown(modifier, title, items, selected, itemText, onItemSelected)
     }

@@ -1,12 +1,17 @@
 package com.michaelflisar.composestyled.ui.components
 
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.registry.LocalStyledRegistry
 import com.michaelflisar.composestyled.registry.StyledComponent
 import com.michaelflisar.composestyled.registry.StyledKey
+import com.michaelflisar.composestyled.ui.primitives.StyledHorizontalDivider
 
 object StyledTabRow {
 
@@ -39,11 +44,24 @@ object StyledTabRow {
             scrollable: Boolean,
             selectedTabIndex: Int,
             modifier: Modifier,
+            scrollState: ScrollState?,
             containerColor: Color,
             contentColor: Color,
-            content: @Composable () -> Unit,
+            edgePadding: Dp,
+            minTabWidth: Dp,
+            divider: @Composable () -> Unit,
+            tabs: @Composable () -> Unit,
         )
     }
+}
+
+// -------------------------
+// defaults
+// -------------------------
+
+object StyledTabRowDefaults {
+    val ScrollableTabRowEdgeStartPadding: Dp = 52.dp
+    val ScrollableTabRowMinTabWidth: Dp = 90.dp
 }
 
 // -------------------------
@@ -55,18 +73,23 @@ object StyledTabRow {
 fun StyledPrimaryTabRow(
     selectedTabIndex: Int,
     modifier: Modifier = Modifier,
-    containerColor: Color = StyledTheme.colorScheme.surface,
-    contentColor: Color = StyledTheme.colorScheme.onSurface,
-    content: @Composable () -> Unit,
+    containerColor: Color = StyledTheme.colorScheme.primarySurface,
+    contentColor: Color = StyledTheme.colorScheme.onPrimarySurface,
+    divider: @Composable () -> Unit = @Composable { StyledHorizontalDivider() },
+    tabs: @Composable () -> Unit,
 ) {
     StyledTabRowImpl(
         variant = StyledTabRow.Variant.Primary,
         scrollable = false,
         selectedTabIndex = selectedTabIndex,
         modifier = modifier,
+        scrollState = null,
         containerColor = containerColor,
         contentColor = contentColor,
-        content = content,
+        edgePadding = StyledTabRowDefaults.ScrollableTabRowEdgeStartPadding,
+        minTabWidth = StyledTabRowDefaults.ScrollableTabRowMinTabWidth,
+        divider = divider,
+        tabs = tabs,
     )
 }
 
@@ -75,18 +98,26 @@ fun StyledPrimaryTabRow(
 fun StyledPrimaryScrollableTabRow(
     selectedTabIndex: Int,
     modifier: Modifier = Modifier,
-    containerColor: Color = StyledTheme.colorScheme.surface,
-    contentColor: Color = StyledTheme.colorScheme.onSurface,
-    content: @Composable () -> Unit,
+    scrollState: ScrollState = rememberScrollState(),
+    containerColor: Color = StyledTheme.colorScheme.primarySurface,
+    contentColor: Color = StyledTheme.colorScheme.onPrimarySurface,
+    edgePadding: Dp = StyledTabRowDefaults.ScrollableTabRowEdgeStartPadding,
+    divider: @Composable () -> Unit = @Composable { StyledHorizontalDivider() },
+    minTabWidth: Dp = StyledTabRowDefaults.ScrollableTabRowMinTabWidth,
+    tabs: @Composable () -> Unit,
 ) {
     StyledTabRowImpl(
         variant = StyledTabRow.Variant.Primary,
         scrollable = true,
         selectedTabIndex = selectedTabIndex,
         modifier = modifier,
+        scrollState = scrollState,
         containerColor = containerColor,
         contentColor = contentColor,
-        content = content,
+        edgePadding = edgePadding,
+        minTabWidth = minTabWidth,
+        divider = divider,
+        tabs = tabs,
     )
 }
 
@@ -95,18 +126,23 @@ fun StyledPrimaryScrollableTabRow(
 fun StyledSecondaryTabRow(
     selectedTabIndex: Int,
     modifier: Modifier = Modifier,
-    containerColor: Color = StyledTheme.colorScheme.surface,
-    contentColor: Color = StyledTheme.colorScheme.onSurface,
-    content: @Composable () -> Unit,
+    containerColor: Color = StyledTheme.colorScheme.secondarySurface,
+    contentColor: Color = StyledTheme.colorScheme.onSecondarySurface,
+    divider: @Composable () -> Unit = @Composable { StyledHorizontalDivider() },
+    tabs: @Composable () -> Unit,
 ) {
     StyledTabRowImpl(
         variant = StyledTabRow.Variant.Secondary,
         scrollable = false,
         selectedTabIndex = selectedTabIndex,
         modifier = modifier,
+        scrollState = null,
         containerColor = containerColor,
         contentColor = contentColor,
-        content = content,
+        edgePadding = StyledTabRowDefaults.ScrollableTabRowEdgeStartPadding,
+        minTabWidth = StyledTabRowDefaults.ScrollableTabRowMinTabWidth,
+        divider = divider,
+        tabs = tabs,
     )
 }
 
@@ -115,18 +151,26 @@ fun StyledSecondaryTabRow(
 fun StyledSecondaryScrollableTabRow(
     selectedTabIndex: Int,
     modifier: Modifier = Modifier,
-    containerColor: Color = StyledTheme.colorScheme.surface,
-    contentColor: Color = StyledTheme.colorScheme.onSurface,
-    content: @Composable () -> Unit,
+    scrollState: ScrollState = rememberScrollState(),
+    containerColor: Color = StyledTheme.colorScheme.secondarySurface,
+    contentColor: Color = StyledTheme.colorScheme.onSecondarySurface,
+    edgePadding: Dp = StyledTabRowDefaults.ScrollableTabRowEdgeStartPadding,
+    divider: @Composable () -> Unit = @Composable { StyledHorizontalDivider() },
+    minTabWidth: Dp = StyledTabRowDefaults.ScrollableTabRowMinTabWidth,
+    tabs: @Composable () -> Unit,
 ) {
     StyledTabRowImpl(
         variant = StyledTabRow.Variant.Secondary,
         scrollable = true,
         selectedTabIndex = selectedTabIndex,
         modifier = modifier,
+        scrollState = scrollState,
         containerColor = containerColor,
         contentColor = contentColor,
-        content = content,
+        edgePadding = edgePadding,
+        minTabWidth = minTabWidth,
+        divider = divider,
+        tabs = tabs,
     )
 }
 
@@ -140,17 +184,25 @@ private fun StyledTabRowImpl(
     scrollable: Boolean,
     selectedTabIndex: Int,
     modifier: Modifier,
+    scrollState: ScrollState?,
     containerColor: Color,
     contentColor: Color,
-    content: @Composable () -> Unit,
+    edgePadding: Dp,
+    minTabWidth: Dp,
+    divider: @Composable () -> Unit,
+    tabs: @Composable () -> Unit,
 ) {
     LocalStyledRegistry.current[StyledTabRow.Key].Render(
         variant = variant,
         scrollable = scrollable,
         selectedTabIndex = selectedTabIndex,
         modifier = modifier,
+        scrollState = scrollState,
         containerColor = containerColor,
         contentColor = contentColor,
-        content = content,
+        edgePadding = edgePadding,
+        minTabWidth = minTabWidth,
+        divider = divider,
+        tabs = tabs,
     )
 }

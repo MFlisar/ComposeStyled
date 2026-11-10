@@ -32,7 +32,7 @@ class Material3Tab internal constructor() : StyledTab.Implementation {
         selectedContentColor: Color,
         unselectedContentColor: Color,
         interactionSource: MutableInteractionSource?,
-        content: @Composable ColumnScope.() -> Unit,
+        text: @Composable ColumnScope.() -> Unit,
     ) {
         val selectionColors = LocalStyledSelectionColors.current
         val resolvedSelectedContentColor = selectedContentColor
@@ -65,7 +65,7 @@ class Material3Tab internal constructor() : StyledTab.Implementation {
                 ProvideStyledLocals(
                     contentColor = styledContentColor,
                     textStyle = StyledTheme.typography.labelLarge,
-                    content = { content() },
+                    content = { text() },
                 )
             },
         )
