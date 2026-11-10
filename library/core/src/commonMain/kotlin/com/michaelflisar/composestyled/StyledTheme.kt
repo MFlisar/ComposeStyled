@@ -41,6 +41,12 @@ import com.michaelflisar.composestyled.ui.layout.LocalFullscreenDialogHost
 import com.michaelflisar.composestyled.ui.layout.StyledFloatingHost
 import com.michaelflisar.composestyled.ui.layout.StyledFullscreenDialogHost
 
+// only on android 31+
+expect val StyledTheme.isDynamicColorsSupported: Boolean
+
+// only on android 34+
+expect val StyledTheme.isSystemContrastSupported: Boolean
+
 /** Read-only accessors for the theme and tokens provided by [StyledTheme]. */
 object StyledTheme {
 

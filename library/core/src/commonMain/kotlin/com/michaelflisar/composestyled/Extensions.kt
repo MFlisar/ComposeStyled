@@ -122,3 +122,4 @@ private fun Color.relativeLuminance(): Float {
  */
 val isLandscape: Boolean
     @Composable get() = with(LocalWindowInfo.current.containerSize) { width > height }
+

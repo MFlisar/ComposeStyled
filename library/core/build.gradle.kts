@@ -78,6 +78,7 @@ kotlin {
         val featureCustomScrollbarMain = create("featureCustomScrollbarMain") { dependsOn(commonMain.get()) }
         val featureFoundationScrollbarMain = create("featureFoundationScrollbarMain") { dependsOn(commonMain.get()) }
 
+        val nonAndroidMain = create("nonAndroidMain") { dependsOn(commonMain.get()) }
         val nonMobileMain = create("nonMobileMain") { dependsOn(commonMain.get()) }
 
         setupDependencies(module, buildTargets, sourceSets) {
@@ -86,6 +87,7 @@ kotlin {
 
             featureCustomScrollbarMain supportedBy Target.ANDROID
             featureFoundationScrollbarMain supportedBy !Target.ANDROID
+            nonAndroidMain supportedBy !Target.ANDROID
             nonMobileMain supportedBy !Target.LIST_MOBILE
 
         }
