@@ -243,7 +243,7 @@ abstract class FoundationDialog : StyledDialog.Implementation {
                                     fullscreenVisibility.currentState
                                 val applyStatusBarStyle: Boolean
                                 val applyNavigationBarStyle: Boolean
-                                // Vertical slides switch the edge-adjacent bar before the opposite bar.
+                                // Vertical slides apply the edge-adjacent bar first on entry and restore it last on exit.
                                 when (val animation = style.animation) {
                                     StyledDialog.FullscreenAnimation.Fade -> {
                                         applyStatusBarStyle = fullyVisible
@@ -251,12 +251,12 @@ abstract class FoundationDialog : StyledDialog.Implementation {
                                     }
                                     is StyledDialog.FullscreenAnimation.Slide -> when (animation.direction) {
                                         StyledDialog.FullscreenAnimation.SlideDirection.FromTop -> {
-                                            applyStatusBarStyle = entering || fullyVisible
-                                            applyNavigationBarStyle = exiting || fullyVisible
+                                            applyStatusBarStyle = entering || exiting || fullyVisible
+                                            applyNavigationBarStyle = fullyVisible
                                         }
                                         StyledDialog.FullscreenAnimation.SlideDirection.FromBottom -> {
-                                            applyStatusBarStyle = exiting || fullyVisible
-                                            applyNavigationBarStyle = entering || fullyVisible
+                                            applyStatusBarStyle = fullyVisible
+                                            applyNavigationBarStyle = entering || exiting || fullyVisible
                                         }
                                         StyledDialog.FullscreenAnimation.SlideDirection.FromLeft,
                                         StyledDialog.FullscreenAnimation.SlideDirection.FromRight -> {

@@ -32,6 +32,7 @@ import com.michaelflisar.composestyled.UpdateStyledThemeLocals
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.ui.components.StyledExpandableTopBar
 import com.michaelflisar.composestyled.ui.components.StyledTopBar
+import com.michaelflisar.composestyled.ui.components.StyledExpandableTopBar.DefaultExpandedHeight
 import com.michaelflisar.composestyled.ui.state.StyledExpandableTopBarScrollBehavior
 
 @InternalComposeStyledApi
@@ -73,7 +74,7 @@ class FoundationExpandableTopBar : StyledExpandableTopBar.Implementation {
             }
         }
         val titlePaddingPx = with(density) { expandedTitlePadding.roundToPx() }
-        val defaultExpandedContentHeightPx =
+        val minimumExpandedContentHeightPx =
             (titleLineHeightPx + 2 * titlePaddingPx).toInt()
         val topBarHeightPx = remember { mutableIntStateOf(0) }
         val navigationLeadingEdge = remember { mutableFloatStateOf(Float.NaN) }
@@ -81,13 +82,20 @@ class FoundationExpandableTopBar : StyledExpandableTopBar.Implementation {
         val layoutDirection = LocalLayoutDirection.current
         val expandedContentHeightPx = expandedHeight?.let { height ->
             if (topBarHeightPx.intValue == 0) {
-                defaultExpandedContentHeightPx
+                minimumExpandedContentHeightPx
             } else {
                 val requestedHeightPx = with(density) { height.roundToPx() }
                 (requestedHeightPx - topBarHeightPx.intValue)
-                    .coerceAtLeast(defaultExpandedContentHeightPx)
+                    .coerceAtLeast(minimumExpandedContentHeightPx)
             }
-        } ?: defaultExpandedContentHeightPx
+        } ?: if (topBarHeightPx.intValue == 0) {
+            minimumExpandedContentHeightPx
+        } else {
+            with(density) {
+                (DefaultExpandedHeight.roundToPx() + topInsetPx - topBarHeightPx.intValue)
+                    .coerceAtLeast(minimumExpandedContentHeightPx)
+            }
+        }
         SideEffect {
             behavior.state.updateScrollRange(expandedContentHeightPx)
         }

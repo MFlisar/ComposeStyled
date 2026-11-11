@@ -34,10 +34,13 @@ inherited (for example, omit an explicit `StyledText.style`) to use the animated
 text style. `expandedTitlePadding` controls the expanded title's bottom breathing
 room and defaults to the theme's medium spacing. Set `expandedHeight` to control
 the total expanded height, including the regular top bar and its window insets;
-when omitted, the height is derived from the title and padding. Values too small
-to fit the expanded title and padding use that natural minimum. The expanded
-container and content colors animate to the regular `containerColor` and
-`contentColor` as the bar collapses; they default to those same colors.
+when omitted, it uses the Material 3 large-app-bar content height of 152 dp,
+plus the top inset. Values too small to fit the expanded title and padding use
+the larger natural minimum. Material 3 also keeps its native large-app-bar
+minimum height, so a smaller requested height is raised as needed to let the
+title finish its collapse transition. The expanded container and content colors
+animate to the regular `containerColor` and `contentColor` as the bar collapses;
+they default to those same colors.
 
 Attach the scroll behavior's nested-scroll connection to an ancestor of the
 scrollable content, usually the `StyledScaffold` modifier:

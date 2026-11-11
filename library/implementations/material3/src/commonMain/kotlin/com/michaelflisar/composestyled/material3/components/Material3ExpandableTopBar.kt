@@ -22,6 +22,7 @@ import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.material3.ProvideStyledLocals
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.ui.components.StyledExpandableTopBar
+import com.michaelflisar.composestyled.ui.components.StyledExpandableTopBar.DefaultExpandedHeight
 import com.michaelflisar.composestyled.ui.state.StyledExpandableTopBarScrollBehavior
 
 class Material3ExpandableTopBar internal constructor() :
@@ -62,9 +63,12 @@ class Material3ExpandableTopBar internal constructor() :
         val titlePaddingPx = with(density) { expandedTitlePadding.roundToPx() }
         val topInsetPx = windowInsets.getTop(density)
         val collapsedHeight = 64.dp
-        val minimumExpandedHeight = collapsedHeight + with(density) {
-            (titleLineHeightPx + 2 * titlePaddingPx).toInt().toDp()
-        }
+        val minimumExpandedHeight = maxOf(
+            DefaultExpandedHeight,
+            collapsedHeight + with(density) {
+                (titleLineHeightPx + 2 * titlePaddingPx).toInt().toDp()
+            },
+        )
         val nativeExpandedHeight = expandedHeight?.let { requestedHeight ->
             with(density) {
                 (requestedHeight.roundToPx() - topInsetPx)
