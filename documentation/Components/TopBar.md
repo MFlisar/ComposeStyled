@@ -22,18 +22,20 @@ appearance or its own inset handling.
 ## Expandable top bars
 
 Use `StyledExpandableTopBar` when a scrolling screen needs a large title that
-collapses into the regular top-bar title. It composes the active themed
-`StyledTopBar`, so navigation and action slots keep their normal rendering and
-context behavior. The title is composed once; its inherited text style
-interpolates from `headlineMedium` to `titleLarge` while the title translates
-downward and toward the navigation icon when expanded, then returns to the
-theme-rendered compact title position. `expandedTitlePadding` adds vertical space
-below the expanded title and defaults to the theme's medium spacing. Keep
-the title's style inherited (for example, omit an explicit `StyledText.style`)
-to use the animated text style. Set `expandedHeight` to control the total
-expanded height, including the regular top bar and its window insets; when
-omitted, the height is derived from the title and padding. Values too small to
-fit the expanded title and padding use that natural minimum. The expanded
+collapses into the regular top-bar title. Cupertino, Fluent 2 and Foundation
+renderers reuse the active themed `StyledTopBar`; Material 3 uses its native
+`LargeTopAppBar`, synchronized with the Styled scroll behavior so its title can
+move outside the compact bar bounds while collapsing. Navigation and action
+slots retain their normal context behavior in every theme.
+
+The title is composed once and its inherited text style interpolates from
+`headlineMedium` to `titleLarge` during the transition. Keep the title's style
+inherited (for example, omit an explicit `StyledText.style`) to use the animated
+text style. `expandedTitlePadding` controls the expanded title's bottom breathing
+room and defaults to the theme's medium spacing. Set `expandedHeight` to control
+the total expanded height, including the regular top bar and its window insets;
+when omitted, the height is derived from the title and padding. Values too small
+to fit the expanded title and padding use that natural minimum. The expanded
 container and content colors animate to the regular `containerColor` and
 `contentColor` as the bar collapses; they default to those same colors.
 

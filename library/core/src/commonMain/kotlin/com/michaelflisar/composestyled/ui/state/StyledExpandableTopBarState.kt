@@ -14,6 +14,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -66,7 +67,9 @@ class StyledExpandableTopBarState internal constructor(
         animateTo(0f)
     }
 
-    internal fun updateScrollRange(heightPx: Int) {
+    /** Updates the collapse distance used by theme renderers. */
+    @InternalComposeStyledApi
+    fun updateScrollRange(heightPx: Int) {
         scrollRange = heightPx.coerceAtLeast(0)
     }
 

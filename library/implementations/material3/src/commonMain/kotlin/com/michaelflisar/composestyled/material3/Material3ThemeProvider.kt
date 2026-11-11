@@ -24,6 +24,7 @@ import com.michaelflisar.composestyled.material3.components.Material3Clickable
 import com.michaelflisar.composestyled.material3.layout.Material3Dialog
 import com.michaelflisar.composestyled.material3.layout.Material3BottomSheet
 import com.michaelflisar.composestyled.material3.components.Material3DropdownMenu
+import com.michaelflisar.composestyled.material3.components.Material3ExpandableTopBar
 import com.michaelflisar.composestyled.material3.components.Material3FloatingActionButton
 import com.michaelflisar.composestyled.material3.components.Material3Icon
 import com.michaelflisar.composestyled.material3.components.Material3IconButton
@@ -142,6 +143,7 @@ fun StyledRegistry.Builder.registerMaterial3Components() {
     register(Material3Icon.create())
     register(Material3Scaffold.create())
     register(Material3TopBar.create())
+    register(Material3ExpandableTopBar.create())
     register(Material3BottomNavigationBar.create())
     register(Material3Snackbar.create())
     register(Material3SnackbarHost.create())

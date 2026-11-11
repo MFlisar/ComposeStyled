@@ -12,6 +12,7 @@ import com.michaelflisar.composestyled.cupertino.liquid.components.CupertinoLiqu
 import com.michaelflisar.composestyled.cupertino.liquid.components.CupertinoLiquidClickable
 import com.michaelflisar.composestyled.cupertino.liquid.components.CupertinoLiquidCheckbox
 import com.michaelflisar.composestyled.cupertino.liquid.components.CupertinoLiquidDropdownMenu
+import com.michaelflisar.composestyled.cupertino.liquid.components.CupertinoLiquidExpandableTopBar
 import com.michaelflisar.composestyled.cupertino.liquid.components.CupertinoLiquidFloatingActionButton
 import com.michaelflisar.composestyled.cupertino.liquid.components.CupertinoLiquidIcon
 import com.michaelflisar.composestyled.cupertino.liquid.components.CupertinoLiquidIconButton
@@ -88,6 +89,7 @@ fun StyledRegistry.Builder.registerCupertinoLiquidComponents() {
     register(CupertinoLiquidIcon.create())
     register(CupertinoLiquidScaffold.create())
     register(CupertinoLiquidTopBar.create())
+    register(CupertinoLiquidExpandableTopBar.create())
     register(CupertinoLiquidBottomNavigationBar.create())
     register(CupertinoLiquidSnackbar.create())
     register(CupertinoLiquidSnackbarHost.create())

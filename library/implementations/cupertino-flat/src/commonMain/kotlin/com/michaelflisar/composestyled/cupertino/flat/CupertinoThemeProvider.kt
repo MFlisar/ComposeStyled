@@ -12,6 +12,7 @@ import com.michaelflisar.composestyled.cupertino.flat.components.CupertinoFlatCh
 import com.michaelflisar.composestyled.cupertino.flat.components.CupertinoFlatClickable
 import com.michaelflisar.composestyled.cupertino.flat.components.CupertinoFlatCheckbox
 import com.michaelflisar.composestyled.cupertino.flat.components.CupertinoFlatDropdownMenu
+import com.michaelflisar.composestyled.cupertino.flat.components.CupertinoFlatExpandableTopBar
 import com.michaelflisar.composestyled.cupertino.flat.components.CupertinoFlatFloatingActionButton
 import com.michaelflisar.composestyled.cupertino.flat.components.CupertinoFlatIcon
 import com.michaelflisar.composestyled.cupertino.flat.components.CupertinoFlatIconButton
@@ -88,6 +89,7 @@ fun StyledRegistry.Builder.registerCupertinoFlatComponents() {
     register(CupertinoFlatIcon.create())
     register(CupertinoFlatScaffold.create())
     register(CupertinoFlatTopBar.create())
+    register(CupertinoFlatExpandableTopBar.create())
     register(CupertinoFlatBottomNavigationBar.create())
     register(CupertinoFlatSnackbar.create())
     register(CupertinoFlatSnackbarHost.create())

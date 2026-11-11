@@ -15,6 +15,7 @@ import com.michaelflisar.composestyled.fluent2.layout.Fluent2Dialog
 import com.michaelflisar.composestyled.fluent2.layout.Fluent2BottomSheet
 import com.michaelflisar.composestyled.fluent2.components.Fluent2Checkbox
 import com.michaelflisar.composestyled.fluent2.components.Fluent2DropdownMenu
+import com.michaelflisar.composestyled.fluent2.components.Fluent2ExpandableTopBar
 import com.michaelflisar.composestyled.fluent2.components.Fluent2FloatingActionButton
 import com.michaelflisar.composestyled.fluent2.components.Fluent2Icon
 import com.michaelflisar.composestyled.fluent2.components.Fluent2IconButton
@@ -90,6 +91,7 @@ fun StyledRegistry.Builder.registerFluent2Components() {
     register(Fluent2Icon.create())
     register(Fluent2Scaffold.create())
     register(Fluent2TopBar.create())
+    register(Fluent2ExpandableTopBar.create())
     register(Fluent2BottomNavigationBar.create())
     register(Fluent2Snackbar.create())
     register(Fluent2SnackbarHost.create())
