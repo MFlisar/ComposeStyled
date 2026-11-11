@@ -23,7 +23,7 @@ import com.michaelflisar.composestyled.ui.state.DialogState
 
 /** Shows selectable Styled list items in a dialog. */
 @Composable
-fun <T : Any> StyledDialogList(
+fun <T : Any> DialogList(
     state: DialogState,
     items: List<T>,
     onItemClick: (item: T) -> Unit,

@@ -4,7 +4,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
@@ -37,6 +36,7 @@ import com.michaelflisar.composestyled.classes.IconComposable
 import com.michaelflisar.composepreferences.styled.internal.LocalPreferenceRuntime
 import com.michaelflisar.composepreferences.styled.internal.PreferenceAncestor
 import com.michaelflisar.composepreferences.styled.internal.PreferenceEntry
+import com.michaelflisar.composepreferences.styled.internal.PreferenceListSpacingArrangement
 import com.michaelflisar.composepreferences.styled.internal.currentPreferenceRuntime
 import com.michaelflisar.composestyled.ui.components.StyledIconDefaults
 import com.michaelflisar.composestyled.ui.components.StyledListItem
@@ -44,7 +44,7 @@ import com.michaelflisar.composestyled.ui.primitives.StyledExpandIcon
 import com.michaelflisar.composestyled.ui.primitives.StyledHorizontalDivider
 import kotlin.collections.plus
 
-/** An expandable group of related preferences. */
+/** A group of related preferences that can optionally be expanded. */
 @Composable
 fun PreferenceSection(
     title: String,
@@ -134,29 +134,28 @@ private fun PreferenceSectionImpl(
         }
     }
     val expandedState = expanded ?: internalExpanded
-    val canExpand = isExpandable ?: parent.style.section.isExpandable
+    val canExpand = isExpandable ?: (expanded != null || parent.style.section.isExpandable)
     val sectionIsExpanded = !canExpand || expandedState.value
     val enabled = parent.parentEnabled && isEnabled()
     val visible = parent.parentVisible && isVisible()
     val isCurrentLevel = parent.currentPath == parent.treePath
     val showHeader = !parent.isFiltering && isCurrentLevel &&
         parent.parentExpanded && visible
-    val sectionSpacingTracker = parent.sectionSpacingTracker
-    DisposableEffect(sectionSpacingTracker, identity) {
+    val sectionStyle = parent.style.section
+    DisposableEffect(parent.listSpacingTracker, identity) {
         onDispose {
-            sectionSpacingTracker.remove(identity)
+            parent.listSpacingTracker.remove(identity)
         }
     }
     SideEffect {
-        sectionSpacingTracker.update(
+        parent.listSpacingTracker.update(
             identity = identity,
             scope = parent.identityScope,
             order = parent.identityAllocator.order(identity),
-            isVisible = showHeader,
+            isVisible = true,
+            isDetachedSection = showHeader && !sectionStyle.headerIsPartOfShape,
         )
     }
-    val hasPreviousSection = sectionSpacingTracker.hasPrevious(identity, parent.identityScope)
-    val sectionStyle = parent.style.section
     val current = parent.copy(
         identityScope = parent.identityScope + identity,
         ancestors = parent.ancestors + PreferenceAncestor(
@@ -204,13 +203,16 @@ private fun PreferenceSectionImpl(
                         Modifier
                     }
                 ),
-            verticalArrangement = Arrangement.spacedBy(
-                    if (parent.isFiltering) {
-                        0.dp
-                    } else {
-                        parent.style.inGroupSeparator.spacingOrZero
-                    },
-                ),
+            verticalArrangement = PreferenceListSpacingArrangement(
+                tracker = parent.listSpacingTracker,
+                scope = current.identityScope,
+                itemSpacing = if (parent.isFiltering) {
+                    0.dp
+                } else {
+                    parent.style.spacing.inGroupSeparator.spacingOrZero
+                },
+                sectionSpacing = parent.style.spacing.sectionSpacing,
+            ),
         ) {
             pageContent()
         }
@@ -219,13 +221,6 @@ private fun PreferenceSectionImpl(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .then(
-                if (showHeader && parent.insideSection && hasPreviousSection) {
-                    Modifier.padding(top = parent.style.itemSpacing)
-                } else {
-                    Modifier
-                }
-            )
             .then(
                 if (!parent.isFiltering &&
                     isCurrentLevel &&
@@ -249,37 +244,54 @@ private fun PreferenceSectionImpl(
             isVisible = { showHeader },
             renderInFilter = false,
             trackInGroupSeparator = false,
+            trackInListSpacing = false,
         ) {
-            PreferenceRowContent(
-                title = title,
-                subtitle = subtitle,
-                trailing = if (canExpand) {
-                    {
-                        StyledExpandIcon(
-                            expanded = expandedState.value,
-                            rotationDirection = StyledExpandIcon.RotationDirection.forEndPlacement()
-                        )
-                    }
-                } else {
-                    null
-                },
-                modifier = Modifier.zIndex(1f),
-                enabled = enabled,
-                clickable = canExpand,
-                onClick = if (canExpand) {
-                    { expandedState.value = !expandedState.value }
-                } else {
-                    null
-                },
-                style = it.style,
-                insideSection = true,
-                titleStyle = sectionStyle.titleTextStyle,
-                subtitleStyle = sectionStyle.subtitleTextStyle,
-                colors = sectionStyle.colors,
-                shape = headerShape,
-                contentPadding = sectionStyle.contentPadding,
-                minHeight = sectionStyle.minimumItemHeight,
-            )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .then(
+                        if (!sectionStyle.headerIsPartOfShape) {
+                            Modifier.padding(bottom = parent.style.spacing.sectionSpacing)
+                        } else {
+                            Modifier
+                        }
+                    ),
+            ) {
+                PreferenceRowContent(
+                    title = title,
+                    subtitle = subtitle,
+                    trailing = if (canExpand) {
+                        {
+                            StyledExpandIcon(
+                                expanded = expandedState.value,
+                                rotationDirection = StyledExpandIcon.RotationDirection.forEndPlacement()
+                            )
+                        }
+                    } else {
+                        null
+                    },
+                    modifier = Modifier.zIndex(1f),
+                    enabled = enabled,
+                    clickable = canExpand,
+                    onClick = if (canExpand) {
+                        { expandedState.value = !expandedState.value }
+                    } else {
+                        null
+                    },
+                    style = it.style,
+                    insideSection = true,
+                    titleStyle = sectionStyle.titleTextStyle,
+                    subtitleStyle = sectionStyle.subtitleTextStyle,
+                    colors = sectionStyle.colors,
+                    shape = headerShape,
+                    contentPadding = sectionStyle.contentPadding,
+                    minHeight = if (canExpand) {
+                        sectionStyle.minimumExpandableItemHeight
+                    } else {
+                        sectionStyle.minimumItemHeight
+                    },
+                )
+            }
         }
         if (parent.isFiltering || !isCurrentLevel) {
             sectionChildren()
@@ -320,13 +332,15 @@ private fun PreferenceSectionHeaderSeparator(
     style: com.michaelflisar.composepreferences.styled.PreferenceStyle,
     sectionStyle: com.michaelflisar.composepreferences.styled.PreferenceSectionStyle,
 ) {
-    when (val separator = style.inGroupSeparator) {
-        is com.michaelflisar.composepreferences.styled.PreferenceInGroupSeparatorStyle.Spacing -> Spacer(Modifier.height(separator.spacing))
+    when (val separator = style.spacing.inGroupSeparator) {
+        is com.michaelflisar.composepreferences.styled.PreferenceInGroupSeparatorStyle.Spacing -> {
+            if (sectionStyle.headerIsPartOfShape) {
+                Spacer(Modifier.height(separator.spacing))
+            }
+        }
         is com.michaelflisar.composepreferences.styled.PreferenceInGroupSeparatorStyle.Divider -> {
             if (sectionStyle.headerIsPartOfShape) {
                 PreferenceInGroupDivider(style)
-            } else {
-                Spacer(Modifier.height(separator.headerSpacing))
             }
         }
     }
@@ -337,7 +351,7 @@ internal fun PreferenceInGroupDivider(
     style: com.michaelflisar.composepreferences.styled.PreferenceStyle,
 ) {
     val verticalPadding =
-        (style.inGroupSeparator as? com.michaelflisar.composepreferences.styled.PreferenceInGroupSeparatorStyle.Divider)?.verticalPadding
+        (style.spacing.inGroupSeparator as? com.michaelflisar.composepreferences.styled.PreferenceInGroupSeparatorStyle.Divider)?.verticalPadding
             ?: 0.dp
     val layoutDirection = androidx.compose.ui.platform.LocalLayoutDirection.current
     val itemPadding = style.item.contentPadding

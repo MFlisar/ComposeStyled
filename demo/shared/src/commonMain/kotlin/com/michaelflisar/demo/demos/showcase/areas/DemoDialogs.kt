@@ -368,7 +368,8 @@ internal fun DemoDialogs(baseId: Int, expandState: ExpandState) {
                 itemSpacing = StyledTheme.spacing.medium,
                 modifier = Modifier.padding(contentPadding),
             ) {
-                StyledText("Move the bubble to choose its parking position; restoring keeps the last window position.")
+                StyledText("Drag the minimized bubble; it snaps to the nearest horizontal edge on release.")
+                StyledText("Restoring keeps the last window position; minimizing returns to the same bubble position.")
                 StyledText("Move the restored window: minimizing still returns to the same bubble position.")
                 DialogDemoContent(shortContent, PaddingValues(0.dp))
             }

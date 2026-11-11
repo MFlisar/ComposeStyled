@@ -8,7 +8,6 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -42,8 +41,9 @@ import com.michaelflisar.composepreferences.styled.internal.LocalPreferenceStyle
 import com.michaelflisar.composepreferences.styled.internal.PreferenceFilterResultTracker
 import com.michaelflisar.composepreferences.styled.internal.PreferenceGroupSeparatorTracker
 import com.michaelflisar.composepreferences.styled.internal.PreferenceIdentityAllocator
+import com.michaelflisar.composepreferences.styled.internal.PreferenceListSpacingArrangement
+import com.michaelflisar.composepreferences.styled.internal.PreferenceListSpacingTracker
 import com.michaelflisar.composepreferences.styled.internal.PreferenceRuntime
-import com.michaelflisar.composepreferences.styled.internal.PreferenceSectionSpacingTracker
 import com.michaelflisar.composepreferences.styled.rememberPreferenceStyle
 import com.michaelflisar.composestyled.ui.components.StyledIcon
 import com.michaelflisar.composestyled.ui.components.StyledListItem
@@ -277,7 +277,7 @@ private fun PreferencePage(
         PreferenceFilterResultTracker()
     }
     val groupSeparatorTracker = remember { PreferenceGroupSeparatorTracker() }
-    val sectionSpacingTracker = remember { PreferenceSectionSpacingTracker() }
+    val listSpacingTracker = remember { PreferenceListSpacingTracker() }
     val groupHeader = when (val openGroupHeaderStyle = style.openedGroupHeader) {
         PreferenceOpenGroupHeaderStyle.Disabled -> null
         is PreferenceOpenGroupHeaderStyle.Style ->
@@ -286,14 +286,19 @@ private fun PreferencePage(
     val pageSpacing = if (query.isNotEmpty() || currentPath.isNotEmpty()) {
         0.dp
     } else {
-        style.itemSpacing
+        style.spacing.itemSpacing
     }
     Column(
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
             .padding(style.outerPadding),
-        verticalArrangement = Arrangement.spacedBy(pageSpacing),
+        verticalArrangement = PreferenceListSpacingArrangement(
+            tracker = listSpacingTracker,
+            scope = emptyList(),
+            itemSpacing = pageSpacing,
+            sectionSpacing = style.spacing.sectionSpacing,
+        ),
     ) {
         if (groupHeader != null) {
             val (groupHeaderTitle, groupHeaderStyle) = groupHeader
@@ -323,7 +328,7 @@ private fun PreferencePage(
                 style = style,
                 filterResultTracker = filterResultTracker,
                 groupSeparatorTracker = groupSeparatorTracker,
-                sectionSpacingTracker = sectionSpacingTracker,
+                listSpacingTracker = listSpacingTracker,
                 filterQuery = query,
                 includeHierarchyInFilter = includeHierarchyInFilter,
                 filterScope = filterScope,

@@ -240,6 +240,24 @@ internal fun FoundationFloatingDialog(
                 }
                 minimized = true
             }
+            fun snapMinimizedBubbleToEdge() {
+                if (!minimized || !style.snapToEdge) return
+                val position = bubblePositionFraction.toPosition(
+                    availableSpace,
+                    bubbleSize,
+                    edgeMargin,
+                )
+                bubblePositionFraction = position.snapToHorizontalEdge(
+                    availableSpace = availableSpace,
+                    itemSize = bubbleSize,
+                    margin = edgeMargin,
+                ).toFraction(
+                    availableSpace,
+                    bubbleSize,
+                    edgeMargin,
+                    bubblePositionFraction,
+                )
+            }
             SideEffect { outsideClickActions.minimize = ::minimizeWindow }
             val visualSize = DpSize(
                 animateDpAsState(
@@ -340,14 +358,28 @@ internal fun FoundationFloatingDialog(
                         ) {
                             Box(
                                 Modifier.weight(1f).fillMaxHeight()
-                                .pointerInput(style.draggable, minimized, maximized, availableSpace, windowSize, edgeMargin) {
+                                .pointerInput(
+                                    style.draggable,
+                                    style.snapToEdge,
+                                    minimized,
+                                    maximized,
+                                    availableSpace,
+                                    windowSize,
+                                    edgeMargin,
+                                ) {
                                     if (style.draggable && !maximized) {
                                         detectDragGestures(
                                             onDragStart = {
                                                 dragInProgress = true
                                             },
-                                            onDragEnd = { dragInProgress = false },
-                                            onDragCancel = { dragInProgress = false },
+                                            onDragEnd = {
+                                                snapMinimizedBubbleToEdge()
+                                                dragInProgress = false
+                                            },
+                                            onDragCancel = {
+                                                snapMinimizedBubbleToEdge()
+                                                dragInProgress = false
+                                            },
                                             ) { change, dragAmount ->
                                                 change.consume()
                                                 val delta = with(density) {
@@ -646,6 +678,12 @@ internal data class DpOffset(val x: Dp, val y: Dp) {
         x.coerceIn(margin, margin + (maxWidth - size.width).coerceAtLeast(0.dp)),
         y.coerceIn(margin, margin + (maxHeight - size.height).coerceAtLeast(0.dp)),
     )
+
+    fun snapToHorizontalEdge(availableSpace: DpSize, itemSize: DpSize, margin: Dp): DpOffset {
+        val leftEdge = margin
+        val rightEdge = margin + (availableSpace.width - itemSize.width).coerceAtLeast(0.dp)
+        return copy(x = if (x - leftEdge <= rightEdge - x) leftEdge else rightEdge)
+    }
 }
 
 internal data class FloatingPositionFraction(val x: Float, val y: Float) {

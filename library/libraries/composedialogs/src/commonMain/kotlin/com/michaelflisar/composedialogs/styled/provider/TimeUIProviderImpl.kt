@@ -24,7 +24,7 @@ import com.michaelflisar.composestyled.ui.components.StyledPopupDropdown
 import com.michaelflisar.composestyled.ui.components.StyledRadioButton
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 
-internal object StyledTimeUIProvider : TimeUIProvider {
+internal object TimeUIProviderImpl : TimeUIProvider {
 
     @Composable
     override fun LabeledField(
@@ -33,7 +33,7 @@ internal object StyledTimeUIProvider : TimeUIProvider {
         errorMessage: String?,
         content: @Composable () -> Unit,
     ) {
-        StyledLabeledField(
+        LabeledField(
             label = label,
             modifier = modifier,
             errorMessage = errorMessage,

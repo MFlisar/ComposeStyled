@@ -5,7 +5,7 @@ The `composedialogs` integration module adapts the ComposeDialogs `ui-color`,
 The Styled picker dialogs do not require a global provider installation:
 
 ```kotlin
-StyledDialogColor(
+DialogColor(
     state = colorDialog,
     color = selectedColor,
     title = { StyledText("Choose a color") },
@@ -13,14 +13,14 @@ StyledDialogColor(
 )
 ```
 
-The `StyledDialogColor`, `StyledDialogDate`, `StyledDialogFrequency`, and
-`StyledDialogTime` APIs take a Styled `DialogState` and wrap the picker content
+The `DialogColor`, `DialogDate`, `DialogFrequency`, and `DialogTime` APIs take a
+Styled `DialogState` and wrap the picker content
 in a Styled dialog. Their picker UI is rendered through Styled controls and
 uses the `com.michaelflisar.composedialogs.styled.provider` implementations.
 
-`StyledDialogDate` requires a `DatePickerRange` and `DatePickerSetup` from
+`DialogDate` requires a `DatePickerRange` and `DatePickerSetup` from
 `ui-date` so callers can define the allowed years and localized formatting.
-`StyledDialogFrequency` takes one `MutableState<Frequency>` from
+`DialogFrequency` takes one `MutableState<Frequency>` from
 `ui-frequency`; the immutable frequency model contains its type, interval, and
 type-specific date and time values. For example:
 
@@ -31,7 +31,7 @@ val frequency = remember {
     )
 }
 
-StyledDialogFrequency(
+DialogFrequency(
     state = frequencyDialog,
     frequency = frequency,
 )
@@ -41,7 +41,7 @@ Use `supportedTypes` to limit the available `Frequency.Type` choices. The
 dialog tracks interval validation from the picker and disables its positive
 action while the interval is invalid.
 
-The `StyledDialogInfo`, `StyledDialogInput`, `StyledDialogList`,
-`StyledDialogMenu`, `StyledDialogNumber`, and `StyledDialogProgress` APIs are
-also composed from Styled controls. `StyledDialogMenu` renders nested entries
+The `DialogInfo`, `DialogInput`, `DialogList`, `DialogMenu`, `DialogNumber`, and
+`DialogProgress` APIs are
+also composed from Styled controls. `DialogMenu` renders nested entries
 as a list; each submenu starts with a back row that returns to the parent list.

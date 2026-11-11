@@ -11,17 +11,17 @@ import androidx.compose.ui.unit.dp
 import com.michaelflisar.composedialogs.dialogs.date.ui.DatePickerRange
 import com.michaelflisar.composedialogs.dialogs.date.ui.DatePickerSetup
 import com.michaelflisar.composedialogs.dialogs.frequency.classes.Frequency
-import com.michaelflisar.composedialogs.styled.StyledDialogInfo
-import com.michaelflisar.composedialogs.styled.StyledDialogInput
-import com.michaelflisar.composedialogs.styled.StyledDialogList
-import com.michaelflisar.composedialogs.styled.StyledDialogMenu
-import com.michaelflisar.composedialogs.styled.StyledDialogNumber
-import com.michaelflisar.composedialogs.styled.StyledDialogProgress
-import com.michaelflisar.composedialogs.styled.StyledDialogMenu.Entry
-import com.michaelflisar.composedialogs.styled.StyledDialogColor
-import com.michaelflisar.composedialogs.styled.StyledDialogDate
-import com.michaelflisar.composedialogs.styled.StyledDialogFrequency
-import com.michaelflisar.composedialogs.styled.StyledDialogTime
+import com.michaelflisar.composedialogs.styled.DialogInfo
+import com.michaelflisar.composedialogs.styled.DialogInput
+import com.michaelflisar.composedialogs.styled.DialogList
+import com.michaelflisar.composedialogs.styled.DialogMenu
+import com.michaelflisar.composedialogs.styled.DialogNumber
+import com.michaelflisar.composedialogs.styled.DialogProgress
+import com.michaelflisar.composedialogs.styled.DialogMenu.Entry
+import com.michaelflisar.composedialogs.styled.DialogColor
+import com.michaelflisar.composedialogs.styled.DialogDate
+import com.michaelflisar.composedialogs.styled.DialogFrequency
+import com.michaelflisar.composedialogs.styled.DialogTime
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.classes.CustomColors
 import com.michaelflisar.composestyled.platform.SystemBarStyleEffectIfNeeded
@@ -145,14 +145,14 @@ internal fun DemoPageComposeDialogs(onBack: () -> Unit) {
         }
     }
 
-    StyledDialogColor(
+    DialogColor(
         state = colorDialog,
         color = selectedColor,
         style = dialogStyle,
         title = { StyledText("Choose a color") },
         buttons = doneButton(),
     )
-    StyledDialogDate(
+    DialogDate(
         state = dateDialog,
         date = selectedDate,
         dateRange = datePickerRange,
@@ -161,21 +161,21 @@ internal fun DemoPageComposeDialogs(onBack: () -> Unit) {
         title = { StyledText("Choose a date") },
         buttons = doneButton(),
     )
-    StyledDialogFrequency(
+    DialogFrequency(
         state = frequencyDialog,
         frequency = selectedFrequency,
         style = dialogStyle,
         title = { StyledText("Set a frequency") },
         buttons = doneButton(),
     )
-    StyledDialogTime(
+    DialogTime(
         state = timeDialog,
         time = selectedTime,
         style = dialogStyle,
         title = { StyledText("Choose a time") },
         buttons = doneButton(),
     )
-    StyledDialogInfo(
+    DialogInfo(
         state = infoDialog,
         info = "This information content uses Styled text and typography.",
         infoLabel = "Styled dialog",
@@ -183,7 +183,7 @@ internal fun DemoPageComposeDialogs(onBack: () -> Unit) {
         title = { StyledText("Information") },
         buttons = doneButton(),
     )
-    StyledDialogInput(
+    DialogInput(
         state = inputDialog,
         value = input.value,
         onValueChange = { input.value = it },
@@ -196,7 +196,7 @@ internal fun DemoPageComposeDialogs(onBack: () -> Unit) {
         title = { StyledText("Enter a name") },
         buttons = doneButton(),
     )
-    StyledDialogList(
+    DialogList(
         state = listDialog,
         items = listOf("First", "Second", "Third"),
         onItemClick = { selectedItem.value = it },
@@ -207,7 +207,7 @@ internal fun DemoPageComposeDialogs(onBack: () -> Unit) {
         title = { StyledText("Choose an item") },
         buttons = doneButton(),
     )
-    StyledDialogMenu(
+    DialogMenu(
         state = menuDialog,
         items = listOf(
             Entry.Action(title = "First action", onClick = {}),
@@ -221,7 +221,7 @@ internal fun DemoPageComposeDialogs(onBack: () -> Unit) {
         style = dialogStyle,
         title = { StyledText("Actions") },
     )
-    StyledDialogNumber(
+    DialogNumber(
         state = numberDialog,
         value = number,
         stepSize = 1,
@@ -229,7 +229,7 @@ internal fun DemoPageComposeDialogs(onBack: () -> Unit) {
         title = { StyledText("Choose a number") },
         buttons = doneButton(),
     )
-    StyledDialogProgress(
+    DialogProgress(
         state = progressDialog,
         content = { StyledText("Working...") },
         progress = null, // infinite

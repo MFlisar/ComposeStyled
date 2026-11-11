@@ -709,6 +709,7 @@ private fun SubPagePlaceholder(
                 direction = StyledDialog.FullscreenAnimation.SlideDirection.FromBottom
             ),
             expandableHeader = StyledDialog.Style.Fullscreen.ExpandableHeader(
+                containerColor = StyledTheme.colorScheme.surfaceVariant,
             )
         ),
         title = {

@@ -4,4 +4,7 @@ import androidx.compose.ui.window.DialogProperties
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 
 @InternalComposeStyledApi
-expect fun edgeToEdgeDialogProperties(dismissOnBackPress: Boolean): DialogProperties
+expect fun edgeToEdgeDialogProperties(
+    dismissOnBackPress: Boolean,
+    transparentScrim: Boolean = false,
+): DialogProperties

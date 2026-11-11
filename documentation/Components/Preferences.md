@@ -62,19 +62,16 @@ caller.
 
 ## Sections, groups and state
 
-`PreferenceSection` expands or collapses its children in the current list by
-default. Its rows animate vertically during expansion and collapse, and stay
-clipped to the animated content area until the transition finishes. Set
-`isExpandable = false` on a section to keep its rows visible without an expand
-icon or click behavior. The screen-wide default is configurable with
-`PreferenceStyleDefaults.section(isExpandable = false)`; each section can
-override that default with its own `isExpandable` value. Use
-`isInitiallyExpanded = false` to start an individual section collapsed. For
-fully controlled expansion, use the
-overload that requires a caller-owned `MutableState<Boolean>` as `expanded`.
-These overloads are mutually exclusive: a section uses either caller-owned
-state or its own state initialized by `isInitiallyExpanded`. Internally managed
-state resets to `isInitiallyExpanded` when its group page is closed.
+`PreferenceSection` is not expandable by default, so its rows stay visible.
+Set `isExpandable = true` to make a section collapsible; its rows animate
+vertically and stay clipped to the animated content area until the transition
+finishes. Use `isInitiallyExpanded = false` to start an expandable,
+internally-managed section collapsed. The screen-wide default is configurable with
+`PreferenceStyleDefaults.section(isExpandable = true)`, and each section can
+override it. The overload with caller-owned `MutableState<Boolean>` state is
+expandable by default; passing that state opts into controlled expansion.
+`isExpandable = false` keeps its rows visible instead. Internally managed state
+resets to `isInitiallyExpanded` when its group page is closed.
 `PreferenceGroup` opens a separate list level with a slide transition. The root
 list preserves its scroll position, while each group page starts at the top when
 opened; leaving a group resets its scroll position and internally managed
@@ -94,23 +91,36 @@ Disabling the header also removes its top spacing above the group content.
 
 By default, an expanded section is one clipped, rounded container containing
 its header and rows. `PreferenceSectionStyle.headerIsPartOfShape = false` makes
-the header and its rows use separate shapes instead. `itemSpacing` controls the
-vertical gaps between sibling rows, sections and groups in a list.
-`inGroupSeparator` controls separation inside an optically grouped section or
-group, including the gap from a section header to its first row. It defaults to
-spacing. Use a divider style to draw lines between visible entries; no divider
-is drawn after the last visible entry. Divider insets follow the preference item
-text column, including `reserveLeadingIconSpace`, with `verticalPadding`
-configurable. When a section header is not part of the content shape, no divider
-is drawn between them; `headerSpacing` provides a separate gap instead.
+the header and its rows use separate shapes instead. `PreferenceStyle.spacing`
+groups the spacing configuration. `itemSpacing` controls the vertical gaps
+between ordinary sibling entries. Independently, `sectionSpacing` is used
+before a section header when `headerIsPartOfShape` is false, replacing the
+list's regular gap at that boundary, and between the detached header and its
+content. When the header is part of the shape, `inGroupSeparator` controls the
+boundary between the header and its first row instead. It also controls
+separation between rows inside an optically grouped section or group. It
+defaults to a divider with no vertical padding; use
+`PreferenceInGroupSeparatorStyle.Spacing` for gaps instead. No divider is drawn
+after the last visible entry. Divider insets follow the preference item text
+column, including `reserveLeadingIconSpace`, with `verticalPadding`
+configurable. No divider is drawn between a detached section header and its
+rows.
+
+Non-expandable section headers default to a minimum height of `0.dp`;
+expandable headers default to `PreferenceStyleDefaults.minimumItemHeight()`.
+Configure them independently with `minimumItemHeight` and
+`minimumExpandableItemHeight` in `PreferenceStyleDefaults.section(...)`.
 
 ```kotlin
 val preferenceStyle = rememberPreferenceStyle(
-    inGroupSeparator = PreferenceInGroupSeparatorStyle.Divider(verticalPadding = 4.dp),
+    spacing = PreferenceStyleDefaults.spacing(
+        inGroupSeparator = PreferenceInGroupSeparatorStyle.Divider(verticalPadding = 4.dp),
+    ),
 )
 ```
 
-When filtering flattens the hierarchy, the ordinary `itemSpacing` is used.
+When filtering flattens the hierarchy, the ordinary `spacing.itemSpacing` is
+used.
 Separators do not change a section's shape. When the header is part of the
 shape, its lower corners animate closed when collapsed and square when expanded.
 
@@ -239,8 +249,8 @@ theme-derived style based on the item config. Set it to
 `PreferenceOpenGroupHeaderStyle.Disabled` when a
 `PreferenceBreadcrumb` provides navigation, or use
 `PreferenceStyleDefaults.openedGroupHeader(...)` to customize the row.
-`inGroupSeparator` remains screen-wide because it separates grouped content
-inside sections and opened group pages.
+`spacing.inGroupSeparator` remains screen-wide because it separates grouped
+content inside sections and opened group pages.
 
 `rememberPreferenceStyle` remembers the complete immutable style, so nested
 style configs do not need their own `remember` calls.
@@ -267,13 +277,11 @@ val preferenceStyle = rememberPreferenceStyle(
 )
 ```
 
-Section expansion can also be disabled globally and selectively enabled for
-individual sections:
+Sections are non-expandable by default; enable expansion only where it is
+useful:
 
 ```kotlin
-val preferenceStyle = rememberPreferenceStyle(
-    section = PreferenceStyleDefaults.section(isExpandable = false),
-)
+val preferenceStyle = rememberPreferenceStyle()
 
 PreferenceScreen(style = preferenceStyle) {
     PreferenceSection(title = "Always visible") {
@@ -285,10 +293,10 @@ PreferenceScreen(style = preferenceStyle) {
 }
 ```
 
-The screen style also configures outer padding, reserved leading-icon space,
-`itemSpacing` and `inGroupSeparator`. Standard rows accept local shape, padding
-and color overrides; individual controls expose their relevant `Styled*`
-variants and customization options.
+The screen style also configures outer padding, reserved leading-icon space and
+`spacing` (`itemSpacing`, `sectionSpacing` and `inGroupSeparator`). Standard rows accept
+local shape, padding and color overrides; individual controls expose their
+relevant `Styled*` variants and customization options.
 
 `reserveLeadingIconSpace` defaults to `true`, so standard rows without a leading
 icon keep the same alignment by rendering `StyledIcons.Empty`. Set

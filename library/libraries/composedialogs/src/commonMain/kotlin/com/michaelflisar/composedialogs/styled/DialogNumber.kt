@@ -20,7 +20,7 @@ import com.michaelflisar.composestyled.utils.rememberValidator
 
 /** Shows the Styled number picker in a dialog. */
 @Composable
-fun <T : Number> StyledDialogNumber(
+fun <T : Number> DialogNumber(
     state: DialogState,
     value: MutableState<T>,
     stepSize: T,

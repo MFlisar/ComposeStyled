@@ -51,31 +51,6 @@ val LocalFloatingDialogHost = staticCompositionLocalOf<FloatingDialogHostState?>
 @InternalComposeStyledApi
 val LocalFloatingDialogEntry = staticCompositionLocalOf<FloatingDialogEntry?> { null }
 
-@InternalComposeStyledApi
-class FullscreenDialogEntry {
-    var content: (@Composable () -> Unit)? by mutableStateOf(null)
-}
-
-@InternalComposeStyledApi
-class FullscreenDialogHostState {
-    val entries = mutableStateListOf<FullscreenDialogEntry>()
-
-    fun register(entry: FullscreenDialogEntry) {
-        entries.remove(entry)
-        entries.add(entry)
-    }
-
-    fun unregister(entry: FullscreenDialogEntry) {
-        entries.remove(entry)
-    }
-}
-
-@InternalComposeStyledApi
-val LocalFullscreenDialogHost = staticCompositionLocalOf<FullscreenDialogHostState?> { null }
-
-@InternalComposeStyledApi
-val LocalFullscreenDialogEntry = staticCompositionLocalOf<FullscreenDialogEntry?> { null }
-
 /**
  * Provides a bounded overlay area for non-modal [StyledDialog.Style.FloatingWindow] windows.
  * The closest host receives floating windows; without an explicit wrapper, `StyledTheme`
@@ -101,26 +76,6 @@ fun StyledFloatingHost(
             BoxWithConstraints(Modifier.matchParentSize()) {
                 host.entries.sortedBy { it.zIndex }.forEach { entry ->
                     CompositionLocalProvider(LocalFloatingDialogEntry provides entry) {
-                        entry.content?.invoke()
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-@OptIn(InternalComposeStyledApi::class)
-internal fun StyledFullscreenDialogHost(
-    content: @Composable () -> Unit,
-) {
-    val host = remember { FullscreenDialogHostState() }
-    CompositionLocalProvider(LocalFullscreenDialogHost provides host) {
-        BoxWithConstraints(Modifier.fillMaxSize()) {
-            content()
-            host.entries.forEach { entry ->
-                Box(Modifier.matchParentSize()) {
-                    CompositionLocalProvider(LocalFullscreenDialogEntry provides entry) {
                         entry.content?.invoke()
                     }
                 }

@@ -94,9 +94,10 @@ Fullscreen dialogs use a fade transition by default. Choose `Fade` or
 The slide direction identifies the entering edge (`FromLeft`, `FromRight`,
 `FromTop` or `FromBottom`); dismissal slides back toward that same edge. The
 default is `FromRight`.
-Fullscreen dialogs render in the theme's overlay host so the scrim and content
-share the same visibility transition: the scrim fades while the content fades
-or slides. Other modal styles retain their platform dialog window and scrim.
+All modal styles, including fullscreen, use the platform's Compose `Dialog`.
+Fullscreen requests a transparent scrim while remaining modal; other modal
+styles use the platform's default scrim. Fullscreen's fade or slide animation
+applies to its content. Nested modal styles use the same dialog path.
 
 Fullscreen dialogs can opt into a scroll-driven expandable header:
 
@@ -104,6 +105,7 @@ Fullscreen dialogs can opt into a scroll-driven expandable header:
 StyledDialog.Style.Fullscreen(
     expandableHeader = StyledDialog.Style.Fullscreen.ExpandableHeader(
         expandedHeight = 240.dp,
+        containerColor = StyledTheme.colorScheme.surfaceVariant,
     ),
 )
 ```
@@ -113,7 +115,13 @@ StyledDialog.Style.Fullscreen(
 regular top bar and window insets; when omitted, it uses the expandable top bar's
 natural title-and-padding size. The dialog connects the header to nested scroll
 from its body. The body must contain scrollable content to collapse or expand
-the header. If `title` is `null`, the regular toolbar is retained.
+the header. `containerColor` and `contentColor` configure the collapsed header;
+by default, the background uses the theme surface and the content color is
+derived from it. `expandedContainerColor` and `expandedContentColor` optionally
+override those colors while expanded; otherwise, the collapsed colors are used.
+When an expanded background is provided without an expanded content color, the
+content color is derived from that background. If `title` is `null`, the regular
+toolbar is retained.
 
 Bottom sheets slide up when shown. Button, back and outside dismissals slide
 down; a swipe-to-dismiss uses the drag motion itself and does not replay a
@@ -142,6 +150,9 @@ window as a bubble without dismissing the dialog. The window is rendered in the
 automatically provided `StyledTheme` host, or in the nearest explicit
 `StyledFloatingHost` when you need to limit floating windows to a specific
 bounded area.
+
+Dragging a minimized bubble snaps it to the nearest horizontal edge on release
+by default. Set `snapToEdge = false` to keep its dropped position.
 
 ```kotlin
 StyledDialog(

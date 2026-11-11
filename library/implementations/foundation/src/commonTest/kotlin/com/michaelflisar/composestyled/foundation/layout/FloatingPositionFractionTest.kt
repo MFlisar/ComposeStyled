@@ -66,4 +66,20 @@ class FloatingPositionFractionTest {
 
         assertEquals(FloatingPositionFraction(1f, 0f), position)
     }
+
+    @Test
+    fun minimizedBubbleSnapsToNearestHorizontalEdge() {
+        val availableSpace = DpSize(600.dp, 400.dp)
+        val bubbleSize = DpSize(48.dp, 48.dp)
+        val margin = 12.dp
+
+        assertEquals(
+            DpOffset(12.dp, 140.dp),
+            DpOffset(100.dp, 140.dp).snapToHorizontalEdge(availableSpace, bubbleSize, margin),
+        )
+        assertEquals(
+            DpOffset(564.dp, 220.dp),
+            DpOffset(500.dp, 220.dp).snapToHorizontalEdge(availableSpace, bubbleSize, margin),
+        )
+    }
 }

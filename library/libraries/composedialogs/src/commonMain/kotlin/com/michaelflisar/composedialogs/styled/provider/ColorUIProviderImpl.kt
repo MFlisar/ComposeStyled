@@ -10,7 +10,7 @@ import androidx.compose.ui.text.font.FontWeight
 import com.michaelflisar.composedialogs.dialogs.color.ColorPickerIcon
 import com.michaelflisar.composedialogs.dialogs.color.ColorTextStyle
 import com.michaelflisar.composedialogs.dialogs.color.ColorUIProvider
-import com.michaelflisar.composedialogs.styled.StyledDialogInput
+import com.michaelflisar.composedialogs.styled.DialogInput
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.tokens.LocalStyledContentColor
 import com.michaelflisar.composestyled.ui.components.StyledCard
@@ -20,7 +20,7 @@ import com.michaelflisar.composestyled.ui.components.StyledIcon
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
 import com.michaelflisar.composestyled.ui.state.rememberDialogState
 
-internal object StyledColorUIProvider : ColorUIProvider {
+internal object ColorUIProviderImpl : ColorUIProvider {
 
     @Composable
     override fun Text(
@@ -83,7 +83,7 @@ internal object StyledColorUIProvider : ColorUIProvider {
         onClick: () -> Unit,
         content: @Composable RowScope.() -> Unit,
     ) {
-        ProvideStyledDialogActionContext {
+        ProvideDialogActionContext {
             StyledTextButton(onClick = onClick, modifier = modifier, content = content)
         }
     }
@@ -119,7 +119,7 @@ internal object StyledColorUIProvider : ColorUIProvider {
         androidx.compose.runtime.LaunchedEffect(visible) {
             if (visible) state.show() else state.dismiss()
         }
-        StyledDialogInput(
+        DialogInput(
             state = state,
             value = value.value,
             onValueChange = { value.value = it },

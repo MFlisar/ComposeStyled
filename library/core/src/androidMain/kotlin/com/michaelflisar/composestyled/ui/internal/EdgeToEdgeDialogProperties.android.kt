@@ -4,7 +4,11 @@ import androidx.compose.ui.window.DialogProperties
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 
 @InternalComposeStyledApi
-actual fun edgeToEdgeDialogProperties(dismissOnBackPress: Boolean): DialogProperties =
+@Suppress("UNUSED_PARAMETER")
+actual fun edgeToEdgeDialogProperties(
+    dismissOnBackPress: Boolean,
+    transparentScrim: Boolean,
+): DialogProperties =
     DialogProperties(
         dismissOnBackPress = dismissOnBackPress,
         dismissOnClickOutside = false,

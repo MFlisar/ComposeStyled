@@ -19,7 +19,7 @@ import com.michaelflisar.composestyled.ui.state.DialogState
 
 /** Shows a theme-rendered Styled input inside a dialog. */
 @Composable
-fun StyledDialogInput(
+fun DialogInput(
     state: DialogState,
     value: String,
     onValueChange: (String) -> Unit,

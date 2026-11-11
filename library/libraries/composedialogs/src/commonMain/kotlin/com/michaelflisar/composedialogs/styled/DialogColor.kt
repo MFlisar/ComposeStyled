@@ -15,7 +15,7 @@ import com.michaelflisar.composedialogs.dialogs.color.ColorPicker
 import com.michaelflisar.composedialogs.dialogs.color.ColorPickerDefaults
 import com.michaelflisar.composedialogs.dialogs.color.ColorPickerLabelStyle
 import com.michaelflisar.composedialogs.dialogs.color.ColorPickerTexts
-import com.michaelflisar.composedialogs.styled.provider.StyledColorUIProvider
+import com.michaelflisar.composedialogs.styled.provider.ColorUIProviderImpl
 import com.michaelflisar.composedialogs.styled.shared.composeDialog
 import com.michaelflisar.composestyled.isLandscape
 import com.michaelflisar.composestyled.StyledTheme
@@ -25,7 +25,7 @@ import com.michaelflisar.composestyled.ui.state.DialogState
 
 /** Shows the ComposeDialogs color picker in a Styled dialog. */
 @Composable
-fun StyledDialogColor(
+fun DialogColor(
     state: DialogState,
     color: MutableState<Color>,
     modifier: Modifier = Modifier,
@@ -68,7 +68,7 @@ fun StyledDialogColor(
     ) {
         if (state.visible) {
             ColorPicker(
-                uiProvider = StyledColorUIProvider,
+                uiProvider = ColorUIProviderImpl,
                 color = color,
                 texts = texts,
                 alphaSupported = alphaSupported,

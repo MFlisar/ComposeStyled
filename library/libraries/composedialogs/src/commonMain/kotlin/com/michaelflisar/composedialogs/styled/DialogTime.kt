@@ -11,7 +11,7 @@ import com.michaelflisar.composedialogs.dialogs.time.TimePicker
 import com.michaelflisar.composedialogs.dialogs.time.TimePickerDefaults
 import com.michaelflisar.composedialogs.dialogs.time.TimePickerSetup
 import com.michaelflisar.composedialogs.dialogs.time.TimePickerTexts
-import com.michaelflisar.composedialogs.styled.provider.StyledTimeUIProvider
+import com.michaelflisar.composedialogs.styled.provider.TimeUIProviderImpl
 import com.michaelflisar.composedialogs.styled.shared.composeDialog
 import com.michaelflisar.composedialogs.styled.shared.withPositiveButtonEnabled
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
@@ -21,7 +21,7 @@ import kotlinx.datetime.LocalTime
 
 /** Shows the ComposeDialogs time picker in a Styled dialog. */
 @Composable
-fun StyledDialogTime(
+fun DialogTime(
     state: DialogState,
     time: MutableState<LocalTime>,
     modifier: Modifier = Modifier,
@@ -53,7 +53,7 @@ fun StyledDialogTime(
                 hourPickType = setup.hourPickType,
                 minutePickType = setup.minutePickType,
                 texts = texts,
-                uiProvider = StyledTimeUIProvider,
+                uiProvider = TimeUIProviderImpl,
                 onValidationChanged = { isValid = it },
             )
         }

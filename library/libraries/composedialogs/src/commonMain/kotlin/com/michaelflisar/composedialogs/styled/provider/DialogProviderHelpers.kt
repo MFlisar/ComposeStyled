@@ -18,7 +18,7 @@ import com.michaelflisar.composestyled.ui.layout.StyledDialog
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 
 @Composable
-internal fun StyledLabeledField(
+internal fun LabeledField(
     label: String?,
     modifier: Modifier,
     errorMessage: String?,
@@ -69,7 +69,7 @@ internal fun StyledLabeledField(
 
 @OptIn(InternalComposeStyledApi::class)
 @Composable
-internal fun ProvideStyledDialogActionContext(content: @Composable () -> Unit) {
+internal fun ProvideDialogActionContext(content: @Composable () -> Unit) {
     CompositionLocalProvider(
         LocalStyledContext provides StyledDialog.Context.DialogAction,
         content = content,

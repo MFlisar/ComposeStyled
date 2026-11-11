@@ -34,13 +34,14 @@ data class PreferenceItemStyle internal constructor(
     val subtitleTextStyle: TextStyle,
 )
 
-/** Style for expandable section headers and their grouped content. */
+/** Style for preference section headers and their grouped content. */
 @Immutable
 @ConsistentCopyVisibility
 data class PreferenceSectionStyle internal constructor(
     val colors: PreferenceRowColors,
     val shape: Shape,
     val contentPadding: PaddingValues,
+    /** Minimum height for non-expandable section headers. */
     val minimumItemHeight: Dp,
     val titleTextStyle: TextStyle,
     val subtitleTextStyle: TextStyle,
@@ -50,6 +51,8 @@ data class PreferenceSectionStyle internal constructor(
     val groupCornerSize: Dp,
     /** Whether sections expand by default; an individual section can override this. */
     val isExpandable: Boolean,
+    /** Minimum height for expandable section headers. */
+    val minimumExpandableItemHeight: Dp,
 )
 
 /** Styling for the back row shown at the top of an opened preference group. */
@@ -95,12 +98,23 @@ sealed interface PreferenceInGroupSeparatorStyle {
     @Immutable
     data class Divider(
         val verticalPadding: Dp = 0.dp,
-        val headerSpacing: Dp = verticalPadding * 2,
     ) : PreferenceInGroupSeparatorStyle
 
     val spacingOrZero: Dp
         get() = (this as? Spacing)?.spacing ?: 0.dp
 }
+
+/** Spacing and separators used between preference list entries. */
+@Immutable
+@ConsistentCopyVisibility
+data class PreferenceSpacingStyle internal constructor(
+    /** Spacing between ordinary sibling entries outside grouped sections. */
+    val itemSpacing: Dp,
+    /** Spacing before a detached section header and between it and its content. */
+    val sectionSpacing: Dp,
+    /** Separator used between entries inside an optically grouped section or group. */
+    val inGroupSeparator: PreferenceInGroupSeparatorStyle,
+)
 
 /** Styling shared by preference lists and their standard rows. */
 @Immutable
@@ -108,15 +122,12 @@ sealed interface PreferenceInGroupSeparatorStyle {
 data class PreferenceStyle internal constructor(
     val item: PreferenceItemStyle,
     val section: PreferenceSectionStyle,
+    val spacing: PreferenceSpacingStyle,
     val openedGroupHeader: PreferenceOpenGroupHeaderStyle,
     val trailingStyle: PreferenceTrailingStyle,
     val outerPadding: PaddingValues,
     /** Keeps leading content aligned by rendering an empty icon when a row has no icon. */
     val reserveLeadingIconSpace: Boolean = true,
-    /** Vertical spacing between sibling preference rows, sections and groups in a list. */
-    val itemSpacing: Dp,
-    /** Separator between rows inside an optically grouped section or group. */
-    val inGroupSeparator: PreferenceInGroupSeparatorStyle,
 )
 
 object PreferenceStyleDefaults {
@@ -159,32 +170,51 @@ object PreferenceStyleDefaults {
         subtitleTextStyle = subtitleTextStyle,
     )
 
-    /** Creates the default style for an expandable preference section. */
+    /** Creates the default style for a preference section. */
     @Composable
     fun section(
-        item: PreferenceItemStyle = item(),
+        isExpandable: Boolean = false,
         colors: PreferenceRowColors = rowColors(
             containerColor = Color.Transparent,
             contentColor = StyledTheme.colorScheme.primary,
         ),
-        shape: Shape = item.shape,
-        contentPadding: PaddingValues = item.contentPadding,
-        minimumItemHeight: Dp = item.minimumItemHeight,
+        shape: Shape = StyledTheme.shapes.medium,
+        contentPadding: PaddingValues = PaddingValues(
+            horizontal = StyledTheme.padding.medium,
+            vertical = StyledTheme.padding.small,
+        ),
+        minimumItemHeight: Dp = 0.dp,
+        minimumExpandableItemHeight: Dp = minimumItemHeight(),
         titleTextStyle: TextStyle = StyledTheme.typography.titleSmall,
-        subtitleTextStyle: TextStyle = item.subtitleTextStyle,
+        subtitleTextStyle: TextStyle = StyledTheme.typography.bodySmall,
         headerIsPartOfShape: Boolean = false,
-        groupCornerSize: Dp = 8.dp,
-        isExpandable: Boolean = true,
+        groupCornerSize: Dp = 8.dp
     ): PreferenceSectionStyle = PreferenceSectionStyle(
         colors = colors,
         shape = shape,
         contentPadding = contentPadding,
         minimumItemHeight = minimumItemHeight,
+        minimumExpandableItemHeight = minimumExpandableItemHeight,
         titleTextStyle = titleTextStyle,
         subtitleTextStyle = subtitleTextStyle,
         headerIsPartOfShape = headerIsPartOfShape,
         groupCornerSize = groupCornerSize,
         isExpandable = isExpandable,
+    )
+
+    /** Creates spacing and separator defaults from the active Styled theme tokens. */
+    @Composable
+    fun spacing(
+        itemSpacing: Dp = StyledTheme.spacing.large,
+        sectionSpacing: Dp = StyledTheme.spacing.small,
+        inGroupSeparator: PreferenceInGroupSeparatorStyle =
+            PreferenceInGroupSeparatorStyle.Divider(
+                verticalPadding = 0.dp,
+            ),
+    ): PreferenceSpacingStyle = PreferenceSpacingStyle(
+        itemSpacing = itemSpacing,
+        sectionSpacing = sectionSpacing,
+        inGroupSeparator = inGroupSeparator,
     )
 
     /** Creates the default style for preference row trailing content. */
@@ -238,7 +268,7 @@ object PreferenceStyleDefaults {
 @Composable
 fun rememberPreferenceStyle(
     item: PreferenceItemStyle = PreferenceStyleDefaults.item(),
-    section: PreferenceSectionStyle = PreferenceStyleDefaults.section(item),
+    section: PreferenceSectionStyle = PreferenceStyleDefaults.section(),
     openedGroupHeader: PreferenceOpenGroupHeaderStyle =
         PreferenceStyleDefaults.openedGroupHeader(item),
     outerPadding: PaddingValues = PaddingValues(
@@ -246,33 +276,26 @@ fun rememberPreferenceStyle(
         vertical = StyledTheme.padding.medium,
     ),
     reserveLeadingIconSpace: Boolean = true,
-    itemSpacing: Dp = StyledTheme.spacing.large,
-    inGroupSeparator: PreferenceInGroupSeparatorStyle =
-        PreferenceInGroupSeparatorStyle.Divider(
-            verticalPadding = 0.dp,
-            headerSpacing = itemSpacing
-        ),
+    spacing: PreferenceSpacingStyle = PreferenceStyleDefaults.spacing(),
     trailingStyle: PreferenceTrailingStyle = PreferenceStyleDefaults.trailing(),
 ): PreferenceStyle {
     return remember(
         item,
         section,
+        spacing,
         openedGroupHeader,
         trailingStyle,
         outerPadding,
         reserveLeadingIconSpace,
-        itemSpacing,
-        inGroupSeparator,
     ) {
         PreferenceStyle(
             item = item,
             section = section,
+            spacing = spacing,
             openedGroupHeader = openedGroupHeader,
             trailingStyle = trailingStyle,
             outerPadding = outerPadding,
             reserveLeadingIconSpace = reserveLeadingIconSpace,
-            itemSpacing = itemSpacing,
-            inGroupSeparator = inGroupSeparator,
         )
     }
 }

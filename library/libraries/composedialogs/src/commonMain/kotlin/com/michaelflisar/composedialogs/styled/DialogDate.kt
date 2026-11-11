@@ -7,7 +7,7 @@ import androidx.compose.ui.Modifier
 import com.michaelflisar.composedialogs.dialogs.date.DatePicker
 import com.michaelflisar.composedialogs.dialogs.date.ui.DatePickerRange
 import com.michaelflisar.composedialogs.dialogs.date.ui.DatePickerSetup
-import com.michaelflisar.composedialogs.styled.provider.StyledDateUIProvider
+import com.michaelflisar.composedialogs.styled.provider.DateUIProviderImpl
 import com.michaelflisar.composedialogs.styled.shared.composeDialog
 import com.michaelflisar.composestyled.isLandscape
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
@@ -18,7 +18,7 @@ import kotlinx.datetime.LocalDate
 /** Shows the ComposeDialogs date picker in a Styled dialog. */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun StyledDialogDate(
+fun DialogDate(
     state: DialogState,
     date: MutableState<LocalDate>,
     dateRange: DatePickerRange,
@@ -44,7 +44,7 @@ fun StyledDialogDate(
     ) {
         if (state.visible) {
             DatePicker(
-                uiProvider = StyledDateUIProvider,
+                uiProvider = DateUIProviderImpl,
                 date = date,
                 dateRange = dateRange,
                 setup = setup,

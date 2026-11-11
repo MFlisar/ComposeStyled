@@ -12,7 +12,7 @@ import com.michaelflisar.composestyled.ui.state.DialogState
 
 /** Shows Styled information content in a dialog. */
 @Composable
-fun StyledDialogInfo(
+fun DialogInfo(
     state: DialogState,
     info: String,
     modifier: Modifier = Modifier,

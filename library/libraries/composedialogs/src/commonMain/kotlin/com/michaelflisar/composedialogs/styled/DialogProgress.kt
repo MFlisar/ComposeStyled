@@ -20,7 +20,7 @@ import com.michaelflisar.composestyled.ui.state.DialogState
 
 /** Shows Styled progress and optional message content in a dialog. */
 @Composable
-fun StyledDialogProgress(
+fun DialogProgress(
     state: DialogState,
     modifier: Modifier = Modifier,
     content: (@Composable ColumnScope.() -> Unit)? = null,

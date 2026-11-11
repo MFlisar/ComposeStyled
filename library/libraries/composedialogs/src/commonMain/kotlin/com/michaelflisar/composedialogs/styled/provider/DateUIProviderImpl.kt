@@ -35,7 +35,7 @@ import com.michaelflisar.composestyled.UpdateStyledThemeLocals
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import kotlinx.datetime.LocalDate
 
-internal object StyledDateUIProvider : DateUIProvider {
+internal object DateUIProviderImpl : DateUIProvider {
 
     @Composable
     override fun Text(

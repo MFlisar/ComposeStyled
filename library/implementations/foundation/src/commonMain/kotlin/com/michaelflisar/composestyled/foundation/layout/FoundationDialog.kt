@@ -11,15 +11,8 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.ExperimentalTransitionApi
-import androidx.compose.animation.core.rememberTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.ui.backhandler.BackHandler
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -44,7 +37,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -53,8 +45,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.customActions
-import androidx.compose.ui.semantics.dialog
-import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.TextStyle
@@ -77,9 +67,9 @@ import com.michaelflisar.composestyled.ui.state.rememberStyledExpandableTopBarSc
 import com.michaelflisar.composestyled.ui.internal.DialogActions
 import com.michaelflisar.composestyled.ui.internal.DialogButton
 import com.michaelflisar.composestyled.ui.internal.DIALOG_VISIBILITY_ANIMATION_DURATION_MILLIS
+import com.michaelflisar.composestyled.ui.internal.DialogScrimEffect
 import com.michaelflisar.composestyled.ui.internal.edgeToEdgeDialogProperties
 import com.michaelflisar.composestyled.ui.internal.dialogInput
-import com.michaelflisar.composestyled.ui.layout.LocalFullscreenDialogEntry
 
 @InternalComposeStyledApi
 abstract class FoundationDialog : StyledDialog.Implementation {
@@ -154,21 +144,6 @@ abstract class FoundationDialog : StyledDialog.Implementation {
             )
             return
         }
-        if (style is StyledDialog.Style.Fullscreen && LocalFullscreenDialogEntry.current != null) {
-            FullscreenOverlay(
-                visible = visible,
-                onDismissRequest = onDismissRequest,
-                modifier = modifier,
-                properties = properties,
-                shape = RectangleShape,
-                title = title,
-                buttons = buttons,
-                content = content,
-                animation = style.animation,
-                expandableHeader = style.expandableHeader,
-            )
-            return
-        }
         val shape: Shape
         val maxWidth: Dp
         val maxHeightFraction: Float
@@ -212,15 +187,19 @@ abstract class FoundationDialog : StyledDialog.Implementation {
                 properties = if (
                     style is StyledDialog.Style.BottomSheet ||
                     style is StyledDialog.Style.Fullscreen ||
-                    expandedToolbar
+                    canExpandToolbar
                 ) {
-                    edgeToEdgeDialogProperties(properties.dismissOnBackPress)
+                    edgeToEdgeDialogProperties(
+                        dismissOnBackPress = properties.dismissOnBackPress,
+                        transparentScrim = style is StyledDialog.Style.Fullscreen,
+                    )
                 } else DialogProperties(
                     dismissOnBackPress = properties.dismissOnBackPress,
                     dismissOnClickOutside = false,
                     usePlatformDefaultWidth = false,
                 ),
             ) {
+                DialogScrimEffect(transparent = style is StyledDialog.Style.Fullscreen)
                 if (style is StyledDialog.Style.BottomSheet) {
                     FoundationDialogSheet(
                         onDismissRequest, onDismissRequestWithoutAnimation,
@@ -369,64 +348,6 @@ abstract class FoundationDialog : StyledDialog.Implementation {
     }
 
     @Composable
-    @OptIn(ExperimentalComposeUiApi::class, ExperimentalTransitionApi::class)
-    private fun FullscreenOverlay(
-        visible: Boolean,
-        onDismissRequest: () -> Unit,
-        modifier: Modifier,
-        properties: StyledDialog.Properties,
-        shape: Shape,
-        title: (@Composable () -> Unit)?,
-        buttons: StyledDialog.Buttons,
-        content: @Composable ColumnScope.(PaddingValues) -> Unit,
-        animation: StyledDialog.FullscreenAnimation,
-        expandableHeader: StyledDialog.Style.Fullscreen.ExpandableHeader?,
-    ) {
-        val transitionState = remember { MutableTransitionState(false) }
-        LaunchedEffect(visible) { transitionState.targetState = visible }
-        val transition = rememberTransition(transitionState, label = "fullscreenDialog")
-        val scrimAlpha by transition.animateFloat(
-            transitionSpec = { tween(durationMillis = DIALOG_VISIBILITY_ANIMATION_DURATION_MILLIS) },
-            label = "fullscreenDialogScrim",
-        ) { targetState -> if (targetState) FULLSCREEN_DIALOG_SCRIM_ALPHA else 0f }
-
-        BackHandler(
-            enabled = properties.dismissOnBackPress,
-            onBack = onDismissRequest,
-        )
-        Box(Modifier.fillMaxSize().semantics { dialog() }) {
-            Box(
-                Modifier.fillMaxSize()
-                    .background(Color.Black.copy(alpha = scrimAlpha))
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = {},
-                    )
-                    .semantics { hideFromAccessibility() },
-            )
-            transition.AnimatedVisibility(
-                visible = { it },
-                modifier = Modifier.fillMaxSize()
-                    .then(modifier)
-                    .dialogInput(properties.dismissOnBackPress, onDismissRequest),
-                enter = fullscreenEnterTransition(animation),
-                exit = fullscreenExitTransition(animation),
-            ) {
-                Fullscreen(
-                    Modifier.fillMaxSize(),
-                    shape,
-                    title,
-                    buttons,
-                    content,
-                    edgeToEdge = true,
-                    expandableHeader = expandableHeader,
-                )
-            }
-        }
-    }
-
-    @Composable
     @OptIn(ExperimentalFoundationApi::class)
     private fun Fullscreen(
         modifier: Modifier,
@@ -443,13 +364,30 @@ abstract class FoundationDialog : StyledDialog.Implementation {
     ) {
         val expandableHeaderEnabled = expandableHeader != null && title != null
         val expandableHeaderBehavior = rememberStyledExpandableTopBarScrollBehavior()
+        val headerContainerColor =
+            expandableHeader?.containerColor ?: StyledTheme.colorScheme.surface
+        val headerContentColor = expandableHeader?.contentColor
+            ?: StyledTheme.contentColorFor(headerContainerColor)
+        val expandedHeaderContainerColor =
+            expandableHeader?.expandedContainerColor ?: headerContainerColor
+        val expandedHeaderContentColor = expandableHeader?.expandedContentColor
+            ?: if (expandableHeader?.expandedContainerColor == null) {
+                headerContentColor
+            } else {
+                StyledTheme.contentColorFor(expandedHeaderContainerColor)
+            }
+        val statusBarContainerColor = if (expandableHeaderEnabled) {
+            expandedHeaderContainerColor
+        } else {
+            StyledTheme.colorScheme.surface
+        }
         val footerButtons = if (fullscreenActionsInToolbar) {
             StyledDialog.Buttons(neutral = buttons.neutral)
         } else buttons
         if (edgeToEdge) {
             SystemBarStyleEffect(
                 statusBar = systemBarIconStyleFor(
-                    StyledTheme.colorScheme.surface,
+                    statusBarContainerColor,
                     StyledTheme.colorScheme.background,
                 ),
                 navigationBar = systemBarIconStyleFor(containerColor, StyledTheme.colorScheme.background),
@@ -526,6 +464,10 @@ abstract class FoundationDialog : StyledDialog.Implementation {
                     StyledExpandableTopBar(
                         behavior = expandableHeaderBehavior,
                         expandedHeight = expandableHeader?.expandedHeight,
+                        containerColor = headerContainerColor,
+                        contentColor = headerContentColor,
+                        expandedContainerColor = expandedHeaderContainerColor,
+                        expandedContentColor = expandedHeaderContentColor,
                         navigationIcon = navigation,
                         actions = actions,
                         title = renderedTitle,
@@ -581,8 +523,6 @@ abstract class FoundationDialog : StyledDialog.Implementation {
             }
         }
     }
-
-    private val FULLSCREEN_DIALOG_SCRIM_ALPHA = 0.32f
 
     private fun fullscreenEnterTransition(
         animation: StyledDialog.FullscreenAnimation,

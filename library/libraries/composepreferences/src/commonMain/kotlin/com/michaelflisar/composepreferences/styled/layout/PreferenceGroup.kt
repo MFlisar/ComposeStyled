@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -15,6 +17,7 @@ import com.michaelflisar.composestyled.classes.IconComposable
 import com.michaelflisar.composepreferences.styled.internal.LocalPreferenceRuntime
 import com.michaelflisar.composepreferences.styled.internal.PreferenceAncestor
 import com.michaelflisar.composepreferences.styled.internal.PreferenceEntry
+import com.michaelflisar.composepreferences.styled.internal.PreferenceListSpacingArrangement
 import com.michaelflisar.composepreferences.styled.PreferenceFilter
 import com.michaelflisar.composepreferences.styled.PreferenceOpenGroupHeaderStyle
 import com.michaelflisar.composepreferences.styled.internal.currentPreferenceRuntime
@@ -54,7 +57,7 @@ fun PreferenceGroup(
                     parent.currentPath.take(groupPath.size) == groupPath)
     val groupSeparatorSpacing = when {
         parent.isFiltering -> 0.dp
-        groupContentIsActive && visible -> parent.style.inGroupSeparator.spacingOrZero
+        groupContentIsActive && visible -> parent.style.spacing.inGroupSeparator.spacingOrZero
         else -> 0.dp
     }
     val childRuntime = parent.copy(
@@ -70,6 +73,19 @@ fun PreferenceGroup(
         parentExpanded = true,
         insideSection = !parent.isFiltering,
     )
+    DisposableEffect(parent.listSpacingTracker, identity) {
+        onDispose {
+            parent.listSpacingTracker.remove(identity)
+        }
+    }
+    SideEffect {
+        parent.listSpacingTracker.update(
+            identity = identity,
+            scope = parent.identityScope,
+            order = parent.identityAllocator.order(identity),
+            isVisible = true,
+        )
+    }
 
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -84,6 +100,7 @@ fun PreferenceGroup(
             isEnabled = { enabled },
             isVisible = { showGroup },
             renderInFilter = parent.filterScope != PreferenceFilter.Scope.Global,
+            trackInListSpacing = false,
         ) {
             PreferenceRowContent(
                 title = title,
@@ -122,7 +139,7 @@ fun PreferenceGroup(
         } else if (groupIsCurrentPage && visible) {
             val groupTopSpacing = when (parent.style.openedGroupHeader) {
                 PreferenceOpenGroupHeaderStyle.Disabled -> 0.dp
-                is PreferenceOpenGroupHeaderStyle.Style -> parent.style.itemSpacing
+                is PreferenceOpenGroupHeaderStyle.Style -> parent.style.spacing.itemSpacing
             }
             Box(
                 modifier = Modifier
@@ -132,8 +149,11 @@ fun PreferenceGroup(
             ) {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(
-                        parent.style.inGroupSeparator.spacingOrZero,
+                    verticalArrangement = PreferenceListSpacingArrangement(
+                        tracker = parent.listSpacingTracker,
+                        scope = childRuntime.identityScope,
+                        itemSpacing = parent.style.spacing.inGroupSeparator.spacingOrZero,
+                        sectionSpacing = parent.style.spacing.sectionSpacing,
                     ),
                 ) {
                     groupContent()

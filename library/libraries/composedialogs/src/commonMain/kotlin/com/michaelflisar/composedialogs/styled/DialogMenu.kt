@@ -29,7 +29,7 @@ import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.ui.state.DialogState
 
 /** Entry types for a hierarchical menu rendered as a dialog list. */
-object StyledDialogMenu {
+object DialogMenu {
     sealed interface Entry {
         @Stable
         class Action(
@@ -61,9 +61,9 @@ object StyledDialogMenu {
 
 /** Shows Styled menu entries in a dialog; submenus are navigated as nested lists. */
 @Composable
-fun StyledDialogMenu(
+fun DialogMenu(
     state: DialogState,
-    items: List<StyledDialogMenu.Entry>,
+    items: List<DialogMenu.Entry>,
     modifier: Modifier = Modifier,
     listModifier: Modifier = Modifier,
     dismissOnClick: Boolean = true,
@@ -85,7 +85,7 @@ fun StyledDialogMenu(
     onDismissRequest: () -> Unit = state::dismiss,
 ) {
     var menuPath by remember(items) {
-        mutableStateOf<List<StyledDialogMenu.Entry.Submenu>>(emptyList())
+        mutableStateOf<List<DialogMenu.Entry.Submenu>>(emptyList())
     }
     val visibleItems = menuPath.lastOrNull()?.items ?: items
 
@@ -129,7 +129,7 @@ fun StyledDialogMenu(
                 }
                 visibleItems.forEach { entry ->
                     when (entry) {
-                        is StyledDialogMenu.Entry.Action -> {
+                        is DialogMenu.Entry.Action -> {
                             menuListItem(
                                 title = entry.title,
                                 description = entry.description,
@@ -152,7 +152,7 @@ fun StyledDialogMenu(
                             )
                         }
 
-                        is StyledDialogMenu.Entry.Submenu -> {
+                        is DialogMenu.Entry.Submenu -> {
                             menuListItem(
                                 title = entry.title,
                                 description = entry.description,
@@ -175,7 +175,7 @@ fun StyledDialogMenu(
                             )
                         }
 
-                        is StyledDialogMenu.Entry.Header -> {
+                        is DialogMenu.Entry.Header -> {
                             StyledText(
                                 text = entry.title,
                                 modifier = Modifier.padding(
@@ -186,11 +186,11 @@ fun StyledDialogMenu(
                             )
                         }
 
-                        StyledDialogMenu.Entry.Divider -> {
+                        DialogMenu.Entry.Divider -> {
                             StyledHorizontalDivider()
                         }
 
-                        is StyledDialogMenu.Entry.Custom -> {
+                        is DialogMenu.Entry.Custom -> {
                             entry.content()
                         }
                     }

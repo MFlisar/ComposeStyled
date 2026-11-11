@@ -104,6 +104,17 @@ object StyledDialog {
                  * Null derives the height from the expanded title and its default padding.
                  */
                 val expandedHeight: Dp? = null,
+                /** Background color while the header is collapsed; null uses the theme surface. */
+                val containerColor: Color? = null,
+                /** Content color while the header is collapsed; null derives it from [containerColor]. */
+                val contentColor: Color? = null,
+                /** Background color while the header is expanded; null uses [containerColor]. */
+                val expandedContainerColor: Color? = null,
+                /**
+                 * Content color while the header is expanded; null follows [contentColor] unless an
+                 * [expandedContainerColor] is provided, in which case it is derived from that color.
+                 */
+                val expandedContentColor: Color? = null,
             )
         }
 
@@ -140,6 +151,8 @@ object StyledDialog {
             /** Outside-click handling and optional dimming; defaults to passing clicks through. */
             val backgroundMode: FloatingWindowBackgroundMode =
                 FloatingWindowBackgroundMode.Interactive,
+            /** Snaps a dragged minimized bubble to the nearest horizontal edge on release. */
+            val snapToEdge: Boolean = true,
         ) : Style
     }
 
@@ -384,29 +397,7 @@ fun StyledDialog(
         val registry = LocalStyledRegistry.current
         val implementation = registry[StyledDialog.Key]
         val resolvedButtons = dialogButtons(state, properties, buttons, onDismissRequest)
-        if (style is StyledDialog.Style.Fullscreen) {
-            val host = checkNotNull(LocalFullscreenDialogHost.current) {
-                "StyledDialog.Style.Fullscreen requires StyledTheme"
-            }
-            val entry = remember(state) { FullscreenDialogEntry() }
-            val compositionLocalContext = currentCompositionLocalContext
-            val render: @Composable () -> Unit = {
-                CompositionLocalProvider(compositionLocalContext) {
-                    CompositionLocalProvider(LocalFullscreenDialogEntry provides entry) {
-                        implementation.Render(
-                            style, onDismissRequest, dismissWithoutAnimation, modifier, properties,
-                            title, resolvedButtons, visible, { state.visible }, content,
-                        )
-                    }
-                }
-            }
-            val currentRender = rememberUpdatedState(render)
-            SideEffect { entry.content = { currentRender.value() } }
-            DisposableEffect(host, entry) {
-                host.register(entry)
-                onDispose { host.unregister(entry) }
-            }
-        } else if (style is StyledDialog.Style.FloatingWindow) {
+        if (style is StyledDialog.Style.FloatingWindow) {
             val host = checkNotNull(LocalFloatingDialogHost.current) {
                 "StyledDialog.Style.FloatingWindow requires StyledTheme or StyledFloatingHost"
             }

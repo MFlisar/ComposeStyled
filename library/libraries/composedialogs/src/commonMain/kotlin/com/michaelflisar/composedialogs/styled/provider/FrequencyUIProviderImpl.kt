@@ -19,7 +19,7 @@ import com.michaelflisar.composedialogs.dialogs.frequency.FrequencyTextStyle
 import com.michaelflisar.composedialogs.dialogs.frequency.FrequencyUIProvider
 import com.michaelflisar.composedialogs.dialogs.frequency.classes.Frequency
 import com.michaelflisar.composedialogs.dialogs.time.TimePickerSetup
-import com.michaelflisar.composedialogs.styled.StyledDialogTime
+import com.michaelflisar.composedialogs.styled.DialogTime
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.tokens.LocalStyledTextStyle
 import com.michaelflisar.composestyled.ui.components.StyledButton
@@ -34,7 +34,7 @@ import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.Month
 
-internal object StyledFrequencyUIProvider : FrequencyUIProvider {
+internal object FrequencyUIProviderImpl : FrequencyUIProvider {
 
     @Composable
     override fun LabeledField(
@@ -43,7 +43,7 @@ internal object StyledFrequencyUIProvider : FrequencyUIProvider {
         errorMessage: String?,
         content: @Composable () -> Unit,
     ) {
-        StyledLabeledField(
+        LabeledField(
             label = label,
             modifier = modifier,
             errorMessage = errorMessage,
@@ -132,7 +132,7 @@ internal object StyledFrequencyUIProvider : FrequencyUIProvider {
         value: String,
         onClick: () -> Unit,
     ) {
-        ProvideStyledDialogActionContext {
+        ProvideDialogActionContext {
             StyledTextButton(
                 onClick = onClick,
                 modifier = modifier
@@ -166,7 +166,7 @@ internal object StyledFrequencyUIProvider : FrequencyUIProvider {
         val currentSelectedTime = rememberUpdatedState(selectedTime)
         val currentOnTimeSelected = rememberUpdatedState(onTimeSelected)
         val selectedTimeState = remember {
-            // Bridge the value/callback API to StyledDialogTime's MutableState API.
+            // Bridge the value/callback API to DialogTime's MutableState API.
             object : MutableState<LocalTime> {
                 override var value: LocalTime
                     get() = currentSelectedTime.value
@@ -186,7 +186,7 @@ internal object StyledFrequencyUIProvider : FrequencyUIProvider {
             value = selectedTime.toString(),
             onClick = dialogState::show,
         )
-        StyledDialogTime(
+        DialogTime(
             state = dialogState,
             time = selectedTimeState,
             setup = setup,

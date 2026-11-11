@@ -12,7 +12,7 @@ import com.michaelflisar.composedialogs.dialogs.frequency.FrequencyPickerTexts
 import com.michaelflisar.composedialogs.dialogs.frequency.classes.Frequency
 import com.michaelflisar.composedialogs.dialogs.time.TimePickerDefaults
 import com.michaelflisar.composedialogs.dialogs.time.TimePickerSetup
-import com.michaelflisar.composedialogs.styled.provider.StyledFrequencyUIProvider
+import com.michaelflisar.composedialogs.styled.provider.FrequencyUIProviderImpl
 import com.michaelflisar.composedialogs.styled.shared.composeDialog
 import com.michaelflisar.composedialogs.styled.shared.withPositiveButtonEnabled
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
@@ -22,7 +22,7 @@ import kotlinx.datetime.DayOfWeek
 
 /** Shows the ComposeDialogs frequency editor in a Styled dialog. */
 @Composable
-fun StyledDialogFrequency(
+fun DialogFrequency(
     state: DialogState,
     frequency: MutableState<Frequency>,
     modifier: Modifier = Modifier,
@@ -53,7 +53,7 @@ fun StyledDialogFrequency(
     ) {
         if (state.visible) {
             FrequencyPicker(
-                uiProvider = StyledFrequencyUIProvider,
+                uiProvider = FrequencyUIProviderImpl,
                 frequency = frequency,
                 texts = texts,
                 supportedTypes = supportedTypes,

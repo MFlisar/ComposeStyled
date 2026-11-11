@@ -37,9 +37,7 @@ import com.michaelflisar.composestyled.tokens.StyledSizes
 import com.michaelflisar.composestyled.tokens.StyledSpacing
 import com.michaelflisar.composestyled.tokens.StyledTypography
 import com.michaelflisar.composestyled.ui.layout.LocalFloatingDialogHost
-import com.michaelflisar.composestyled.ui.layout.LocalFullscreenDialogHost
 import com.michaelflisar.composestyled.ui.layout.StyledFloatingHost
-import com.michaelflisar.composestyled.ui.layout.StyledFullscreenDialogHost
 
 // only on android 31+
 expect val StyledTheme.isDynamicColorsSupported: Boolean
@@ -167,7 +165,7 @@ object StyledTheme {
 }
 
 /**
- * Provides theme tokens, the provider's component registry and dialog overlay hosts to [content].
+ * Provides theme tokens, the provider's component registry and floating-window host to [content].
  *
  * Use this as the root of a Styled UI subtree. [customization] is applied after the provider's
  * default registrations, so it can replace renderers and update their defaults.
@@ -217,22 +215,20 @@ fun StyledTheme(
         LocalStyledSizes provides sizes,
         LocalStyledBehavior provides behavior
     ) {
-        ProvideFullscreenDialogHostIfMissing {
-            ProvideFloatingHostIfMissing {
-                themeProvider.Root {
-                    val definition = themeProvider.definition()
-                    val defaultRegistry = StyledRegistry.createComposable(definition.registry) {
-                        register(themeProvider.defaultIconSet)
-                    }
-                    val registry = customization?.let {
-                        StyledRegistry.createComposable(defaultRegistry, it)
-                    } ?: defaultRegistry
-                    CompositionLocalProvider(
-                        LocalStyledThemeName provides definition.name,
-                        LocalStyledRegistry provides registry,
-                    ) {
-                        content()
-                    }
+        ProvideFloatingHostIfMissing {
+            themeProvider.Root {
+                val definition = themeProvider.definition()
+                val defaultRegistry = StyledRegistry.createComposable(definition.registry) {
+                    register(themeProvider.defaultIconSet)
+                }
+                val registry = customization?.let {
+                    StyledRegistry.createComposable(defaultRegistry, it)
+                } ?: defaultRegistry
+                CompositionLocalProvider(
+                    LocalStyledThemeName provides definition.name,
+                    LocalStyledRegistry provides registry,
+                ) {
+                    content()
                 }
             }
         }
@@ -244,16 +240,6 @@ fun StyledTheme(
 private fun ProvideFloatingHostIfMissing(content: @Composable () -> Unit) {
     if (LocalFloatingDialogHost.current == null) {
         StyledFloatingHost(content = content)
-    } else {
-        content()
-    }
-}
-
-@Composable
-@OptIn(InternalComposeStyledApi::class)
-private fun ProvideFullscreenDialogHostIfMissing(content: @Composable () -> Unit) {
-    if (LocalFullscreenDialogHost.current == null) {
-        StyledFullscreenDialogHost(content = content)
     } else {
         content()
     }

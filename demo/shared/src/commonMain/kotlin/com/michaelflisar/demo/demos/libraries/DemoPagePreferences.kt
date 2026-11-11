@@ -14,6 +14,8 @@ import androidx.compose.ui.unit.dp
 import com.michaelflisar.composepreferences.styled.navigation.PreferenceBreadcrumb
 import com.michaelflisar.composepreferences.styled.PreferenceFilter
 import com.michaelflisar.composepreferences.styled.PreferenceOpenGroupHeaderStyle
+import com.michaelflisar.composepreferences.styled.PreferenceInGroupSeparatorStyle
+import com.michaelflisar.composepreferences.styled.PreferenceStyleDefaults
 import com.michaelflisar.composepreferences.styled.layout.PreferenceScreen
 import com.michaelflisar.composepreferences.styled.PreferenceBool
 import com.michaelflisar.composepreferences.styled.PreferenceCustomItem
@@ -79,7 +81,7 @@ internal fun DemoPagePreferences(onBack: () -> Unit) {
     val filter = rememberPreferenceFilter()
     val preferenceState = rememberPreferenceScreenState()
     val preferenceStyle = rememberPreferenceStyle(
-        openedGroupHeader = PreferenceOpenGroupHeaderStyle.Disabled
+        openedGroupHeader = PreferenceOpenGroupHeaderStyle.Disabled,
     )
 
     val scaffoldColor = StyledTheme.colorScheme.surface
@@ -227,6 +229,7 @@ internal fun DemoPagePreferences(onBack: () -> Unit) {
                     ) {
                         PreferenceSection(
                             title = "Theme Colors",
+                            isExpandable = true,
                             filterTags = listOf("Palette", "Brand", "Background", "Foreground"),
                         ) {
                             PreferenceList(
@@ -269,6 +272,7 @@ internal fun DemoPagePreferences(onBack: () -> Unit) {
                         }
                         PreferenceSection(
                             title = "Typography & Layout",
+                            isExpandable = true,
                             filterTags = listOf("Font", "Text", "Spacing", "Density"),
                         ) {
                             PreferenceNumber(
@@ -305,6 +309,7 @@ internal fun DemoPagePreferences(onBack: () -> Unit) {
                     ) {
                         PreferenceSection(
                             title = "Data & Privacy",
+                            isExpandable = true,
                             filterTags = listOf("Permissions", "Telemetry"),
                         ) {
                             PreferenceBool(
