@@ -98,6 +98,8 @@ abstract class FoundationDialog : StyledDialog.Implementation {
         @Composable get() = StyledTheme.typography.titleLarge
     protected open val containerColor: Color
         @Composable get() = StyledTheme.colorScheme.surface
+    protected open val fullscreenContainerColor: Color
+        @Composable get() = containerColor
 
     @Composable
     final override fun Render(
@@ -224,19 +226,51 @@ abstract class FoundationDialog : StyledDialog.Implementation {
                         fullscreen = style is StyledDialog.Style.Fullscreen || expandedToolbar,
                     ) { bounds ->
                         if (style is StyledDialog.Style.Fullscreen) {
-                            val transition = remember { MutableTransitionState(false) }
-                            LaunchedEffect(visible) { transition.targetState = visible }
+                            val fullscreenVisibility = remember { MutableTransitionState(false) }
+                            LaunchedEffect(visible) { fullscreenVisibility.targetState = visible }
                             AnimatedVisibility(
-                                visibleState = transition,
+                                visibleState = fullscreenVisibility,
                                 modifier = bounds.then(modifier)
                                     .dialogInput(properties.dismissOnBackPress, onDismissRequest),
                                 enter = fullscreenEnterTransition(style.animation),
                                 exit = fullscreenExitTransition(style.animation),
                             ) {
+                                val entering = !fullscreenVisibility.isIdle &&
+                                    fullscreenVisibility.targetState
+                                val exiting = !fullscreenVisibility.isIdle &&
+                                    !fullscreenVisibility.targetState
+                                val fullyVisible = fullscreenVisibility.isIdle &&
+                                    fullscreenVisibility.currentState
+                                val applyStatusBarStyle: Boolean
+                                val applyNavigationBarStyle: Boolean
+                                // Vertical slides switch the edge-adjacent bar before the opposite bar.
+                                when (val animation = style.animation) {
+                                    StyledDialog.FullscreenAnimation.Fade -> {
+                                        applyStatusBarStyle = fullyVisible
+                                        applyNavigationBarStyle = fullyVisible
+                                    }
+                                    is StyledDialog.FullscreenAnimation.Slide -> when (animation.direction) {
+                                        StyledDialog.FullscreenAnimation.SlideDirection.FromTop -> {
+                                            applyStatusBarStyle = entering || fullyVisible
+                                            applyNavigationBarStyle = exiting || fullyVisible
+                                        }
+                                        StyledDialog.FullscreenAnimation.SlideDirection.FromBottom -> {
+                                            applyStatusBarStyle = exiting || fullyVisible
+                                            applyNavigationBarStyle = entering || fullyVisible
+                                        }
+                                        StyledDialog.FullscreenAnimation.SlideDirection.FromLeft,
+                                        StyledDialog.FullscreenAnimation.SlideDirection.FromRight -> {
+                                            applyStatusBarStyle = fullyVisible
+                                            applyNavigationBarStyle = fullyVisible
+                                        }
+                                    }
+                                }
                                 Fullscreen(
                                     Modifier.fillMaxSize(), shape, title, buttons, content,
                                     edgeToEdge = true,
                                     expandableHeader = style.expandableHeader,
+                                    applyStatusBarStyle = applyStatusBarStyle,
+                                    applyNavigationBarStyle = applyNavigationBarStyle,
                                 )
                             }
                         } else {
@@ -361,11 +395,12 @@ abstract class FoundationDialog : StyledDialog.Implementation {
         onToggleExpanded: () -> Unit = {},
         animateBounds: Boolean = false,
         expandableHeader: StyledDialog.Style.Fullscreen.ExpandableHeader? = null,
+        applyStatusBarStyle: Boolean = true,
+        applyNavigationBarStyle: Boolean = true,
     ) {
         val expandableHeaderEnabled = expandableHeader != null && title != null
         val expandableHeaderBehavior = rememberStyledExpandableTopBarScrollBehavior()
-        val headerContainerColor =
-            expandableHeader?.containerColor ?: StyledTheme.colorScheme.surface
+        val headerContainerColor = expandableHeader?.containerColor ?: fullscreenContainerColor
         val headerContentColor = expandableHeader?.contentColor
             ?: StyledTheme.contentColorFor(headerContainerColor)
         val expandedHeaderContainerColor =
@@ -386,11 +421,12 @@ abstract class FoundationDialog : StyledDialog.Implementation {
         } else buttons
         if (edgeToEdge) {
             SystemBarStyleEffect(
-                statusBar = systemBarIconStyleFor(
-                    statusBarContainerColor,
-                    StyledTheme.colorScheme.background,
-                ),
-                navigationBar = systemBarIconStyleFor(containerColor, StyledTheme.colorScheme.background),
+                statusBar = if (applyStatusBarStyle) {
+                    systemBarIconStyleFor(statusBarContainerColor, StyledTheme.colorScheme.background)
+                } else null,
+                navigationBar = if (applyNavigationBarStyle) {
+                    systemBarIconStyleFor(fullscreenContainerColor, StyledTheme.colorScheme.background)
+                } else null,
             )
         }
         StyledSurface(
@@ -398,7 +434,7 @@ abstract class FoundationDialog : StyledDialog.Implementation {
                 animationSpec = tween(DIALOG_VISIBILITY_ANIMATION_DURATION_MILLIS),
             ).then(modifier) else modifier,
             shape = if (expanded) RectangleShape else shape,
-            color = containerColor,
+            color = fullscreenContainerColor,
         ) {
             Column(
                 Modifier.fillMaxSize().then(

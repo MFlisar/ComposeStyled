@@ -81,6 +81,15 @@ actual fun SystemBarStyleEffect(
     val window = (view.parent as? DialogWindowProvider)?.window
         ?: LocalContext.current.findActivity()?.window
     val decorView = window?.decorView
+    val baselineSystemUiMask =
+        android.view.View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or
+            android.view.View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+    val baselineAppearanceMask = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS or
+            android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS
+    } else {
+        0
+    }
     val legacySystemUiMask = buildList {
         if (statusBar != null) add(android.view.View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR)
         if (navigationBar != null) add(android.view.View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR)
@@ -93,12 +102,12 @@ actual fun SystemBarStyleEffect(
     } else {
         0
     }
-    val baselineSystemUiFlags = remember(window, legacySystemUiMask) {
-        decorView?.systemUiVisibility?.and(legacySystemUiMask) ?: 0
+    val baselineSystemUiFlags = remember(window) {
+        decorView?.systemUiVisibility?.and(baselineSystemUiMask) ?: 0
     }
-    val baselineAppearance = remember(window, appearanceMask) {
+    val baselineAppearance = remember(window) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && window != null) {
-            window.insetsController?.systemBarsAppearance?.and(appearanceMask) ?: 0
+            window.insetsController?.systemBarsAppearance?.and(baselineAppearanceMask) ?: 0
         } else {
             0
         }

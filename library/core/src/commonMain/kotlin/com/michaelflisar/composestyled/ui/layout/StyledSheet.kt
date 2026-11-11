@@ -13,17 +13,20 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -48,74 +51,84 @@ import com.michaelflisar.composestyled.ui.components.StyledSurfaceDefaults
 import com.michaelflisar.composestyled.ui.internal.dialogInput
 import kotlin.math.roundToInt
 
-object StyledSideSheet {
+object StyledSheet {
 
-    enum class Side { Start, End }
+    enum class Edge { Start, End, Top, Bottom }
 
-    sealed interface Width {
+    enum class Value { Collapsed, Expanded }
+
+    sealed interface Size {
         @Immutable
-        data class Fixed(val value: Dp) : Width {
+        data class Fixed(val value: Dp) : Size {
             init {
                 require(value.value.isFinite() && value > 0.dp) {
-                    "Side sheet width must be finite and greater than zero"
+                    "Sheet size must be finite and greater than zero"
                 }
             }
         }
 
         @Immutable
-        data class Fraction(val value: Float) : Width {
+        data class Fraction(val value: Float) : Size {
             init {
                 require(value.isFinite() && value > 0f && value <= 1f) {
-                    "Side sheet width fraction must be greater than zero and at most one"
+                    "Sheet size fraction must be greater than zero and at most one"
                 }
             }
         }
     }
 }
 
+@Stable
+class StyledSheetState internal constructor(initialValue: StyledSheet.Value) {
+
+    var currentValue by mutableStateOf(initialValue)
+        private set
+
+    private val mutableProgress = mutableStateOf(
+        if (initialValue == StyledSheet.Value.Expanded) 1f else 0f,
+    )
+    val progress: Float get() = mutableProgress.value
+
+    internal val progressState: MutableState<Float> get() = mutableProgress
+
+    fun expand() = set(StyledSheet.Value.Expanded)
+
+    fun collapse() = set(StyledSheet.Value.Collapsed)
+
+    fun set(value: StyledSheet.Value) {
+        currentValue = value
+    }
+
+    companion object {
+        val Saver: Saver<StyledSheetState, Boolean> = Saver(
+            save = { it.currentValue == StyledSheet.Value.Expanded },
+            restore = {
+                StyledSheetState(
+                    if (it) StyledSheet.Value.Expanded else StyledSheet.Value.Collapsed,
+                )
+            },
+        )
+    }
+}
+
+@Composable
+fun rememberStyledSheetState(
+    initialValue: StyledSheet.Value = StyledSheet.Value.Collapsed,
+): StyledSheetState = rememberSaveable(saver = StyledSheetState.Saver) {
+    StyledSheetState(initialValue)
+}
+
 /**
- * Shows a modal side sheet over the surrounding content. The default state is saveable and starts
- * collapsed; swipe inward from the selected edge to open it.
+ * Shows a modal sheet over the surrounding content. Use [rememberStyledSheetState] for saveable
+ * state; it starts collapsed and can also be opened by swiping inward from the selected edge.
  */
 @Composable
-fun StyledSideSheet(
-    expanded: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
+fun StyledSheet(
+    state: StyledSheetState = rememberStyledSheetState(),
     modifier: Modifier = Modifier,
-    side: StyledSideSheet.Side = StyledSideSheet.Side.Start,
-    expandedWidth: StyledSideSheet.Width = StyledSideSheet.Width.Fraction(0.8f),
-    triggerWidth: Dp = 24.dp,
-    gesturesEnabled: Boolean = true,
-    shape: Shape = StyledSurfaceDefaults.shape,
-    containerColor: Color = StyledTheme.colorScheme.surface,
-    contentColor: Color = StyledTheme.contentColorFor(containerColor),
-    scrimColor: Color = Color.Black.copy(alpha = 0.32f),
-    shadowElevation: Dp = 8.dp,
-    content: @Composable ColumnScope.() -> Unit,
-) = StyledSideSheet(
-    expanded = expanded.value,
-    onExpandedChange = { expanded.value = it },
-    modifier = modifier,
-    side = side,
-    expandedWidth = expandedWidth,
-    triggerWidth = triggerWidth,
-    gesturesEnabled = gesturesEnabled,
-    shape = shape,
-    containerColor = containerColor,
-    contentColor = contentColor,
-    scrimColor = scrimColor,
-    shadowElevation = shadowElevation,
-    content = content,
-)
-
-/** Controlled side-sheet state overload. */
-@Composable
-fun StyledSideSheet(
-    expanded: Boolean,
-    onExpandedChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier,
-    side: StyledSideSheet.Side = StyledSideSheet.Side.Start,
-    expandedWidth: StyledSideSheet.Width = StyledSideSheet.Width.Fraction(0.8f),
-    triggerWidth: Dp = 32.dp,
+    edge: StyledSheet.Edge = StyledSheet.Edge.Start,
+    expandedSize: StyledSheet.Size = StyledSheet.Size.Fraction(0.8f),
+    triggerSize: Dp = 24.dp,
     gesturesEnabled: Boolean = true,
     shape: Shape = StyledSurfaceDefaults.shape,
     containerColor: Color = StyledTheme.colorScheme.surface,
@@ -124,22 +137,28 @@ fun StyledSideSheet(
     shadowElevation: Dp = 8.dp,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    require(triggerWidth.value.isFinite() && triggerWidth >= 0.dp) {
-        "Side sheet trigger width must be finite and non-negative"
+    require(triggerSize.value.isFinite() && triggerSize >= 0.dp) {
+        "Sheet trigger size must be finite and non-negative"
     }
-    SideSheetLayout(
+    val expanded = state.currentValue == StyledSheet.Value.Expanded
+    SheetLayout(
         expanded = expanded,
-        onExpandedChange = onExpandedChange,
+        onExpandedChange = { value ->
+            state.set(
+                if (value) StyledSheet.Value.Expanded else StyledSheet.Value.Collapsed,
+            )
+        },
         modifier = modifier,
-        side = side,
-        expandedWidth = expandedWidth,
-        triggerWidth = triggerWidth,
+        edge = edge,
+        expandedSize = expandedSize,
+        triggerSize = triggerSize,
         gesturesEnabled = gesturesEnabled,
         shape = shape,
         containerColor = containerColor,
         contentColor = contentColor,
         scrimColor = scrimColor,
         shadowElevation = shadowElevation,
+        state = state,
         content = content,
     )
 }
@@ -149,19 +168,20 @@ fun StyledSideSheet(
     InternalComposeStyledApi::class,
 )
 @Composable
-private fun SideSheetLayout(
+private fun SheetLayout(
     expanded: Boolean,
     onExpandedChange: (Boolean) -> Unit,
     modifier: Modifier,
-    side: StyledSideSheet.Side,
-    expandedWidth: StyledSideSheet.Width,
-    triggerWidth: Dp,
+    edge: StyledSheet.Edge,
+    expandedSize: StyledSheet.Size,
+    triggerSize: Dp,
     gesturesEnabled: Boolean,
     shape: Shape,
     containerColor: Color,
     contentColor: Color,
     scrimColor: Color,
     shadowElevation: Dp,
+    state: StyledSheetState,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     BackHandler(enabled = expanded) { onExpandedChange(false) }
@@ -176,29 +196,40 @@ private fun SideSheetLayout(
     }
     BoxWithConstraints(modifier.then(inputModifier).fillMaxSize()) {
         require(constraints.hasBoundedWidth && constraints.hasBoundedHeight) {
-            "StyledSideSheet requires a bounded width and height"
+            "StyledSheet requires a bounded width and height"
         }
-        if (maxWidth == 0.dp) return@BoxWithConstraints
+        if (maxWidth == 0.dp || maxHeight == 0.dp) return@BoxWithConstraints
         val density = LocalDensity.current
         val layoutDirection = LocalLayoutDirection.current
-        val sheetWidth = when (expandedWidth) {
-            is StyledSideSheet.Width.Fixed -> minOf(expandedWidth.value, maxWidth)
-            is StyledSideSheet.Width.Fraction -> maxWidth * expandedWidth.value
+        val isHorizontal = edge == StyledSheet.Edge.Start || edge == StyledSheet.Edge.End
+        val availableSize = if (isHorizontal) maxWidth else maxHeight
+        val sheetSize = when (expandedSize) {
+            is StyledSheet.Size.Fixed -> minOf(expandedSize.value, availableSize)
+            is StyledSheet.Size.Fraction -> availableSize * expandedSize.value
         }
-        val widthPx = with(density) { sheetWidth.toPx() }
+        val sizePx = with(density) { sheetSize.toPx() }
         val velocityThreshold = with(density) { 400.dp.toPx() }
-        val openDirection = when (side) {
-            StyledSideSheet.Side.Start ->
+        val openDirection = when (edge) {
+            StyledSheet.Edge.Start ->
                 if (layoutDirection == LayoutDirection.Ltr) 1f else -1f
 
-            StyledSideSheet.Side.End ->
+            StyledSheet.Edge.End ->
                 if (layoutDirection == LayoutDirection.Ltr) -1f else 1f
+
+            StyledSheet.Edge.Top -> 1f
+            StyledSheet.Edge.Bottom -> -1f
         }
-        val alignment = when (side) {
-            StyledSideSheet.Side.Start -> Alignment.CenterStart
-            StyledSideSheet.Side.End -> Alignment.CenterEnd
+        val alignment = when (edge) {
+            StyledSheet.Edge.Start ->
+                if (layoutDirection == LayoutDirection.Ltr) Alignment.CenterStart else Alignment.CenterEnd
+
+            StyledSheet.Edge.End ->
+                if (layoutDirection == LayoutDirection.Ltr) Alignment.CenterEnd else Alignment.CenterStart
+
+            StyledSheet.Edge.Top -> Alignment.TopCenter
+            StyledSheet.Edge.Bottom -> Alignment.BottomCenter
         }
-        var progress by remember { mutableFloatStateOf(if (expanded) 1f else 0f) }
+        var progress by state.progressState
         var dragging by remember { mutableStateOf(false) }
         var edgeDragging by remember { mutableStateOf(false) }
 
@@ -213,7 +244,7 @@ private fun SideSheetLayout(
         }
 
         val dragState = rememberDraggableState { delta ->
-            progress = (progress + delta * openDirection / widthPx).coerceIn(0f, 1f)
+            progress = (progress + delta * openDirection / sizePx).coerceIn(0f, 1f)
         }
 
         fun settleDrag(velocity: Float) {
@@ -228,14 +259,14 @@ private fun SideSheetLayout(
 
         val dragModifier = Modifier.draggable(
             state = dragState,
-            orientation = Orientation.Horizontal,
+            orientation = if (isHorizontal) Orientation.Horizontal else Orientation.Vertical,
             enabled = gesturesEnabled,
             onDragStarted = { dragging = true },
             onDragStopped = { settleDrag(it) },
         )
         val edgeDragModifier = Modifier.draggable(
             state = dragState,
-            orientation = Orientation.Horizontal,
+            orientation = if (isHorizontal) Orientation.Horizontal else Orientation.Vertical,
             enabled = gesturesEnabled,
             onDragStarted = {
                 dragging = true
@@ -266,16 +297,18 @@ private fun SideSheetLayout(
         }
 
         if (progress > 0f || expanded) {
+            val sheetSizeModifier = if (isHorizontal) {
+                Modifier.width(sheetSize).fillMaxHeight()
+            } else {
+                Modifier.fillMaxWidth().height(sheetSize)
+            }
             StyledSurface(
                 modifier = Modifier
                     .align(alignment)
-                    .width(sheetWidth)
-                    .fillMaxHeight()
+                    .then(sheetSizeModifier)
                     .offset {
-                        IntOffset(
-                            x = (-openDirection * widthPx * (1f - progress)).roundToInt(),
-                            y = 0,
-                        )
+                        val offset = (-openDirection * sizePx * (1f - progress)).roundToInt()
+                        if (isHorizontal) IntOffset(x = offset, y = 0) else IntOffset(x = 0, y = offset)
                     }
                     .zIndex(2f)
                     .then(dragModifier)
@@ -297,13 +330,17 @@ private fun SideSheetLayout(
         }
 
         if (!expanded && (progress == 0f || edgeDragging) &&
-            gesturesEnabled && triggerWidth > 0.dp
+            gesturesEnabled && triggerSize > 0.dp
         ) {
+            val triggerModifier = if (isHorizontal) {
+                Modifier.width(minOf(triggerSize, maxWidth)).fillMaxHeight()
+            } else {
+                Modifier.fillMaxWidth().height(minOf(triggerSize, maxHeight))
+            }
             Box(
                 Modifier
                     .align(alignment)
-                    .width(minOf(triggerWidth, maxWidth))
-                    .fillMaxHeight()
+                    .then(triggerModifier)
                     .zIndex(3f)
                     .then(edgeDragModifier)
                     .semantics {

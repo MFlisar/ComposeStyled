@@ -592,46 +592,6 @@ class DialogButtonTest(private val theme: Int) {
             }
         }
 
-        @Test
-        fun expandableFullscreenTitleUsesHeaderContentColor() = runDesktopComposeUiTest(
-            width = 1000, height = 800,
-        ) {
-            var titleStyleColor by mutableStateOf(Color.Unspecified)
-            var titleContentColor by mutableStateOf(Color.Unspecified)
-            var expectedContentColor by mutableStateOf(Color.Unspecified)
-            setContent {
-                val baseTypography = PlatformDefaults.typography(Platform.JvmWindows)
-                val typography = baseTypography.copy(
-                    headlineMedium = baseTypography.headlineMedium.copy(color = Color.Red),
-                )
-                Theme(typography = typography) {
-                    val headerContentColor = StyledTheme.contentColorFor(StyledTheme.colorScheme.surface)
-                    SideEffect { expectedContentColor = headerContentColor }
-                    StyledDialog(
-                        state = dialogStateOf(true),
-                        style = StyledDialog.Style.Fullscreen(
-                            expandableHeader = StyledDialog.Style.Fullscreen.ExpandableHeader(),
-                        ),
-                        title = {
-                            val styleColor = LocalStyledTextStyle.current.color
-                            val contentColor = LocalStyledContentColor.current
-                            SideEffect {
-                                titleStyleColor = styleColor
-                                titleContentColor = contentColor
-                            }
-                            StyledText("Expandable title")
-                        },
-                    ) { StyledText("Body") }
-                }
-            }
-
-            onNodeWithText("Expandable title").assertIsDisplayed()
-            runOnIdle {
-                assertEquals(expectedContentColor, titleContentColor)
-                assertEquals(expectedContentColor, titleStyleColor)
-            }
-        }
-
         val iconNode = onNodeWithTag("fullscreen toolbar icon", useUnmergedTree = true)
         iconNode.assertIsDisplayed()
         val icon = iconNode.captureToImage().toPixelMap()
@@ -640,6 +600,72 @@ class DialogButtonTest(private val theme: Int) {
                 titleContentColor,
                 icon[icon.width / 2, icon.height / 2],
             )
+        }
+    }
+
+    @Test
+    fun expandableFullscreenTitleUsesHeaderContentColor() = runDesktopComposeUiTest(
+        width = 1000, height = 800,
+    ) {
+        var titleStyleColor by mutableStateOf(Color.Unspecified)
+        var titleContentColor by mutableStateOf(Color.Unspecified)
+        var expectedContentColor by mutableStateOf(Color.Unspecified)
+        setContent {
+            val baseTypography = PlatformDefaults.typography(Platform.JvmWindows)
+            val typography = baseTypography.copy(
+                headlineMedium = baseTypography.headlineMedium.copy(color = Color.Red),
+            )
+            Theme(typography = typography) {
+                val headerContentColor = StyledTheme.contentColorFor(StyledTheme.colorScheme.surface)
+                SideEffect { expectedContentColor = headerContentColor }
+                StyledDialog(
+                    state = dialogStateOf(true),
+                    style = StyledDialog.Style.Fullscreen(
+                        expandableHeader = StyledDialog.Style.Fullscreen.ExpandableHeader(),
+                    ),
+                    title = {
+                        val styleColor = LocalStyledTextStyle.current.color
+                        val contentColor = LocalStyledContentColor.current
+                        SideEffect {
+                            titleStyleColor = styleColor
+                            titleContentColor = contentColor
+                        }
+                        StyledText("Expandable title")
+                    },
+                ) { StyledText("Body") }
+            }
+        }
+
+        onNodeWithText("Expandable title").assertIsDisplayed()
+        runOnIdle {
+            assertEquals(expectedContentColor, titleContentColor)
+            assertEquals(expectedContentColor, titleStyleColor)
+        }
+    }
+
+    @Test
+    fun expandableFullscreenHeaderMatchesDialogContainerByDefault() = runDesktopComposeUiTest(
+        width = 1000, height = 800,
+    ) {
+        var expectedContainerColor by mutableStateOf(Color.Unspecified)
+        setContent {
+            Theme {
+                SideEffect { expectedContainerColor = StyledTheme.colorScheme.surface }
+                StyledDialog(
+                    state = dialogStateOf(true),
+                    modifier = Modifier.testTag("fullscreen dialog"),
+                    style = StyledDialog.Style.Fullscreen(
+                        expandableHeader = StyledDialog.Style.Fullscreen.ExpandableHeader(),
+                    ),
+                    title = { StyledText("Expandable title") },
+                ) {}
+            }
+        }
+
+        val dialog = onNodeWithTag("fullscreen dialog").captureToImage().toPixelMap()
+        runOnIdle {
+            assertEquals(expectedContainerColor, dialog[dialog.width / 2, 16])
+            assertEquals(expectedContainerColor, dialog[dialog.width / 2, dialog.height - 16])
         }
     }
 

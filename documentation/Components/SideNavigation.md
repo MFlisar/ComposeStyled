@@ -3,7 +3,7 @@
 `StyledSideNavigation` replaces the former rail API. It supports compact
 icon-oriented navigation and expanded sidebar rows across all themes.
 For a temporary, edge-revealed overlay rather than persistent navigation, see
-[Side sheet](SideSheet.md).
+[sheet](Sheet.md).
 
 ```kotlin
 val expanded = rememberSaveable { mutableStateOf(false) }

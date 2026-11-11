@@ -51,6 +51,8 @@ class Material3Dialog internal constructor(
         @Composable get() = MaterialTheme.typography.headlineSmall
     override val containerColor
         @Composable get() = MaterialTheme.colorScheme.surfaceContainerHigh
+    override val fullscreenContainerColor
+        @Composable get() = StyledTheme.colorScheme.surface
 
     companion object {
 

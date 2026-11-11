@@ -97,7 +97,12 @@ default is `FromRight`.
 All modal styles, including fullscreen, use the platform's Compose `Dialog`.
 Fullscreen requests a transparent scrim while remaining modal; other modal
 styles use the platform's default scrim. Fullscreen's fade or slide animation
-applies to its content. Nested modal styles use the same dialog path.
+applies to its content. System-bar icon styling follows the transition: for a
+fade or horizontal slide, it changes after the dialog is fully visible and
+restores when dismissal starts. For vertical slides, the bar at the entering
+edge changes as the dialog arrives, while the opposite bar changes when the
+transition completes; dismissal reverses that timing. Nested modal styles use
+the same dialog path.
 
 Fullscreen dialogs can opt into a scroll-driven expandable header:
 
@@ -116,8 +121,10 @@ regular top bar and window insets; when omitted, it uses the expandable top bar'
 natural title-and-padding size. The dialog connects the header to nested scroll
 from its body. The body must contain scrollable content to collapse or expand
 the header. `containerColor` and `contentColor` configure the collapsed header;
-by default, the background uses the theme surface and the content color is
-derived from it. `expandedContainerColor` and `expandedContentColor` optionally
+by default, its background matches the dialog container and the content color is
+derived from it. Fullscreen dialog content uses the theme's `surface` role by
+default; the Material 3 renderer retains `surfaceContainerHigh` for other
+dialog styles. `expandedContainerColor` and `expandedContentColor` optionally
 override those colors while expanded; otherwise, the collapsed colors are used.
 When an expanded background is provided without an expanded content color, the
 content color is derived from that background. If `title` is `null`, the regular

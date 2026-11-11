@@ -254,7 +254,7 @@ fun createDemoAreas(
                             { showSnackbarWithUndo("Changes saved") })
                     },
                     { baseId, expandState ->
-                        com.michaelflisar.demo.demos.showcase.areas.DemoSideSheet(
+                        com.michaelflisar.demo.demos.showcase.areas.DemoSheet(
                             baseId,
                             expandState
                         )

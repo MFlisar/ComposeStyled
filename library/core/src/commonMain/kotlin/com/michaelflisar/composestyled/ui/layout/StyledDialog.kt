@@ -104,7 +104,7 @@ object StyledDialog {
                  * Null derives the height from the expanded title and its default padding.
                  */
                 val expandedHeight: Dp? = null,
-                /** Background color while the header is collapsed; null uses the theme surface. */
+                /** Background color while the header is collapsed; null uses the dialog container color. */
                 val containerColor: Color? = null,
                 /** Content color while the header is collapsed; null derives it from [containerColor]. */
                 val contentColor: Color? = null,
