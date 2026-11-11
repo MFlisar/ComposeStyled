@@ -75,10 +75,9 @@ the default mapping for styles that should remain unchanged.
 > :warning: Following experimental annotations are used:
 > - **OptIn**
 >   - `` (1x)
->   - `androidx.compose.animation.core.ExperimentalTransitionApi` (1x)
 >   - `androidx.compose.foundation.ExperimentalFoundationApi` (3x)
 >   - `androidx.compose.material3.ExperimentalMaterial3Api` (5x)
->   - `androidx.compose.ui.ExperimentalComposeUiApi` (7x)
+>   - `androidx.compose.ui.ExperimentalComposeUiApi` (9x)
 >   - `dev.chrisbanes.haze.ExperimentalHazeApi` (1x)
 >   - `kotlinx.cinterop.ExperimentalForeignApi` (3x)
 >
