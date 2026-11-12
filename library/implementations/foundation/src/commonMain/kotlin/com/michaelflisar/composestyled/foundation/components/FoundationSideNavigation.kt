@@ -71,7 +71,7 @@ abstract class FoundationSideNavigation(
         showScrollbar: Boolean,
         containerColor: Color,
         contentColor: Color,
-        customization: StyledSideNavigation.Customization?,
+        indicatorTint: Color,
         title: @Composable (() -> Unit)?,
         header: @Composable (() -> Unit)?,
         footer: @Composable (() -> Unit)?,
@@ -80,7 +80,7 @@ abstract class FoundationSideNavigation(
     ) {
         FoundationSideNavigationLayout(
             modifier, mode, expanded, onExpandedChange, scrollable, scrollState, showScrollbar,
-            containerColor, contentColor, customization, title, header, footer, windowInsets,
+            containerColor, contentColor, indicatorTint, title, header, footer, windowInsets,
             toggleIcon = toggleIcon,
             titleStartPadding = itemHorizontalPadding + itemContentPadding + iconColumnWidth,
             toggleIconCenter = itemHorizontalPadding + itemContentPadding + iconColumnWidth / 2,
@@ -115,14 +115,16 @@ abstract class FoundationSideNavigation(
         val hovered by source.collectIsHoveredAsState()
         val keyboardFocus = focused && LocalInputModeManager.current.inputMode == InputMode.Keyboard
         val colors = LocalStyledSelectionColors.current
-        val base = (if (selected) colors?.selectedContentColor else colors?.unselectedContentColor)
-            ?.takeUnless { it == Color.Unspecified }
-            ?: if (selected) StyledTheme.colorScheme.primary else LocalStyledContentColor.current
+        val indicator = colors?.indicatorColor?.takeUnless { it == Color.Unspecified }
+            ?: StyledTheme.colorScheme.primary
+        val base = if (selected && showSelectionBackground) {
+            StyledTheme.contentColorFor(indicator)
+        } else {
+            LocalStyledContentColor.current
+        }
         val foreground = if (enabled) base else base.copy(
             alpha = base.alpha * StyledTheme.colorScheme.disableFactors.content,
         )
-        val indicator = colors?.indicatorColor?.takeUnless { it == Color.Unspecified }
-            ?: StyledTheme.colorScheme.primarySurface
         val shape = RoundedCornerShape(8.dp)
         val selectionBackground = if (selected && showSelectionBackground) {
             if (enabled) indicator else indicator.copy(

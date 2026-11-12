@@ -10,14 +10,11 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.ui.internal.LocalStyledBottomNavigationScrollable
-import com.michaelflisar.composestyled.classes.ColorToken
-import com.michaelflisar.composestyled.classes.asColorToken
 import com.michaelflisar.composestyled.registry.LocalStyledRegistry
 import com.michaelflisar.composestyled.registry.StyledComponent
 import com.michaelflisar.composestyled.registry.StyledKey
@@ -29,19 +26,6 @@ object StyledBottomNavigationBar {
     // -------------
 
     val Key = StyledKey<Implementation>("StyledBottomNavigationBar")
-
-    // -------------
-    // 4) customization
-    // -------------
-
-    @Immutable
-    class Customization internal constructor(
-        val selectedItemIconColor: ColorToken?,
-        val selectedItemTextColor: ColorToken?,
-        val unselectedItemIconColor: ColorToken?,
-        val unselectedItemTextColor: ColorToken?,
-        val selectedItemIndicatorColor: ColorToken?,
-    )
 
     // -------------
     // 5) implementation
@@ -59,7 +43,7 @@ object StyledBottomNavigationBar {
             showScrollbar: Boolean,
             containerColor: Color,
             contentColor: Color,
-            customization: Customization?,
+            indicatorTint: Color,
             windowInsets: WindowInsets,
             content: @Composable RowScope.() -> Unit,
         )
@@ -81,41 +65,6 @@ object StyledBottomNavigationBar {
 }
 
 // -------------------------
-// defaults
-// -------------------------
-
-object StyledBottomNavigationBarDefaults {
-
-    fun customize(
-        selectedItemIconColor: ColorToken,
-        selectedItemTextColor: ColorToken? = null,
-        unselectedItemIconColor: ColorToken? = null,
-        unselectedItemTextColor: ColorToken? = null,
-        selectedItemIndicatorColor: ColorToken? = null,
-    ) = StyledBottomNavigationBar.Customization(
-        selectedItemIconColor,
-        selectedItemTextColor,
-        unselectedItemIconColor,
-        unselectedItemTextColor,
-        selectedItemIndicatorColor,
-    )
-
-    fun customize(
-        selectedItemIconColor: Color,
-        selectedItemTextColor: Color? = null,
-        unselectedItemIconColor: Color? = null,
-        unselectedItemTextColor: Color? = null,
-        selectedItemIndicatorColor: Color? = null,
-    ) = customize(
-        selectedItemIconColor = selectedItemIconColor.asColorToken(),
-        selectedItemTextColor = selectedItemTextColor?.asColorToken(),
-        unselectedItemIconColor = unselectedItemIconColor?.asColorToken(),
-        unselectedItemTextColor = unselectedItemTextColor?.asColorToken(),
-        selectedItemIndicatorColor = selectedItemIndicatorColor?.asColorToken(),
-    )
-}
-
-// -------------------------
 // public API
 // -------------------------
 
@@ -128,10 +77,10 @@ fun StyledBottomNavigationBar(
     showScrollbar: Boolean = StyledTheme.behavior.showScrollbars,
     containerColor: Color = StyledTheme.colorScheme.surfaceVariant,
     contentColor: Color = StyledTheme.contentColorFor(containerColor),
+    indicatorTint: Color = StyledTheme.colorScheme.primary,
     windowInsets: WindowInsets = WindowInsets.safeDrawing.only(
         WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal
     ),
-    customization: StyledBottomNavigationBar.Customization? = null,
     content: @Composable RowScope.() -> Unit,
 ) {
     CompositionLocalProvider(LocalStyledBottomNavigationScrollable provides scrollable) {
@@ -142,7 +91,7 @@ fun StyledBottomNavigationBar(
             showScrollbar = showScrollbar,
             containerColor = containerColor,
             contentColor = contentColor,
-            customization = customization,
+            indicatorTint = indicatorTint,
             windowInsets = windowInsets,
             content = content,
         )
@@ -161,11 +110,11 @@ fun <K> StyledBottomNavigationBar(
     showScrollbar: Boolean = StyledTheme.behavior.showScrollbars,
     containerColor: Color = StyledTheme.colorScheme.surfaceVariant,
     contentColor: Color = StyledTheme.contentColorFor(containerColor),
+    indicatorTint: Color = StyledTheme.colorScheme.primary,
     windowInsets: WindowInsets = WindowInsets.safeDrawing.only(
         WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal
     ),
     alwaysShowLabel: Boolean = true,
-    customization: StyledBottomNavigationBar.Customization? = null,
 ) {
     StyledBottomNavigationBar(
         modifier = modifier,
@@ -174,7 +123,7 @@ fun <K> StyledBottomNavigationBar(
         showScrollbar = showScrollbar,
         containerColor = containerColor,
         contentColor = contentColor,
-        customization = customization,
+        indicatorTint = indicatorTint,
         windowInsets = windowInsets,
     ) {
         items.forEach { item ->

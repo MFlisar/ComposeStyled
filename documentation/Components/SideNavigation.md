@@ -222,14 +222,16 @@ for the current mode. All adaptive APIs are in
 `sideNavigationExpanded`; custom navigation should pass that same state to its
 navigation UI.
 
-## Themes and customization
+## Themes and selection tint
 
-Use `StyledSideNavigationDefaults.customize` for shared selected/unselected
-content colors and the selected indicator. Unspecified values keep renderer
-defaults. Unselected item text and icons inherit the navigation's `contentColor`,
-which defaults to `StyledTheme.contentColorFor(containerColor)`. An explicit
-`unselectedItemContentColor` customization overrides that inherited color;
-selected items retain their renderer's selected colors. Change widths through the registry:
+`containerColor` and `contentColor` control the navigation surface and its
+normal item foreground. `indicatorTint` defaults to
+`StyledTheme.colorScheme.primary` and controls the selected treatment; each
+renderer adapts that tint to its design. Unselected items inherit `contentColor`,
+which defaults to `StyledTheme.contentColorFor(containerColor)`. Change widths
+through the registry. The former `StyledSideNavigation.Customization` and
+`StyledSideNavigationDefaults.customize` API is replaced by `indicatorTint`;
+use `contentColor` for the navigation's normal item foreground:
 
 ```kotlin
 StyledTheme(
@@ -248,13 +250,15 @@ width.
 
 | Theme | Selection treatment |
 |---|---|
-| Material 3 | Native expressive rail item with a pill indicator |
-| Fluent 2 | Rounded accent stroke on the start side of the icon, animated in/out without moving content |
-| Cupertino | Rounded selected-row background in an adaptive sidebar |
+| Material 3 | Native expressive rail item with a tinted pill indicator and contrasting selected content |
+| Fluent 2 | Rounded `indicatorTint` stroke on the start side of the icon, animated in/out without moving content |
+| Cupertino | Rounded `indicatorTint` selected-row background with contrasting selected content |
 
-`selectedItemIndicatorColor` customizes the corresponding pill, stroke or row
-background. Fluent 2 retains separate hover, press and keyboard-focus feedback.
-Its compact icon-only mode is a library adaptation; the Fluent Web Nav guidance
+For Fluent 2, the selected item keeps the navigation's `contentColor`; the
+separate start-side stroke communicates selection. Material 3 and Cupertino use
+the tint as a filled selection surface and derive selected content contrast from
+it. Fluent 2 retains separate hover, press and keyboard-focus feedback. Its
+compact icon-only mode is a library adaptation; the Fluent Web Nav guidance
 does not define an icon-only layout.
 
 Cupertino and Fluent 2 use theme-owned adapters over a shared Foundation
@@ -279,7 +283,8 @@ The default toggle has changed from an arrow to a menu icon. Use the slot above
 to restore a progress-driven arrow or another custom presentation.
 
 Custom side-navigation renderers must forward `windowInsets` and the new
-`toggleIcon` argument from `StyledSideNavigation.Implementation.Render`.
+`toggleIcon` and `indicatorTint` arguments from
+`StyledSideNavigation.Implementation.Render`.
 When using `FoundationSideNavigationLayout`, pass `onExpandedChange` and
 `toggleIcon`; the frame supplies the button and constructs the slot state from
 its actual width animation.

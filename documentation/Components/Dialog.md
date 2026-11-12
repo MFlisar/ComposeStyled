@@ -134,14 +134,12 @@ Bottom sheets slide up when shown. Button, back and outside dismissals slide
 down; a swipe-to-dismiss uses the drag motion itself and does not replay a
 second exit animation.
 
-Toolbar dialogs can opt into `expandToFullscreen`. The toolbar then offers an
-Expand action; double-clicking its title toggles between the bounded and
-fullscreen workspaces. In fullscreen, no extra Restore button is shown; the
-title double-click and its accessibility custom action restore the bounded
-layout. Expansion animates the workspace bounds, switches to edge-to-edge
-layout, and updates system-bar icon contrast. The option defaults to `false`.
-If no title is provided, a Restore action is shown because there is no title
-area to use for the double-click gesture.
+Toolbar dialogs can opt into `expandToFullscreen`. Drag the toolbar upward to
+expand the workspace edge-to-edge, or downward to restore its bounded layout.
+The workspace bounds follow the drag continuously; on release, drag distance
+and velocity determine which layout it settles into. System-bar icon contrast
+updates at the fullscreen endpoint. Assistive technology can use the toolbar's
+expand/restore custom action. The option defaults to `false`.
 
 ### Floating windows
 
@@ -526,6 +524,7 @@ val sheetStyle = StyledDialog.Style.BottomSheet(
         expandToFullscreen = true,
         gesturesEnabled = true,
         dismissOnSwipe = true,
+        dismissOnSwipeOnlyWhenContentAtTop = true,
         initiallyExpanded = false,
         peekHeightFraction = 0.5f,
     ),
@@ -560,13 +559,23 @@ Larger sheets snap between peek and expanded positions. Downward swipes may
 dismiss independently of Back/outside-click policy. Nested scrolling expands
 the sheet before upward body scrolling; downward scrolling reaches the body's
 start before moving the sheet.
+With `dismissOnSwipeOnlyWhenContentAtTop = true`, a dismissal swipe must begin
+with the body already at its top and the sheet at peek. Swiping from fullscreen
+or expanded returns the sheet to peek first; a separate downward swipe can then
+dismiss it. A fling that scrolls a list to its top cannot also dismiss the sheet.
+Set the option to `false` to allow a single swipe to dismiss from any sheet
+position or after scrolling the body. If the sheet has no distinct peek position,
+a swipe from its expanded position can still dismiss it.
 Clicking the drag handle toggles between peek and expanded positions when gestures
-are enabled and these positions differ; it does not dismiss the sheet.
+are enabled and these positions differ; only its centered tap target is clickable,
+with no visual press indication. It does not dismiss the sheet.
 `expandToFullscreen` makes the expanded position fill the sheet viewport (the
 dialog window for modal sheets). The expanded height takes precedence over
 `maxHeightFraction`. The sheet animates its handle/title into a safe-area-aware
 top bar; themes that place fullscreen actions in the toolbar move
 positive/negative actions there while neutral actions remain in the footer.
+The toolbar background matches the sheet content, and its content color is
+derived from that background, just like the fullscreen dialog toolbar.
 The option defaults to `false`.
 
 With `fixedButtons = true`, the opaque, shadowless footer is a separate overlay anchored to

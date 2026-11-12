@@ -1,5 +1,7 @@
 package com.michaelflisar.composestyled.foundation.components
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -15,6 +17,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.padding
@@ -42,17 +45,23 @@ import com.michaelflisar.composestyled.UpdateStyledThemeLocals
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.tokens.LocalStyledContentColor
 import com.michaelflisar.composestyled.ui.components.StyledBottomNavigationBar
-import com.michaelflisar.composestyled.ui.internal.LocalStyledBottomNavigationColors
-import com.michaelflisar.composestyled.ui.internal.StyledBottomNavigationColors
+import com.michaelflisar.composestyled.ui.internal.LocalStyledBottomNavigationIndicatorTint
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.ui.layout.StyledHorizontalScrollContainer
 
 @InternalComposeStyledApi
 class FoundationBottomNavigationBar(
     private val minimumHeight: Dp,
-    private val showIndicator: Boolean = true,
+    private val indicatorStyle: IndicatorStyle = IndicatorStyle.Background,
     private val addVerticalContentPadding: Boolean = true,
 ) : StyledBottomNavigationBar.Implementation {
+
+    @InternalComposeStyledApi
+    enum class IndicatorStyle {
+        Background,
+        Bottom,
+        None,
+    }
 
     @Composable
     override fun Render(
@@ -62,7 +71,7 @@ class FoundationBottomNavigationBar(
         showScrollbar: Boolean,
         containerColor: Color,
         contentColor: Color,
-        customization: StyledBottomNavigationBar.Customization?,
+        indicatorTint: Color,
         windowInsets: WindowInsets,
         content: @Composable RowScope.() -> Unit,
     ) {
@@ -71,31 +80,15 @@ class FoundationBottomNavigationBar(
         } else {
             contentColor
         }
+        val resolvedIndicatorTint = indicatorTint.takeUnless { it == Color.Unspecified }
+            ?: StyledTheme.colorScheme.primary
         UpdateStyledThemeLocals(
             contentColor = resolvedContentColor,
             textStyle = StyledTheme.typography.labelLarge,
         ) {
-            val selectedItemIcon = customization?.selectedItemIconColor?.resolve()
-            val selectedItemText = customization?.selectedItemTextColor?.resolve()
-            val unselectedItemIcon = customization?.unselectedItemIconColor?.resolve()
-            val unselectedItemText = customization?.unselectedItemTextColor?.resolve()
-            val selectedItemIndicator = customization?.selectedItemIndicatorColor?.resolve()
-            val selectionColors = remember(
-                selectedItemIcon,
-                selectedItemText,
-                unselectedItemIcon,
-                unselectedItemText,
-                selectedItemIndicator,
+            CompositionLocalProvider(
+                LocalStyledBottomNavigationIndicatorTint provides resolvedIndicatorTint,
             ) {
-                StyledBottomNavigationColors(
-                    selectedIconColor = selectedItemIcon,
-                    selectedTextColor = selectedItemText,
-                    unselectedIconColor = unselectedItemIcon,
-                    unselectedTextColor = unselectedItemText,
-                    indicatorColor = selectedItemIndicator,
-                )
-            }
-            CompositionLocalProvider(LocalStyledBottomNavigationColors provides selectionColors) {
                 val items: @Composable () -> Unit = {
                     val verticalContentPadding = if (addVerticalContentPadding) {
                         StyledTheme.padding.small
@@ -164,30 +157,31 @@ class FoundationBottomNavigationBar(
         val pressed by source.collectIsPressedAsState()
         val keyboardFocus = enabled && focused &&
             LocalInputModeManager.current.inputMode == InputMode.Keyboard
-        val selectionColors = LocalStyledBottomNavigationColors.current
         val barContentColor = LocalStyledContentColor.current
-        val resolvedIndicatorColor =
-            selectionColors?.indicatorColor
-                ?.takeUnless { it == Color.Unspecified }
-                ?: StyledTheme.colorScheme.primarySurface
-        val baseIconColor = if (selected) {
-            selectionColors?.selectedIconColor
-                ?.takeUnless { it == Color.Unspecified }
-                ?: if (showIndicator) StyledTheme.contentColorFor(resolvedIndicatorColor)
-                else StyledTheme.colorScheme.primary
+        val indicatorTint = LocalStyledBottomNavigationIndicatorTint.current
+            .takeUnless { it == Color.Unspecified }
+            ?: StyledTheme.colorScheme.primary
+        val indicatorColor = if (enabled) indicatorTint else indicatorTint.copy(
+            alpha = indicatorTint.alpha * StyledTheme.colorScheme.disableFactors.default,
+        )
+        val bottomIndicatorProgress = if (indicatorStyle == IndicatorStyle.Bottom) {
+            animateFloatAsState(
+                targetValue = if (selected) 1f else 0f,
+                animationSpec = tween(160),
+            ).value
         } else {
-            selectionColors?.unselectedIconColor
-                ?.takeUnless { it == Color.Unspecified }
-                ?: barContentColor
+            0f
         }
-        val baseTextColor = if (selected) {
-            selectionColors?.selectedTextColor
-                ?.takeUnless { it == Color.Unspecified }
-                ?: if (showIndicator) barContentColor else StyledTheme.colorScheme.primary
+        val baseIconColor = when {
+            selected && indicatorStyle == IndicatorStyle.Background ->
+                StyledTheme.contentColorFor(indicatorTint)
+            selected && indicatorStyle == IndicatorStyle.None -> indicatorTint
+            else -> barContentColor
+        }
+        val baseTextColor = if (selected && indicatorStyle == IndicatorStyle.None) {
+            indicatorTint
         } else {
-            selectionColors?.unselectedTextColor
-                ?.takeUnless { it == Color.Unspecified }
-                ?: barContentColor
+            barContentColor
         }
         val iconColor = if (enabled) baseIconColor else baseIconColor.copy(
             alpha = baseIconColor.alpha * StyledTheme.colorScheme.disableFactors.content
@@ -200,67 +194,94 @@ class FoundationBottomNavigationBar(
             contentColor = textColor,
             textStyle = StyledTheme.typography.labelMedium,
         ) {
-            with(rowScope) {
-                Column(
-                    modifier = modifier
-                        .weight(1f)
-                        .sizeIn(
-                            minWidth = StyledTheme.sizes.minimumInteractiveSize,
-                            minHeight = maxOf(minimumHeight, StyledTheme.sizes.minimumInteractiveSize),
-                        )
-                        .clip(shape)
-                        .selectable(
-                            selected = selected,
-                            enabled = enabled,
-                            role = Role.Tab,
-                            interactionSource = source,
-                            indication = null,
-                            onClick = onClick,
-                        )
-                        .then(
-                            if (keyboardFocus) Modifier.border(2.dp, textColor, shape) else Modifier
-                        )
-                        .background(
-                            if (enabled && pressed) baseTextColor.copy(alpha = 0.12f) else Color.Transparent
-                        )
-                        .padding(StyledTheme.padding.small),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(
-                        StyledTheme.spacing.small, Alignment.CenterVertically,
-                    ),
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .background(
-                                if (selected && showIndicator) {
-                                    if (enabled) resolvedIndicatorColor else resolvedIndicatorColor.copy(
-                                        alpha = resolvedIndicatorColor.alpha * StyledTheme.colorScheme.disableFactors.default
-                                    )
-                                } else Color.Transparent,
-                                shape,
-                            )
+            @Composable
+            fun itemContent(modifier: Modifier) {
+                Box(modifier, contentAlignment = Alignment.Center) {
+                    Column(
+                        Modifier
+                            .fillMaxWidth()
                             .padding(
-                                horizontal = StyledTheme.padding.medium,
-                                vertical = StyledTheme.padding.small,
+                                bottom = if (indicatorStyle == IndicatorStyle.Bottom) {
+                                    3.dp + StyledTheme.spacing.small
+                                } else {
+                                    0.dp
+                                },
                             ),
-                        contentAlignment = Alignment.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(
+                            StyledTheme.spacing.small, Alignment.CenterVertically,
+                        ),
                     ) {
-                        UpdateStyledThemeLocals(contentColor = iconColor, content = icon)
-                    }
-                    if (label != null && (alwaysShowLabel || selected)) {
-                        UpdateStyledThemeLocals(
-                            contentColor = textColor,
-                            textStyle = StyledTheme.typography.labelMedium.copy(textAlign = TextAlign.Center),
+                        Box(
+                            modifier = Modifier
+                                .background(
+                                    if (selected && indicatorStyle == IndicatorStyle.Background) {
+                                        indicatorColor
+                                    } else {
+                                        Color.Transparent
+                                    },
+                                    shape,
+                                )
+                                .padding(
+                                    horizontal = StyledTheme.padding.medium,
+                                    vertical = StyledTheme.padding.small,
+                                ),
+                            contentAlignment = Alignment.Center,
                         ) {
-                            Box(
-                                modifier = Modifier.fillMaxWidth(),
-                                contentAlignment = Alignment.Center,
+                            UpdateStyledThemeLocals(contentColor = iconColor, content = icon)
+                        }
+                        if (label != null && (alwaysShowLabel || selected)) {
+                            UpdateStyledThemeLocals(
+                                contentColor = textColor,
+                                textStyle = StyledTheme.typography.labelMedium.copy(textAlign = TextAlign.Center),
                             ) {
-                                label()
+                                Box(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    label()
+                                }
                             }
                         }
                     }
+                    if (indicatorStyle == IndicatorStyle.Bottom) {
+                        Box(
+                            Modifier
+                                .align(Alignment.BottomCenter)
+                                .width(24.dp * bottomIndicatorProgress)
+                                .height(3.dp)
+                                .clip(RoundedCornerShape(percent = 50))
+                                .background(
+                                    indicatorColor.copy(alpha = indicatorColor.alpha * bottomIndicatorProgress),
+                                ),
+                        )
+                    }
                 }
+            }
+            with(rowScope) {
+                val itemModifier = modifier
+                    .weight(1f)
+                    .sizeIn(
+                        minWidth = StyledTheme.sizes.minimumInteractiveSize,
+                        minHeight = maxOf(minimumHeight, StyledTheme.sizes.minimumInteractiveSize),
+                    )
+                    .clip(shape)
+                    .selectable(
+                        selected = selected,
+                        enabled = enabled,
+                        role = Role.Tab,
+                        interactionSource = source,
+                        indication = null,
+                        onClick = onClick,
+                    )
+                    .then(
+                        if (keyboardFocus) Modifier.border(2.dp, textColor, shape) else Modifier
+                    )
+                    .background(
+                        if (enabled && pressed) baseTextColor.copy(alpha = 0.12f) else Color.Transparent
+                    )
+                    .padding(StyledTheme.padding.small)
+                itemContent(itemModifier)
             }
         }
     }

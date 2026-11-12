@@ -4,9 +4,9 @@
   Use `RowScope.StyledBottomNavigationBarItem` for equally weighted destinations
   with `selected`, `onClick`, icon, optional label, `enabled` and `alwaysShowLabel`.
   The caller owns the selected destination and navigation. Items also accept an
-  interaction source; their colors are configured together on the container,
-  not individually on each item. Labels are horizontally centered within each
-  item.
+  interaction source. Item foregrounds inherit the bar's `contentColor`; the
+  selected appearance is controlled by the bar's `indicatorTint`, not by
+  per-item color parameters. Labels are horizontally centered within each item.
   Supply an accessible icon description when omitting a label.
   Theme factories expose `bottomNavigationBar` instead of `bottomBar`; Scaffold's
   generic `bottomBar` slot keeps its name.
@@ -15,11 +15,13 @@ Material3 uses Compose Material3 `NavigationBar` and `NavigationBarItem` for bot
 navigation, not `BottomAppBar`, and keeps their native vertical spacing.
 Its item row has a small horizontal content inset, while the bar background
 remains full width.
-Cupertino uses tint-based tab selection without a filled indicator and avoids
-additional outer vertical content padding for its compact tab bar. Fluent2 uses
-a filled selected-icon indicator and retains small theme-based vertical content
-padding. Both Foundation-based themes support disabled destinations and keyboard
-focus.
+Material3 renders the selection tint as a subtle filled indicator and applies
+the tint to the selected icon. Fluent2 renders it as a short indicator below
+the item content, animating its width horizontally on selection changes.
+Cupertino has no separate indicator and uses the tint for the
+selected icon and label. Unselected items use the bar's `contentColor`.
+Cupertino avoids additional outer vertical content padding for its compact tab
+bar. Foundation-based themes support disabled destinations and keyboard focus.
 
 Bottom bars handle their safe-area insets themselves. Pass
 `WindowInsets(0, 0, 0, 0)` when embedding a bar inside other content.
@@ -35,30 +37,22 @@ Icon and label slots receive their own content-color scope. Nested `StyledIcon`,
 `StyledText` and other Styled content inherit the foreground of their slot,
 not a shared foreground for the entire item.
 
-Without customization, Material3 and Fluent2 use the bar's `contentColor` for
-labels and unselected icons. The selected icon uses the theme's content color
-for the selected indicator (`primarySurface` by default). Cupertino has no
-filled indicator and retains its `primary` selection tint for both the selected
-icon and label; unselected content uses the bar's `contentColor`.
+`indicatorTint` defaults to `StyledTheme.colorScheme.primary`. It represents the
+selection accent; each renderer adapts it to its design rather than using the
+same rendered color value. Material3 uses a translucent indicator background
+and selected-icon tint, Fluent2 uses a horizontally animated indicator, and Cupertino uses a
+selected-content tint without a separate indicator. The default `contentColor`
+continues to follow `containerColor`.
 
-For a custom container, use `StyledBottomNavigationBarDefaults.customize` to
-configure selected and unselected icon and text colors independently, together
-with the selection indicator. Explicit colors override the theme defaults.
-For example, on a `primary` container, use `onPrimarySurface` for the selected
-icon on its `primarySurface` indicator, but `onPrimary` for labels and unselected
-icons directly on the bar:
+Set `indicatorTint` to use a different selection accent. For example, the
+primary-surface bar below keeps its foreground colors derived from that surface,
+while the selection tint remains independently configurable:
 
 ```kotlin
 StyledBottomNavigationBar(
-    containerColor = StyledTheme.colorScheme.primary,
-    contentColor = StyledTheme.colorScheme.onPrimary,
-    customization = StyledBottomNavigationBarDefaults.customize(
-        selectedItemIconColor = ColorToken.Theme.OnPrimarySurface,
-        selectedItemTextColor = ColorToken.Theme.OnPrimary,
-        unselectedItemIconColor = ColorToken.Theme.OnPrimary,
-        unselectedItemTextColor = ColorToken.Theme.OnPrimary,
-        selectedItemIndicatorColor = ColorToken.Theme.PrimarySurface,
-    ),
+    containerColor = StyledTheme.colorScheme.primarySurface,
+    contentColor = StyledTheme.colorScheme.onPrimarySurface,
+    indicatorTint = StyledTheme.colorScheme.primary,
 ) {
     StyledBottomNavigationBarItem(
         selected = true,
@@ -70,16 +64,11 @@ StyledBottomNavigationBar(
 }
 ```
 
-Both `ColorToken` and `Color` overloads are available. `selectedItemIconColor`
-is required when calling `customize`; other fields are optional and retain their
-individual theme defaults. For an indicator color outside the theme's known
-background colors, supply its selected icon foreground explicitly.
-
-This replaces the former `selectedItemContentColor` and
-`unselectedItemContentColor` customization parameters. Migrate each to the
-corresponding icon and text parameters; the two foregrounds need not be equal.
-Side navigation's customization API is unchanged. Disabled items retain each
-renderer's disabled styling.
+The selection tint does not replace the bar's content color: labels and
+unselected icons still inherit `contentColor`, while renderers apply the tint
+according to their selection indicator. Side navigation uses the same
+`indicatorTint` API, adapted to its pill, start-side stroke or selected-row
+background. Disabled items retain each renderer's disabled styling.
 
 ## Optional horizontal scrolling
 

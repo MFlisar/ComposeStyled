@@ -20,7 +20,7 @@ class CupertinoLiquidBottomNavigationBar internal constructor() : StyledBottomNa
 
     private val renderer = FoundationBottomNavigationBar(
         minimumHeight = 49.dp,
-        showIndicator = false,
+        indicatorStyle = FoundationBottomNavigationBar.IndicatorStyle.None,
         addVerticalContentPadding = false,
     )
 
@@ -32,7 +32,7 @@ class CupertinoLiquidBottomNavigationBar internal constructor() : StyledBottomNa
         showScrollbar: Boolean,
         containerColor: Color,
         contentColor: Color,
-        customization: StyledBottomNavigationBar.Customization?,
+        indicatorTint: Color,
         windowInsets: WindowInsets,
         content: @Composable RowScope.() -> Unit,
     ) {
@@ -46,7 +46,7 @@ class CupertinoLiquidBottomNavigationBar internal constructor() : StyledBottomNa
             showScrollbar = showScrollbar,
             containerColor = Color.Transparent,
             contentColor = contentColor,
-            customization = customization,
+            indicatorTint = indicatorTint,
             windowInsets = windowInsets,
             content = content,
         )

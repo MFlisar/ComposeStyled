@@ -19,8 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import com.michaelflisar.composestyled.StyledTheme
-import com.michaelflisar.composestyled.classes.ColorToken
-import com.michaelflisar.composestyled.classes.asColorToken
 import com.michaelflisar.composestyled.registry.LocalStyledRegistry
 import com.michaelflisar.composestyled.registry.StyledComponent
 import com.michaelflisar.composestyled.registry.StyledComponentWithDefaults
@@ -67,17 +65,6 @@ object StyledSideNavigation {
     )
 
     // -------------
-    // 4) customization
-    // -------------
-
-    @Immutable
-    class Customization internal constructor(
-        val selectedItemContentColor: ColorToken?,
-        val unselectedItemContentColor: ColorToken?,
-        val selectedItemIndicatorColor: ColorToken?,
-    )
-
-    // -------------
     // 5) implementation
     // -------------
 
@@ -97,7 +84,7 @@ object StyledSideNavigation {
             showScrollbar: Boolean,
             containerColor: Color,
             contentColor: Color,
-            customization: Customization?,
+            indicatorTint: Color,
             title: @Composable (() -> Unit)?,
             header: @Composable (() -> Unit)?,
             footer: @Composable (() -> Unit)?,
@@ -136,24 +123,6 @@ object StyledSideNavigationDefaults {
 
     val expandedWidth: Dp
         @Composable get() = LocalStyledRegistry.current[StyledSideNavigation.DefaultsKey].expandedWidth
-
-    fun customize(
-        selectedItemContentColor: ColorToken,
-        unselectedItemContentColor: ColorToken? = null,
-        selectedItemIndicatorColor: ColorToken? = null,
-    ) = StyledSideNavigation.Customization(
-        selectedItemContentColor, unselectedItemContentColor, selectedItemIndicatorColor,
-    )
-
-    fun customize(
-        selectedItemContentColor: Color,
-        unselectedItemContentColor: Color? = null,
-        selectedItemIndicatorColor: Color? = null,
-    ) = customize(
-        selectedItemContentColor.asColorToken(),
-        unselectedItemContentColor?.asColorToken(),
-        selectedItemIndicatorColor?.asColorToken(),
-    )
 }
 
 // -------------------------
@@ -175,7 +144,7 @@ fun StyledSideNavigation(
     showScrollbar: Boolean = StyledTheme.behavior.showScrollbars,
     containerColor: Color = StyledTheme.colorScheme.surfaceVariant,
     contentColor: Color = StyledTheme.contentColorFor(containerColor),
-    customization: StyledSideNavigation.Customization? = null,
+    indicatorTint: Color = StyledTheme.colorScheme.primary,
     title: @Composable (() -> Unit)? = null,
     header: @Composable (() -> Unit)? = null,
     footer: @Composable (() -> Unit)? = null,
@@ -195,7 +164,7 @@ fun StyledSideNavigation(
     showScrollbar = showScrollbar,
     containerColor = containerColor,
     contentColor = contentColor,
-    customization = customization,
+    indicatorTint = indicatorTint,
     title = title,
     header = header,
     footer = footer,
@@ -217,7 +186,7 @@ fun StyledSideNavigation(
     showScrollbar: Boolean = StyledTheme.behavior.showScrollbars,
     containerColor: Color = StyledTheme.colorScheme.surfaceVariant,
     contentColor: Color = StyledTheme.contentColorFor(containerColor),
-    customization: StyledSideNavigation.Customization? = null,
+    indicatorTint: Color = StyledTheme.colorScheme.primary,
     title: @Composable (() -> Unit)? = null,
     header: @Composable (() -> Unit)? = null,
     footer: @Composable (() -> Unit)? = null,
@@ -246,7 +215,7 @@ fun StyledSideNavigation(
             showScrollbar = showScrollbar,
             containerColor = containerColor,
             contentColor = contentColor,
-            customization = customization,
+            indicatorTint = indicatorTint,
             title = title,
             header = header,
             footer = footer,
@@ -271,7 +240,7 @@ fun <K> StyledSideNavigation(
     showScrollbar: Boolean = StyledTheme.behavior.showScrollbars,
     containerColor: Color = StyledTheme.colorScheme.surfaceVariant,
     contentColor: Color = StyledTheme.contentColorFor(containerColor),
-    customization: StyledSideNavigation.Customization? = null,
+    indicatorTint: Color = StyledTheme.colorScheme.primary,
     title: @Composable (() -> Unit)? = null,
     header: @Composable (() -> Unit)? = null,
     footer: @Composable (() -> Unit)? = null,
@@ -293,7 +262,7 @@ fun <K> StyledSideNavigation(
     showScrollbar = showScrollbar,
     containerColor = containerColor,
     contentColor = contentColor,
-    customization = customization,
+    indicatorTint = indicatorTint,
     title = title,
     header = header,
     footer = footer,
@@ -317,7 +286,7 @@ fun <K> StyledSideNavigation(
     showScrollbar: Boolean = StyledTheme.behavior.showScrollbars,
     containerColor: Color = StyledTheme.colorScheme.surfaceVariant,
     contentColor: Color = StyledTheme.contentColorFor(containerColor),
-    customization: StyledSideNavigation.Customization? = null,
+    indicatorTint: Color = StyledTheme.colorScheme.primary,
     title: @Composable (() -> Unit)? = null,
     header: @Composable (() -> Unit)? = null,
     footer: @Composable (() -> Unit)? = null,
@@ -337,7 +306,7 @@ fun <K> StyledSideNavigation(
         showScrollbar = showScrollbar,
         containerColor = containerColor,
         contentColor = contentColor,
-        customization = customization,
+        indicatorTint = indicatorTint,
         title = title,
         header = header,
         footer = footer,

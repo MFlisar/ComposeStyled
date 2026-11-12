@@ -11,7 +11,7 @@ import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 class CupertinoFlatBottomNavigationBar internal constructor() :
     StyledBottomNavigationBar.Implementation by FoundationBottomNavigationBar(
         minimumHeight = 49.dp,
-        showIndicator = false,
+        indicatorStyle = FoundationBottomNavigationBar.IndicatorStyle.None,
         addVerticalContentPadding = false,
     ) {
 

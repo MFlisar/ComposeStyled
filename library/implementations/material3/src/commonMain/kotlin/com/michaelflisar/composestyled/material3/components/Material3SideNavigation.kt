@@ -36,6 +36,7 @@ import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.ui.components.StyledSideNavigation
 import com.michaelflisar.composestyled.ui.components.StyledSideNavigationDefaults
 import com.michaelflisar.composestyled.ui.internal.LocalStyledSelectionColors
+import com.michaelflisar.composestyled.tokens.LocalStyledContentColor
 
 @OptIn(InternalComposeStyledApi::class)
 class Material3SideNavigation internal constructor() : StyledSideNavigation.Implementation {
@@ -65,7 +66,7 @@ class Material3SideNavigation internal constructor() : StyledSideNavigation.Impl
         showScrollbar: Boolean,
         containerColor: Color,
         contentColor: Color,
-        customization: StyledSideNavigation.Customization?,
+        indicatorTint: Color,
         title: @Composable (() -> Unit)?,
         header: @Composable (() -> Unit)?,
         footer: @Composable (() -> Unit)?,
@@ -79,7 +80,7 @@ class Material3SideNavigation internal constructor() : StyledSideNavigation.Impl
         Surface(modifier = modifier, color = containerColor, contentColor = resolvedContentColor) {
             FoundationSideNavigationLayout(
                 Modifier, mode, expanded, onExpandedChange, scrollable, scrollState, showScrollbar,
-                containerColor, resolvedContentColor, customization, title, header, footer, windowInsets,
+                containerColor, resolvedContentColor, indicatorTint, title, header, footer, windowInsets,
                 toggleIcon = toggleIcon,
                 titleStartPadding = 36.dp + StyledTheme.sizes.iconSize + 8.dp,
                 toggleIconCenter = 36.dp + StyledTheme.sizes.iconSize / 2,
@@ -110,17 +111,16 @@ class Material3SideNavigation internal constructor() : StyledSideNavigation.Impl
         val currentLabel by rememberUpdatedState(label)
         val labelContent = remember { movableContentOf { currentLabel?.invoke() } }
         val palette = LocalStyledSelectionColors.current
-        val selectedContent = palette?.selectedContentColor?.takeUnless { it == Color.Unspecified }
-            ?: StyledTheme.colorScheme.onSecondarySurface
-        val unselectedContent = palette?.unselectedContentColor?.takeUnless { it == Color.Unspecified }
-            ?: StyledTheme.colorScheme.onSurfaceVariant
+        val indicatorTint = palette?.indicatorColor?.takeUnless { it == Color.Unspecified }
+            ?: StyledTheme.colorScheme.primary
+        val selectedContent = StyledTheme.contentColorFor(indicatorTint)
+        val unselectedContent = LocalStyledContentColor.current
         val colors = WideNavigationRailItemDefaults.colors(
             selectedIconColor = selectedContent,
             selectedTextColor = selectedContent,
             unselectedIconColor = unselectedContent,
             unselectedTextColor = unselectedContent,
-            selectedIndicatorColor = palette?.indicatorColor?.takeUnless { it == Color.Unspecified }
-                ?: StyledTheme.colorScheme.secondarySurface,
+            selectedIndicatorColor = indicatorTint,
         )
         val styledContentColor = (if (selected) selectedContent else unselectedContent).let { color ->
             if (enabled) color else color.copy(

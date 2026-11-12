@@ -25,11 +25,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.StyledTheme
-import com.michaelflisar.composestyled.classes.ColorToken
 import com.michaelflisar.composestyled.classes.toIconComposable
 import com.michaelflisar.composestyled.ui.components.StyledOutlinedCard
 import com.michaelflisar.composestyled.ui.components.StyledBottomNavigationBar
-import com.michaelflisar.composestyled.ui.components.StyledBottomNavigationBarDefaults
 import com.michaelflisar.composestyled.ui.components.StyledCenterAlignedTopBar
 import com.michaelflisar.composestyled.ui.components.StyledPopupDropdownIndex
 import com.michaelflisar.composestyled.ui.components.StyledExpandableTopBar
@@ -239,20 +237,14 @@ internal fun DemoComponentParts(
             onItemClick = { selected.value = it.key },
             windowInsets = WindowInsets(0, 0, 0, 0),
         )
-        SubTitle("Bottom navigation with separate icon and text colors")
+        SubTitle("Bottom navigation with a custom indicator tint")
         StyledBottomNavigationBar(
             items = items,
             selectedKey = selected.value,
             onItemClick = { selected.value = it.key },
-            containerColor = StyledTheme.colorScheme.primary,
-            contentColor = StyledTheme.colorScheme.onPrimary,
-            customization = StyledBottomNavigationBarDefaults.customize(
-                selectedItemIconColor = ColorToken.Theme.OnPrimarySurface,
-                selectedItemTextColor = ColorToken.Theme.OnPrimary,
-                unselectedItemIconColor = ColorToken.Theme.OnPrimary,
-                unselectedItemTextColor = ColorToken.Theme.OnPrimary,
-                selectedItemIndicatorColor = ColorToken.Theme.PrimarySurface,
-            ),
+            containerColor = StyledTheme.colorScheme.primarySurface,
+            contentColor = StyledTheme.colorScheme.onPrimarySurface,
+            indicatorTint = StyledTheme.colorScheme.primary,
             windowInsets = WindowInsets(0, 0, 0, 0),
         )
         val longItems = remember(items) {
@@ -318,15 +310,11 @@ internal fun DemoComponentParts(
                     mode = StyledSideNavigation.Mode.entries[selectedMode.value],
                     compactLabelVisibility = StyledSideNavigation.CompactLabelVisibility.entries[selectedLabels.value],
                     scrollable = scrollable.value,
-                    containerColor = if (customColors.value) StyledTheme.colorScheme.primary else StyledTheme.colorScheme.surfaceVariant,
-                    contentColor = if (customColors.value) StyledTheme.colorScheme.onPrimary else StyledTheme.contentColorFor(
+                    containerColor = if (customColors.value) StyledTheme.colorScheme.primarySurface else StyledTheme.colorScheme.surfaceVariant,
+                    contentColor = if (customColors.value) StyledTheme.colorScheme.onPrimarySurface else StyledTheme.contentColorFor(
                         StyledTheme.colorScheme.surfaceVariant
                     ),
-                    customization = if (customColors.value) StyledSideNavigationDefaults.customize(
-                        selectedItemContentColor = ColorToken.Theme.OnPrimarySurface,
-                        unselectedItemContentColor = ColorToken.Theme.OnPrimary,
-                        selectedItemIndicatorColor = ColorToken.Theme.PrimarySurface,
-                    ) else null,
+                    indicatorTint = StyledTheme.colorScheme.primary,
                     title = { StyledText("Destinations") },
                     toggleIcon = { state ->
                         when (selectedToggle.value) {

@@ -9,10 +9,12 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.animation.core.animate
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -25,7 +27,6 @@ import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
@@ -33,6 +34,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -116,10 +118,25 @@ abstract class FoundationDialog : StyledDialog.Implementation {
     ) {
         val defaults = StyledDialogDefaults.defaults
         val toolbarExpanded = rememberSaveable { mutableStateOf(false) }
+        val toolbarExpansionProgress = remember {
+            mutableFloatStateOf(if (toolbarExpanded.value) 1f else 0f)
+        }
+        val toolbarDragTravelPx = remember { mutableFloatStateOf(1f) }
+        val toolbarDragging = remember { mutableStateOf(false) }
         val canExpandToolbar = style is StyledDialog.Style.ToolbarDialog && style.expandToFullscreen
-        val expandedToolbar = canExpandToolbar && toolbarExpanded.value
         LaunchedEffect(canExpandToolbar) {
             if (!canExpandToolbar) toolbarExpanded.value = false
+        }
+        LaunchedEffect(canExpandToolbar, toolbarExpanded.value, toolbarDragging.value) {
+            if (!canExpandToolbar) {
+                toolbarExpansionProgress.floatValue = 0f
+            } else if (!toolbarDragging.value) {
+                animate(
+                    initialValue = toolbarExpansionProgress.floatValue,
+                    targetValue = if (toolbarExpanded.value) 1f else 0f,
+                    animationSpec = tween(DIALOG_VISIBILITY_ANIMATION_DURATION_MILLIS),
+                ) { value, _ -> toolbarExpansionProgress.floatValue = value }
+            }
         }
         val toggleToolbarExpansion = { toolbarExpanded.value = !toolbarExpanded.value }
         if (style is StyledDialog.Style.FloatingWindow) {
@@ -223,7 +240,17 @@ abstract class FoundationDialog : StyledDialog.Implementation {
                 } else {
                     FoundationDialogBounds(
                         maxWidth, maxHeightFraction, edgeMargin, properties, onDismissRequest,
-                        fullscreen = style is StyledDialog.Style.Fullscreen || expandedToolbar,
+                        fullscreen = style is StyledDialog.Style.Fullscreen,
+                        fullscreenProgress = if (canExpandToolbar) {
+                            toolbarExpansionProgress.floatValue
+                        } else {
+                            null
+                        },
+                        onFullscreenTravelChanged = if (canExpandToolbar) {
+                            { toolbarDragTravelPx.floatValue = it }
+                        } else {
+                            null
+                        },
                     ) { bounds ->
                         if (style is StyledDialog.Style.Fullscreen) {
                             val fullscreenVisibility = remember { MutableTransitionState(false) }
@@ -280,11 +307,23 @@ abstract class FoundationDialog : StyledDialog.Implementation {
                                     onDismissRequest,
                                 ),
                                 shape, title, buttons, content,
-                                edgeToEdge = expandedToolbar,
-                                expandable = canExpandToolbar,
-                                expanded = expandedToolbar,
+                                edgeToEdge = toolbarExpansionProgress.floatValue >= 0.999f,
+                                toolbarDragEnabled = canExpandToolbar,
+                                toolbarExpansionProgress = toolbarExpansionProgress.floatValue,
+                                onToolbarDragStarted = { toolbarDragging.value = true },
+                                onToolbarDragDelta = { delta ->
+                                    val travel = toolbarDragTravelPx.floatValue.coerceAtLeast(1f)
+                                    toolbarExpansionProgress.floatValue =
+                                        (toolbarExpansionProgress.floatValue - delta / travel).coerceIn(0f, 1f)
+                                },
+                                onToolbarDragStopped = { velocity ->
+                                    val travel = toolbarDragTravelPx.floatValue.coerceAtLeast(1f)
+                                    val projectedProgress =
+                                        toolbarExpansionProgress.floatValue - velocity * 0.15f / travel
+                                    toolbarExpanded.value = projectedProgress >= 0.5f
+                                    toolbarDragging.value = false
+                                },
                                 onToggleExpanded = toggleToolbarExpansion,
-                                animateBounds = canExpandToolbar,
                             )
                         }
                     }
@@ -382,7 +421,6 @@ abstract class FoundationDialog : StyledDialog.Implementation {
     }
 
     @Composable
-    @OptIn(ExperimentalFoundationApi::class)
     private fun Fullscreen(
         modifier: Modifier,
         shape: Shape,
@@ -390,10 +428,12 @@ abstract class FoundationDialog : StyledDialog.Implementation {
         buttons: StyledDialog.Buttons,
         content: @Composable ColumnScope.(PaddingValues) -> Unit,
         edgeToEdge: Boolean,
-        expandable: Boolean = false,
-        expanded: Boolean = false,
+        toolbarDragEnabled: Boolean = false,
+        toolbarExpansionProgress: Float = 0f,
+        onToolbarDragStarted: () -> Unit = {},
+        onToolbarDragDelta: (Float) -> Unit = {},
+        onToolbarDragStopped: (Float) -> Unit = {},
         onToggleExpanded: () -> Unit = {},
-        animateBounds: Boolean = false,
         expandableHeader: StyledDialog.Style.Fullscreen.ExpandableHeader? = null,
         applyStatusBarStyle: Boolean = true,
         applyNavigationBarStyle: Boolean = true,
@@ -419,6 +459,29 @@ abstract class FoundationDialog : StyledDialog.Implementation {
         val footerButtons = if (fullscreenActionsInToolbar) {
             StyledDialog.Buttons(neutral = buttons.neutral)
         } else buttons
+        val toolbarModifier = if (toolbarDragEnabled) {
+            Modifier.draggable(
+                state = rememberDraggableState(onToolbarDragDelta),
+                orientation = Orientation.Vertical,
+                onDragStarted = { onToolbarDragStarted() },
+                onDragStopped = { velocity -> onToolbarDragStopped(velocity) },
+            ).semantics {
+                customActions = listOf(
+                    CustomAccessibilityAction(
+                        if (toolbarExpansionProgress >= 0.5f) {
+                            "Restore bounded dialog"
+                        } else {
+                            "Expand fullscreen dialog"
+                        },
+                    ) {
+                        onToggleExpanded()
+                        true
+                    },
+                )
+            }
+        } else {
+            Modifier
+        }
         if (edgeToEdge) {
             SystemBarStyleEffect(
                 statusBar = if (applyStatusBarStyle) {
@@ -430,10 +493,8 @@ abstract class FoundationDialog : StyledDialog.Implementation {
             )
         }
         StyledSurface(
-            modifier = if (animateBounds) Modifier.animateContentSize(
-                animationSpec = tween(DIALOG_VISIBILITY_ANIMATION_DURATION_MILLIS),
-            ).then(modifier) else modifier,
-            shape = if (expanded) RectangleShape else shape,
+            modifier = modifier,
+            shape = if (toolbarExpansionProgress >= 0.999f) RectangleShape else shape,
             color = fullscreenContainerColor,
         ) {
             Column(
@@ -462,39 +523,6 @@ abstract class FoundationDialog : StyledDialog.Implementation {
                             autoPresentation = presentationMapping(StyledDialog.ActionSlot.Positive),
                         )
                     }
-                    if (expandable && (!expanded || title == null)) {
-                        DialogButton(
-                            StyledDialog.Button(
-                                onClick = onToggleExpanded,
-                                label = if (expanded) "Restore" else "Expand",
-                                dismissOnClick = false,
-                            ),
-                            StyledDialog.ActionSlot.Neutral,
-                            StyledDialog.Context.FullscreenAction,
-                        )
-                    }
-                }
-                val renderedTitle: @Composable () -> Unit = {
-                    if (expandable && title != null) {
-                        val actionLabel = if (expanded) "Restore fullscreen dialog" else "Expand fullscreen dialog"
-                        Box(
-                            Modifier.combinedClickable(
-                                onClick = {},
-                                onDoubleClick = onToggleExpanded,
-                            ).semantics {
-                                customActions = listOf(
-                                    CustomAccessibilityAction(actionLabel) {
-                                        onToggleExpanded()
-                                        true
-                                    },
-                                )
-                            },
-                        ) {
-                            title.invoke()
-                        }
-                    } else {
-                        title?.invoke()
-                    }
                 }
                 if (expandableHeaderEnabled) {
                     StyledExpandableTopBar(
@@ -504,21 +532,24 @@ abstract class FoundationDialog : StyledDialog.Implementation {
                         contentColor = headerContentColor,
                         expandedContainerColor = expandedHeaderContainerColor,
                         expandedContentColor = expandedHeaderContentColor,
+                        modifier = toolbarModifier,
                         navigationIcon = navigation,
                         actions = actions,
-                        title = renderedTitle,
+                        title = { title?.invoke() },
                     )
                 } else if (centeredTitle) {
                     StyledCenterAlignedTopBar(
+                        modifier = toolbarModifier,
                         navigationIcon = navigation,
                         actions = actions,
-                        title = renderedTitle,
+                        title = { title?.invoke() },
                     )
                 } else {
                     StyledTopBar(
+                        modifier = toolbarModifier,
                         navigationIcon = navigation,
                         actions = actions,
-                        title = renderedTitle,
+                        title = { title?.invoke() },
                     )
                 }
                 val layoutDirection = LocalLayoutDirection.current

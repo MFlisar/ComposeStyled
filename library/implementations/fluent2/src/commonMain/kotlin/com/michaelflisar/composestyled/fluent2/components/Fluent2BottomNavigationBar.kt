@@ -9,7 +9,10 @@ import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 
 @OptIn(InternalComposeStyledApi::class)
 class Fluent2BottomNavigationBar internal constructor() :
-    StyledBottomNavigationBar.Implementation by FoundationBottomNavigationBar(48.dp) {
+    StyledBottomNavigationBar.Implementation by FoundationBottomNavigationBar(
+        minimumHeight = 48.dp,
+        indicatorStyle = FoundationBottomNavigationBar.IndicatorStyle.Bottom,
+    ) {
 
     companion object {
 

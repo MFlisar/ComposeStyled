@@ -228,24 +228,36 @@ internal fun FoundationDialogSheet(
         )
         val connection = remember(drag, scope) {
             object : NestedScrollConnection {
-                override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset =
-                    if (source == NestedScrollSource.UserInput && available.y < 0f) {
+                override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                    if (source != NestedScrollSource.UserInput) return Offset.Zero
+                    drag.beginUserGesture()
+                    return if (available.y < 0f) {
                         Offset(0f, drag.drag(available.y))
-                    } else Offset.Zero
+                    } else {
+                        Offset.Zero
+                    }
+                }
 
                 override fun onPostScroll(
                     consumed: Offset,
                     available: Offset,
                     source: NestedScrollSource,
-                ): Offset = if (source == NestedScrollSource.UserInput) {
-                    Offset(0f, drag.drag(available.y))
-                } else Offset.Zero
+                ): Offset {
+                    if (source != NestedScrollSource.UserInput) return Offset.Zero
+                    drag.beginUserGesture()
+                    drag.recordContentScroll(consumed.y)
+                    return Offset(0f, drag.drag(available.y))
+                }
 
                 override suspend fun onPreFling(available: Velocity): Velocity {
                     if (!options.gesturesEnabled || drag.offset <= 0f) return Velocity.Zero
+                    if (!drag.canDismissOnSwipe()) return Velocity.Zero
                     drag.settle(
-                        scope, available.y,
-                        { dismissRequestWithoutAnimation() }, { currentVisibility() },
+                        scope = scope,
+                        velocity = available.y,
+                        allowDismiss = true,
+                        onDismissRequest = { dismissRequestWithoutAnimation() },
+                        isVisible = { currentVisibility() },
                     ).join()
                     return Velocity(0f, available.y)
                 }
@@ -253,9 +265,13 @@ internal fun FoundationDialogSheet(
                 override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
                     if (!options.gesturesEnabled) return Velocity.Zero
                     drag.settle(
-                        scope, available.y,
-                        { dismissRequestWithoutAnimation() }, { currentVisibility() },
+                        scope = scope,
+                        velocity = available.y,
+                        allowDismiss = drag.canDismissOnSwipe(),
+                        onDismissRequest = { dismissRequestWithoutAnimation() },
+                        isVisible = { currentVisibility() },
                     ).join()
+                    drag.endUserGesture()
                     return Velocity(0f, available.y)
                 }
             }
@@ -303,11 +319,16 @@ internal fun FoundationDialogSheet(
                             state = rememberDraggableState { drag.drag(it) },
                             orientation = Orientation.Vertical,
                             enabled = options.gesturesEnabled && visible,
+                            onDragStarted = { drag.beginUserGesture() },
                             onDragStopped = { velocity ->
                                 drag.settle(
-                                    scope, velocity,
-                                    { dismissRequestWithoutAnimation() }, { currentVisibility() },
-                                )
+                                    scope = scope,
+                                    velocity = velocity,
+                                    allowDismiss = drag.canDismissOnSwipe(),
+                                    onDismissRequest = { dismissRequestWithoutAnimation() },
+                                    isVisible = { currentVisibility() },
+                                ).join()
+                                drag.endUserGesture()
                             },
                         ),
                     shape = if (options.expandToFullscreen && sheetTop <= 0f) RectangleShape else shape,
@@ -358,12 +379,16 @@ internal fun FoundationDialogSheet(
                                 }
                                 if (centeredTitle) {
                                     StyledCenterAlignedTopBar(
+                                        containerColor = containerColor,
+                                        contentColor = StyledTheme.contentColorFor(containerColor),
                                         navigationIcon = navigation,
                                         actions = actions,
                                         title = { title?.invoke() },
                                     )
                                 } else {
                                     StyledTopBar(
+                                        containerColor = containerColor,
+                                        contentColor = StyledTheme.contentColorFor(containerColor),
                                         navigationIcon = navigation,
                                         actions = actions,
                                         title = { title?.invoke() },
@@ -377,38 +402,48 @@ internal fun FoundationDialogSheet(
                             ) {
                                 Column(Modifier.fillMaxWidth().onSizeChanged { headerHeight = it.height }) {
                                     Box(
-                                        Modifier.fillMaxWidth().height(32.dp)
-                                            .clickable(enabled = options.gesturesEnabled && peekOffset > 0f && visible) {
-                                                drag.animateTo(
-                                                    scope,
-                                                    if (drag.offset > peekOffset / 2f) 0f else peekOffset,
-                                                )
-                                            }.semantics {
-                                                if (options.gesturesEnabled && visible) {
-                                                    if (peekOffset > 0f) {
-                                                        expand {
-                                                            drag.animateTo(scope, 0f)
-                                                            true
-                                                        }
-                                                        collapse {
-                                                            drag.animateTo(scope, peekOffset)
-                                                            true
-                                                        }
-                                                    }
-                                                    if (options.dismissOnSwipe) {
-                                                        dismiss { dismissRequest(); true }
-                                                    }
-                                                }
-                                            },
+                                        Modifier.fillMaxWidth().height(32.dp),
                                         contentAlignment = Alignment.Center,
                                     ) {
-                                        Spacer(
-                                            Modifier.size(32.dp, 4.dp)
-                                                .background(
-                                                    StyledTheme.colorScheme.outlineVariant,
-                                                    RoundedCornerShape(2.dp),
-                                                ),
-                                        )
+                                        Box(
+                                            Modifier.size(width = 48.dp, height = 32.dp)
+                                                .clickable(
+                                                    interactionSource = remember { MutableInteractionSource() },
+                                                    indication = null,
+                                                    enabled = options.gesturesEnabled &&
+                                                        peekOffset > 0f && visible,
+                                                ) {
+                                                    drag.animateTo(
+                                                        scope,
+                                                        if (drag.offset > peekOffset / 2f) 0f else peekOffset,
+                                                    )
+                                                }.semantics {
+                                                    if (options.gesturesEnabled && visible) {
+                                                        if (peekOffset > 0f) {
+                                                            expand {
+                                                                drag.animateTo(scope, 0f)
+                                                                true
+                                                            }
+                                                            collapse {
+                                                                drag.animateTo(scope, peekOffset)
+                                                                true
+                                                            }
+                                                        }
+                                                        if (options.dismissOnSwipe) {
+                                                            dismiss { dismissRequest(); true }
+                                                        }
+                                                    }
+                                                },
+                                            contentAlignment = Alignment.Center,
+                                        ) {
+                                            Spacer(
+                                                Modifier.size(32.dp, 4.dp)
+                                                    .background(
+                                                        StyledTheme.colorScheme.outlineVariant,
+                                                        RoundedCornerShape(2.dp),
+                                                    ),
+                                            )
+                                        }
                                     }
                                     if (title != null) {
                                         Box(Modifier.padding(horizontal = StyledTheme.spacing.large)) {
@@ -543,6 +578,34 @@ private class SheetDragState(
     var offset by mutableFloatStateOf(if (isExpanded) 0f else peekOffset)
         private set
     private var settling: Job? = null
+    private var userGestureStartOffset: Float? = null
+    private var contentConsumedDownwardScroll = false
+
+    fun beginUserGesture() {
+        if (userGestureStartOffset == null) {
+            userGestureStartOffset = offset
+            contentConsumedDownwardScroll = false
+        }
+    }
+
+    fun recordContentScroll(consumedY: Float) {
+        if (userGestureStartOffset != null && consumedY > 0f) {
+            contentConsumedDownwardScroll = true
+        }
+    }
+
+    fun canDismissOnSwipe(): Boolean {
+        if (!options.dismissOnSwipe) return false
+        if (!options.dismissOnSwipeOnlyWhenContentAtTop) return true
+        val startOffset = userGestureStartOffset ?: offset
+        val startedAtPeek = startOffset >= peekOffset
+        return startedAtPeek && !contentConsumedDownwardScroll
+    }
+
+    fun endUserGesture() {
+        userGestureStartOffset = null
+        contentConsumedDownwardScroll = false
+    }
 
     fun updateGeometry(
         height: Float,
@@ -582,11 +645,13 @@ private class SheetDragState(
     fun settle(
         scope: CoroutineScope,
         velocity: Float,
+        allowDismiss: Boolean,
         onDismissRequest: () -> Unit,
         isVisible: () -> Boolean,
     ): Job {
         settling?.cancel()
-        val anchors = listOf(0f, peekOffset) + if (options.dismissOnSwipe) listOf(height) else emptyList()
+        val anchors = listOf(0f, peekOffset) +
+            if (options.dismissOnSwipe && allowDismiss) listOf(height) else emptyList()
         val projected = offset + velocity * 0.15f
         val target = anchors.minBy { abs(it - projected) }
         return scope.launch {

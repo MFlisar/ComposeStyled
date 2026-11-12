@@ -85,7 +85,7 @@ object StyledDialog {
             val maxWidth: Dp? = null,
             val maxHeightFraction: Float? = null,
             val edgeMargin: Dp? = null,
-            /** Allows title double-click or the toolbar action to expand this workspace edge-to-edge. */
+            /** Allows dragging the toolbar up to expand this workspace edge-to-edge. */
             val expandToFullscreen: Boolean = false,
         ) : Style
 
@@ -293,6 +293,8 @@ object StyledDialog {
         val peekHeightFraction: Float = 0.5f,
         /** Allows the expanded sheet to fill the window and transition its actions into a top bar. */
         val expandToFullscreen: Boolean = false,
+        /** Requires the body to be at its top and the sheet at peek before a swipe can dismiss it. */
+        val dismissOnSwipeOnlyWhenContentAtTop: Boolean = true,
     ) {
         init {
             require(peekHeightFraction > 0f && peekHeightFraction <= 1f) {

@@ -29,8 +29,7 @@ import androidx.compose.ui.text.style.TextAlign
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.material3.ProvideStyledLocals
 import com.michaelflisar.composestyled.ui.components.StyledBottomNavigationBar
-import com.michaelflisar.composestyled.ui.internal.LocalStyledBottomNavigationColors
-import com.michaelflisar.composestyled.ui.internal.StyledBottomNavigationColors
+import com.michaelflisar.composestyled.ui.internal.LocalStyledBottomNavigationIndicatorTint
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 
 class Material3BottomNavigationBar internal constructor() : StyledBottomNavigationBar.Implementation {
@@ -54,7 +53,7 @@ class Material3BottomNavigationBar internal constructor() : StyledBottomNavigati
         showScrollbar: Boolean,
         containerColor: Color,
         contentColor: Color,
-        customization: StyledBottomNavigationBar.Customization?,
+        indicatorTint: Color,
         windowInsets: WindowInsets,
         content: @Composable RowScope.() -> Unit,
     ) {
@@ -63,31 +62,15 @@ class Material3BottomNavigationBar internal constructor() : StyledBottomNavigati
         } else {
             contentColor
         }
+        val resolvedIndicatorTint = indicatorTint.takeUnless { it == Color.Unspecified }
+            ?: StyledTheme.colorScheme.primary
         ProvideStyledLocals(
             contentColor = resolvedContentColor,
             textStyle = StyledTheme.typography.labelLarge,
         ) {
-            val selectedItemIcon = customization?.selectedItemIconColor?.resolve()
-            val selectedItemText = customization?.selectedItemTextColor?.resolve()
-            val unselectedItemIcon = customization?.unselectedItemIconColor?.resolve()
-            val unselectedItemText = customization?.unselectedItemTextColor?.resolve()
-            val selectedItemIndicator = customization?.selectedItemIndicatorColor?.resolve()
-            val selectionColors = remember(
-                selectedItemIcon,
-                selectedItemText,
-                unselectedItemIcon,
-                unselectedItemText,
-                selectedItemIndicator,
+            CompositionLocalProvider(
+                LocalStyledBottomNavigationIndicatorTint provides resolvedIndicatorTint,
             ) {
-                StyledBottomNavigationColors(
-                    selectedIconColor = selectedItemIcon,
-                    selectedTextColor = selectedItemText,
-                    unselectedIconColor = unselectedItemIcon,
-                    unselectedTextColor = unselectedItemText,
-                    indicatorColor = selectedItemIndicator,
-                )
-            }
-            CompositionLocalProvider(LocalStyledBottomNavigationColors provides selectionColors) {
                 if (scrollable) {
                     Surface(
                         modifier = modifier.fillMaxWidth(),
@@ -157,25 +140,16 @@ class Material3BottomNavigationBar internal constructor() : StyledBottomNavigati
             }
             return
         }
-        val selectionColors = LocalStyledBottomNavigationColors.current
         val barContentColor = LocalStyledContentColor.current
-        val resolvedIndicatorColor = selectionColors?.indicatorColor
-            ?.takeUnless { it == Color.Unspecified }
-            ?: StyledTheme.colorScheme.primarySurface
+        val indicatorTint = LocalStyledBottomNavigationIndicatorTint.current
+            .takeUnless { it == Color.Unspecified }
+            ?: StyledTheme.colorScheme.primary
         val colors = NavigationBarItemDefaults.colors(
-            selectedIconColor = selectionColors?.selectedIconColor
-                ?.takeUnless { it == Color.Unspecified }
-                ?: StyledTheme.contentColorFor(resolvedIndicatorColor),
-            selectedTextColor = selectionColors?.selectedTextColor
-                ?.takeUnless { it == Color.Unspecified }
-                ?: barContentColor,
-            unselectedIconColor = selectionColors?.unselectedIconColor
-                ?.takeUnless { it == Color.Unspecified }
-                ?: barContentColor,
-            unselectedTextColor = selectionColors?.unselectedTextColor
-                ?.takeUnless { it == Color.Unspecified }
-                ?: barContentColor,
-            indicatorColor = resolvedIndicatorColor,
+            selectedIconColor = indicatorTint,
+            selectedTextColor = barContentColor,
+            unselectedIconColor = barContentColor,
+            unselectedTextColor = barContentColor,
+            indicatorColor = indicatorTint.copy(alpha = indicatorTint.alpha * 0.12f),
         )
         @Composable
         fun withEnabledState(color: Color) =

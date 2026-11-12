@@ -87,7 +87,7 @@ fun FoundationSideNavigationLayout(
     showScrollbar: Boolean,
     containerColor: Color,
     contentColor: Color,
-    customization: StyledSideNavigation.Customization?,
+    indicatorTint: Color,
     title: @Composable (() -> Unit)?,
     header: @Composable (() -> Unit)?,
     footer: @Composable (() -> Unit)?,
@@ -116,11 +116,10 @@ fun FoundationSideNavigationLayout(
             else heightProgress.snapTo(0f)
         }
     }
-    val selectedContent = customization?.selectedItemContentColor?.resolve()
-    val unselectedContent = customization?.unselectedItemContentColor?.resolve()
-    val indicator = customization?.selectedItemIndicatorColor?.resolve()
-    val colors = remember(selectedContent, unselectedContent, indicator) {
-        StyledSelectionColors(selectedContent, unselectedContent, indicator)
+    val resolvedIndicatorTint = indicatorTint.takeUnless { it == Color.Unspecified }
+        ?: StyledTheme.colorScheme.primary
+    val colors = remember(resolvedIndicatorTint) {
+        StyledSelectionColors(null, null, resolvedIndicatorTint)
     }
     val resolvedContent = contentColor.takeUnless { it == Color.Unspecified }
         ?: StyledTheme.contentColorFor(containerColor)

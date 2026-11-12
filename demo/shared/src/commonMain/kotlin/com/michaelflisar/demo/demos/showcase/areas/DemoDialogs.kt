@@ -57,6 +57,7 @@ internal fun DemoDialogs(baseId: Int, expandState: ExpandState) {
         var dismissOnBackPress by rememberSaveable { mutableStateOf(true) }
         var dismissOnClickOutside by rememberSaveable { mutableStateOf(true) }
         var dismissOnSwipe by rememberSaveable { mutableStateOf(true) }
+        var dismissOnSwipeOnlyWhenContentAtTop by rememberSaveable { mutableStateOf(true) }
         var gesturesEnabled by rememberSaveable { mutableStateOf(true) }
         var expandSheetToFullscreen by rememberSaveable { mutableStateOf(false) }
         var expandToolbarToFullscreen by rememberSaveable { mutableStateOf(false) }
@@ -114,6 +115,7 @@ internal fun DemoDialogs(baseId: Int, expandState: ExpandState) {
             expandToFullscreen = expandSheetToFullscreen,
             dismissOnSwipe = dismissOnSwipe,
             gesturesEnabled = gesturesEnabled,
+            dismissOnSwipeOnlyWhenContentAtTop = dismissOnSwipeOnlyWhenContentAtTop,
         )
 
         SubTitle("Settings")
@@ -192,6 +194,12 @@ internal fun DemoDialogs(baseId: Int, expandState: ExpandState) {
             StyledSwitch(checked = dismissOnSwipe, onCheckedChange = { dismissOnSwipe = it }) {
                 StyledText("Dismiss sheets by swiping down")
             }
+            StyledSwitch(
+                checked = dismissOnSwipeOnlyWhenContentAtTop,
+                onCheckedChange = { dismissOnSwipeOnlyWhenContentAtTop = it },
+            ) {
+                StyledText("Only dismiss from peek when content is at the top")
+            }
             StyledSwitch(checked = gesturesEnabled, onCheckedChange = { gesturesEnabled = it }) {
                 StyledText("Enable sheet dragging and handle clicks (peek / expanded)")
             }
@@ -205,7 +213,7 @@ internal fun DemoDialogs(baseId: Int, expandState: ExpandState) {
                 checked = expandToolbarToFullscreen,
                 onCheckedChange = { expandToolbarToFullscreen = it },
             ) {
-                StyledText("Allow toolbar dialogs to expand to fullscreen")
+                StyledText("Allow dragging toolbar dialogs to fullscreen")
             }
             StyledSwitch(checked = positiveEnabled, onCheckedChange = { positiveEnabled = it }) {
                 StyledText("Enable Save")
