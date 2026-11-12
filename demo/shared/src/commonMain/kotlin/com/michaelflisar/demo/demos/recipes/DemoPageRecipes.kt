@@ -17,6 +17,7 @@ import com.michaelflisar.composestyled.ui.icons.StyledIcons
 import com.michaelflisar.composestyled.ui.layout.StyledColumn
 import com.michaelflisar.composestyled.ui.layout.StyledScaffold
 import com.michaelflisar.composestyled.ui.primitives.StyledText
+import com.michaelflisar.demo.demos.recipes.examples.DemoPageTemplate
 import com.michaelflisar.demo.demos.recipes.examples.DemoRecipeSelection
 import com.michaelflisar.demo.helper.DemoTopBar
 import com.michaelflisar.demo.recipes.ScaffoldStarterTemplate
@@ -36,7 +37,12 @@ private object DemoPageRecipes {
             content = ::DemoRecipeSelection
         ),
         Recipe(
-            name = "Template",
+            name = "Template App",
+            description = "A full example app template",
+            content = ::DemoPageTemplate
+        ),
+        Recipe(
+            name = "Template Scaffold",
             description = "A themed scaffold with examples for each slot.",
             content = ::ScaffoldStarterTemplate
         )

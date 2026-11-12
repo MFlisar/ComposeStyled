@@ -18,6 +18,7 @@ import com.michaelflisar.composepreferences.styled.internal.LocalPreferenceRunti
 import com.michaelflisar.composepreferences.styled.internal.PreferenceAncestor
 import com.michaelflisar.composepreferences.styled.internal.PreferenceEntry
 import com.michaelflisar.composepreferences.styled.internal.PreferenceListSpacingArrangement
+import com.michaelflisar.composepreferences.styled.internal.accountForPreferenceListSpacing
 import com.michaelflisar.composepreferences.styled.PreferenceFilter
 import com.michaelflisar.composepreferences.styled.PreferenceOpenGroupHeaderStyle
 import com.michaelflisar.composepreferences.styled.internal.currentPreferenceRuntime
@@ -128,6 +129,12 @@ fun PreferenceGroup(
             )
         }
 
+        val groupListSpacingArrangement = PreferenceListSpacingArrangement(
+            tracker = parent.listSpacingTracker,
+            scope = childRuntime.identityScope,
+            itemSpacing = parent.style.spacing.inGroupSeparator.spacingOrZero,
+            sectionSpacing = parent.style.spacing.sectionSpacing,
+        )
         val groupContent: @Composable () -> Unit = {
             CompositionLocalProvider(LocalPreferenceRuntime provides childRuntime) {
                 content()
@@ -148,13 +155,10 @@ fun PreferenceGroup(
                     .clip(parent.style.item.shape),
             ) {
                 Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = PreferenceListSpacingArrangement(
-                        tracker = parent.listSpacingTracker,
-                        scope = childRuntime.identityScope,
-                        itemSpacing = parent.style.spacing.inGroupSeparator.spacingOrZero,
-                        sectionSpacing = parent.style.spacing.sectionSpacing,
-                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .accountForPreferenceListSpacing(groupListSpacingArrangement),
+                    verticalArrangement = groupListSpacingArrangement,
                 ) {
                     groupContent()
                 }

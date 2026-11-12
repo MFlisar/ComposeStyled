@@ -37,6 +37,7 @@ import com.michaelflisar.composepreferences.styled.internal.LocalPreferenceRunti
 import com.michaelflisar.composepreferences.styled.internal.PreferenceAncestor
 import com.michaelflisar.composepreferences.styled.internal.PreferenceEntry
 import com.michaelflisar.composepreferences.styled.internal.PreferenceListSpacingArrangement
+import com.michaelflisar.composepreferences.styled.internal.accountForPreferenceListSpacing
 import com.michaelflisar.composepreferences.styled.internal.currentPreferenceRuntime
 import com.michaelflisar.composestyled.ui.components.StyledIconDefaults
 import com.michaelflisar.composestyled.ui.components.StyledListItem
@@ -189,6 +190,16 @@ private fun PreferenceSectionImpl(
         sectionStyle.shape
     }
 
+    val sectionListSpacingArrangement = PreferenceListSpacingArrangement(
+        tracker = parent.listSpacingTracker,
+        scope = current.identityScope,
+        itemSpacing = if (parent.isFiltering) {
+            0.dp
+        } else {
+            parent.style.spacing.inGroupSeparator.spacingOrZero
+        },
+        sectionSpacing = parent.style.spacing.sectionSpacing,
+    )
     val sectionChildren: @Composable () -> Unit = {
         Column(
             modifier = Modifier
@@ -202,17 +213,9 @@ private fun PreferenceSectionImpl(
                     } else {
                         Modifier
                     }
-                ),
-            verticalArrangement = PreferenceListSpacingArrangement(
-                tracker = parent.listSpacingTracker,
-                scope = current.identityScope,
-                itemSpacing = if (parent.isFiltering) {
-                    0.dp
-                } else {
-                    parent.style.spacing.inGroupSeparator.spacingOrZero
-                },
-                sectionSpacing = parent.style.spacing.sectionSpacing,
-            ),
+                )
+                .accountForPreferenceListSpacing(sectionListSpacingArrangement),
+            verticalArrangement = sectionListSpacingArrangement,
         ) {
             pageContent()
         }

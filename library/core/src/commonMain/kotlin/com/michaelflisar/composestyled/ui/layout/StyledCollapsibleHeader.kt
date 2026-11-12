@@ -57,7 +57,7 @@ enum class StyledCollapsibleHeaderScrollBehavior {
  */
 @Stable
 class StyledCollapsibleHeaderState internal constructor(
-    initialCollapsedFraction: Float = 0f,
+    initialCollapsedFraction: Float,
 ) {
     private var fraction by mutableFloatStateOf(initialCollapsedFraction.coerceIn(0f, 1f))
     private var animationJob: Job? = null
@@ -119,11 +119,15 @@ private val StyledCollapsibleHeaderStateSaver: Saver<StyledCollapsibleHeaderStat
 
 /**
  * Creates and remembers a saveable [StyledCollapsibleHeaderState].
+ *
+ * @param initialCollapsedFraction Initial collapse fraction; changing it resets the remembered state.
  */
 @Composable
-fun rememberStyledCollapsibleHeaderState(): StyledCollapsibleHeaderState =
-    rememberSaveable(saver = StyledCollapsibleHeaderStateSaver) {
-        StyledCollapsibleHeaderState()
+fun rememberStyledCollapsibleHeaderState(
+    initialCollapsedFraction: Float = 0f,
+): StyledCollapsibleHeaderState =
+    rememberSaveable(initialCollapsedFraction, saver = StyledCollapsibleHeaderStateSaver) {
+        StyledCollapsibleHeaderState(initialCollapsedFraction)
     }
 
 /**

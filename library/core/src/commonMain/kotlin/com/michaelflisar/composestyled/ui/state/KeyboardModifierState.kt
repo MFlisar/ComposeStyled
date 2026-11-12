@@ -49,7 +49,7 @@ data class KeyboardModifierSnapshot(
 /** Tracks keyboard modifiers from preview key events for use by pointer callbacks. */
 @Stable
 class KeyboardModifierState internal constructor(
-    private val isReadOnly: Boolean = false,
+    private val isReadOnly: Boolean,
 ) {
     private var currentSnapshot by mutableStateOf(KeyboardModifierSnapshot.None)
 
@@ -97,7 +97,7 @@ class KeyboardModifierState internal constructor(
 /** Remembers a modifier tracker scoped to the current composition. */
 @Composable
 fun rememberKeyboardModifierState(): KeyboardModifierState =
-    remember { KeyboardModifierState() }
+    remember { KeyboardModifierState(isReadOnly = false) }
 
 /** Current keyboard modifier state provided by [ProvideKeyboardModifierState]. */
 val LocalKeyboardModifiers = staticCompositionLocalOf { KeyboardModifierState.None }

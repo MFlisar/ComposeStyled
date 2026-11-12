@@ -1,8 +1,11 @@
 package com.michaelflisar.demo.demos.libraries
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableFloatStateOf
@@ -44,10 +47,19 @@ import com.michaelflisar.composestyled.ui.layout.StyledRow
 import com.michaelflisar.composestyled.ui.layout.StyledScaffold
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.ui.state.rememberDialogState
+import com.michaelflisar.demo.PreferenceTest
 import com.michaelflisar.demo.helper.DemoTopBar
 
 @Composable
 internal fun DemoPagePreferences(onBack: () -> Unit) {
+
+    // TEST
+    // StyledScaffold {
+    //     Box(modifier = Modifier.height(400.dp).padding(it)) {
+    //         PreferenceTest()
+    //     }
+    // }
+    // return
 
     // "preferences"
     val notifications = rememberSaveable { mutableStateOf(true) }

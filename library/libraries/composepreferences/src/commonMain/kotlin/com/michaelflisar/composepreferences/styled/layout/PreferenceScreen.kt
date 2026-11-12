@@ -44,6 +44,7 @@ import com.michaelflisar.composepreferences.styled.internal.PreferenceIdentityAl
 import com.michaelflisar.composepreferences.styled.internal.PreferenceListSpacingArrangement
 import com.michaelflisar.composepreferences.styled.internal.PreferenceListSpacingTracker
 import com.michaelflisar.composepreferences.styled.internal.PreferenceRuntime
+import com.michaelflisar.composepreferences.styled.internal.accountForPreferenceListSpacing
 import com.michaelflisar.composepreferences.styled.rememberPreferenceStyle
 import com.michaelflisar.composestyled.ui.components.StyledIcon
 import com.michaelflisar.composestyled.ui.components.StyledListItem
@@ -52,7 +53,7 @@ import com.michaelflisar.composestyled.ui.primitives.StyledText
 
 @Stable
 class PreferenceScreenState internal constructor(
-    routes: List<PreferenceRoute> = emptyList(),
+    routes: List<PreferenceRoute>,
 ) {
     internal var routes by mutableStateOf(routes)
         private set
@@ -87,7 +88,9 @@ private val PreferenceScreenStateSaver: Saver<PreferenceScreenState, List<Any>> 
 /** Remembers navigation state for a [PreferenceScreen]. */
 @Composable
 fun rememberPreferenceScreenState(): PreferenceScreenState =
-    rememberSaveable(saver = PreferenceScreenStateSaver) { PreferenceScreenState() }
+    rememberSaveable(saver = PreferenceScreenStateSaver) {
+        PreferenceScreenState(emptyList())
+    }
 
 /** Hosts nested preference lists, filtering and navigation state. */
 @Composable
@@ -288,17 +291,20 @@ private fun PreferencePage(
     } else {
         style.spacing.itemSpacing
     }
+    val listSpacingArrangement = PreferenceListSpacingArrangement(
+        tracker = listSpacingTracker,
+        scope = emptyList(),
+        itemSpacing = pageSpacing,
+        sectionSpacing = style.spacing.sectionSpacing,
+        leadingItems = if (groupHeader == null) 0 else 1,
+    )
     Column(
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
-            .padding(style.outerPadding),
-        verticalArrangement = PreferenceListSpacingArrangement(
-            tracker = listSpacingTracker,
-            scope = emptyList(),
-            itemSpacing = pageSpacing,
-            sectionSpacing = style.spacing.sectionSpacing,
-        ),
+            .padding(style.outerPadding)
+            .accountForPreferenceListSpacing(listSpacingArrangement),
+        verticalArrangement = listSpacingArrangement,
     ) {
         if (groupHeader != null) {
             val (groupHeaderTitle, groupHeaderStyle) = groupHeader

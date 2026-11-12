@@ -1,11 +1,21 @@
 package com.michaelflisar.demo.helper
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.classes.toIconComposable
@@ -37,7 +47,10 @@ internal fun DemoTopBar(
             }
         }
     }
-    val titleContent: @Composable () -> Unit = { StyledText(title) }
+    val titleContent: @Composable () -> Unit = {
+        //StyledText(title)
+        DemoComplexTitleContent(title, "Sub Title")
+    }
     if (scrollBehavior != null) {
         StyledExpandableTopBar(
             behavior = scrollBehavior,
@@ -91,4 +104,44 @@ internal fun DemoSideNavigation(
         contentColor = contentColor,
         title = { StyledText("Components") },
     )
+}
+
+@Composable
+private fun DemoComplexTitleContent(
+    title: String,
+    subtitle: String?,
+) {
+    Column {
+        Crossfade(
+            targetState = title,
+            label = "toolbarTitle",
+        ) { currentTitle ->
+            StyledText(currentTitle)
+        }
+        val lastSubtitle = remember {
+            mutableStateOf(subtitle)
+        }
+        LaunchedEffect(subtitle) {
+            subtitle?.let {
+                lastSubtitle.value = it
+            }
+        }
+        AnimatedVisibility(
+            visible = subtitle != null,
+            enter = slideInVertically { it } +
+                    expandVertically(expandFrom = Alignment.Top),
+            exit = slideOutVertically { it } +
+                    shrinkVertically(shrinkTowards = Alignment.Top),
+        ) {
+            Crossfade(
+                targetState = subtitle ?: lastSubtitle.value.orEmpty(),
+                label = "toolbarSubtitle",
+            ) { currentSubtitle ->
+                StyledText(
+                    currentSubtitle,
+                    style = StyledTheme.typography.bodySmall
+                )
+            }
+        }
+    }
 }

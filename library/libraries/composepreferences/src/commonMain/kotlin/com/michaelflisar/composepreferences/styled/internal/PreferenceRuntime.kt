@@ -19,6 +19,7 @@ import androidx.compose.runtime.saveable.SaveableStateHolder
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import com.michaelflisar.composepreferences.styled.PreferenceFilter
@@ -127,13 +128,21 @@ internal class PreferenceListSpacingArrangement(
     private val scope: List<String>,
     private val itemSpacing: Dp,
     private val sectionSpacing: Dp,
+    private val leadingItems: Int = 0,
 ) : Arrangement.Vertical {
+    override val spacing: Dp
+        get() = if (tracker.spacingKinds(scope).isEmpty()) {
+            itemSpacing
+        } else {
+            minOf(itemSpacing, sectionSpacing)
+        }
+
     override fun Density.arrange(
         totalSize: Int,
         sizes: IntArray,
         outPositions: IntArray,
     ) {
-        val spacingKinds = tracker.spacingKinds(scope)
+        val spacingKinds = spacingKinds()
         if (spacingKinds.size != sizes.size) {
             arrangeWithSpacing(sizes, outPositions, itemSpacing.roundToPx())
             return
@@ -153,6 +162,19 @@ internal class PreferenceListSpacingArrangement(
         }
     }
 
+    fun additionalSpacingPx(density: Density): Int {
+        val baseline = with(density) { spacing.roundToPx() }
+        return spacingKinds().drop(1).sumOf { isSection ->
+            val spacing = if (isSection) sectionSpacing else itemSpacing
+            (with(density) { spacing.roundToPx() } - baseline).coerceAtLeast(0)
+        }
+    }
+
+    private fun spacingKinds(): List<Boolean> = buildList {
+        repeat(leadingItems) { add(false) }
+        addAll(tracker.spacingKinds(scope))
+    }
+
     private fun arrangeWithSpacing(
         sizes: IntArray,
         outPositions: IntArray,
@@ -164,6 +186,17 @@ internal class PreferenceListSpacingArrangement(
             outPositions[index] = position
             position += sizes[index]
         }
+    }
+}
+
+internal fun Modifier.accountForPreferenceListSpacing(
+    arrangement: PreferenceListSpacingArrangement,
+): Modifier = layout { measurable, constraints ->
+    val placeable = measurable.measure(constraints)
+    val height = placeable.height + arrangement.additionalSpacingPx(this)
+    // The column places variable gaps itself; extend its measured bounds to include them.
+    layout(placeable.width, height) {
+        placeable.place(0, 0)
     }
 }
 

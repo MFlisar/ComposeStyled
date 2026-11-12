@@ -41,7 +41,7 @@ enum class StyledExpandableTopBarScrollMode {
  */
 @Stable
 class StyledExpandableTopBarState internal constructor(
-    initialCollapsedFraction: Float = 0f,
+    initialCollapsedFraction: Float,
 ) {
     private var fraction by mutableFloatStateOf(initialCollapsedFraction.coerceIn(0f, 1f))
     private var scrollRange by mutableIntStateOf(0)
@@ -113,11 +113,15 @@ private val StyledExpandableTopBarStateSaver: Saver<StyledExpandableTopBarState,
 
 /**
  * Creates and remembers a saveable [StyledExpandableTopBarState].
+ *
+ * @param initialCollapsedFraction Initial collapse fraction; changing it resets the remembered state.
  */
 @Composable
-fun rememberStyledExpandableTopBarState(): StyledExpandableTopBarState =
-    rememberSaveable(saver = StyledExpandableTopBarStateSaver) {
-        StyledExpandableTopBarState()
+fun rememberStyledExpandableTopBarState(
+    initialCollapsedFraction: Float = 0f,
+): StyledExpandableTopBarState =
+    rememberSaveable(initialCollapsedFraction, saver = StyledExpandableTopBarStateSaver) {
+        StyledExpandableTopBarState(initialCollapsedFraction)
     }
 
 /**
