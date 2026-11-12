@@ -44,6 +44,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.customActions
@@ -54,6 +55,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import kotlin.math.roundToInt
 import com.michaelflisar.composestyled.UpdateStyledThemeLocals
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.platform.SystemBarStyleEffect
@@ -439,6 +441,25 @@ abstract class FoundationDialog : StyledDialog.Implementation {
         applyNavigationBarStyle: Boolean = true,
     ) {
         val expandableHeaderEnabled = expandableHeader != null && title != null
+        val safeInsetProgress = if (toolbarDragEnabled) {
+            toolbarExpansionProgress.coerceIn(0f, 1f)
+        } else if (edgeToEdge) {
+            1f
+        } else {
+            0f
+        }
+        val safeInsets = WindowInsets.safeDrawing
+        val density = LocalDensity.current
+        val layoutDirection = LocalLayoutDirection.current
+        val scaledSafeInsets = WindowInsets(
+            (safeInsets.getLeft(density, layoutDirection) * safeInsetProgress).roundToInt(),
+            (safeInsets.getTop(density) * safeInsetProgress).roundToInt(),
+            (safeInsets.getRight(density, layoutDirection) * safeInsetProgress).roundToInt(),
+            (safeInsets.getBottom(density) * safeInsetProgress).roundToInt(),
+        )
+        val toolbarInsets = scaledSafeInsets.only(
+            WindowInsetsSides.Top + WindowInsetsSides.Horizontal,
+        )
         val expandableHeaderBehavior = rememberStyledExpandableTopBarScrollBehavior()
         val headerContainerColor = expandableHeader?.containerColor ?: fullscreenContainerColor
         val headerContentColor = expandableHeader?.contentColor
@@ -533,6 +554,7 @@ abstract class FoundationDialog : StyledDialog.Implementation {
                         expandedContainerColor = expandedHeaderContainerColor,
                         expandedContentColor = expandedHeaderContentColor,
                         modifier = toolbarModifier,
+                        windowInsets = toolbarInsets,
                         navigationIcon = navigation,
                         actions = actions,
                         title = { title?.invoke() },
@@ -540,6 +562,7 @@ abstract class FoundationDialog : StyledDialog.Implementation {
                 } else if (centeredTitle) {
                     StyledCenterAlignedTopBar(
                         modifier = toolbarModifier,
+                        windowInsets = toolbarInsets,
                         navigationIcon = navigation,
                         actions = actions,
                         title = { title?.invoke() },
@@ -547,17 +570,17 @@ abstract class FoundationDialog : StyledDialog.Implementation {
                 } else {
                     StyledTopBar(
                         modifier = toolbarModifier,
+                        windowInsets = toolbarInsets,
                         navigationIcon = navigation,
                         actions = actions,
                         title = { title?.invoke() },
                     )
                 }
-                val layoutDirection = LocalLayoutDirection.current
-                val safePadding = WindowInsets.safeDrawing.only(
+                val safePadding = scaledSafeInsets.only(
                     WindowInsetsSides.Horizontal,
                 ).asPaddingValues()
                 val safeBottomPadding = if (footerButtons.isEmpty) {
-                    WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom)
+                    scaledSafeInsets.only(WindowInsetsSides.Bottom)
                         .asPaddingValues().calculateBottomPadding()
                 } else 0.dp
                 val largePadding = StyledTheme.spacing.large
@@ -575,7 +598,7 @@ abstract class FoundationDialog : StyledDialog.Implementation {
                     DialogActions(
                         footerButtons, StyledDialog.Context.FullscreenAction,
                         Modifier.windowInsetsPadding(
-                            WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal),
+                            scaledSafeInsets.only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal),
                         ).padding(
                             start = StyledTheme.spacing.large,
                             end = StyledTheme.spacing.large,

@@ -136,10 +136,12 @@ second exit animation.
 
 Toolbar dialogs can opt into `expandToFullscreen`. Drag the toolbar upward to
 expand the workspace edge-to-edge, or downward to restore its bounded layout.
-The workspace bounds follow the drag continuously; on release, drag distance
-and velocity determine which layout it settles into. System-bar icon contrast
-updates at the fullscreen endpoint. Assistive technology can use the toolbar's
-expand/restore custom action. The option defaults to `false`.
+The workspace bounds follow the drag continuously; system-bar insets transition
+with the expansion, so a bounded dialog does not reserve extra body padding for
+the system bars. On release, drag distance and velocity determine which layout
+it settles into. System-bar icon contrast updates at the fullscreen endpoint.
+Assistive technology can use the toolbar's expand/restore custom action. The
+option defaults to `false`.
 
 ### Floating windows
 
