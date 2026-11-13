@@ -18,6 +18,8 @@ composables; they do not accept a variant override. Use
 `StyledButton(variant = StyledButton.Variant.Filled)` when a filled style must
 remain explicit in every context. Use `StyledButtonDefaults.customize` and
 `CustomColors` for color changes rather than primary/secondary role variants.
+The `colors` argument is optional when using customization for the outline
+border alone.
 For caller-defined content that needs click feedback without a button's minimum
 width, use [`StyledClickable`](Clickable.md).
 

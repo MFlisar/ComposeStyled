@@ -5,6 +5,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -79,6 +80,28 @@ fun <T : Any> dialogStateOf(initialData: T?): DataDialogState<T> = DataDialogSta
 @Composable
 fun rememberDialogState(initialVisible: Boolean = false): VisibilityDialogState =
     rememberSaveable(saver = VisibilityDialogStateSaver) { dialogStateOf(initialVisible) }
+
+/**
+ * Remembers a stable adapter for visibility and dismissal managed by another state object.
+ */
+@Composable
+fun rememberDialogState(
+    visible: Boolean,
+    onDismiss: () -> Unit,
+): DialogState {
+    val currentVisible = rememberUpdatedState(visible)
+    val currentOnDismiss = rememberUpdatedState(onDismiss)
+    return remember {
+        object : DialogState {
+            override val visible: Boolean
+                get() = currentVisible.value
+
+            override fun dismiss() {
+                currentOnDismiss.value()
+            }
+        }
+    }
+}
 
 /** [initialData] is used only when this composition first creates the state. */
 @Composable

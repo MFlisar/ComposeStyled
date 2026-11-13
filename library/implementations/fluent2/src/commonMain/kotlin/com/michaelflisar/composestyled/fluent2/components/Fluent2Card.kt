@@ -84,7 +84,8 @@ class Fluent2Card internal constructor(
             shape = shape,
             containerColor = background,
             contentColor = customContent ?: StyledTheme.contentColorFor(background),
-            shadowElevation = if (mappedVariant == Variant.Standard) 2.dp else 0.dp,
+            shadowElevation = customization?.elevation
+                ?: if (mappedVariant == Variant.Standard) 2.dp else 0.dp,
             border = when {
                 customBorder != null -> BorderStroke(1.dp, customBorder)
                 mappedVariant == Variant.Alternative -> BorderStroke(1.dp, colors.outline)

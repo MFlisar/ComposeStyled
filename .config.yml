@@ -43,7 +43,9 @@ project:
 apps:
   - name: Compose Styled Demo
     namespace: com.michaelflisar.composestyled.demo
-    version-name: 1.0.0
+    releases:
+      - name: 1.0.0
+        number: 1
     module-paths:
       - demo/app/android
       - demo/app/jvm
@@ -115,6 +117,9 @@ modules:
     - artifact-id: styled-composetable
       description: a styled implementation for ComposeTable
       path: library/libraries/composetable
+    - artifact-id: styled-composechangelog
+      description: a Styled changelog with Kotlin-defined releases
+      path: library/libraries/composechangelog
 
   # XCFrameworks [name, path, targets (ios, macos)]
   xcframeworks: []

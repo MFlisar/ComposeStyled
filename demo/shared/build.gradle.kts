@@ -122,9 +122,7 @@ kotlin {
             api(project(":composestyled:libraries:composetable"))
             api(project(":composestyled:libraries:composedialogs"))
             api(project(":composestyled:libraries:composepreferences"))
-
-            // TODO
-            // composedialogs + composepreferences + composechangelog
+            api(project(":composestyled:libraries:composechangelog"))
         }
 
     }

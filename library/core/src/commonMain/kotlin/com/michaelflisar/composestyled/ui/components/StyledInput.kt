@@ -85,7 +85,7 @@ object StyledInput {
 
     @Immutable
     class Customization internal constructor(
-        val colors: CustomColors,
+        val colors: CustomColors?,
         val border: ColorToken?,
     )
 
@@ -161,12 +161,12 @@ object StyledInputDefaults {
     val showConditionalClearIconForNumericOptionalInputs: Boolean
         @Composable get() = LocalStyledRegistry.current[StyledInput.DefaultsKey].showConditionalClearIconForNumericOptionalInputs
 
-    fun customize(colors: CustomColors) = StyledInput.Customization(colors, null)
+    fun customize(colors: CustomColors? = null) = StyledInput.Customization(colors, null)
 
-    fun customize(colors: CustomColors, border: Color) =
+    fun customize(colors: CustomColors? = null, border: Color) =
         customize(colors, border.asColorToken())
 
-    fun customize(colors: CustomColors, border: ColorToken) =
+    fun customize(colors: CustomColors? = null, border: ColorToken) =
         StyledInput.Customization(colors, border)
 
     @Composable

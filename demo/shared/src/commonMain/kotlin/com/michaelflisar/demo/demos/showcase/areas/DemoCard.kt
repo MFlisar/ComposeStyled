@@ -65,6 +65,12 @@ internal fun DemoCard(baseId: Int, expandState: ExpandState) {
         ) {
             StyledText("Custom padding", Modifier.padding(8.dp))
         }
+        StyledCard(
+            modifier = Modifier.fillMaxWidth(),
+            customization = StyledCardDefaults.customize(elevation = 0.dp),
+        ) {
+            StyledText("Customized elevation without overriding colors")
+        }
 
         StyledOutlinedCard(
             modifier = Modifier.fillMaxWidth(),

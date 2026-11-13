@@ -14,7 +14,8 @@ not accept a variant override.
 | Fluent 2 | Filled | Standard |
 
 It supports `shape`, `interactionSource` and
-`StyledIconButtonDefaults.customize(CustomColors, border)`. The content overload
+`StyledIconButtonDefaults.customize(CustomColors, border)`. The `colors`
+argument is optional when only overriding the outline border. The content overload
 accepts an arbitrary composable slot; the `IconComposable` overload applies the
 configured icon size and optional padding:
 

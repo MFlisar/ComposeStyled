@@ -12,6 +12,7 @@ import com.michaelflisar.composestyled.themes.nature.NatureThemes
 import com.michaelflisar.composestyled.themes.pastel.PastelThemes
 import com.michaelflisar.demo.demos.libraries.DemoPageComposeDialogs
 import com.michaelflisar.demo.demos.libraries.DemoPageComposeTable
+import com.michaelflisar.demo.demos.libraries.DemoPageChangelog
 import com.michaelflisar.demo.demos.libraries.DemoPagePreferences
 import com.michaelflisar.demo.demos.recipes.DemoPageRecipes
 import com.michaelflisar.demo.demos.showcase.DemoPageShowCase
@@ -45,5 +46,6 @@ object Definitions {
         "Table" to @Composable { DemoPageComposeTable(onBackPress) },
         "Preferences" to @Composable { DemoPagePreferences(onBackPress) },
         "Dialogs" to @Composable { DemoPageComposeDialogs(onBackPress) },
+        "Changelog" to @Composable { DemoPageChangelog(onBackPress) },
     )
 }

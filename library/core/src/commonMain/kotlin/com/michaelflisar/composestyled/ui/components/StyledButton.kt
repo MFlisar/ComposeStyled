@@ -64,7 +64,7 @@ object StyledButton {
 
     @Immutable
     class Customization internal constructor(
-        val colors: CustomColors,
+        val colors: CustomColors?,
         val border: ColorToken?,
     )
 
@@ -103,16 +103,16 @@ object StyledButtonDefaults {
         @Composable get() = LocalStyledRegistry.current[StyledButton.DefaultsKey].shape
 
     fun customize(
-        colors: CustomColors
+        colors: CustomColors? = null
     ) = Customization(colors, null)
 
     fun customize(
-        colors: CustomColors,
+        colors: CustomColors? = null,
         border: Color,
     ) = customize(colors, border.asColorToken())
 
     fun customize(
-        colors: CustomColors,
+        colors: CustomColors? = null,
         border: ColorToken,
     ) = Customization(colors, border)
 

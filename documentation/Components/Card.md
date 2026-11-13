@@ -15,14 +15,18 @@ Override `contentPadding`, for example with
 part of `StyledPadding`.
 
 All variants support `shape` and optional
-`StyledCardDefaults.customize(colors, border, elevation)`. An optional `onClick`
+`StyledCardDefaults.customize(colors, border, elevation)`. The `colors` argument
+is optional, so border and/or elevation can be customized without overriding
+colors. An optional `onClick`
 enables button semantics, keyboard activation and an interaction source;
 `enabled = false` disables the action. Filled styles use
 `CustomColors.filledBackground` and `CustomColors.filledForeground`; outlined
 styles use `textForeground` and the optional border color. Elevation is part of
 customization because it is style-specific: Material 3 uses a supplied
-elevation for filled cards and otherwise retains its native default; outlined
-cards and Cupertino/Fluent 2 renderers use their own elevation behavior.
+elevation for filled cards and otherwise retains its native default. Cupertino
+cards use no shadow by default. Fluent 2 uses 2 dp for standard cards and 0 dp
+for alternative cards by default; a supplied elevation overrides either
+default.
 Material 3 maps filled cards to `Card` and outlined cards to `OutlinedCard`,
 selecting the clickable overload only when `onClick` is supplied. Cupertino
 and Fluent 2 adapt the same variants to their card appearance and share

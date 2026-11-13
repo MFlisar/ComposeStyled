@@ -16,7 +16,8 @@ The input supports enabled/read-only modes, single-line or multiline input
 (`singleLine = false`, `minLines`, `maxLines`), label, placeholder,
 leading/trailing icons and supporting text. Shape defaults follow the
 implementation; use `StyledInputDefaults.customize(CustomColors, border)` to
-customize colors consistently across filled and outlined styles. Filled input
+customize colors consistently across filled and outlined styles. The `colors`
+argument is optional when only overriding the outlined border. Filled input
 uses `filledBackground`/`filledForeground`; outlined input uses
 `textForeground` and the optional border color.
 

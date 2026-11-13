@@ -390,6 +390,17 @@ State factories remain in `com.michaelflisar.composestyled.ui.state`.
 visibility is saved across supported host recreation, so a visible dialog or
 sheet remains visible after a configuration change.
 
+For visibility owned by another state object, use the adapter overload with
+`visible` and `onDismiss`. It keeps a stable `DialogState` while forwarding
+dismissal to the owner:
+
+```kotlin
+val dialogState = rememberDialogState(
+    visible = externalState.visible,
+    onDismiss = externalState::hide,
+)
+```
+
 The data-backed overload creates `DataDialogState<T>`. Non-null data means
 visible; `dismiss()` clears it. `show(data)` replaces the data and opens it.
 `requireData()` returns non-null data or throws if hidden. Read it inside a

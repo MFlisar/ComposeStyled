@@ -50,7 +50,7 @@ object StyledCard {
 
     @Immutable
     class Customization internal constructor(
-        val colors: CustomColors,
+        val colors: CustomColors?,
         val border: ColorToken?,
         val elevation: Dp?,
     )
@@ -92,18 +92,18 @@ object StyledCardDefaults {
         @Composable get() = LocalStyledRegistry.current[StyledCard.DefaultsKey].contentPadding
 
     fun customize(
-        colors: CustomColors,
+        colors: CustomColors? = null,
         elevation: Dp? = null,
     ) = StyledCard.Customization(colors, null, elevation)
 
     fun customize(
-        colors: CustomColors,
+        colors: CustomColors? = null,
         border: Color,
         elevation: Dp? = null,
     ) = customize(colors, border.asColorToken(), elevation)
 
     fun customize(
-        colors: CustomColors,
+        colors: CustomColors? = null,
         border: ColorToken,
         elevation: Dp? = null,
     ) = StyledCard.Customization(colors, border, elevation)

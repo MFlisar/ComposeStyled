@@ -243,7 +243,7 @@ object StyledDialog {
     ) {
         /** Custom content is rendered unchanged as a text-style action, without automatic icons. */
         constructor(
-            onClick: () -> Unit,
+            onClick: () -> Unit = {},
             enabled: Boolean = true,
             dismissOnClick: Boolean? = null,
             content: @Composable RowScope.() -> Unit,
@@ -254,7 +254,7 @@ object StyledDialog {
 
         /** Custom content can opt into a fixed visual variant while retaining the trailing content slot. */
         constructor(
-            onClick: () -> Unit,
+            onClick: () -> Unit = {},
             variant: StyledButton.Variant,
             enabled: Boolean = true,
             dismissOnClick: Boolean? = null,
@@ -265,7 +265,7 @@ object StyledDialog {
 
         /** Label also supplies the accessible name and tooltip when rendered as an icon. */
         constructor(
-            onClick: () -> Unit,
+            onClick: () -> Unit = {},
             label: String,
             icon: IconComposable? = null,
             presentation: ButtonPresentation = ButtonPresentation.Auto,

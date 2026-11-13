@@ -18,7 +18,7 @@ composetable =              "0.0.1-alpha06"
 
 # plugins only
 kmpicon =                   "1.0.0"
-kmpdevtools =               "9.3.4" # use the "devTools" task to change the version
+kmpdevtools =               "9.3.7" # use the "devTools" task to change the version
 
 # demos
 democomposables =           "1.0.5"
