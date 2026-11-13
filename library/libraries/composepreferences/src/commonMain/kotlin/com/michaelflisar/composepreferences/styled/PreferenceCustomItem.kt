@@ -36,6 +36,7 @@ fun PreferenceCustomItem(
         key = key,
         isEnabled = isEnabled,
         isVisible = isVisible,
+        breaksSectionShape = shape != null,
     ) { visuals ->
         val item = visuals.style.item
         val colors = item.colors

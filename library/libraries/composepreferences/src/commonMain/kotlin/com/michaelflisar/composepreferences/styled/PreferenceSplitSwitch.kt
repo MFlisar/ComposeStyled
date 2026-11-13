@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import com.michaelflisar.composepreferences.styled.internal.PreferenceSplit
 import com.michaelflisar.composestyled.classes.IconComposable
 import com.michaelflisar.composestyled.StyledTheme
@@ -25,6 +26,7 @@ fun PreferenceSplitSwitch(
     isVisible: @Composable () -> Boolean = { true },
     tint: Color? = null,
     onTint: Color? = null,
+    shape: Shape? = null,
 ) {
     PreferenceSplitSwitch(
         value = value.value,
@@ -40,6 +42,7 @@ fun PreferenceSplitSwitch(
         isVisible = isVisible,
         tint = tint,
         onTint = onTint,
+        shape = shape,
     )
 }
 
@@ -60,6 +63,7 @@ fun PreferenceSplitSwitch(
     isVisible: @Composable () -> Boolean = { true },
     tint: Color? = null,
     onTint: Color? = null,
+    shape: Shape? = null,
 ) {
     PreferenceSplit(
         title = title,
@@ -71,6 +75,7 @@ fun PreferenceSplitSwitch(
         filterTags = filterTags,
         isEnabled = isEnabled,
         isVisible = isVisible,
+        shape = shape,
         control = { visuals ->
             val tintToUse = tint ?: StyledTheme.colorScheme.primary
             val onTintToUse = onTint ?: StyledTheme.contentColorFor(tintToUse)

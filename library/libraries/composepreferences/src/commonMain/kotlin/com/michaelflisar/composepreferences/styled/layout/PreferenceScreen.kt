@@ -44,6 +44,7 @@ import com.michaelflisar.composepreferences.styled.internal.PreferenceIdentityAl
 import com.michaelflisar.composepreferences.styled.internal.PreferenceListSpacingArrangement
 import com.michaelflisar.composepreferences.styled.internal.PreferenceListSpacingTracker
 import com.michaelflisar.composepreferences.styled.internal.PreferenceRuntime
+import com.michaelflisar.composepreferences.styled.internal.PreferenceSectionShapeTracker
 import com.michaelflisar.composepreferences.styled.internal.accountForPreferenceListSpacing
 import com.michaelflisar.composepreferences.styled.rememberPreferenceStyle
 import com.michaelflisar.composestyled.ui.components.StyledIcon
@@ -280,6 +281,7 @@ private fun PreferencePage(
         PreferenceFilterResultTracker()
     }
     val groupSeparatorTracker = remember { PreferenceGroupSeparatorTracker() }
+    val sectionShapeTracker = remember { PreferenceSectionShapeTracker() }
     val listSpacingTracker = remember { PreferenceListSpacingTracker() }
     val groupHeader = when (val openGroupHeaderStyle = style.openedGroupHeader) {
         PreferenceOpenGroupHeaderStyle.Disabled -> null
@@ -334,6 +336,7 @@ private fun PreferencePage(
                 style = style,
                 filterResultTracker = filterResultTracker,
                 groupSeparatorTracker = groupSeparatorTracker,
+                sectionShapeTracker = sectionShapeTracker,
                 listSpacingTracker = listSpacingTracker,
                 filterQuery = query,
                 includeHierarchyInFilter = includeHierarchyInFilter,
@@ -347,6 +350,7 @@ private fun PreferencePage(
                 parentVisible = true,
                 parentExpanded = true,
                 insideSection = false,
+                sectionShapeCoordinates = null,
             ),
         ) {
             content()

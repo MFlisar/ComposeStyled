@@ -22,7 +22,6 @@ import com.michaelflisar.composepreferences.styled.PreferenceStyleDefaults
 import com.michaelflisar.composepreferences.styled.layout.PreferenceScreen
 import com.michaelflisar.composepreferences.styled.PreferenceBool
 import com.michaelflisar.composepreferences.styled.PreferenceCustomItem
-import com.michaelflisar.composepreferences.styled.PreferenceInfo
 import com.michaelflisar.composepreferences.styled.PreferenceInputText
 import com.michaelflisar.composepreferences.styled.PreferenceItem
 import com.michaelflisar.composepreferences.styled.PreferenceList
@@ -238,6 +237,7 @@ internal fun DemoPagePreferences(onBack: () -> Unit) {
                         subtitle = "Customize theme colors, typography, and layout",
                         icon = StyledIcons.Settings,
                         filterTags = listOf("Visuals", "Theme", "Design"),
+                        shape = StyledTheme.shapes.small,
                     ) {
                         PreferenceSection(
                             title = "Theme Colors",
@@ -301,7 +301,7 @@ internal fun DemoPagePreferences(onBack: () -> Unit) {
                                 selected = density,
                                 title = "Layout Density",
                                 subtitle = "Choose the spacing between controls",
-                                filterTags = listOf("Compact", "Spacing"),
+                                filterTags = listOf("Compact", "Spacing")
                             )
                             PreferenceListMultiSelect(
                                 items = areas,
@@ -310,6 +310,7 @@ internal fun DemoPagePreferences(onBack: () -> Unit) {
                                 presentation = PreferenceList.Presentation.Dropdown(),
                                 filter = PreferenceList.Filter(label = "Filter areas"),
                                 filterTags = listOf("Navigation", "Menu"),
+
                             )
                         }
                     }
@@ -330,6 +331,11 @@ internal fun DemoPagePreferences(onBack: () -> Unit) {
                                 subtitle = "Keep preferences in sync across devices",
                                 filterTags = listOf("Backup", "Account"),
                             )
+                            PreferenceItem(
+                                title = "Custom shape",
+                                subtitle = "This row separates the section shape",
+                                shape = StyledTheme.shapes.small,
+                            )
                             PreferenceBool(
                                 value = usageAnalytics,
                                 title = "Usage Analytics",
@@ -344,7 +350,16 @@ internal fun DemoPagePreferences(onBack: () -> Unit) {
                     title = "Advanced",
                     subtitle = "Developer options and custom settings",
                     filterTags = listOf("Developer", "Expert"),
+                    shape = StyledTheme.shapes.small,
                 ) {
+                    PreferenceBool(
+                        value = notifications,
+                        title = "Notifications",
+                        subtitle = "Show updates and reminders",
+                        filterTags = listOf("Alerts"),
+                        icon = StyledIcons.Notifications
+                    )
+
                     PreferenceSection(
                         title = "Developer Options",
                         isExpandable = false,
@@ -356,12 +371,14 @@ internal fun DemoPagePreferences(onBack: () -> Unit) {
                             subtitle = "Open details or toggle the mode",
                             onOpen = { detailDialog.show() },
                             filterTags = listOf("Experimental"),
+                            shape = StyledTheme.shapes.small,
                         )
                         PreferenceInputText(
                             value = profileLabel,
                             title = "Profile Label",
                             subtitle = "Custom label used in the account menu",
                             filterTags = listOf("Account", "Name"),
+                            shape = StyledTheme.shapes.small,
                         )
                         PreferenceItem(
                             title = "Custom Content",
@@ -389,9 +406,9 @@ internal fun DemoPagePreferences(onBack: () -> Unit) {
                     isInitiallyExpanded = false,
                     filterTags = listOf("Debug", "Testing"),
                 ) {
-                    PreferenceInfo(
+                    PreferenceItem(
                         title = "More",
-                        text = "Item in section that is not initially expanded"
+                        subtitle = "Item in section that is not initially expanded"
                     )
                 }
             }

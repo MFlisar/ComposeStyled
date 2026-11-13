@@ -12,6 +12,7 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.classes.IconComposable
 import com.michaelflisar.composepreferences.styled.internal.LocalPreferenceRuntime
@@ -36,6 +37,7 @@ fun PreferenceGroup(
     filterTags: List<String> = emptyList(),
     isEnabled: @Composable () -> Boolean = { true },
     isVisible: @Composable () -> Boolean = { true },
+    shape: Shape? = null,
     content: @Composable () -> Unit,
 ) {
     val parent =
@@ -72,7 +74,8 @@ fun PreferenceGroup(
         parentEnabled = enabled,
         parentVisible = visible,
         parentExpanded = true,
-        insideSection = !parent.isFiltering,
+        insideSection = false,
+        sectionShapeCoordinates = null,
     )
     DisposableEffect(parent.listSpacingTracker, identity) {
         onDispose {
@@ -85,6 +88,7 @@ fun PreferenceGroup(
             scope = parent.identityScope,
             order = parent.identityAllocator.order(identity),
             isVisible = true,
+            isInsideSection = parent.insideSection && shape == null,
         )
     }
 
@@ -102,6 +106,7 @@ fun PreferenceGroup(
             isVisible = { showGroup },
             renderInFilter = parent.filterScope != PreferenceFilter.Scope.Global,
             trackInListSpacing = false,
+            breaksSectionShape = shape != null,
         ) {
             PreferenceRowContent(
                 title = title,
@@ -126,6 +131,7 @@ fun PreferenceGroup(
                 },
                 style = it.style,
                 insideSection = it.insideSection,
+                shape = shape,
             )
         }
 

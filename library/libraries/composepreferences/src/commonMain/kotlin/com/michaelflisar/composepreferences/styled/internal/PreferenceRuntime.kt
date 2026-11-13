@@ -19,7 +19,11 @@ import androidx.compose.runtime.saveable.SaveableStateHolder
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.layout
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import com.michaelflisar.composepreferences.styled.PreferenceFilter
@@ -53,13 +57,24 @@ internal class PreferenceGroupSeparatorTracker {
     private data class Entry(
         val scope: List<String>,
         val order: Int,
+        val isInsideSection: Boolean,
     )
 
     private val entries = mutableStateMapOf<String, Entry>()
 
-    fun update(identity: String, scope: List<String>, order: Int, isVisible: Boolean) {
+    fun update(
+        identity: String,
+        scope: List<String>,
+        order: Int,
+        isVisible: Boolean,
+        isInsideSection: Boolean,
+    ) {
         if (isVisible) {
-            val entry = Entry(scope = scope, order = order)
+            val entry = Entry(
+                scope = scope,
+                order = order,
+                isInsideSection = isInsideSection,
+            )
             if (entries[identity] != entry) entries[identity] = entry
         } else {
             entries.remove(identity)
@@ -72,14 +87,85 @@ internal class PreferenceGroupSeparatorTracker {
 
     fun hasNext(identity: String, scope: List<String>): Boolean {
         val current = entries[identity] ?: return false
-        return entries.values.any { it.scope == scope && it.order > current.order }
+        if (!current.isInsideSection) return false
+        val siblings = entries.values
+            .filter { it.scope == scope }
+            .sortedBy(Entry::order)
+        val currentIndex = siblings.indexOf(current)
+        return siblings.getOrNull(currentIndex + 1)?.isInsideSection == true
     }
+}
+
+internal data class PreferenceSectionShapeEntry(
+    val order: Int,
+    val bounds: Rect?,
+)
+
+internal class PreferenceSectionShapeTracker {
+    private data class Entry(
+        val scope: List<String>,
+        val order: Int,
+        val bounds: Rect?,
+    )
+
+    private val entries = mutableStateMapOf<String, Entry>()
+
+    fun update(
+        identity: String,
+        scope: List<String>,
+        order: Int,
+        isVisible: Boolean,
+    ) {
+        if (isVisible) {
+            val current = entries[identity]
+            val bounds = current
+                ?.takeIf { it.scope == scope && it.order == order }
+                ?.bounds
+            val entry = Entry(
+                scope = scope,
+                order = order,
+                bounds = bounds,
+            )
+            if (current != entry) entries[identity] = entry
+        } else {
+            entries.remove(identity)
+        }
+    }
+
+    fun updateBounds(identity: String, bounds: Rect) {
+        val current = entries[identity] ?: return
+        if (current.bounds != bounds) {
+            entries[identity] = current.copy(bounds = bounds)
+        }
+    }
+
+    fun remove(identity: String) {
+        entries.remove(identity)
+    }
+
+    fun entries(scope: List<String>): List<PreferenceSectionShapeEntry> =
+        entries.values
+            .filter { it.scope == scope }
+            .sortedBy(Entry::order)
+            .map {
+                PreferenceSectionShapeEntry(
+                    order = it.order,
+                    bounds = it.bounds,
+                )
+            }
+}
+
+internal enum class PreferenceListSpacingKind {
+    Ordinary,
+    InGroup,
+    DetachedSection,
 }
 
 internal class PreferenceListSpacingTracker {
     private data class Entry(
         val scope: List<String>,
         val order: Int,
+        val isInsideSection: Boolean,
         val isDetachedSection: Boolean,
         val hasDividerAfter: Boolean,
     )
@@ -91,6 +177,7 @@ internal class PreferenceListSpacingTracker {
         scope: List<String>,
         order: Int,
         isVisible: Boolean,
+        isInsideSection: Boolean = false,
         isDetachedSection: Boolean = false,
         hasDividerAfter: Boolean = false,
     ) {
@@ -98,6 +185,7 @@ internal class PreferenceListSpacingTracker {
             val entry = Entry(
                 scope = scope,
                 order = order,
+                isInsideSection = isInsideSection,
                 isDetachedSection = isDetachedSection,
                 hasDividerAfter = hasDividerAfter,
             )
@@ -111,16 +199,32 @@ internal class PreferenceListSpacingTracker {
         entries.remove(identity)
     }
 
-    fun spacingKinds(scope: List<String>): List<Boolean> =
+    fun spacingKinds(scope: List<String>): List<PreferenceListSpacingKind> =
         entries.values
             .filter { it.scope == scope }
             .sortedBy(Entry::order)
             .flatMap { entry ->
                 buildList {
-                    add(entry.isDetachedSection)
-                    if (entry.hasDividerAfter) add(false)
+                    add(
+                        when {
+                            entry.isDetachedSection ->
+                                PreferenceListSpacingKind.DetachedSection
+                            entry.isInsideSection -> PreferenceListSpacingKind.InGroup
+                            else -> PreferenceListSpacingKind.Ordinary
+                        },
+                    )
+                    if (entry.hasDividerAfter) {
+                        add(PreferenceListSpacingKind.InGroup)
+                    }
                 }
             }
+
+    fun firstIsOrdinaryItem(scope: List<String>): Boolean =
+        entries.values
+            .filter { it.scope == scope }
+            .minByOrNull(Entry::order)
+            ?.let { !it.isInsideSection && !it.isDetachedSection }
+            ?: false
 }
 
 internal class PreferenceListSpacingArrangement(
@@ -128,13 +232,14 @@ internal class PreferenceListSpacingArrangement(
     private val scope: List<String>,
     private val itemSpacing: Dp,
     private val sectionSpacing: Dp,
+    private val ordinaryItemSpacing: Dp = itemSpacing,
     private val leadingItems: Int = 0,
 ) : Arrangement.Vertical {
     override val spacing: Dp
         get() = if (tracker.spacingKinds(scope).isEmpty()) {
             itemSpacing
         } else {
-            minOf(itemSpacing, sectionSpacing)
+            minOf(itemSpacing, sectionSpacing, ordinaryItemSpacing)
         }
 
     override fun Density.arrange(
@@ -150,12 +255,10 @@ internal class PreferenceListSpacingArrangement(
         var position = 0
         sizes.indices.forEach { index ->
             if (index > 0) {
-                val spacing = if (spacingKinds[index]) {
-                    sectionSpacing
-                } else {
-                    itemSpacing
-                }
-                position += spacing.roundToPx()
+                position += spacingBetween(
+                    previous = spacingKinds[index - 1],
+                    current = spacingKinds[index],
+                ).roundToPx()
             }
             outPositions[index] = position
             position += sizes[index]
@@ -164,14 +267,28 @@ internal class PreferenceListSpacingArrangement(
 
     fun additionalSpacingPx(density: Density): Int {
         val baseline = with(density) { spacing.roundToPx() }
-        return spacingKinds().drop(1).sumOf { isSection ->
-            val spacing = if (isSection) sectionSpacing else itemSpacing
+        val kinds = spacingKinds()
+        return kinds.indices.drop(1).sumOf { index ->
+            val spacing = spacingBetween(
+                previous = kinds[index - 1],
+                current = kinds[index],
+            )
             (with(density) { spacing.roundToPx() } - baseline).coerceAtLeast(0)
         }
     }
 
-    private fun spacingKinds(): List<Boolean> = buildList {
-        repeat(leadingItems) { add(false) }
+    private fun spacingBetween(
+        previous: PreferenceListSpacingKind,
+        current: PreferenceListSpacingKind,
+    ): Dp = when {
+        current == PreferenceListSpacingKind.DetachedSection -> sectionSpacing
+        previous == PreferenceListSpacingKind.InGroup &&
+                current == PreferenceListSpacingKind.InGroup -> itemSpacing
+        else -> ordinaryItemSpacing
+    }
+
+    private fun spacingKinds(): List<PreferenceListSpacingKind> = buildList {
+        repeat(leadingItems) { add(PreferenceListSpacingKind.Ordinary) }
         addAll(tracker.spacingKinds(scope))
     }
 
@@ -207,6 +324,7 @@ internal data class PreferenceRuntime(
     val style: PreferenceStyle,
     val filterResultTracker: PreferenceFilterResultTracker,
     val groupSeparatorTracker: PreferenceGroupSeparatorTracker,
+    val sectionShapeTracker: PreferenceSectionShapeTracker,
     val listSpacingTracker: PreferenceListSpacingTracker,
     val filterQuery: String,
     val includeHierarchyInFilter: Boolean,
@@ -220,6 +338,7 @@ internal data class PreferenceRuntime(
     val parentVisible: Boolean,
     val parentExpanded: Boolean,
     val insideSection: Boolean,
+    val sectionShapeCoordinates: LayoutCoordinates?,
 ) {
     val isFiltering: Boolean
         get() = filterQuery.isNotBlank()
@@ -267,6 +386,7 @@ internal fun PreferenceEntry(
     renderInFilter: Boolean = true,
     trackInGroupSeparator: Boolean = true,
     trackInListSpacing: Boolean = true,
+    breaksSectionShape: Boolean = false,
     content: @Composable (PreferenceEntryVisuals) -> Unit,
 ) {
     val runtime = currentPreferenceRuntime()
@@ -318,11 +438,31 @@ internal fun PreferenceEntry(
     } else {
         visible && isAtCurrentLevel
     }
-    val usesInGroupDivider = trackInGroupSeparator &&
+    val sectionShapeCoordinates = runtime.sectionShapeCoordinates
+    val insideSection = runtime.insideSection && !breaksSectionShape
+    val tracksSectionShape = !runtime.isFiltering &&
+        sectionShapeCoordinates != null &&
+        breaksSectionShape
+    if (tracksSectionShape) {
+        DisposableEffect(runtime.sectionShapeTracker, identity) {
+            onDispose {
+                runtime.sectionShapeTracker.remove(identity)
+            }
+        }
+        SideEffect {
+            runtime.sectionShapeTracker.update(
+                identity = identity,
+                scope = runtime.identityScope,
+                order = runtime.identityAllocator.order(identity),
+                isVisible = shouldRender,
+            )
+        }
+    }
+    val tracksInGroupDivider = trackInGroupSeparator &&
             !runtime.isFiltering &&
             runtime.insideSection &&
             runtime.style.spacing.inGroupSeparator is PreferenceInGroupSeparatorStyle.Divider
-    if (usesInGroupDivider) {
+    if (tracksInGroupDivider) {
         DisposableEffect(runtime.groupSeparatorTracker, identity) {
             onDispose {
                 runtime.groupSeparatorTracker.remove(identity)
@@ -334,10 +474,12 @@ internal fun PreferenceEntry(
                 scope = runtime.identityScope,
                 order = runtime.identityAllocator.order(identity),
                 isVisible = shouldRender,
+                isInsideSection = insideSection,
             )
         }
     }
-    val hasNextInGroupEntry = usesInGroupDivider &&
+    val hasNextInGroupEntry = tracksInGroupDivider &&
+            insideSection &&
             shouldRender &&
             runtime.groupSeparatorTracker.hasNext(identity, runtime.identityScope)
     if (trackInListSpacing) {
@@ -352,6 +494,7 @@ internal fun PreferenceEntry(
                 scope = runtime.identityScope,
                 order = runtime.identityAllocator.order(identity),
                 isVisible = shouldRender || runtime.isFiltering,
+                isInsideSection = insideSection,
                 hasDividerAfter = hasNextInGroupEntry,
             )
         }
@@ -381,7 +524,7 @@ internal fun PreferenceEntry(
                     enabled = enabled,
                     breadcrumb = breadcrumb,
                     style = runtime.style,
-                    insideSection = runtime.insideSection,
+                    insideSection = insideSection,
                 )
             )
         }
@@ -417,6 +560,37 @@ internal fun PreferenceEntry(
                 PreferenceInGroupDivider(runtime.style)
             }
         }
-        renderedContent()
+        if (tracksSectionShape) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onGloballyPositioned { coordinates ->
+                        val parentCoordinates = sectionShapeCoordinates
+                        if (
+                            parentCoordinates != null &&
+                            parentCoordinates.isAttached &&
+                            coordinates.isAttached
+                        ) {
+                            val position = parentCoordinates.localPositionOf(
+                                sourceCoordinates = coordinates,
+                                relativeToSource = Offset.Zero,
+                            )
+                            runtime.sectionShapeTracker.updateBounds(
+                                identity = identity,
+                                bounds = Rect(
+                                    left = position.x,
+                                    top = position.y,
+                                    right = position.x + coordinates.size.width,
+                                    bottom = position.y + coordinates.size.height,
+                                ),
+                            )
+                        }
+                    },
+            ) {
+                renderedContent()
+            }
+        } else {
+            renderedContent()
+        }
     }
 }

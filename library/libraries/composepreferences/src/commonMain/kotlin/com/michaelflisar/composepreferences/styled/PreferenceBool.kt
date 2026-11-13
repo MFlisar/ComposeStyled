@@ -93,6 +93,7 @@ fun PreferenceBool(
         key = key,
         isEnabled = isEnabled,
         isVisible = isVisible,
+        breaksSectionShape = shape != null,
     ) { visuals ->
         val tintToUse = tint ?: StyledTheme.colorScheme.primary
         val onTintToUse = onTint ?: StyledTheme.contentColorFor(tintToUse)

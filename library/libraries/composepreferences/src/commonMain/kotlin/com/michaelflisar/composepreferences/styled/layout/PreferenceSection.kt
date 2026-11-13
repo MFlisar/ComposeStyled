@@ -27,7 +27,15 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Outline
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -37,6 +45,7 @@ import com.michaelflisar.composepreferences.styled.internal.LocalPreferenceRunti
 import com.michaelflisar.composepreferences.styled.internal.PreferenceAncestor
 import com.michaelflisar.composepreferences.styled.internal.PreferenceEntry
 import com.michaelflisar.composepreferences.styled.internal.PreferenceListSpacingArrangement
+import com.michaelflisar.composepreferences.styled.internal.PreferenceSectionShapeEntry
 import com.michaelflisar.composepreferences.styled.internal.accountForPreferenceListSpacing
 import com.michaelflisar.composepreferences.styled.internal.currentPreferenceRuntime
 import com.michaelflisar.composestyled.ui.components.StyledIconDefaults
@@ -143,6 +152,12 @@ private fun PreferenceSectionImpl(
     val showHeader = !parent.isFiltering && isCurrentLevel &&
         parent.parentExpanded && visible
     val sectionStyle = parent.style.section
+    val clipsSectionShape = !parent.isFiltering &&
+        sectionIsExpanded &&
+        (!sectionStyle.headerIsPartOfShape || (isCurrentLevel && visible))
+    val sectionShapeCoordinates = remember(identity) {
+        mutableStateOf<LayoutCoordinates?>(null)
+    }
     DisposableEffect(parent.listSpacingTracker, identity) {
         onDispose {
             parent.listSpacingTracker.remove(identity)
@@ -154,6 +169,7 @@ private fun PreferenceSectionImpl(
             scope = parent.identityScope,
             order = parent.identityAllocator.order(identity),
             isVisible = true,
+            isInsideSection = parent.insideSection && sectionStyle.headerIsPartOfShape,
             isDetachedSection = showHeader && !sectionStyle.headerIsPartOfShape,
         )
     }
@@ -168,7 +184,15 @@ private fun PreferenceSectionImpl(
         parentVisible = visible,
         parentExpanded = parent.parentExpanded,
         insideSection = if (parent.isFiltering) false else true,
+        sectionShapeCoordinates = sectionShapeCoordinates.value.takeIf { clipsSectionShape },
     )
+    val sectionShape = PreferenceSectionClipShape(
+        shape = sectionStyle.shape,
+        entries = parent.sectionShapeTracker.entries(current.identityScope),
+        breakSpacing = parent.style.spacing.itemSpacing,
+    )
+    val firstItemIsOrdinary = parent.listSpacingTracker
+        .firstIsOrdinaryItem(current.identityScope)
     val pageContent = @Composable {
         CompositionLocalProvider(LocalPreferenceRuntime provides current) {
             content()
@@ -199,6 +223,11 @@ private fun PreferenceSectionImpl(
             parent.style.spacing.inGroupSeparator.spacingOrZero
         },
         sectionSpacing = parent.style.spacing.sectionSpacing,
+        ordinaryItemSpacing = if (parent.isFiltering) {
+            0.dp
+        } else {
+            parent.style.spacing.itemSpacing
+        },
     )
     val sectionChildren: @Composable () -> Unit = {
         Column(
@@ -209,7 +238,11 @@ private fun PreferenceSectionImpl(
                         !sectionStyle.headerIsPartOfShape &&
                         sectionIsExpanded
                     ) {
-                        Modifier.clip(sectionStyle.shape)
+                        Modifier
+                            .onGloballyPositioned {
+                                sectionShapeCoordinates.value = it
+                            }
+                            .clip(sectionShape)
                     } else {
                         Modifier
                     }
@@ -231,7 +264,11 @@ private fun PreferenceSectionImpl(
                     sectionStyle.headerIsPartOfShape &&
                     sectionIsExpanded
                 ) {
-                    Modifier.clip(sectionStyle.shape)
+                    Modifier
+                        .onGloballyPositioned {
+                            sectionShapeCoordinates.value = it
+                        }
+                        .clip(sectionShape)
                 } else {
                     Modifier
                 }
@@ -254,7 +291,13 @@ private fun PreferenceSectionImpl(
                     .fillMaxWidth()
                     .then(
                         if (!sectionStyle.headerIsPartOfShape) {
-                            Modifier.padding(bottom = parent.style.spacing.sectionSpacing)
+                            Modifier.padding(
+                                bottom = if (firstItemIsOrdinary) {
+                                    parent.style.spacing.itemSpacing
+                                } else {
+                                    parent.style.spacing.sectionSpacing
+                                },
+                            )
                         } else {
                             Modifier
                         }
@@ -301,7 +344,11 @@ private fun PreferenceSectionImpl(
         } else if (!canExpand) {
             Column(modifier = Modifier.fillMaxWidth()) {
                 if (showHeader && parent.parentExpanded && visible) {
-                    PreferenceSectionHeaderSeparator(parent.style, sectionStyle)
+                    PreferenceSectionHeaderSeparator(
+                        parent.style,
+                        sectionStyle,
+                        firstItemIsOrdinary,
+                    )
                 }
                 sectionChildren()
             }
@@ -320,7 +367,11 @@ private fun PreferenceSectionImpl(
             ) {
                 Column(modifier = Modifier.fillMaxWidth()) {
                     if (showHeader && parent.parentExpanded && visible) {
-                        PreferenceSectionHeaderSeparator(parent.style, sectionStyle)
+                        PreferenceSectionHeaderSeparator(
+                            parent.style,
+                            sectionStyle,
+                            firstItemIsOrdinary,
+                        )
                     }
                     sectionChildren()
                 }
@@ -329,21 +380,84 @@ private fun PreferenceSectionImpl(
     }
 }
 
+private class PreferenceSectionClipShape(
+    private val shape: Shape,
+    private val entries: List<PreferenceSectionShapeEntry>,
+    private val breakSpacing: Dp,
+) : Shape {
+    override fun createOutline(
+        size: Size,
+        layoutDirection: androidx.compose.ui.unit.LayoutDirection,
+        density: androidx.compose.ui.unit.Density,
+    ): Outline {
+        if (entries.isEmpty() || entries.any { it.bounds == null }) {
+            return shape.createOutline(size, layoutDirection, density)
+        }
+
+        val path = Path()
+        val breakSpacingPx = with(density) { breakSpacing.toPx() }
+        var segmentStart = 0f
+
+        fun addSectionSegment(top: Float, bottom: Float) {
+            val clippedTop = top.coerceIn(0f, size.height)
+            val clippedBottom = bottom.coerceIn(0f, size.height)
+            if (clippedBottom <= clippedTop) return
+            val segmentOutline = shape.createOutline(
+                Size(size.width, clippedBottom - clippedTop),
+                layoutDirection,
+                density,
+            )
+            path.addOutline(segmentOutline, Offset(0f, clippedTop))
+        }
+
+        entries.forEach { entry ->
+            val bounds = checkNotNull(entry.bounds)
+            val breakTop = bounds.top.coerceIn(0f, size.height)
+            val breakBottom = bounds.bottom.coerceIn(0f, size.height)
+            val segmentTop = (breakTop - breakSpacingPx).coerceIn(0f, size.height)
+            val segmentBottom = (breakBottom + breakSpacingPx).coerceIn(0f, size.height)
+            addSectionSegment(segmentStart, segmentTop)
+
+            val left = bounds.left.coerceIn(0f, size.width)
+            val right = bounds.right.coerceIn(0f, size.width)
+            if (right > left && breakBottom > breakTop) {
+                path.addRect(Rect(left, breakTop, right, breakBottom))
+            }
+            segmentStart = segmentBottom
+        }
+
+        addSectionSegment(segmentStart, size.height)
+        return Outline.Generic(path)
+    }
+
+    private fun Path.addOutline(outline: Outline, offset: Offset) {
+        val outlinePath = Path()
+        when (outline) {
+            is Outline.Rectangle -> outlinePath.addRect(outline.rect)
+            is Outline.Rounded -> outlinePath.addRoundRect(outline.roundRect)
+            is Outline.Generic -> outlinePath.addPath(outline.path)
+        }
+        addPath(outlinePath, offset)
+    }
+}
+
 
 @Composable
 private fun PreferenceSectionHeaderSeparator(
     style: com.michaelflisar.composepreferences.styled.PreferenceStyle,
     sectionStyle: com.michaelflisar.composepreferences.styled.PreferenceSectionStyle,
+    firstItemIsOrdinary: Boolean,
 ) {
-    when (val separator = style.spacing.inGroupSeparator) {
-        is com.michaelflisar.composepreferences.styled.PreferenceInGroupSeparatorStyle.Spacing -> {
-            if (sectionStyle.headerIsPartOfShape) {
-                Spacer(Modifier.height(separator.spacing))
-            }
-        }
-        is com.michaelflisar.composepreferences.styled.PreferenceInGroupSeparatorStyle.Divider -> {
-            if (sectionStyle.headerIsPartOfShape) {
-                PreferenceInGroupDivider(style)
+    if (sectionStyle.headerIsPartOfShape) {
+        if (firstItemIsOrdinary) {
+            Spacer(Modifier.height(style.spacing.itemSpacing))
+        } else {
+            when (val separator = style.spacing.inGroupSeparator) {
+                is com.michaelflisar.composepreferences.styled.PreferenceInGroupSeparatorStyle.Spacing ->
+                    Spacer(Modifier.height(separator.spacing))
+
+                is com.michaelflisar.composepreferences.styled.PreferenceInGroupSeparatorStyle.Divider ->
+                    PreferenceInGroupDivider(style)
             }
         }
     }

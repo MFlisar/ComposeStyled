@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 import com.michaelflisar.composepreferences.styled.layout.PreferenceStyledRow
 import com.michaelflisar.composestyled.classes.IconComposable
@@ -24,6 +25,7 @@ internal fun PreferenceSplit(
     filterTags: List<String>,
     isEnabled: @Composable () -> Boolean,
     isVisible: @Composable () -> Boolean,
+    shape: Shape?,
     control: @Composable (PreferenceEntryVisuals) -> Unit,
 ) {
     PreferenceEntry(
@@ -33,6 +35,7 @@ internal fun PreferenceSplit(
         key = key,
         isEnabled = isEnabled,
         isVisible = isVisible,
+        breaksSectionShape = shape != null,
     ) { visuals ->
         PreferenceStyledRow(
             title = title,
@@ -44,6 +47,7 @@ internal fun PreferenceSplit(
             style = visuals.style,
             insideSection = visuals.insideSection,
             breadcrumb = visuals.breadcrumb,
+            shape = shape,
             trailing = {
                 StyledIcon(
                     icon = StyledIcons.Submenu,

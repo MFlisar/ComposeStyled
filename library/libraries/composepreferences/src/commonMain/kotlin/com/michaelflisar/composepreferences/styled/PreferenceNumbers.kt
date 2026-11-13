@@ -12,6 +12,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import com.michaelflisar.composepreferences.styled.internal.BaseDialogPreference
 import com.michaelflisar.composepreferences.styled.internal.PreferenceEntry
 import com.michaelflisar.composepreferences.styled.layout.PreferenceStyledRow
@@ -48,6 +49,7 @@ fun <T : Number> PreferenceInputNumber(
     parser: NumberParser<T> = rememberNumberParser(value.value, stepSize),
     validator: Validator<T> = rememberValidator(value.value),
     inputVariant: StyledInput.Variant = StyledInput.Variant.Auto,
+    shape: Shape? = null,
 ) {
     PreferenceInputNumber(
         value = value.value,
@@ -65,6 +67,7 @@ fun <T : Number> PreferenceInputNumber(
         parser = parser,
         validator = validator,
         inputVariant = inputVariant,
+        shape = shape,
     )
 }
 
@@ -87,6 +90,7 @@ fun <T : Number> PreferenceInputNumber(
     parser: NumberParser<T> = rememberNumberParser(value, stepSize),
     validator: Validator<T> = rememberValidator(value),
     inputVariant: StyledInput.Variant = StyledInput.Variant.Auto,
+    shape: Shape? = null,
 ) {
     val dialog = rememberDialogState()
     var draft by rememberSaveable { mutableStateOf(value) }
@@ -107,6 +111,7 @@ fun <T : Number> PreferenceInputNumber(
         enabled = enabled,
         isEnabled = isEnabled,
         isVisible = isVisible,
+        shape = shape,
         buttons = {
             StyledDialog.Buttons(
                 positive = StyledDialog.Button(
@@ -170,6 +175,7 @@ fun <T> PreferenceNumber(
     parser: NumberParser<T> = rememberNumberParser(value.value, stepSize),
     tint: Color? = null,
     inputVariant: StyledInput.Variant = StyledInput.Variant.Auto,
+    shape: Shape? = null,
 ) where T : Number, T : Comparable<T> {
     PreferenceNumber(
         value = value.value,
@@ -190,6 +196,7 @@ fun <T> PreferenceNumber(
         parser = parser,
         tint = tint,
         inputVariant = inputVariant,
+        shape = shape,
     )
 }
 
@@ -215,6 +222,7 @@ fun <T> PreferenceNumber(
     parser: NumberParser<T> = rememberNumberParser(value, stepSize),
     tint: Color? = null,
     inputVariant: StyledInput.Variant = StyledInput.Variant.Auto,
+    shape: Shape? = null,
 ) where T : Number, T : Comparable<T> {
     val dialog = rememberDialogState()
     var draft by rememberSaveable { mutableStateOf(value) }
@@ -236,6 +244,7 @@ fun <T> PreferenceNumber(
             enabled = enabled,
             isEnabled = isEnabled,
             isVisible = isVisible,
+            shape = shape,
             buttons = {
                 StyledDialog.Buttons(
                     positive = StyledDialog.Button(
@@ -272,6 +281,7 @@ fun <T> PreferenceNumber(
             key = key,
             isEnabled = isEnabled,
             isVisible = isVisible,
+            breaksSectionShape = shape != null,
         ) { visuals ->
             PreferenceStyledRow(
                 title = title,
@@ -282,6 +292,7 @@ fun <T> PreferenceNumber(
                 style = visuals.style,
                 insideSection = visuals.insideSection,
                 breadcrumb = visuals.breadcrumb,
+                shape = shape,
                 inlineContent = {
                     StyledSlider(
                         value = value,

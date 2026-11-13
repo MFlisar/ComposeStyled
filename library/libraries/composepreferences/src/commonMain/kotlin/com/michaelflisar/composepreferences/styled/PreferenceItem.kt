@@ -45,6 +45,7 @@ fun PreferenceItem(
         key = key,
         isEnabled = isEnabled,
         isVisible = isVisible,
+        breaksSectionShape = shape != null,
     ) { visuals ->
         PreferenceStyledRow(
             title = title,

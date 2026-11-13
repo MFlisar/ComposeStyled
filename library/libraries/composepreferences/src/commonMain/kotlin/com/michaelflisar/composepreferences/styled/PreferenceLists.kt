@@ -137,7 +137,7 @@ fun <T : Any> PreferenceList(
     val strings = LocalPreferenceStrings.current
     var query by rememberSaveable { mutableStateOf("") }
     val dropdownExpanded = remember { mutableStateOf(false) }
-    val effectiveShape = shape ?: checkNotNull(LocalPreferenceStyle.current).item.shape
+    val effectiveShape = checkNotNull(LocalPreferenceStyle.current).item.shape
 
     when (presentation) {
         is PreferenceList.Presentation.Dropdown -> PreferenceEntry(
@@ -147,6 +147,7 @@ fun <T : Any> PreferenceList(
             key = key,
             isEnabled = isEnabled,
             isVisible = isVisible,
+            breaksSectionShape = shape != null,
         ) { visuals ->
             PreferenceStyledRow(
                 title = title,
@@ -165,6 +166,7 @@ fun <T : Any> PreferenceList(
                 style = visuals.style,
                 insideSection = visuals.insideSection,
                 breadcrumb = visuals.breadcrumb,
+                shape = shape,
                 trailing = {
                     val textStyle = LocalStyledTextStyle.current
                     val dropdownTextStyle = textStyle.copy(textAlign = TextAlign.Start)
@@ -180,7 +182,6 @@ fun <T : Any> PreferenceList(
                             variant = StyledButton.Variant.Plain,
                             customization = dropdownCustomization
                                 ?: visuals.style.toDropdownCustomization(),
-                            shape = effectiveShape,
                             content = {
                                 selection { item ->
                                     if (item != null) {
@@ -225,6 +226,7 @@ fun <T : Any> PreferenceList(
             enabled = enabled,
             isEnabled = isEnabled,
             isVisible = isVisible,
+            shape = shape,
             trailing = {
                 StyledRow(itemSpacing = StyledTheme.spacing.medium) {
                     itemLeadingContent?.invoke(selected)
@@ -357,7 +359,7 @@ fun <T : Any> PreferenceListMultiSelect(
     LaunchedEffect(dialog.visible, selected) {
         if (dialog.visible) draft = selected
     }
-    val effectiveShape = shape ?: checkNotNull(LocalPreferenceStyle.current).item.shape
+    val effectiveShape = checkNotNull(LocalPreferenceStyle.current).item.shape
     val selectedText = selected.joinToString(", ", transform = itemText)
 
     when (presentation) {
@@ -368,6 +370,7 @@ fun <T : Any> PreferenceListMultiSelect(
             key = key,
             isEnabled = isEnabled,
             isVisible = isVisible,
+            breaksSectionShape = shape != null,
         ) { visuals ->
             PreferenceStyledRow(
                 title = title,
@@ -386,6 +389,7 @@ fun <T : Any> PreferenceListMultiSelect(
                 style = visuals.style,
                 insideSection = visuals.insideSection,
                 breadcrumb = visuals.breadcrumb,
+                shape = shape,
                 trailing = {
                     val textStyle = LocalStyledTextStyle.current
                     val dropdownTextStyle = textStyle.copy(textAlign = TextAlign.Start)
@@ -403,7 +407,6 @@ fun <T : Any> PreferenceListMultiSelect(
                             variant = StyledButton.Variant.Plain,
                             customization = dropdownCustomization
                                 ?: visuals.style.toDropdownCustomization(),
-                            shape = effectiveShape,
                             content = {
                                 selection { selectedItems ->
                                     StyledRow(itemSpacing = 0.dp) {
@@ -457,6 +460,7 @@ fun <T : Any> PreferenceListMultiSelect(
             enabled = enabled,
             isEnabled = isEnabled,
             isVisible = isVisible,
+            shape = shape,
             buttons = { visuals ->
                 StyledDialog.Buttons(
                     positive = StyledDialog.Button(

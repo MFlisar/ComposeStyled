@@ -77,6 +77,8 @@ list preserves its scroll position, while each group page starts at the top when
 opened; leaving a group resets its scroll position and internally managed
 section expansion state for the next visit. Caller-owned `expanded` state
 remains under the caller's control.
+Standalone preferences on a group page keep their own item shape; only rows
+inside a `PreferenceSection` use the section's grouped shape.
 Groups can also display an optional leading `IconComposable` through the `icon`
 parameter.
 `rememberPreferenceScreenState()` can be supplied to `PreferenceScreen` when the
@@ -123,6 +125,16 @@ When filtering flattens the hierarchy, the ordinary `spacing.itemSpacing` is
 used.
 Separators do not change a section's shape. When the header is part of the
 shape, its lower corners animate closed when collapsed and square when expanded.
+Passing a non-null `shape` to a preference row overrides that row's shape and
+breaks the section shape around it. The row and the gaps on both sides are
+treated like ordinary sibling items: `inGroupSeparator` dividers are omitted,
+and `itemSpacing` is used. If it is the first row, the same spacing replaces
+the section-header separator. The section shape resumes after the gaps around
+the row. This applies to `PreferenceItem`, `PreferenceBool`,
+`PreferenceCustomItem`, `PreferenceGroup`, the input and number preferences,
+split preferences, and both `PreferenceList` variants. For lists, `shape`
+affects only the preference row; dropdown popup and option shapes keep their
+defaults.
 
 IDs are generated automatically for ordinary, statically ordered preference
 compositions. Supply the optional `key` when an item or container may be inserted,
@@ -185,7 +197,7 @@ route. Matching result paths remain informational.
   caller-defined content and the active preference item's default shape,
   colors, padding and minimum height. It has no title or subtitle; use
   `filterTags` when it should match preference searches.
-- `PreferenceInfo` is non-interactive; use `PreferenceItem` with
+- `PreferenceItem` is non-interactive when `onClick` is omitted; provide
   `onClick` for caller-defined actions.
 - `PreferenceBool` renders a switch or checkbox and can make either the
   whole row or only the control toggle. `PreferenceSplitSwitch` and

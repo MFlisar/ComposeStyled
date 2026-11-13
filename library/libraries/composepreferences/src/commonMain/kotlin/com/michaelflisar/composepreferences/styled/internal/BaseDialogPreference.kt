@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Shape
 import com.michaelflisar.composepreferences.styled.layout.PreferenceStyledRow
 import com.michaelflisar.composestyled.classes.IconComposable
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
@@ -28,6 +29,7 @@ internal fun <T> BaseDialogPreference(
     buttons: (PreferenceEntryVisuals) -> StyledDialog.Buttons = { StyledDialog.Buttons() },
     trailing: (@Composable RowScope.() -> Unit)? = null,
     onOpen: () -> Unit = {},
+    shape: Shape? = null,
     content: @Composable ColumnScope.(
         data: T,
         dialog: VisibilityDialogState,
@@ -42,6 +44,7 @@ internal fun <T> BaseDialogPreference(
         key = key,
         isEnabled = isEnabled,
         isVisible = isVisible,
+        breaksSectionShape = shape != null,
     ) { visuals ->
         PreferenceStyledRow(
             title = title,
@@ -56,6 +59,7 @@ internal fun <T> BaseDialogPreference(
             style = visuals.style,
             insideSection = visuals.insideSection,
             breadcrumb = visuals.breadcrumb,
+            shape = shape,
             trailing = trailing,
         )
         StyledDialog(

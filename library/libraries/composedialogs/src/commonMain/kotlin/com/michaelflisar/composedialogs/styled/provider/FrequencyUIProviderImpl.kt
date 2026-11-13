@@ -44,7 +44,7 @@ internal object FrequencyUIProviderImpl : FrequencyUIProvider {
         content: @Composable () -> Unit,
     ) {
         LabeledField(
-            label = label,
+            label = label as String?,
             modifier = modifier,
             errorMessage = errorMessage,
             content = content,

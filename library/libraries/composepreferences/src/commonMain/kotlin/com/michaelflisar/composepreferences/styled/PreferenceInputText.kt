@@ -10,6 +10,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Shape
 import com.michaelflisar.composepreferences.styled.internal.BaseDialogPreference
 import com.michaelflisar.composestyled.classes.IconComposable
 import com.michaelflisar.composestyled.ui.components.StyledInput
@@ -32,6 +33,7 @@ fun PreferenceInputText(
     isVisible: @Composable () -> Boolean = { true },
     variant: StyledInput.Variant = StyledInput.Variant.Auto,
     customization: StyledInput.Customization? = null,
+    shape: Shape? = null,
 ) {
     PreferenceInputText(
         value = value.value,
@@ -47,6 +49,7 @@ fun PreferenceInputText(
         isVisible = isVisible,
         variant = variant,
         customization = customization,
+        shape = shape,
     )
 }
 
@@ -66,6 +69,7 @@ fun PreferenceInputText(
     isVisible: @Composable () -> Boolean = { true },
     variant: StyledInput.Variant = StyledInput.Variant.Auto,
     customization: StyledInput.Customization? = null,
+    shape: Shape? = null,
 ) {
     val dialog = rememberDialogState()
     val strings = LocalPreferenceStrings.current
@@ -86,6 +90,7 @@ fun PreferenceInputText(
         enabled = enabled,
         isEnabled = isEnabled,
         isVisible = isVisible,
+        shape = shape,
         buttons = {
             StyledDialog.Buttons(
                 positive = StyledDialog.Button(
