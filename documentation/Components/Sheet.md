@@ -58,6 +58,10 @@ set `gesturesEnabled = false`, to disable edge opening. While open, the sheet
 can be dragged toward its edge to close when gestures are enabled; tapping the
 scrim remains available regardless of gesture settings.
 
+While the sheet is fully collapsed, clicks and hover in the trigger region also
+reach the content underneath it. A drag inward still opens the sheet. The
+expanded sheet and its scrim remain modal.
+
 On release, a slow drag settles according to whether the sheet crossed halfway.
 A fling at or above `400.dp/s` settles in its fling direction, matching the
 Material 3 navigation drawer threshold.

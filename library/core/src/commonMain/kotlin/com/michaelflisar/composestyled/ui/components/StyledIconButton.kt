@@ -288,6 +288,60 @@ fun StyledIconOutlinedButton(
     )
 }
 
+/** A theme-rendered plain icon button. Its visual variant is fixed. */
+@Composable
+fun StyledIconPlainButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    interactionSource: MutableInteractionSource? = null,
+    shape: Shape = StyledIconButtonDefaults.shape(),
+    customization: StyledIconButton.Customization? = null,
+    content: @Composable () -> Unit,
+) {
+    StyledIconButton(
+        onClick = onClick,
+        modifier = modifier,
+        enabled = enabled,
+        interactionSource = interactionSource,
+        variant = StyledButton.Variant.Plain,
+        shape = shape,
+        customization = customization,
+        content = content,
+    )
+}
+
+/** A theme-rendered plain icon button for an [icon] with optional padding. */
+@Composable
+fun StyledIconPlainButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    interactionSource: MutableInteractionSource? = null,
+    shape: Shape = StyledIconButtonDefaults.shape(),
+    customization: StyledIconButton.Customization? = null,
+    icon: IconComposable,
+    contentDescription: String? = null,
+    iconSize: Dp? = StyledTheme.sizes.iconSize,
+    iconPaddingValues: PaddingValues = PaddingValues(0.dp),
+    tint: Color? = null,
+) {
+    StyledIconButton(
+        onClick = onClick,
+        modifier = modifier,
+        enabled = enabled,
+        interactionSource = interactionSource,
+        variant = StyledButton.Variant.Plain,
+        shape = shape,
+        customization = customization,
+        icon = icon,
+        contentDescription = contentDescription,
+        iconSize = iconSize,
+        iconPaddingValues = iconPaddingValues,
+        tint = tint,
+    )
+}
+
 // -------------------------
 // private API
 // -------------------------

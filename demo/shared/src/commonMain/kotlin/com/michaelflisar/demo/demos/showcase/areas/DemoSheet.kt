@@ -10,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.StyledTheme
@@ -29,8 +30,9 @@ internal fun DemoSheet(baseId: Int, expandState: ExpandState) {
     RegionContainer(title = "Sheet", id = baseId + 1, expanded = expandState) {
         val sheetState = rememberStyledSheetState()
         var edge by remember { mutableStateOf(StyledSheet.Edge.Start) }
+        var edgeTapCount by remember { mutableStateOf(0) }
 
-        SubTitle("Choose an edge, then swipe inward to open the sheet")
+        SubTitle("Choose an edge, tap through it, or swipe inward to open the sheet")
         StyledRow(itemSpacing = 8.dp) {
             StyledButton(onClick = { edge = StyledSheet.Edge.Start }) {
                 StyledText("Start")
@@ -47,7 +49,7 @@ internal fun DemoSheet(baseId: Int, expandState: ExpandState) {
                 StyledText("Bottom")
             }
         }
-        StyledText("Open the sheet with the button or drag inward from the selected edge.")
+        StyledText("Tap through the selected edge or drag inward to open the sheet.")
         StyledButton(onClick = { sheetState.expand() }) {
             StyledText("Open sheet")
         }
@@ -64,6 +66,18 @@ internal fun DemoSheet(baseId: Int, expandState: ExpandState) {
                         text = "The sheet overlays this content. Tap the scrim or press Back to close it.",
                         modifier = Modifier.padding(16.dp),
                     )
+                }
+                val edgeButtonAlignment = when (edge) {
+                    StyledSheet.Edge.Start -> Alignment.CenterStart
+                    StyledSheet.Edge.End -> Alignment.CenterEnd
+                    StyledSheet.Edge.Top -> Alignment.TopCenter
+                    StyledSheet.Edge.Bottom -> Alignment.BottomCenter
+                }
+                StyledButton(
+                    modifier = Modifier.align(edgeButtonAlignment),
+                    onClick = { edgeTapCount++ },
+                ) {
+                    StyledText("Tap through ($edgeTapCount)")
                 }
                 StyledSheet(
                     state = sheetState,

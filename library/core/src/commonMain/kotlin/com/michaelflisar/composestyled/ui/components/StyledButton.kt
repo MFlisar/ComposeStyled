@@ -206,34 +206,6 @@ fun StyledTextButton(
     )
 }
 
-/** A theme-rendered button with a leading icon and custom content. */
-@Composable
-fun StyledIconTextButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    interactionSource: MutableInteractionSource? = null,
-    variant: StyledButton.Variant = StyledButton.Variant.Auto,
-    // defaults / customisation
-    shape: Shape = StyledButtonDefaults.shape,
-    customization: Customization? = null,
-    // content
-    icon: IconComposable,
-    content: @Composable RowScope.() -> Unit,
-) {
-    StyledButton(
-        onClick = onClick,
-        modifier = modifier,
-        enabled = enabled,
-        interactionSource = interactionSource,
-        variant = variant,
-        shape = shape,
-        customization = customization,
-        leadingIcon = icon,
-        content = content,
-    )
-}
-
 // -------------------------
 // private API
 // -------------------------

@@ -34,6 +34,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.input.pointer.PointerEvent
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.node.ModifierNodeElement
+import androidx.compose.ui.node.PointerInputModifierNode
+import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.dismiss
@@ -41,6 +46,7 @@ import androidx.compose.ui.semantics.expand
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -194,7 +200,17 @@ private fun SheetLayout(
     } else {
         Modifier
     }
-    BoxWithConstraints(modifier.then(inputModifier).fillMaxSize()) {
+    // Pointer sharing is configured per layout, so limit it to the fully collapsed state.
+    val siblingPointerInputModifier = if (
+        !expanded && state.progress == 0f && gesturesEnabled && triggerSize > 0.dp
+    ) {
+        Modifier.sharePointerInputWithSiblings()
+    } else {
+        Modifier
+    }
+    BoxWithConstraints(
+        modifier.then(inputModifier).then(siblingPointerInputModifier).fillMaxSize(),
+    ) {
         require(constraints.hasBoundedWidth && constraints.hasBoundedHeight) {
             "StyledSheet requires a bounded width and height"
         }
@@ -352,4 +368,32 @@ private fun SheetLayout(
             )
         }
     }
+}
+
+private fun Modifier.sharePointerInputWithSiblings(): Modifier =
+    then(SharePointerInputWithSiblingsElement)
+
+private data object SharePointerInputWithSiblingsElement :
+    ModifierNodeElement<SharePointerInputWithSiblingsNode>() {
+
+    override fun create() = SharePointerInputWithSiblingsNode()
+
+    override fun update(node: SharePointerInputWithSiblingsNode) = Unit
+
+    override fun InspectorInfo.inspectableProperties() {
+        name = "sharePointerInputWithSiblings"
+    }
+}
+
+private class SharePointerInputWithSiblingsNode : Modifier.Node(), PointerInputModifierNode {
+
+    override fun onPointerEvent(
+        pointerEvent: PointerEvent,
+        pass: PointerEventPass,
+        bounds: IntSize,
+    ) = Unit
+
+    override fun onCancelPointerInput() = Unit
+
+    override fun sharePointerInputWithSiblings() = true
 }
