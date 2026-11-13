@@ -63,6 +63,7 @@ the default mapping for styles that should remain unchanged.
 | styled-composedialog | a styled implementation for ComposeDialogs |
 | styled-composepreferences | a styled implementation for ComposePreferences |
 | styled-composetable | a styled implementation for ComposeTable |
+| styled-composechangelog | a Styled changelog with Kotlin-defined releases |
 
 # :arrow_right: Versions
 
@@ -117,6 +118,7 @@ composestyled-theme-nature = { module = "io.github.mflisar.composestyled:theme-n
 composestyled-styled-composedialog = { module = "io.github.mflisar.composestyled:styled-composedialog", version.ref = "composestyled" }
 composestyled-styled-composepreferences = { module = "io.github.mflisar.composestyled:styled-composepreferences", version.ref = "composestyled" }
 composestyled-styled-composetable = { module = "io.github.mflisar.composestyled:styled-composetable", version.ref = "composestyled" }
+composestyled-styled-composechangelog = { module = "io.github.mflisar.composestyled:styled-composechangelog", version.ref = "composestyled" }
 ```
 
 And then use the definitions in your projects **build.gradle.kts** file like following:
@@ -139,6 +141,7 @@ implementation(libs.composestyled.theme.nature)
 implementation(libs.composestyled.styled.composedialog)
 implementation(libs.composestyled.styled.composepreferences)
 implementation(libs.composestyled.styled.composetable)
+implementation(libs.composestyled.styled.composechangelog)
 ```
 
 </details>
@@ -171,6 +174,7 @@ implementation("io.github.mflisar.composestyled:theme-nature:${composestyled}")
 implementation("io.github.mflisar.composestyled:styled-composedialog:${composestyled}")
 implementation("io.github.mflisar.composestyled:styled-composepreferences:${composestyled}")
 implementation("io.github.mflisar.composestyled:styled-composetable:${composestyled}")
+implementation("io.github.mflisar.composestyled:styled-composechangelog:${composestyled}")
 ```
 
 </details>
