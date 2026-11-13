@@ -33,7 +33,7 @@ internal object TimeUIProviderImpl : TimeUIProvider {
         errorMessage: String?,
         content: @Composable () -> Unit,
     ) {
-        LabeledField(
+        LabeledDialogField(
             label = label,
             modifier = modifier,
             errorMessage = errorMessage,

@@ -1,6 +1,5 @@
 package com.michaelflisar.composedialogs.styled.provider
 
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.runtime.Composable
@@ -22,7 +21,6 @@ import com.michaelflisar.composedialogs.dialogs.time.TimePickerSetup
 import com.michaelflisar.composedialogs.styled.DialogTime
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.tokens.LocalStyledTextStyle
-import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.ui.components.StyledInput
 import com.michaelflisar.composestyled.ui.components.StyledPopupDropdown
 import com.michaelflisar.composestyled.ui.components.StyledTextButton
@@ -43,8 +41,8 @@ internal object FrequencyUIProviderImpl : FrequencyUIProvider {
         errorMessage: String?,
         content: @Composable () -> Unit,
     ) {
-        LabeledField(
-            label = label as String?,
+        LabeledDialogField(
+            label = label,
             modifier = modifier,
             errorMessage = errorMessage,
             content = content,

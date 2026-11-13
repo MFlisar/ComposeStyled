@@ -20,7 +20,6 @@ import com.michaelflisar.composestyled.ui.layout.StyledColumn
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
 import com.michaelflisar.composestyled.ui.layout.StyledScaffold
 import com.michaelflisar.composestyled.ui.primitives.StyledText
-import com.michaelflisar.composestyled.ui.state.rememberDialogState
 import com.michaelflisar.demo.helper.DemoTopBar
 
 @Composable

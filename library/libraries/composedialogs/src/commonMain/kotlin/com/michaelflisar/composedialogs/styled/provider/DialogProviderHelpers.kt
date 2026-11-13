@@ -18,7 +18,7 @@ import com.michaelflisar.composestyled.ui.layout.StyledDialog
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 
 @Composable
-internal fun LabeledField(
+internal fun LabeledDialogField(
     label: String?,
     modifier: Modifier,
     errorMessage: String?,

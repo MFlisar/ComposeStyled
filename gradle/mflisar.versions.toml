@@ -8,7 +8,6 @@ cachefileprovider =         "1.0.0"
 kotpreferences =        	"4.0.1"
 lumberjack =                "12.0.0"
 composedebugdrawer =		"4.0.0"
-composechangelog =   		"4.0.0"
 composepreferences =   		"3.0.0"
 composethemer =   			"2.0.0"
 composecolors =             "2.0.0"
@@ -18,15 +17,12 @@ composetable =              "0.0.1-alpha06"
 
 # plugins only
 kmpicon =                   "1.0.0"
-kmpdevtools =               "9.3.7" # use the "devTools" task to change the version
+kmpdevtools =               "9.3.9" # use the "devTools" task to change the version
 
 # demos
 democomposables =           "1.0.5"
 
 [plugins]
-
-# general
-changelog-gradleplugin =            { id = "io.github.mflisar.composechangelog.gradle-plugin",          version.ref = "composechangelog" }
 
 # plugins only
 kmpdevtools-buildplugin =           { id = "io.github.mflisar.kmpdevtools.plugins-build-gradle",        version.ref = "kmpdevtools" }
@@ -55,10 +51,6 @@ composedebugdrawer-infos-build =           		{ module = "io.github.mflisar.compo
 composedebugdrawer-infos-device =          		{ module = "io.github.mflisar.composedebugdrawer:infos-device",                		version.ref = "composedebugdrawer" }
 composedebugdrawer-plugin-lumberjack =     		{ module = "io.github.mflisar.composedebugdrawer:plugin-lumberjack",           		version.ref = "composedebugdrawer" }
 composedebugdrawer-plugin-kotpreferences = 		{ module = "io.github.mflisar.composedebugdrawer:plugin-kotpreferences",  			version.ref = "composedebugdrawer" }
-composechangelog-core =               			{ module = "io.github.mflisar.composechangelog:core",      			        	    version.ref = "composechangelog" }
-composechangelog-renderer-header =  		    { module = "io.github.mflisar.composechangelog:renderer-header",      		        version.ref = "composechangelog" }
-composechangelog-statesaver-preferences =  		{ module = "io.github.mflisar.composechangelog:statesaver-preferences",      		version.ref = "composechangelog" }
-composechangelog-statesaver-kotpreferences =	{ module = "io.github.mflisar.composechangelog:statesaver-kotpreferences",      	version.ref = "composechangelog" }
 composepreferences-core =						{ module = "io.github.mflisar.composepreferences:core",      						version.ref = "composepreferences" }
 composepreferences-screen-bool =				{ module = "io.github.mflisar.composepreferences:screen-bool",      				version.ref = "composepreferences" }
 composepreferences-screen-button =				{ module = "io.github.mflisar.composepreferences:screen-button",      				version.ref = "composepreferences" }

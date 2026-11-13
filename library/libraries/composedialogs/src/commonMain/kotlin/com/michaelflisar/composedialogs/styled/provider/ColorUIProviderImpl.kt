@@ -2,6 +2,7 @@ package com.michaelflisar.composedialogs.styled.provider
 
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -14,10 +15,12 @@ import com.michaelflisar.composedialogs.styled.DialogInput
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.tokens.LocalStyledContentColor
 import com.michaelflisar.composestyled.ui.components.StyledCard
+import com.michaelflisar.composestyled.ui.components.StyledIcon
+import com.michaelflisar.composestyled.ui.components.StyledSlider
 import com.michaelflisar.composestyled.ui.components.StyledTextButton
 import com.michaelflisar.composestyled.ui.icons.StyledIcons
-import com.michaelflisar.composestyled.ui.components.StyledIcon
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
+import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.ui.state.rememberDialogState
 
 internal object ColorUIProviderImpl : ColorUIProvider {
@@ -30,7 +33,7 @@ internal object ColorUIProviderImpl : ColorUIProvider {
         color: Color?,
         fontWeight: FontWeight?,
     ) {
-        com.michaelflisar.composestyled.ui.primitives.StyledText(
+        StyledText(
             text = text,
             modifier = modifier,
             style = when (style) {
@@ -49,7 +52,7 @@ internal object ColorUIProviderImpl : ColorUIProvider {
         value: Float,
         onValueChange: (Float) -> Unit,
     ) {
-        com.michaelflisar.composestyled.ui.components.StyledSlider(
+        StyledSlider(
             modifier = modifier,
             value = value,
             onValueChange = onValueChange,
@@ -116,7 +119,7 @@ internal object ColorUIProviderImpl : ColorUIProvider {
         onDismissRequest: () -> Unit,
     ) {
         val state = rememberDialogState()
-        androidx.compose.runtime.LaunchedEffect(visible) {
+        LaunchedEffect(visible) {
             if (visible) state.show() else state.dismiss()
         }
         DialogInput(

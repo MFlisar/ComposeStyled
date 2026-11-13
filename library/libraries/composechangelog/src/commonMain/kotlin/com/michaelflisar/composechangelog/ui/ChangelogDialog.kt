@@ -36,9 +36,8 @@ fun ChangelogDialog(
         ChangelogContent(
             state = state,
             setup = setup,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(contentPadding),
+            modifier = Modifier.fillMaxWidth(),
+            contentPadding = contentPadding
         )
     }
 }

@@ -2,6 +2,7 @@ package com.michaelflisar.composechangelog.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
@@ -37,6 +38,7 @@ fun ChangelogContent(
     state: ChangelogState,
     setup: ChangelogSetup,
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues()
 ) {
     val minimumVersion = state.minimumVisibleReleaseVersion
     val preparedReleases = remember(setup, minimumVersion) {
@@ -61,6 +63,7 @@ fun ChangelogContent(
         StyledLazyColumn(
             modifier = modifier,
             itemSpacing = StyledColumnDefaults.itemSpacing,
+            contentPadding = contentPadding
         ) {
             items(
                 items = releases,

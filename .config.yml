@@ -43,9 +43,9 @@ project:
 apps:
   - name: Compose Styled Demo
     namespace: com.michaelflisar.composestyled.demo
-    releases:
-      - name: 1.0.0
-        number: 1
+    version:
+      code: 1
+      name: 1.0.0
     module-paths:
       - demo/app/android
       - demo/app/jvm
