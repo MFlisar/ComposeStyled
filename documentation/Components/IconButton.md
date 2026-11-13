@@ -34,6 +34,10 @@ Outlined and Standard (its Auto style is filled tonal); Fluent 2 uses Filled,
 Outlined and Standard. In all themes, Plain uses the unfilled standard
 appearance.
 
+For `Plain`, the foreground inherits the surrounding Styled content color,
+including the `contentColor` provided by a `StyledSurface`. A configured
+`CustomColors.textForeground` takes precedence.
+
 Use `CustomColors` for filled background/foreground or standard foreground;
 `border` optionally overrides the outline. Fluent 2 buttons and icon buttons
 share an internal color resolver for default, hover, pressed and disabled

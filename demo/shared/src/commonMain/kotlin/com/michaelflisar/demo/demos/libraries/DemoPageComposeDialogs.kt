@@ -68,7 +68,9 @@ internal fun DemoPageComposeDialogs(onBack: () -> Unit) {
     val dialogStyle = when (selectedDialogStyle.value) {
         "Bottom sheet" -> StyledDialog.Style.BottomSheet()
         "Bottom sheet + expand to full screen" -> StyledDialog.Style.BottomSheet(
-            options = SheetOptions(expandToFullscreen = true)
+            options = SheetOptions(
+                expandToFullScreen = StyledDialog.ExpandToFullScreen.Enabled(),
+            )
         )
         "Full screen" -> StyledDialog.Style.Fullscreen()
         else -> StyledDialog.Style.Dialog()

@@ -125,7 +125,10 @@ abstract class FoundationDialog : StyledDialog.Implementation {
         }
         val toolbarDragTravelPx = remember { mutableFloatStateOf(1f) }
         val toolbarDragging = remember { mutableStateOf(false) }
-        val canExpandToolbar = style is StyledDialog.Style.ToolbarDialog && style.expandToFullscreen
+        val toolbarExpansion = (style as? StyledDialog.Style.ToolbarDialog)?.expandToFullScreen
+        val canExpandToolbar = toolbarExpansion is StyledDialog.ExpandToFullScreen.Enabled
+        val canExitToolbarFullscreen =
+            (toolbarExpansion as? StyledDialog.ExpandToFullScreen.Enabled)?.allowExit != false
         LaunchedEffect(canExpandToolbar) {
             if (!canExpandToolbar) toolbarExpanded.value = false
         }
@@ -310,22 +313,32 @@ abstract class FoundationDialog : StyledDialog.Implementation {
                                 ),
                                 shape, title, buttons, content,
                                 edgeToEdge = toolbarExpansionProgress.floatValue >= 0.999f,
-                                toolbarDragEnabled = canExpandToolbar,
+                                toolbarDragEnabled = canExpandToolbar &&
+                                    (canExitToolbarFullscreen || !toolbarExpanded.value),
                                 toolbarExpansionProgress = toolbarExpansionProgress.floatValue,
                                 onToolbarDragStarted = { toolbarDragging.value = true },
                                 onToolbarDragDelta = { delta ->
-                                    val travel = toolbarDragTravelPx.floatValue.coerceAtLeast(1f)
-                                    toolbarExpansionProgress.floatValue =
-                                        (toolbarExpansionProgress.floatValue - delta / travel).coerceIn(0f, 1f)
+                                    if (delta <= 0f || canExitToolbarFullscreen || !toolbarExpanded.value) {
+                                        val travel = toolbarDragTravelPx.floatValue.coerceAtLeast(1f)
+                                        toolbarExpansionProgress.floatValue =
+                                            (toolbarExpansionProgress.floatValue - delta / travel).coerceIn(0f, 1f)
+                                    }
                                 },
                                 onToolbarDragStopped = { velocity ->
-                                    val travel = toolbarDragTravelPx.floatValue.coerceAtLeast(1f)
-                                    val projectedProgress =
-                                        toolbarExpansionProgress.floatValue - velocity * 0.15f / travel
-                                    toolbarExpanded.value = projectedProgress >= 0.5f
+                                    if (!toolbarExpanded.value || canExitToolbarFullscreen) {
+                                        val travel = toolbarDragTravelPx.floatValue.coerceAtLeast(1f)
+                                        val projectedProgress =
+                                            toolbarExpansionProgress.floatValue - velocity * 0.15f / travel
+                                        toolbarExpanded.value = projectedProgress >= 0.5f
+                                    }
                                     toolbarDragging.value = false
                                 },
-                                onToggleExpanded = toggleToolbarExpansion,
+                                onToggleExpanded = {
+                                    if (!toolbarExpanded.value || canExitToolbarFullscreen) {
+                                        toggleToolbarExpansion()
+                                    }
+                                },
+                                toolbarCanExit = canExitToolbarFullscreen,
                             )
                         }
                     }
@@ -436,6 +449,7 @@ abstract class FoundationDialog : StyledDialog.Implementation {
         onToolbarDragDelta: (Float) -> Unit = {},
         onToolbarDragStopped: (Float) -> Unit = {},
         onToggleExpanded: () -> Unit = {},
+        toolbarCanExit: Boolean = true,
         expandableHeader: StyledDialog.Style.Fullscreen.ExpandableHeader? = null,
         applyStatusBarStyle: Boolean = true,
         applyNavigationBarStyle: Boolean = true,
@@ -487,18 +501,22 @@ abstract class FoundationDialog : StyledDialog.Implementation {
                 onDragStarted = { onToolbarDragStarted() },
                 onDragStopped = { velocity -> onToolbarDragStopped(velocity) },
             ).semantics {
-                customActions = listOf(
-                    CustomAccessibilityAction(
-                        if (toolbarExpansionProgress >= 0.5f) {
-                            "Restore bounded dialog"
-                        } else {
-                            "Expand fullscreen dialog"
+                customActions = if (toolbarExpansionProgress >= 0.5f && !toolbarCanExit) {
+                    emptyList()
+                } else {
+                    listOf(
+                        CustomAccessibilityAction(
+                            if (toolbarExpansionProgress >= 0.5f) {
+                                "Restore bounded dialog"
+                            } else {
+                                "Expand fullscreen dialog"
+                            },
+                        ) {
+                            onToggleExpanded()
+                            true
                         },
-                    ) {
-                        onToggleExpanded()
-                        true
-                    },
-                )
+                    )
+                }
             }
         } else {
             Modifier

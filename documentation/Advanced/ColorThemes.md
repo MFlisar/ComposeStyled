@@ -47,6 +47,12 @@ persist stable IDs as needed.
 `themeProvider.defaultThemeColors` supplies the default colors used by
 `StyledTheme`: the matching Blue preset for each built-in provider.
 
+On Android 12 and newer, set `themeDynamic = true` to use the system's dynamic
+accent colors as the base for Styled's semantic palette. This works without a
+Material 3 dependency and keeps the selected `themeVariant`, `themeAppearance`
+and `themeContrast`; when dynamic colors are disabled or unsupported,
+`themeColors` is used as usual.
+
 `StyledThemeColorsPicker` accepts four `MutableState` parameters with the same
 names, or four plain values with their corresponding `onThemeColorsChange`,
 `onThemeVariantChange`, `onThemeAppearanceChange` and `onThemeContrastChange`

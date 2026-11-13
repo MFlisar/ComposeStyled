@@ -42,6 +42,9 @@ import com.michaelflisar.composestyled.ui.layout.StyledFloatingHost
 // only on android 31+
 expect val StyledTheme.isDynamicColorsSupported: Boolean
 
+@Composable
+internal expect fun platformDynamicThemeColors(): StyledThemeColors?
+
 // only on android 34+
 expect val StyledTheme.isSystemContrastSupported: Boolean
 
@@ -169,6 +172,9 @@ object StyledTheme {
  *
  * Use this as the root of a Styled UI subtree. [customization] is applied after the provider's
  * default registrations, so it can replace renderers and update their defaults.
+ *
+ * When [themeDynamic] is enabled and dynamic colors are supported, Android system colors provide
+ * the base palette instead of [themeColors].
  */
 @Composable
 fun StyledTheme(
@@ -178,6 +184,7 @@ fun StyledTheme(
     themeVariant: StyledThemeVariant = StyledThemeVariant.Colorful,
     themeAppearance: StyledThemeAppearance = StyledThemeAppearance.System,
     themeContrast: StyledThemeContrast = StyledThemeContrast.System,
+    themeDynamic: Boolean = false,
     typography: StyledTypography = PlatformDefaults.typography(platform),
     shapes: StyledShapes = PlatformDefaults.shapes(platform),
     paddings: StyledPadding = PlatformDefaults.paddings(platform),
@@ -200,7 +207,12 @@ fun StyledTheme(
         StyledThemeContrast.Medium -> StyledContrastLevel.Medium
         StyledThemeContrast.High -> StyledContrastLevel.High
     }
-    val colors = themeColors.resolve(themeVariant, isDark, contrast)
+    val resolvedThemeColors = if (themeDynamic && StyledTheme.isDynamicColorsSupported) {
+        platformDynamicThemeColors() ?: themeColors
+    } else {
+        themeColors
+    }
+    val colors = resolvedThemeColors.resolve(themeVariant, isDark, contrast)
 
     CompositionLocalProvider(
         LocalPlatform provides platform,

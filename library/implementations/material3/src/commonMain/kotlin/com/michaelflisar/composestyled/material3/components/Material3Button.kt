@@ -126,14 +126,17 @@ class Material3Button internal constructor(
         } else {
             modifier
         }
-        val isContainerDefaultText = variant == StyledButton.Variant.Auto &&
-            (context is StyledTopBar.Context ||
-                context == StyledMenuBar.Context.MenuItem)
+        val inheritsStyledContentColor = variant == StyledButton.Variant.Plain ||
+            (variant == StyledButton.Variant.Auto &&
+                (context is StyledTopBar.Context ||
+                    context == StyledMenuBar.Context.MenuItem))
         @Composable
         fun styledContentColor(color: Color) =
             if (enabled) color else color.copy(
                 alpha = color.alpha * StyledTheme.colorScheme.disableFactors.content,
             )
+        val textForeground = customization?.colors?.textForeground?.resolve()
+            ?.takeUnless { it == Color.Unspecified }
 
         when (rendererVariant) {
             Variant.FilledTonal -> {
@@ -318,8 +321,8 @@ class Material3Button internal constructor(
                     interactionSource = interactionSource,
                     colors = ButtonDefaults.textButtonColors(
                         containerColor = Color.Unspecified,
-                        contentColor = customization?.colors?.textForeground?.resolve()
-                            ?: if (isContainerDefaultText) LocalStyledContentColor.current
+                        contentColor = textForeground
+                            ?: if (inheritsStyledContentColor) LocalStyledContentColor.current
                             else StyledTheme.colorScheme.primary
                     ),
                     contentPadding = if (isGroupBox) {
@@ -330,9 +333,8 @@ class Material3Button internal constructor(
                 ) {
                     ProvideStyledLocals(
                         contentColor = styledContentColor(
-                            customization?.colors?.textForeground?.resolve()
-                                ?.takeUnless { it == Color.Unspecified }
-                                ?: if (isContainerDefaultText) LocalStyledContentColor.current
+                            textForeground
+                                ?: if (inheritsStyledContentColor) LocalStyledContentColor.current
                                 else StyledTheme.colorScheme.primary
                         ),
                         textStyle = StyledTheme.typography.labelLarge,

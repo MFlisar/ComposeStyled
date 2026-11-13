@@ -101,11 +101,12 @@ class Material3IconButton internal constructor(
         val textForeground = customization?.colors?.textForeground?.resolve()
             ?.takeIf { it != Color.Unspecified }
         val context = LocalStyledContext.current
-        val inheritsStyledContentColor = variant == StyledButton.Variant.Auto &&
-            (context is StyledTopBar.Context ||
-                context is StyledInput.Context ||
-                context is StyledDialog.ActionContext &&
-                context.context == StyledDialog.Context.FullscreenAction)
+        val inheritsStyledContentColor = variant == StyledButton.Variant.Plain ||
+            (variant == StyledButton.Variant.Auto &&
+                (context is StyledTopBar.Context ||
+                    context is StyledInput.Context ||
+                    context is StyledDialog.ActionContext &&
+                    context.context == StyledDialog.Context.FullscreenAction))
         val borderTint = if (enabled) {
             customization?.border?.resolve()?.takeIf { it != Color.Unspecified }
         } else {

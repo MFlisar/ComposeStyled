@@ -61,6 +61,7 @@ internal fun DemoDialogs(baseId: Int, expandState: ExpandState) {
         var gesturesEnabled by rememberSaveable { mutableStateOf(true) }
         var expandSheetToFullscreen by rememberSaveable { mutableStateOf(false) }
         var expandToolbarToFullscreen by rememberSaveable { mutableStateOf(false) }
+        var allowFullscreenExit by rememberSaveable { mutableStateOf(true) }
         var fullscreenAnimation by rememberSaveable(stateSaver = FullscreenAnimationSaver) {
             mutableStateOf<StyledDialog.FullscreenAnimation>(StyledDialog.FullscreenAnimation.Fade)
         }
@@ -112,7 +113,11 @@ internal fun DemoDialogs(baseId: Int, expandState: ExpandState) {
         )
         val options = StyledDialog.SheetOptions(
             fixedButtons = fixedButtons,
-            expandToFullscreen = expandSheetToFullscreen,
+            expandToFullScreen = if (expandSheetToFullscreen) {
+                StyledDialog.ExpandToFullScreen.Enabled(allowExit = allowFullscreenExit)
+            } else {
+                StyledDialog.ExpandToFullScreen.Disabled()
+            },
             dismissOnSwipe = dismissOnSwipe,
             gesturesEnabled = gesturesEnabled,
             dismissOnSwipeOnlyWhenContentAtTop = dismissOnSwipeOnlyWhenContentAtTop,
@@ -214,6 +219,12 @@ internal fun DemoDialogs(baseId: Int, expandState: ExpandState) {
                 onCheckedChange = { expandToolbarToFullscreen = it },
             ) {
                 StyledText("Allow dragging toolbar dialogs to fullscreen")
+            }
+            StyledSwitch(
+                checked = allowFullscreenExit,
+                onCheckedChange = { allowFullscreenExit = it },
+            ) {
+                StyledText("Allow dragging back to the regular size")
             }
             StyledSwitch(checked = positiveEnabled, onCheckedChange = { positiveEnabled = it }) {
                 StyledText("Enable Save")
@@ -321,7 +332,11 @@ internal fun DemoDialogs(baseId: Int, expandState: ExpandState) {
             state = toolbarDialog, properties = properties, buttons = buttons,
             style = StyledDialog.Style.ToolbarDialog(
                 maxWidth = if (narrowDialog) 400.dp else null,
-                expandToFullscreen = expandToolbarToFullscreen,
+                expandToFullScreen = if (expandToolbarToFullscreen) {
+                    StyledDialog.ExpandToFullScreen.Enabled(allowExit = allowFullscreenExit)
+                } else {
+                    StyledDialog.ExpandToFullScreen.Disabled()
+                },
             ),
             title = if (showTitle) ({ StyledText("Bounded workspace") }) else null,
         ) { contentPadding ->

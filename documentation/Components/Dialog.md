@@ -68,7 +68,7 @@ StyledDialog(
         maxWidth = 840.dp,
         maxHeightFraction = 0.85f,
         edgeMargin = 24.dp,
-        expandToFullscreen = true,
+        expandToFullScreen = StyledDialog.ExpandToFullScreen.Enabled(),
     ),
     title = { StyledText("Edit document") },
     buttons = buttons,
@@ -134,14 +134,19 @@ Bottom sheets slide up when shown. Button, back and outside dismissals slide
 down; a swipe-to-dismiss uses the drag motion itself and does not replay a
 second exit animation.
 
-Toolbar dialogs can opt into `expandToFullscreen`. Drag the toolbar upward to
-expand the workspace edge-to-edge, or downward to restore its bounded layout.
+Toolbar dialogs can opt into `expandToFullScreen` with
+`StyledDialog.ExpandToFullScreen.Enabled()`. Drag the toolbar upward to expand
+the workspace edge-to-edge, or downward to restore its bounded layout.
 The workspace bounds follow the drag continuously; system-bar insets transition
 with the expansion, so a bounded dialog does not reserve extra body padding for
 the system bars. On release, drag distance and velocity determine which layout
 it settles into. System-bar icon contrast updates at the fullscreen endpoint.
 Assistive technology can use the toolbar's expand/restore custom action. The
-option defaults to `false`.
+default is `StyledDialog.ExpandToFullScreen.Disabled()`. Set
+`StyledDialog.ExpandToFullScreen.Enabled(allowExit = false)` to prevent
+returning to the bounded layout. While expanded, toolbar dragging and its
+accessibility action are disabled. Dialog buttons, outside-click and Back
+dismissal still follow the existing policies.
 
 ### Floating windows
 
@@ -362,7 +367,7 @@ is 2/4 dp. These are layout gaps, not distances between visible text glyphs:
 buttons retain their own content padding and minimum interactive footprint.
 
 Toolbar dialogs, fullscreen dialogs, floating windows and sheets configured with
-`expandToFullscreen` keep their intended workspace/viewport height. Regular
+`expandToFullScreen` keep their intended workspace/viewport height. Regular
 bottom sheets wrap their measured title, body and actions up to the configured
 height limit and remeasure when body content changes. Scrollable content uses
 the available height up to that limit. The renderer passes body-only
@@ -523,7 +528,7 @@ val sheetStyle = StyledDialog.Style.BottomSheet(
     maxHeightFraction = 0.9f,
     options = StyledDialog.SheetOptions(
         fixedButtons = true,
-        expandToFullscreen = true,
+        expandToFullScreen = StyledDialog.ExpandToFullScreen.Enabled(),
         gesturesEnabled = true,
         dismissOnSwipe = true,
         dismissOnSwipeOnlyWhenContentAtTop = true,
@@ -571,14 +576,18 @@ a swipe from its expanded position can still dismiss it.
 Clicking the drag handle toggles between peek and expanded positions when gestures
 are enabled and these positions differ; only its centered tap target is clickable,
 with no visual press indication. It does not dismiss the sheet.
-`expandToFullscreen` makes the expanded position fill the sheet viewport (the
+`expandToFullScreen` makes the expanded position fill the sheet viewport (the
 dialog window for modal sheets). The expanded height takes precedence over
 `maxHeightFraction`. The sheet animates its handle/title into a safe-area-aware
 top bar; themes that place fullscreen actions in the toolbar move
 positive/negative actions there while neutral actions remain in the footer.
 The toolbar background matches the sheet content, and its content color is
 derived from that background, just like the fullscreen dialog toolbar.
-The option defaults to `false`.
+The default is `StyledDialog.ExpandToFullScreen.Disabled()`. Set
+`StyledDialog.ExpandToFullScreen.Enabled(allowExit = false)` to prevent the
+expanded sheet from being dragged, including returning to its regular size or
+swipe dismissal. The handle and accessibility collapse action are also disabled.
+Button, outside-click and Back dismissal still follow their respective policies.
 
 With `fixedButtons = true`, the opaque, shadowless footer is a separate overlay anchored to
 the **viewport's bottom edge**, with buttons above any overlapping system navigation area.
@@ -591,7 +600,7 @@ reserved and keyboard insets are respected. The bottom safe-area background stay
 opaque throughout dragging so body content cannot reappear behind system navigation.
 Modal sheets use an edge-to-edge window on Android to draw this background.
 Their navigation icon style follows the sheet background and is restored when
-the sheet closes. With `expandToFullscreen`, the status-bar icons also adapt as
+the sheet closes. With `expandToFullScreen`, the status-bar icons also adapt as
 the top bar reaches the status area. Standalone fullscreen dialogs draw
 edge-to-edge and adapt both system-bar icon styles to their backgrounds.
 With `false`, the footer moves with the sheet and may be offscreen at peek;
@@ -639,7 +648,7 @@ Embedded sheets use their own `StyledBottomSheet.Key`/`DefaultsKey` and
 | Cupertino | Full-width vertical positive, neutral, negative actions | Centered title, negative leading, positive trailing; neutral in footer | Full-width vertical plain actions | Bottom footer; default-role actions use plain buttons |
 | Fluent 2 | Trailing positive, neutral, negative actions | Window-like title bar with all actions in bottom footer | Trailing positive, neutral, negative actions | Positive, neutral, negative footer actions with Fluent action-slot hierarchy |
 
-When `expandToFullscreen` is enabled, Material 3 and Cupertino promote positive
+When `expandToFullScreen` is enabled, Material 3 and Cupertino promote positive
 and negative sheet actions into the top bar, matching their fullscreen-dialog
 action layout; neutral actions remain at the bottom. Fluent 2 keeps its actions
 in the footer.

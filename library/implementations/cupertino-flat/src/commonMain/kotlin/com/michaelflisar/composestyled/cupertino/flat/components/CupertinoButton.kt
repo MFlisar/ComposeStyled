@@ -132,9 +132,10 @@ class CupertinoFlatButton internal constructor(
             shape = shape,
             interactionSource = interactionSource,
             customization = customization,
-            defaultContentColor = if (variant == StyledButton.Variant.Auto &&
-                (context is StyledTopBar.Context ||
-                    context == StyledMenuBar.Context.MenuItem)
+            defaultContentColor = if (variant == StyledButton.Variant.Plain ||
+                (variant == StyledButton.Variant.Auto &&
+                    (context is StyledTopBar.Context ||
+                        context == StyledMenuBar.Context.MenuItem))
             ) LocalStyledContentColor.current else null,
             content = content,
         )

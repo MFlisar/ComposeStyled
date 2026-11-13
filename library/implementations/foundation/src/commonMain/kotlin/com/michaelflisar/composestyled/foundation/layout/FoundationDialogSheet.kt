@@ -131,6 +131,10 @@ internal fun FoundationDialogSheet(
     val dismissRequest by rememberUpdatedState(onDismissRequest)
     val dismissRequestWithoutAnimation by rememberUpdatedState(onDismissRequestWithoutAnimation)
     val currentVisibility by rememberUpdatedState(isVisible)
+    val expandsToFullScreen =
+        options.expandToFullScreen is StyledDialog.ExpandToFullScreen.Enabled
+    val canExitFullScreen =
+        (options.expandToFullScreen as? StyledDialog.ExpandToFullScreen.Enabled)?.allowExit != false
     if (!modal) {
         BackHandler(enabled = properties.dismissOnBackPress) { dismissRequest() }
     }
@@ -139,7 +143,7 @@ internal fun FoundationDialogSheet(
             .fillMaxSize()
             .then(if (modal) Modifier else Modifier.recalculateWindowInsets())
             .then(
-                if (modal && options.expandToFullscreen) Modifier
+                if (modal && expandsToFullScreen) Modifier
                 else Modifier.windowInsetsPadding(
                     WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
                 ),
@@ -151,7 +155,7 @@ internal fun FoundationDialogSheet(
         val layoutDirection = LocalLayoutDirection.current
         val viewportHeight = constraints.maxHeight.toFloat()
         val horizontalInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)
-        val safeHorizontalWidth = if (modal && options.expandToFullscreen) {
+        val safeHorizontalWidth = if (modal && expandsToFullScreen) {
             (this.maxWidth -
                 with(density) { horizontalInsets.getLeft(this, layoutDirection).toDp() } -
                 with(density) { horizontalInsets.getRight(this, layoutDirection).toDp() }).coerceAtLeast(0.dp)
@@ -162,7 +166,7 @@ internal fun FoundationDialogSheet(
                 (safeHorizontalWidth - edgeMargin * 2).coerceAtLeast(0.dp)
             } else safeHorizontalWidth,
         )
-        val topInset = if (modal && options.expandToFullscreen) {
+        val topInset = if (modal && expandsToFullScreen) {
             WindowInsets.safeDrawing.getTop(density).toFloat()
         } else 0f
         val regularViewportHeight = (viewportHeight - topInset).coerceAtLeast(0f)
@@ -170,7 +174,7 @@ internal fun FoundationDialogSheet(
             regularViewportHeight * maxHeightFraction,
             (regularViewportHeight - with(density) { edgeMargin.toPx() }).coerceAtLeast(0f),
         )
-        val contentMaxHeight = if (options.expandToFullscreen) viewportHeight else regularSheetHeight
+        val contentMaxHeight = if (expandsToFullScreen) viewportHeight else regularSheetHeight
         var footerHeight by remember { mutableIntStateOf(0) }
         var headerHeight by remember { mutableIntStateOf(0) }
         var measuredContentHeight by remember { mutableIntStateOf(0) }
@@ -193,7 +197,7 @@ internal fun FoundationDialogSheet(
         } else {
             maxOf(measuredContentHeight.toFloat(), minimumSheetHeight)
         }
-        val sheetHeight = if (options.expandToFullscreen) {
+        val sheetHeight = if (expandsToFullScreen) {
             viewportHeight
         } else {
             minOf(contentMaxHeight, measuredSheetHeight)
@@ -205,6 +209,7 @@ internal fun FoundationDialogSheet(
         ) {
             SheetDragState(sheetHeight, peekOffset, options, options.initiallyExpanded)
         }
+        val canDragSheet = canExitFullScreen || !drag.isExpanded
         SideEffect {
             drag.updateGeometry(sheetHeight, peekOffset, options)
         }
@@ -212,24 +217,24 @@ internal fun FoundationDialogSheet(
             onDispose { drag.cancel() }
         }
         val scope = rememberCoroutineScope()
-        val fullscreenToolbarVisible = options.expandToFullscreen &&
+        val fullscreenToolbarVisible = expandsToFullScreen &&
             (peekOffset <= 0f || drag.offset <= topInset + with(density) { 56.dp.toPx() })
         val sheetWidth by animateDpAsState(
             targetValue = if (fullscreenToolbarVisible) this.maxWidth else regularSheetWidth,
         )
         val sheetTop = viewportHeight - sheetHeight + drag.offset
         SystemBarStyleEffect(
-            statusBar = if (modal && options.expandToFullscreen && sheetTop <= 0f) {
+            statusBar = if (modal && expandsToFullScreen && sheetTop <= 0f) {
                 systemBarIconStyleFor(StyledTheme.colorScheme.surface, StyledTheme.colorScheme.background)
             } else null,
             navigationBar = if (modal) {
                 systemBarIconStyleFor(containerColor, StyledTheme.colorScheme.background)
             } else null,
         )
-        val connection = remember(drag, scope) {
+        val connection = remember(drag, scope, options, canDragSheet) {
             object : NestedScrollConnection {
                 override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                    if (source != NestedScrollSource.UserInput) return Offset.Zero
+                    if (source != NestedScrollSource.UserInput || !canDragSheet) return Offset.Zero
                     drag.beginUserGesture()
                     return if (available.y < 0f) {
                         Offset(0f, drag.drag(available.y))
@@ -243,14 +248,16 @@ internal fun FoundationDialogSheet(
                     available: Offset,
                     source: NestedScrollSource,
                 ): Offset {
-                    if (source != NestedScrollSource.UserInput) return Offset.Zero
+                    if (source != NestedScrollSource.UserInput || !canDragSheet) return Offset.Zero
                     drag.beginUserGesture()
                     drag.recordContentScroll(consumed.y)
                     return Offset(0f, drag.drag(available.y))
                 }
 
                 override suspend fun onPreFling(available: Velocity): Velocity {
-                    if (!options.gesturesEnabled || drag.offset <= 0f) return Velocity.Zero
+                    if (!options.gesturesEnabled || !canDragSheet || drag.offset <= 0f) {
+                        return Velocity.Zero
+                    }
                     if (!drag.canDismissOnSwipe()) return Velocity.Zero
                     drag.settle(
                         scope = scope,
@@ -263,7 +270,7 @@ internal fun FoundationDialogSheet(
                 }
 
                 override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
-                    if (!options.gesturesEnabled) return Velocity.Zero
+                    if (!options.gesturesEnabled || !canDragSheet) return Velocity.Zero
                     drag.settle(
                         scope = scope,
                         velocity = available.y,
@@ -279,10 +286,10 @@ internal fun FoundationDialogSheet(
         val visibleHeight = (sheetHeight - drag.offset).coerceAtLeast(0f)
         val footerOffset = (protectedHeight + footerHeight - visibleHeight).coerceAtLeast(0f)
         val bottomInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom)
-        val footerInsets = if (modal && options.expandToFullscreen) {
+        val footerInsets = if (modal && expandsToFullScreen) {
             WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal)
         } else bottomInsets
-        val sheetHorizontalInsets = if (modal && options.expandToFullscreen) {
+        val sheetHorizontalInsets = if (modal && expandsToFullScreen) {
             horizontalInsets
         } else WindowInsets(0, 0, 0, 0)
         if (modal) {
@@ -318,20 +325,22 @@ internal fun FoundationDialogSheet(
                         .draggable(
                             state = rememberDraggableState { drag.drag(it) },
                             orientation = Orientation.Vertical,
-                            enabled = options.gesturesEnabled && visible,
+                            enabled = options.gesturesEnabled && visible && canDragSheet,
                             onDragStarted = { drag.beginUserGesture() },
                             onDragStopped = { velocity ->
-                                drag.settle(
-                                    scope = scope,
-                                    velocity = velocity,
-                                    allowDismiss = drag.canDismissOnSwipe(),
-                                    onDismissRequest = { dismissRequestWithoutAnimation() },
-                                    isVisible = { currentVisibility() },
-                                ).join()
+                                if (canDragSheet) {
+                                    drag.settle(
+                                        scope = scope,
+                                        velocity = velocity,
+                                        allowDismiss = drag.canDismissOnSwipe(),
+                                        onDismissRequest = { dismissRequestWithoutAnimation() },
+                                        isVisible = { currentVisibility() },
+                                    ).join()
+                                }
                                 drag.endUserGesture()
                             },
                         ),
-                    shape = if (options.expandToFullscreen && sheetTop <= 0f) RectangleShape else shape,
+                    shape = if (expandsToFullScreen && sheetTop <= 0f) RectangleShape else shape,
                     color = containerColor,
                     shadowElevation = 8.dp,
                 ) {
@@ -339,7 +348,7 @@ internal fun FoundationDialogSheet(
                         Column(
                             Modifier.windowInsetsPadding(sheetHorizontalInsets)
                                 .then(
-                                    if (options.expandToFullscreen) {
+                                    if (expandsToFullScreen) {
                                         Modifier.height(with(density) { contentMaxHeight.toDp() })
                                     } else {
                                         Modifier.heightIn(
@@ -411,7 +420,8 @@ internal fun FoundationDialogSheet(
                                                     interactionSource = remember { MutableInteractionSource() },
                                                     indication = null,
                                                     enabled = options.gesturesEnabled &&
-                                                        peekOffset > 0f && visible,
+                                                        peekOffset > 0f && visible &&
+                                                        (canExitFullScreen || !drag.isExpanded),
                                                 ) {
                                                     drag.animateTo(
                                                         scope,
@@ -424,9 +434,11 @@ internal fun FoundationDialogSheet(
                                                                 drag.animateTo(scope, 0f)
                                                                 true
                                                             }
-                                                            collapse {
-                                                                drag.animateTo(scope, peekOffset)
-                                                                true
+                                                            if (canExitFullScreen || !drag.isExpanded) {
+                                                                collapse {
+                                                                    drag.animateTo(scope, peekOffset)
+                                                                    true
+                                                                }
                                                             }
                                                         }
                                                         if (options.dismissOnSwipe) {
@@ -457,13 +469,17 @@ internal fun FoundationDialogSheet(
                                 }
                             }
                             Column(
-                                Modifier.then(if (options.expandToFullscreen) Modifier.weight(1f) else Modifier)
+                                Modifier.then(if (expandsToFullScreen) Modifier.weight(1f) else Modifier)
                                     .fillMaxWidth(),
                             ) {
                                 content(
                                     PaddingValues(
                                         start = contentPadding,
-                                        top = contentPadding,
+                                        top = if (title != null && fullscreenToolbarVisible) {
+                                            0.dp
+                                        } else {
+                                            contentPadding
+                                        },
                                         end = contentPadding,
                                         bottom = if (fixedButtons) {
                                             with(density) { footerHeight.toDp() }
@@ -650,7 +666,9 @@ private class SheetDragState(
         isVisible: () -> Boolean,
     ): Job {
         settling?.cancel()
-        val anchors = listOf(0f, peekOffset) +
+        val canReturnToPeek = !isExpanded ||
+            (options.expandToFullScreen as? StyledDialog.ExpandToFullScreen.Enabled)?.allowExit != false
+        val anchors = listOf(0f) + (if (canReturnToPeek) listOf(peekOffset) else emptyList()) +
             if (options.dismissOnSwipe && allowDismiss) listOf(height) else emptyList()
         val projected = offset + velocity * 0.15f
         val target = anchors.minBy { abs(it - projected) }

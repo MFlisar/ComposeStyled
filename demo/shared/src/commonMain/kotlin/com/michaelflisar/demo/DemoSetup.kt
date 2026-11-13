@@ -5,12 +5,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import com.michaelflisar.composestyled.StyledTheme
+import com.michaelflisar.composestyled.isDynamicColorsSupported
 import com.michaelflisar.composestyled.themes.StyledThemeAppearance
 import com.michaelflisar.composestyled.themes.StyledThemeColors
 import com.michaelflisar.composestyled.themes.StyledThemeColorsCollection
 import com.michaelflisar.composestyled.themes.StyledThemeContrast
 import com.michaelflisar.composestyled.themes.StyledThemeVariant
 import com.michaelflisar.composestyled.ui.components.StyledPopupDropdownIndex
+import com.michaelflisar.composestyled.ui.components.StyledSwitch
 import com.michaelflisar.composestyled.ui.layout.StyledRow
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.ui.specials.StyledThemeColorsPicker
@@ -27,6 +29,7 @@ fun DemoSetup(
     themeVariant: MutableState<StyledThemeVariant>,
     themeAppearance: MutableState<StyledThemeAppearance>,
     themeContrast: MutableState<StyledThemeContrast>,
+    themeDynamic: MutableState<Boolean>,
 ) {
     SubTitle("Platform / Implementation")
     StyledRow(
@@ -53,6 +56,13 @@ fun DemoSetup(
         modifier = Modifier.fillMaxWidth(),
         collections = themeCollections,
     )
+    if (StyledTheme.isDynamicColorsSupported) {
+        StyledSwitch(
+            checked = themeDynamic.value,
+            onCheckedChange = { themeDynamic.value = it },
+            label = { StyledText("Use dynamic system colors") },
+        )
+    }
 
     SubTitle("Theme Name")
     StyledText(

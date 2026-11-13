@@ -86,7 +86,7 @@ object StyledDialog {
             val maxHeightFraction: Float? = null,
             val edgeMargin: Dp? = null,
             /** Allows dragging the toolbar up to expand this workspace edge-to-edge. */
-            val expandToFullscreen: Boolean = false,
+            val expandToFullScreen: ExpandToFullScreen = ExpandToFullScreen.Disabled(),
         ) : Style
 
         /** Full-window workspace for extensive workflows or compact screens. */
@@ -154,6 +154,22 @@ object StyledDialog {
             /** Snaps a dragged minimized bubble to the nearest horizontal edge on release. */
             val snapToEdge: Boolean = true,
         ) : Style
+    }
+
+    /** Controls whether a dialog or sheet can expand to full screen and return to its regular size. */
+    @Stable
+    sealed interface ExpandToFullScreen {
+        @Stable
+        class Disabled : ExpandToFullScreen {
+            override fun equals(other: Any?): Boolean = other is Disabled
+            override fun hashCode(): Int = 0
+            override fun toString(): String = "Disabled"
+        }
+
+        @Stable
+        data class Enabled(
+            val allowExit: Boolean = true,
+        ) : ExpandToFullScreen
     }
 
     /** Defines outside-click handling and optional dimming for an expanded floating window. */
@@ -292,7 +308,7 @@ object StyledDialog {
         val initiallyExpanded: Boolean = false,
         val peekHeightFraction: Float = 0.5f,
         /** Allows the expanded sheet to fill the window and transition its actions into a top bar. */
-        val expandToFullscreen: Boolean = false,
+        val expandToFullScreen: ExpandToFullScreen = ExpandToFullScreen.Disabled(),
         /** Requires the body to be at its top and the sheet at peek before a swipe can dismiss it. */
         val dismissOnSwipeOnlyWhenContentAtTop: Boolean = true,
     ) {

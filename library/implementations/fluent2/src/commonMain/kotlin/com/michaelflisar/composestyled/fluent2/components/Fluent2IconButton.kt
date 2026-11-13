@@ -113,10 +113,11 @@ class Fluent2IconButton internal constructor(
                 LocalInputModeManager.current.inputMode == InputMode.Keyboard
         val context = LocalStyledContext.current
         val rendererVariant = variantMapping(variant, context)
-        val defaultContentColor = if (variant == StyledButton.Variant.Auto &&
-            (context is StyledTopBar.Context ||
-                context is StyledDialog.ActionContext &&
-                context.context == StyledDialog.Context.FullscreenAction)
+        val defaultContentColor = if (variant == StyledButton.Variant.Plain ||
+            (variant == StyledButton.Variant.Auto &&
+                (context is StyledTopBar.Context ||
+                    context is StyledDialog.ActionContext &&
+                    context.context == StyledDialog.Context.FullscreenAction))
         ) LocalStyledContentColor.current else null
         val colors = FluentButtonColors.resolve(
             variant = when (rendererVariant) {

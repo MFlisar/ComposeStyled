@@ -86,6 +86,7 @@ fun DemoContent(
     val themeVariant = rememberSaveable { mutableStateOf(StyledThemeVariant.Colorful) }
     val themeAppearance = rememberSaveable { mutableStateOf(StyledThemeAppearance.Light) }
     val themeContrast = rememberSaveable { mutableStateOf(StyledThemeContrast.System) }
+    val themeDynamic = rememberSaveable { mutableStateOf(false) }
 
     val dialogSetup = rememberDialogState(initialVisible = true)
     val demoStateHolder = rememberSaveableStateHolder()
@@ -99,6 +100,7 @@ fun DemoContent(
         themeVariant = themeVariant.value,
         themeAppearance = themeAppearance.value,
         themeContrast = themeContrast.value,
+        themeDynamic = themeDynamic.value,
         behavior = StyledTheme.Behavior(
             showScrollbars = PlatformDefaults.showScrollbars(hostPlatform),
         ),
@@ -226,6 +228,7 @@ fun DemoContent(
                                 themeVariant = themeVariant,
                                 themeAppearance = themeAppearance,
                                 themeContrast = themeContrast,
+                                themeDynamic = themeDynamic,
                             )
                         } else {
                             SubTitle("Template (not adjustable) - shows a easy start point for your own app")

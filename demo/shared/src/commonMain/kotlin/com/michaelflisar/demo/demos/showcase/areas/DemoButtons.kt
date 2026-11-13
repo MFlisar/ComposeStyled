@@ -14,7 +14,9 @@ import com.michaelflisar.composestyled.ui.components.StyledButtonDefaults
 import com.michaelflisar.composestyled.ui.components.StyledIcon
 import com.michaelflisar.composestyled.ui.components.StyledIconButton
 import com.michaelflisar.composestyled.ui.components.StyledIconButtonDefaults
+import com.michaelflisar.composestyled.ui.components.StyledIconTextButton
 import com.michaelflisar.composestyled.ui.components.StyledOutlinedButton
+import com.michaelflisar.composestyled.ui.components.StyledSurface
 import com.michaelflisar.composestyled.ui.components.StyledTextButton
 import com.michaelflisar.composestyled.ui.layout.StyledFlowRow
 import com.michaelflisar.composestyled.ui.primitives.StyledText
@@ -155,8 +157,35 @@ internal fun DemoButtons(
             ) {
                 StyledText("Outlined")
             }
+            StyledIconTextButton(
+                onClick = { showMessage("Icon-text button clicked") },
+                icon = Icons.Default.Add.toIconComposable(),
+            ) {
+                StyledText("Icon and text")
+            }
             StyledTextButton(onClick = { showMessage("Text button clicked") }) {
                 StyledText("Text")
+            }
+        }
+
+        SubTitle("Plain buttons inherit surface content color")
+        StyledSurface(
+            color = StyledTheme.colorScheme.primary,
+            contentColor = StyledTheme.colorScheme.onPrimary,
+        ) {
+            StyledFlowRow(spacing = StyledTheme.spacing.medium) {
+                StyledTextButton(
+                    onClick = { showMessage("Plain icon-text button clicked") },
+                    leadingIcon = Icons.Default.Add.toIconComposable(),
+                ) {
+                    StyledText("Plain button")
+                }
+                StyledIconButton(
+                    onClick = { showMessage("Plain icon button clicked") },
+                    variant = StyledButton.Variant.Plain,
+                    icon = Icons.Default.Add.toIconComposable(),
+                    contentDescription = "Plain action",
+                )
             }
         }
     }

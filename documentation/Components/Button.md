@@ -35,6 +35,22 @@ StyledButton(
 }
 ```
 
+For the common leading-icon layout, `StyledIconTextButton()` requires an icon
+and forwards the rest of the interaction, variant, customization and content
+handling to `StyledButton()`:
+
+```kotlin
+StyledIconTextButton(
+    onClick = { save() },
+    icon = Icons.Default.Save.toIconComposable(),
+) {
+    StyledText("Save")
+}
+```
+
+An explicit `Plain` variant inherits the surrounding Styled content color.
+`CustomColors.textForeground` takes precedence when provided.
+
 Default Auto mappings preserve the style vocabulary while adapting to the
 active design system. Explicit variants are never replaced by context:
 
