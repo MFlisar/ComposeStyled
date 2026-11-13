@@ -3,7 +3,6 @@ package com.michaelflisar.composedialogs.styled
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.Modifier
-import com.michaelflisar.composedialogs.styled.shared.composeDialog
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
 import com.michaelflisar.composestyled.ui.layout.StyledDialogDefaults
@@ -26,19 +25,19 @@ fun DialogInfo(
     buttons: StyledDialog.Buttons = StyledDialog.Buttons(),
     onDismissRequest: () -> Unit = state::dismiss,
 ) {
-    composeDialog(
+    StyledDialog(
         state = state,
         modifier = modifier,
         style = style,
         properties = properties,
-        title = title,
-        icon = icon,
+        title = StyledDialogDefaults.title(icon, title),
         buttons = buttons,
         onDismissRequest = onDismissRequest,
-    ) {
-        if (infoLabel.isNotEmpty()) {
-            StyledText(infoLabel, style = labelStyle)
-        }
-        StyledText(info, style = infoStyle)
-    }
+        content = StyledDialogDefaults.content {
+            if (infoLabel.isNotEmpty()) {
+                StyledText(infoLabel, style = labelStyle)
+            }
+            StyledText(info, style = infoStyle)
+        },
+    )
 }

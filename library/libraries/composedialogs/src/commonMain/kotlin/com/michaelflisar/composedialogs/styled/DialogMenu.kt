@@ -14,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
-import com.michaelflisar.composedialogs.styled.shared.composeDialog
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.ui.components.StyledIcon
 import com.michaelflisar.composestyled.ui.components.StyledListItem
@@ -89,115 +88,115 @@ fun DialogMenu(
     }
     val visibleItems = menuPath.lastOrNull()?.items ?: items
 
-    composeDialog(
+    StyledDialog(
         state = state,
         modifier = modifier,
         style = style,
         properties = properties,
-        title = title,
-        icon = icon,
+        title = StyledDialogDefaults.title(icon, title),
         buttons = buttons,
         onDismissRequest = onDismissRequest,
-    ) {
-        StyledVerticalScrollContainer(
-            modifier = listModifier.fillMaxWidth(),
-            contentPadding = listContentPadding,
-        ) {
-            StyledColumn(
-                itemSpacing = itemSpacing,
-                modifier = Modifier.fillMaxWidth(),
+        content = StyledDialogDefaults.content {
+            StyledVerticalScrollContainer(
+                modifier = listModifier.fillMaxWidth(),
+                contentPadding = listContentPadding,
             ) {
-                if (menuPath.isNotEmpty()) {
-                    menuListItem(
-                        title = "Back to ${menuPath.last().title}",
-                        onClick = { menuPath = menuPath.dropLast(1) },
-                        leading = {
-                            StyledIcon(
-                                icon = StyledIcons.NavigateBack,
-                                contentDescription = "Back",
-                            )
-                        },
-                        itemContentSpacing = itemContentSpacing,
-                        itemShape = itemShape,
-                        itemMinHeight = itemMinHeight,
-                        itemContentPadding = itemContentPadding,
-                        itemContainerColor = itemContainerColor,
-                        itemContentColor = itemContentColor,
-                        itemSupportingColor = itemSupportingColor,
-                        itemBorderColor = itemBorderColor,
-                    )
-                }
-                visibleItems.forEach { entry ->
-                    when (entry) {
-                        is DialogMenu.Entry.Action -> {
-                            menuListItem(
-                                title = entry.title,
-                                description = entry.description,
-                                onClick = {
-                                    entry.onClick()
-                                    if (entry.dismissOnClick && dismissOnClick) {
-                                        onDismissRequest()
-                                    }
-                                },
-                                enabled = entry.enabled,
-                                leading = entry.leading,
-                                itemContentSpacing = itemContentSpacing,
-                                itemShape = itemShape,
-                                itemMinHeight = itemMinHeight,
-                                itemContentPadding = itemContentPadding,
-                                itemContainerColor = itemContainerColor,
-                                itemContentColor = itemContentColor,
-                                itemSupportingColor = itemSupportingColor,
-                                itemBorderColor = itemBorderColor,
-                            )
-                        }
+                StyledColumn(
+                    itemSpacing = itemSpacing,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    if (menuPath.isNotEmpty()) {
+                        menuListItem(
+                            title = "Back to ${menuPath.last().title}",
+                            onClick = { menuPath = menuPath.dropLast(1) },
+                            leading = {
+                                StyledIcon(
+                                    icon = StyledIcons.NavigateBack,
+                                    contentDescription = "Back",
+                                )
+                            },
+                            itemContentSpacing = itemContentSpacing,
+                            itemShape = itemShape,
+                            itemMinHeight = itemMinHeight,
+                            itemContentPadding = itemContentPadding,
+                            itemContainerColor = itemContainerColor,
+                            itemContentColor = itemContentColor,
+                            itemSupportingColor = itemSupportingColor,
+                            itemBorderColor = itemBorderColor,
+                        )
+                    }
+                    visibleItems.forEach { entry ->
+                        when (entry) {
+                            is DialogMenu.Entry.Action -> {
+                                menuListItem(
+                                    title = entry.title,
+                                    description = entry.description,
+                                    onClick = {
+                                        entry.onClick()
+                                        if (entry.dismissOnClick && dismissOnClick) {
+                                            onDismissRequest()
+                                        }
+                                    },
+                                    enabled = entry.enabled,
+                                    leading = entry.leading,
+                                    itemContentSpacing = itemContentSpacing,
+                                    itemShape = itemShape,
+                                    itemMinHeight = itemMinHeight,
+                                    itemContentPadding = itemContentPadding,
+                                    itemContainerColor = itemContainerColor,
+                                    itemContentColor = itemContentColor,
+                                    itemSupportingColor = itemSupportingColor,
+                                    itemBorderColor = itemBorderColor,
+                                )
+                            }
 
-                        is DialogMenu.Entry.Submenu -> {
-                            menuListItem(
-                                title = entry.title,
-                                description = entry.description,
-                                onClick = { menuPath = menuPath + entry },
-                                leading = entry.leading,
-                                actions = {
-                                    StyledIcon(
-                                        icon = StyledIcons.Submenu,
-                                        contentDescription = "Open submenu",
-                                    )
-                                },
-                                itemContentSpacing = itemContentSpacing,
-                                itemShape = itemShape,
-                                itemMinHeight = itemMinHeight,
-                                itemContentPadding = itemContentPadding,
-                                itemContainerColor = itemContainerColor,
-                                itemContentColor = itemContentColor,
-                                itemSupportingColor = itemSupportingColor,
-                                itemBorderColor = itemBorderColor,
-                            )
-                        }
+                            is DialogMenu.Entry.Submenu -> {
+                                menuListItem(
+                                    title = entry.title,
+                                    description = entry.description,
+                                    onClick = { menuPath = menuPath + entry },
+                                    leading = entry.leading,
+                                    actions = {
+                                        StyledIcon(
+                                            icon = StyledIcons.Submenu,
+                                            contentDescription = "Open submenu",
+                                        )
+                                    },
+                                    itemContentSpacing = itemContentSpacing,
+                                    itemShape = itemShape,
+                                    itemMinHeight = itemMinHeight,
+                                    itemContentPadding = itemContentPadding,
+                                    itemContainerColor = itemContainerColor,
+                                    itemContentColor = itemContentColor,
+                                    itemSupportingColor = itemSupportingColor,
+                                    itemBorderColor = itemBorderColor,
+                                )
+                            }
 
-                        is DialogMenu.Entry.Header -> {
-                            StyledText(
-                                text = entry.title,
-                                modifier = Modifier.padding(
-                                    horizontal = StyledTheme.padding.medium,
-                                    vertical = StyledTheme.padding.small,
-                                ),
-                                style = StyledTheme.typography.titleSmall,
-                            )
-                        }
+                            is DialogMenu.Entry.Header -> {
+                                StyledText(
+                                    text = entry.title,
+                                    modifier = Modifier.padding(
+                                        horizontal = StyledTheme.padding.medium,
+                                        vertical = StyledTheme.padding.small,
+                                    ),
+                                    style = StyledTheme.typography.titleSmall,
+                                )
+                            }
 
-                        DialogMenu.Entry.Divider -> {
-                            StyledHorizontalDivider()
-                        }
+                            DialogMenu.Entry.Divider -> {
+                                StyledHorizontalDivider()
+                            }
 
-                        is DialogMenu.Entry.Custom -> {
-                            entry.content()
+                            is DialogMenu.Entry.Custom -> {
+                                entry.content()
+                            }
                         }
                     }
                 }
             }
-        }
-    }
+        },
+    )
 }
 
 @Composable

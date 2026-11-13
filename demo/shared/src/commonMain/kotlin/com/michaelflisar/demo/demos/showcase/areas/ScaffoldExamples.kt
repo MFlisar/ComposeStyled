@@ -112,7 +112,15 @@ internal fun ScaffoldExamples(
                     expandedContainerColor = StyledTheme.colorScheme.primarySurface,
                     expandedContentColor = StyledTheme.colorScheme.onPrimarySurface,
                     windowInsets = WindowInsets(0, 0, 0, 0),
-                    title = { StyledText("Expandable toolbar") },
+                    title = {
+                        StyledColumn(itemSpacing = StyledTheme.spacing.small) {
+                            StyledText("Expandable toolbar")
+                            StyledText(
+                                "The subtitle stays visible while expanded",
+                                style = StyledTheme.typography.bodySmall,
+                            )
+                        }
+                    },
                 )
             },
             content = { paddingValues ->

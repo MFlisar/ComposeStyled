@@ -14,7 +14,7 @@ import com.michaelflisar.composestyled.ui.components.StyledButtonDefaults
 import com.michaelflisar.composestyled.ui.components.StyledIcon
 import com.michaelflisar.composestyled.ui.components.StyledIconButton
 import com.michaelflisar.composestyled.ui.components.StyledIconButtonDefaults
-import com.michaelflisar.composestyled.ui.components.StyledIconTextButton
+import com.michaelflisar.composestyled.ui.components.StyledIconPlainButton
 import com.michaelflisar.composestyled.ui.components.StyledOutlinedButton
 import com.michaelflisar.composestyled.ui.components.StyledSurface
 import com.michaelflisar.composestyled.ui.components.StyledTextButton
@@ -157,12 +157,6 @@ internal fun DemoButtons(
             ) {
                 StyledText("Outlined")
             }
-            StyledIconTextButton(
-                onClick = { showMessage("Icon-text button clicked") },
-                icon = Icons.Default.Add.toIconComposable(),
-            ) {
-                StyledText("Icon and text")
-            }
             StyledTextButton(onClick = { showMessage("Text button clicked") }) {
                 StyledText("Text")
             }
@@ -180,9 +174,8 @@ internal fun DemoButtons(
                 ) {
                     StyledText("Plain button")
                 }
-                StyledIconButton(
+                StyledIconPlainButton(
                     onClick = { showMessage("Plain icon button clicked") },
-                    variant = StyledButton.Variant.Plain,
                     icon = Icons.Default.Add.toIconComposable(),
                     contentDescription = "Plain action",
                 )

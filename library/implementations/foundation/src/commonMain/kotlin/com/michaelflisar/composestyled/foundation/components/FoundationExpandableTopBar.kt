@@ -74,8 +74,10 @@ class FoundationExpandableTopBar : StyledExpandableTopBar.Implementation {
             }
         }
         val titlePaddingPx = with(density) { expandedTitlePadding.roundToPx() }
-        val minimumExpandedContentHeightPx =
-            (titleLineHeightPx + 2 * titlePaddingPx).toInt()
+        val expandedTitleHeightPx = remember { mutableIntStateOf(0) }
+        val titleContentHeightPx = expandedTitleHeightPx.intValue
+            .takeIf { it > 0 } ?: titleLineHeightPx.toInt()
+        val minimumExpandedContentHeightPx = titleContentHeightPx + 2 * titlePaddingPx
         val topBarHeightPx = remember { mutableIntStateOf(0) }
         val navigationLeadingEdge = remember { mutableFloatStateOf(Float.NaN) }
         val titleLeadingEdge = remember { mutableFloatStateOf(Float.NaN) }
@@ -143,27 +145,29 @@ class FoundationExpandableTopBar : StyledExpandableTopBar.Implementation {
                             },
                         ) {
                             Box(
-                                Modifier.graphicsLayer {
-                                    val expandedFraction =
-                                        1f - behavior.state.collapsedFraction
-                                    val horizontalOffset = if (
-                                        navigationLeadingEdge.floatValue.isFinite() &&
-                                        titleLeadingEdge.floatValue.isFinite()
-                                    ) {
-                                        navigationLeadingEdge.floatValue -
-                                            titleLeadingEdge.floatValue
-                                    } else {
-                                        0f
-                                    }
-                                    translationX = horizontalOffset * expandedFraction
-                                    translationY = (
-                                        topBarHeightPx.intValue / 2f +
-                                            (bottomInsetPx - topInsetPx) / 2f +
-                                            expandedContentHeightPx -
-                                            titlePaddingPx -
-                                            titleLineHeightPx / 2f
-                                        ) * expandedFraction
-                                },
+                                Modifier
+                                    .onSizeChanged { expandedTitleHeightPx.intValue = it.height }
+                                    .graphicsLayer {
+                                        val expandedFraction =
+                                            1f - behavior.state.collapsedFraction
+                                        val horizontalOffset = if (
+                                            navigationLeadingEdge.floatValue.isFinite() &&
+                                            titleLeadingEdge.floatValue.isFinite()
+                                        ) {
+                                            navigationLeadingEdge.floatValue -
+                                                titleLeadingEdge.floatValue
+                                        } else {
+                                            0f
+                                        }
+                                        translationX = horizontalOffset * expandedFraction
+                                        translationY = (
+                                            topBarHeightPx.intValue / 2f +
+                                                (bottomInsetPx - topInsetPx) / 2f +
+                                                expandedContentHeightPx -
+                                                titlePaddingPx -
+                                                titleContentHeightPx / 2f
+                                            ) * expandedFraction
+                                    },
                             ) {
                                 UpdateStyledThemeLocals(
                                     contentColor = animatedContentColor,

@@ -8,7 +8,6 @@ import com.michaelflisar.composedialogs.dialogs.date.DatePicker
 import com.michaelflisar.composedialogs.dialogs.date.ui.DatePickerRange
 import com.michaelflisar.composedialogs.dialogs.date.ui.DatePickerSetup
 import com.michaelflisar.composedialogs.styled.provider.DateUIProviderImpl
-import com.michaelflisar.composedialogs.styled.shared.composeDialog
 import com.michaelflisar.composestyled.isLandscape
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
 import com.michaelflisar.composestyled.ui.layout.StyledDialogDefaults
@@ -32,26 +31,29 @@ fun DialogDate(
     onDismissRequest: () -> Unit = state::dismiss,
 ) {
     val landscape = isLandscape
-    composeDialog(
+    StyledDialog(
         state = state,
         modifier = modifier,
         style = style,
         properties = properties,
-        title = title.takeUnless { landscape },
-        icon = icon.takeUnless { landscape },
+        title = StyledDialogDefaults.title(
+            icon.takeUnless { landscape },
+            title.takeUnless { landscape },
+        ),
         buttons = buttons,
         onDismissRequest = onDismissRequest,
-    ) {
-        if (state.visible) {
-            DatePicker(
-                uiProvider = DateUIProviderImpl,
-                date = date,
-                dateRange = dateRange,
-                setup = setup,
-                landscape = landscape,
-                title = title,
-                icon = icon,
-            )
-        }
-    }
+        content = StyledDialogDefaults.content {
+            if (state.visible) {
+                DatePicker(
+                    uiProvider = DateUIProviderImpl,
+                    date = date,
+                    dateRange = dateRange,
+                    setup = setup,
+                    landscape = landscape,
+                    title = title,
+                    icon = icon,
+                )
+            }
+        },
+    )
 }

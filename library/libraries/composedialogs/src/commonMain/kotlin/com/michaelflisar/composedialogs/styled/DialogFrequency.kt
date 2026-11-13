@@ -13,7 +13,6 @@ import com.michaelflisar.composedialogs.dialogs.frequency.classes.Frequency
 import com.michaelflisar.composedialogs.dialogs.time.TimePickerDefaults
 import com.michaelflisar.composedialogs.dialogs.time.TimePickerSetup
 import com.michaelflisar.composedialogs.styled.provider.FrequencyUIProviderImpl
-import com.michaelflisar.composedialogs.styled.shared.composeDialog
 import com.michaelflisar.composedialogs.styled.shared.withPositiveButtonEnabled
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
 import com.michaelflisar.composestyled.ui.layout.StyledDialogDefaults
@@ -41,28 +40,28 @@ fun DialogFrequency(
     val intervalIsValid = remember(frequency.value.interval) {
         mutableStateOf(frequency.value.interval > 0)
     }
-    composeDialog(
+    StyledDialog(
         state = state,
         modifier = modifier,
         style = style,
         properties = properties,
-        title = title,
-        icon = icon,
+        title = StyledDialogDefaults.title(icon, title),
         buttons = buttons.withPositiveButtonEnabled(intervalIsValid.value),
         onDismissRequest = onDismissRequest,
-    ) {
-        if (state.visible) {
-            FrequencyPicker(
-                uiProvider = FrequencyUIProviderImpl,
-                frequency = frequency,
-                texts = texts,
-                supportedTypes = supportedTypes,
-                firstDayOffset = firstDayOffset,
-                intervalInputType = intervalInputType,
-                timeSetup = timeSetup,
-            ) { isValid ->
-                intervalIsValid.value = isValid
+        content = StyledDialogDefaults.content {
+            if (state.visible) {
+                FrequencyPicker(
+                    uiProvider = FrequencyUIProviderImpl,
+                    frequency = frequency,
+                    texts = texts,
+                    supportedTypes = supportedTypes,
+                    firstDayOffset = firstDayOffset,
+                    intervalInputType = intervalInputType,
+                    timeSetup = timeSetup,
+                ) { isValid ->
+                    intervalIsValid.value = isValid
+                }
             }
-        }
-    }
+        },
+    )
 }

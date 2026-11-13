@@ -200,9 +200,9 @@ private fun SheetLayout(
     } else {
         Modifier
     }
-    // Pointer sharing is configured per layout, so limit it to the fully collapsed state.
+    // Keep sibling sharing attached throughout the drag; removing the node as progress changes can cancel it.
     val siblingPointerInputModifier = if (
-        !expanded && state.progress == 0f && gesturesEnabled && triggerSize > 0.dp
+        !expanded && gesturesEnabled && triggerSize > 0.dp
     ) {
         Modifier.sharePointerInputWithSiblings()
     } else {

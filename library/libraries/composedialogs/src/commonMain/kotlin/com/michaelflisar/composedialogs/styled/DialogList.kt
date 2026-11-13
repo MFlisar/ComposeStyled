@@ -9,7 +9,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
-import com.michaelflisar.composedialogs.styled.shared.composeDialog
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.ui.components.StyledListItem
 import com.michaelflisar.composestyled.ui.components.StyledListItemDefaults
@@ -60,57 +59,57 @@ fun <T : Any> DialogList(
         { _, item -> itemKey(item) }
     }
 
-    composeDialog(
+    StyledDialog(
         state = state,
         modifier = modifier,
         style = style,
         properties = properties,
-        title = title,
-        icon = icon,
+        title = StyledDialogDefaults.title(icon, title),
         buttons = buttons,
         onDismissRequest = onDismissRequest,
-    ) {
-        StyledVerticalScrollContainer(
-            modifier = listModifier.fillMaxWidth(),
-            contentPadding = listContentPadding,
-        ) {
-            StyledColumn(
-                itemSpacing = itemSpacing,
-                modifier = Modifier.fillMaxWidth(),
+        content = StyledDialogDefaults.content {
+            StyledVerticalScrollContainer(
+                modifier = listModifier.fillMaxWidth(),
+                contentPadding = listContentPadding,
             ) {
-                if (items.isEmpty()) {
-                    emptyContent?.invoke()
-                } else {
-                    items.forEachIndexed { index, item ->
-                        key(indexedKey?.invoke(index, item) ?: index) {
-                            StyledListItem(
-                                headline = { itemContent(item) },
-                                onClick = {
-                                    onItemClick(item)
-                                    if (dismissOnItemClick) onDismissRequest()
-                                },
-                                modifier = Modifier.fillMaxWidth(),
-                                enabled = itemEnabled(item),
-                                shape = itemShape,
-                                minHeight = itemMinHeight,
-                                contentPadding = itemContentPadding,
-                                spacing = itemContentSpacing,
-                                containerColor = itemContainerColor,
-                                contentColor = itemContentColor,
-                                supportingColor = itemSupportingColor,
-                                borderColor = itemBorderColor,
-                                supporting = supportingContent?.let { content -> { content(item) } },
-                                overline = overlineContent?.let { content -> { content(item) } },
-                                leading = leadingContent?.let { content -> { content(item) } },
-                                actions = actionsContent?.let { content -> { content(item) } },
-                            )
-                        }
-                        if (showDividers && index < items.lastIndex) {
-                            StyledHorizontalDivider()
+                StyledColumn(
+                    itemSpacing = itemSpacing,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    if (items.isEmpty()) {
+                        emptyContent?.invoke()
+                    } else {
+                        items.forEachIndexed { index, item ->
+                            key(indexedKey?.invoke(index, item) ?: index) {
+                                StyledListItem(
+                                    headline = { itemContent(item) },
+                                    onClick = {
+                                        onItemClick(item)
+                                        if (dismissOnItemClick) onDismissRequest()
+                                    },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    enabled = itemEnabled(item),
+                                    shape = itemShape,
+                                    minHeight = itemMinHeight,
+                                    contentPadding = itemContentPadding,
+                                    spacing = itemContentSpacing,
+                                    containerColor = itemContainerColor,
+                                    contentColor = itemContentColor,
+                                    supportingColor = itemSupportingColor,
+                                    borderColor = itemBorderColor,
+                                    supporting = supportingContent?.let { content -> { content(item) } },
+                                    overline = overlineContent?.let { content -> { content(item) } },
+                                    leading = leadingContent?.let { content -> { content(item) } },
+                                    actions = actionsContent?.let { content -> { content(item) } },
+                                )
+                            }
+                            if (showDividers && index < items.lastIndex) {
+                                StyledHorizontalDivider()
+                            }
                         }
                     }
                 }
             }
-        }
-    }
+        },
+    )
 }

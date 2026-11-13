@@ -12,7 +12,6 @@ import com.michaelflisar.composedialogs.dialogs.time.TimePickerDefaults
 import com.michaelflisar.composedialogs.dialogs.time.TimePickerSetup
 import com.michaelflisar.composedialogs.dialogs.time.TimePickerTexts
 import com.michaelflisar.composedialogs.styled.provider.TimeUIProviderImpl
-import com.michaelflisar.composedialogs.styled.shared.composeDialog
 import com.michaelflisar.composedialogs.styled.shared.withPositiveButtonEnabled
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
 import com.michaelflisar.composestyled.ui.layout.StyledDialogDefaults
@@ -35,27 +34,27 @@ fun DialogTime(
     onDismissRequest: () -> Unit = state::dismiss,
 ) {
     var isValid by remember { mutableStateOf(true) }
-    composeDialog(
+    StyledDialog(
         state = state,
         modifier = modifier,
         style = style,
         properties = properties,
-        title = title,
-        icon = icon,
+        title = StyledDialogDefaults.title(icon, title),
         buttons = buttons.withPositiveButtonEnabled(isValid),
         onDismissRequest = onDismissRequest,
-    ) {
-        if (state.visible) {
-            TimePicker(
-                time = time,
-                is24Hours = setup.is24Hours,
-                minuteStep = setup.minuteStep,
-                hourPickType = setup.hourPickType,
-                minutePickType = setup.minutePickType,
-                texts = texts,
-                uiProvider = TimeUIProviderImpl,
-                onValidationChanged = { isValid = it },
-            )
-        }
-    }
+        content = StyledDialogDefaults.content {
+            if (state.visible) {
+                TimePicker(
+                    time = time,
+                    is24Hours = setup.is24Hours,
+                    minuteStep = setup.minuteStep,
+                    hourPickType = setup.hourPickType,
+                    minutePickType = setup.minutePickType,
+                    texts = texts,
+                    uiProvider = TimeUIProviderImpl,
+                    onValidationChanged = { isValid = it },
+                )
+            }
+        },
+    )
 }

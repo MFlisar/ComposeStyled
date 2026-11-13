@@ -16,7 +16,6 @@ import com.michaelflisar.composedialogs.dialogs.color.ColorPickerDefaults
 import com.michaelflisar.composedialogs.dialogs.color.ColorPickerLabelStyle
 import com.michaelflisar.composedialogs.dialogs.color.ColorPickerTexts
 import com.michaelflisar.composedialogs.styled.provider.ColorUIProviderImpl
-import com.michaelflisar.composedialogs.styled.shared.composeDialog
 import com.michaelflisar.composestyled.isLandscape
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
@@ -56,49 +55,49 @@ fun DialogColor(
         selectedPresetsLevel.intValue = 0
     }
 
-    composeDialog(
+    StyledDialog(
         state = state,
         modifier = modifier,
         style = style,
         properties = properties,
-        title = title,
-        icon = icon,
+        title = StyledDialogDefaults.title(icon, title),
         buttons = buttons,
         onDismissRequest = onDismissRequest,
-    ) {
-        if (state.visible) {
-            ColorPicker(
-                uiProvider = ColorUIProviderImpl,
-                color = color,
-                texts = texts,
-                alphaSupported = alphaSupported,
-                directEditSupported = directEditSupported,
-                shape = shape,
-                gridSize = gridSize,
-                labelStyle = labelStyle,
-                landscape = landscape,
-                customPage = customPage.value,
-                selectedSubColor = selectedSubColor,
-                selectedPresetsLevel = selectedPresetsLevel,
-                selectedAlpha = selectedAlpha,
-                mainColors = defaultPresetGroups.map { it[5] },
-                mainLabels = null,
-                subColors = defaultPresetGroups[selectedMainColor.intValue],
-                subLabels = null,
-                onMainColorSelected = {
-                    selectedMainColor.intValue = it
-                    selectedPresetsLevel.intValue = 1
-                },
-                onSubColorSelected = { index ->
-                    selectedSubColor.value = defaultPresetGroups[selectedMainColor.intValue][index]
-                    color.value = selectedSubColor.value!!.copy(alpha = selectedAlpha.floatValue)
-                },
-                onPresetsClick = { customPage.value = false },
-                onCustomClick = { customPage.value = true },
-                updateSelectedPresetColors = updateSelectedPresetColors,
-            )
-        }
-    }
+        content = StyledDialogDefaults.content {
+            if (state.visible) {
+                ColorPicker(
+                    uiProvider = ColorUIProviderImpl,
+                    color = color,
+                    texts = texts,
+                    alphaSupported = alphaSupported,
+                    directEditSupported = directEditSupported,
+                    shape = shape,
+                    gridSize = gridSize,
+                    labelStyle = labelStyle,
+                    landscape = landscape,
+                    customPage = customPage.value,
+                    selectedSubColor = selectedSubColor,
+                    selectedPresetsLevel = selectedPresetsLevel,
+                    selectedAlpha = selectedAlpha,
+                    mainColors = defaultPresetGroups.map { it[5] },
+                    mainLabels = null,
+                    subColors = defaultPresetGroups[selectedMainColor.intValue],
+                    subLabels = null,
+                    onMainColorSelected = {
+                        selectedMainColor.intValue = it
+                        selectedPresetsLevel.intValue = 1
+                    },
+                    onSubColorSelected = { index ->
+                        selectedSubColor.value = defaultPresetGroups[selectedMainColor.intValue][index]
+                        color.value = selectedSubColor.value!!.copy(alpha = selectedAlpha.floatValue)
+                    },
+                    onPresetsClick = { customPage.value = false },
+                    onCustomClick = { customPage.value = true },
+                    updateSelectedPresetColors = updateSelectedPresetColors,
+                )
+            }
+        },
+    )
 }
 
 private val defaultPresetGroups = listOf(

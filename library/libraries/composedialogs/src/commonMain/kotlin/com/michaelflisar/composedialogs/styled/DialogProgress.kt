@@ -11,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.michaelflisar.composedialogs.styled.shared.composeDialog
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.ui.components.StyledProgressIndicator
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
@@ -36,43 +35,43 @@ fun DialogProgress(
     buttons: StyledDialog.Buttons = StyledDialog.Buttons(),
     onDismissRequest: () -> Unit = state::dismiss,
 ) {
-    composeDialog(
+    StyledDialog(
         state = state,
         modifier = modifier,
         style = style,
         properties = properties,
-        title = title,
-        icon = icon,
+        title = StyledDialogDefaults.title(icon, title),
         buttons = buttons,
         onDismissRequest = onDismissRequest,
-    ) {
-        content?.invoke(this)
-        if (content != null) {
-            Spacer(modifier = Modifier.height(StyledTheme.spacing.small))
-        }
-        if (type == StyledProgressIndicator.Type.Linear) {
-            StyledProgressIndicator(
-                type = type,
-                progress = progress,
-                modifier = Modifier.fillMaxWidth(),
-                color = color,
-                trackColor = trackColor,
-                strokeWidth = strokeWidth,
-            )
-        } else {
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center,
-            ) {
+        content = StyledDialogDefaults.content {
+            content?.invoke(this)
+            if (content != null) {
+                Spacer(modifier = Modifier.height(StyledTheme.spacing.small))
+            }
+            if (type == StyledProgressIndicator.Type.Linear) {
                 StyledProgressIndicator(
                     type = type,
                     progress = progress,
-                    //modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                     color = color,
                     trackColor = trackColor,
                     strokeWidth = strokeWidth,
                 )
+            } else {
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    StyledProgressIndicator(
+                        type = type,
+                        progress = progress,
+                        //modifier = Modifier.fillMaxWidth(),
+                        color = color,
+                        trackColor = trackColor,
+                        strokeWidth = strokeWidth,
+                    )
+                }
             }
-        }
-    }
+        },
+    )
 }

@@ -9,7 +9,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
-import com.michaelflisar.composedialogs.styled.shared.composeDialog
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.ui.components.StyledInput
 import com.michaelflisar.composestyled.ui.components.StyledInputDefaults
@@ -52,41 +51,41 @@ fun DialogInput(
     buttons: StyledDialog.Buttons = StyledDialog.Buttons(),
     onDismissRequest: () -> Unit = state::dismiss,
 ) {
-    composeDialog(
+    StyledDialog(
         state = state,
         modifier = modifier,
         style = style,
         properties = properties,
-        title = title,
-        icon = icon,
+        title = StyledDialogDefaults.title(icon, title),
         buttons = buttons,
         onDismissRequest = onDismissRequest,
-    ) {
-        StyledInput(
-            value = value,
-            onValueChange = onValueChange,
-            modifier = Modifier.fillMaxWidth(),
-            enabled = enabled,
-            readOnly = readOnly,
-            interactionEnabled = interactionEnabled,
-            isError = isError,
-            errorMessage = errorMessage,
-            singleLine = singleLine,
-            minLines = minLines,
-            maxLines = maxLines,
-            shape = shape,
-            customization = customization,
-            textStyle = textStyle,
-            keyboardOptions = keyboardOptions,
-            keyboardActions = keyboardActions,
-            visualTransformation = visualTransformation,
-            interactionSource = interactionSource,
-            label = label,
-            placeholder = placeholder,
-            leadingIcon = leadingIcon,
-            trailingIcon = trailingIcon,
-            supportingText = supportingText,
-            variant = variant,
-        )
-    }
+        content = StyledDialogDefaults.content {
+            StyledInput(
+                value = value,
+                onValueChange = onValueChange,
+                modifier = Modifier.fillMaxWidth(),
+                enabled = enabled,
+                readOnly = readOnly,
+                interactionEnabled = interactionEnabled,
+                isError = isError,
+                errorMessage = errorMessage,
+                singleLine = singleLine,
+                minLines = minLines,
+                maxLines = maxLines,
+                shape = shape,
+                customization = customization,
+                textStyle = textStyle,
+                keyboardOptions = keyboardOptions,
+                keyboardActions = keyboardActions,
+                visualTransformation = visualTransformation,
+                interactionSource = interactionSource,
+                label = label,
+                placeholder = placeholder,
+                leadingIcon = leadingIcon,
+                trailingIcon = trailingIcon,
+                supportingText = supportingText,
+                variant = variant,
+            )
+        },
+    )
 }

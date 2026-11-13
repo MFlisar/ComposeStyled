@@ -29,7 +29,8 @@ enum class StyledExpandableTopBarScrollMode {
     EnterAlways,
 
     /**
-     * Expand the toolbar only after the nested scrolling content reaches its start.
+     * Expand the toolbar after content reaches its start when fully collapsed. If partially
+     * expanded, downward scroll continues expanding it before scrolling the content.
      */
     ExitUntilCollapsed,
 }
@@ -138,7 +139,10 @@ class StyledExpandableTopBarScrollBehavior internal constructor(
 ) {
     val nestedScrollConnection: NestedScrollConnection = object : NestedScrollConnection {
         override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-            if (available.y >= 0f && scrollMode != StyledExpandableTopBarScrollMode.EnterAlways) {
+            if (available.y >= 0f &&
+                scrollMode != StyledExpandableTopBarScrollMode.EnterAlways &&
+                (available.y == 0f || state.collapsedFraction >= 1f)
+            ) {
                 return Offset.Zero
             }
             return Offset(0f, state.dispatchRawDelta(available.y))

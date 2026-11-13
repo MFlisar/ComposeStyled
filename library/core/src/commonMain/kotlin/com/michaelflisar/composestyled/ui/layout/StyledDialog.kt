@@ -1,8 +1,13 @@
 package com.michaelflisar.composestyled.ui.layout
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
@@ -23,16 +28,16 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.StyledTheme
+import com.michaelflisar.composestyled.classes.IconComposable
 import com.michaelflisar.composestyled.registry.LocalStyledRegistry
-import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
-import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.registry.StyledComponent
 import com.michaelflisar.composestyled.registry.StyledComponentWithDefaults
 import com.michaelflisar.composestyled.registry.StyledKey
+import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.runtime.StyledContext
-import com.michaelflisar.composestyled.classes.IconComposable
-import com.michaelflisar.composestyled.ui.primitives.StyledText
+import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.ui.internal.dialogButtons
+import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.ui.state.DialogState
 
 object StyledDialog {
@@ -332,8 +337,10 @@ object StyledDialog {
         val shadowElevation: Dp? = null,
     ) {
         init {
-            require(shadowElevation == null ||
-                (shadowElevation.value.isFinite() && shadowElevation >= 0.dp)) {
+            require(
+                shadowElevation == null ||
+                        (shadowElevation.value.isFinite() && shadowElevation >= 0.dp)
+            ) {
                 "Bubble shadowElevation must be finite and non-negative"
             }
         }
@@ -343,7 +350,8 @@ object StyledDialog {
     // 5) implementation
     // -------------
 
-    interface Implementation : StyledComponent<Implementation>, StyledComponentWithDefaults<Defaults> {
+    interface Implementation : StyledComponent<Implementation>,
+        StyledComponentWithDefaults<Defaults> {
         override val key: StyledKey<Implementation>
             get() = Key
         override val defaultsKey: StyledKey<Defaults>
@@ -370,11 +378,41 @@ object StyledDialog {
 // -------------------------
 
 object StyledDialogDefaults {
+
     val defaults: StyledDialog.Defaults
         @Composable get() = LocalStyledRegistry.current[StyledDialog.DefaultsKey]
 
     val style: StyledDialog.Style
         @Composable get() = defaults.style
+
+    /** Wraps dialog content in the standard full-width column and applies its content padding. */
+    fun content(
+        content: @Composable ColumnScope.() -> Unit,
+    ): @Composable ColumnScope.(PaddingValues) -> Unit = { contentPadding ->
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(contentPadding),
+        ) {
+            content()
+        }
+    }
+
+    /** Combines the optional icon and title in the standard dialog title row. */
+    @Composable
+    fun title(
+        icon: (@Composable () -> Unit)?,
+        title: (@Composable () -> Unit)?,
+    ): (@Composable () -> Unit)? {
+        if (icon == null && title == null) return null
+        return {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.small),
+            ) {
+                icon?.invoke()
+                title?.invoke()
+            }
+        }
+    }
 }
 
 // -------------------------
@@ -400,8 +438,8 @@ fun StyledDialog(
         if (visible) skipExitAnimation.value = false
     }
     val animateExit = (
-        style is StyledDialog.Style.BottomSheet || style is StyledDialog.Style.Fullscreen
-    ) && !skipExitAnimation.value
+            style is StyledDialog.Style.BottomSheet || style is StyledDialog.Style.Fullscreen
+            ) && !skipExitAnimation.value
     val retained = com.michaelflisar.composestyled.ui.internal.rememberDialogCompositionVisible(
         state = state,
         animateExit = animateExit,

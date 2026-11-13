@@ -6,7 +6,6 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
-import com.michaelflisar.composedialogs.styled.shared.composeDialog
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.ui.components.StyledInput
 import com.michaelflisar.composestyled.ui.components.StyledNumberPicker
@@ -45,32 +44,32 @@ fun <T : Number> DialogNumber(
     buttons: StyledDialog.Buttons = StyledDialog.Buttons(),
     onDismissRequest: () -> Unit = state::dismiss,
 ) {
-    composeDialog(
+    StyledDialog(
         state = state,
         modifier = modifier,
         style = style,
         properties = properties,
-        title = title,
-        icon = icon,
+        title = StyledDialogDefaults.title(icon, title),
         buttons = buttons,
         onDismissRequest = onDismissRequest,
-    ) {
-        StyledNumberPicker(
-            value = value,
-            validator = validator,
-            parser = parser,
-            modifier = Modifier.fillMaxWidth(),
-            label = label,
-            enabled = enabled,
-            showButtons = showButtons,
-            overrun = overrun,
-            allowManualInput = allowManualInput,
-            clearFocusOnButtonPress = clearFocusOnButtonPress,
-            textStyle = textStyle,
-            prefix = prefix,
-            suffix = suffix,
-            onCurrentValueIsInvalid = onCurrentValueIsInvalid,
-            variant = variant,
-        )
-    }
+        content = StyledDialogDefaults.content {
+            StyledNumberPicker(
+                value = value,
+                validator = validator,
+                parser = parser,
+                modifier = Modifier.fillMaxWidth(),
+                label = label,
+                enabled = enabled,
+                showButtons = showButtons,
+                overrun = overrun,
+                allowManualInput = allowManualInput,
+                clearFocusOnButtonPress = clearFocusOnButtonPress,
+                textStyle = textStyle,
+                prefix = prefix,
+                suffix = suffix,
+                onCurrentValueIsInvalid = onCurrentValueIsInvalid,
+                variant = variant,
+            )
+        },
+    )
 }
