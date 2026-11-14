@@ -78,7 +78,7 @@ the default mapping for styles that should remain unchanged.
 >   - `` (1x)
 >   - `androidx.compose.foundation.ExperimentalFoundationApi` (2x)
 >   - `androidx.compose.material3.ExperimentalMaterial3Api` (6x)
->   - `androidx.compose.ui.ExperimentalComposeUiApi` (9x)
+>   - `androidx.compose.ui.ExperimentalComposeUiApi` (8x)
 >   - `dev.chrisbanes.haze.ExperimentalHazeApi` (1x)
 >   - `kotlinx.cinterop.ExperimentalForeignApi` (3x)
 >
