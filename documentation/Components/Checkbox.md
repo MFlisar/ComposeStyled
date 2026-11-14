@@ -9,6 +9,8 @@ interactive height and theme-medium horizontal padding for clear click feedback.
 Set it to `StyledToggleBehavior.ControlOnly` when only the checkbox should
 toggle. The row is clipped to `shape`, which defaults to
 `StyledCheckboxDefaults.shape`.
+Use `labelArrangement = StyledToggleLabelArrangement.LabelThenControl` to place
+the label before the checkbox; the default is `ControlThenLabel`.
 The Boolean-state overload follows these same defaults. With a null callback,
 a parent can continue to own the interaction and semantics.
 
@@ -17,6 +19,7 @@ var checked by remember { mutableStateOf(false) }
 StyledCheckbox(
     checked = checked,
     onCheckedChange = { checked = it },
+    labelArrangement = StyledToggleLabelArrangement.LabelThenControl,
     label = { StyledText("Enable notifications") },
 )
 ```

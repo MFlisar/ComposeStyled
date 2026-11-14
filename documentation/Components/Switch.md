@@ -7,6 +7,8 @@ make the switch and label row toggle together. The row is clipped to `shape`, wh
 defaults to `StyledSwitchDefaults.shape`; the supplied `modifier` applies to the
 combined switch and label. A null callback leaves interaction and semantics to
 the parent.
+Use `labelArrangement = StyledToggleLabelArrangement.LabelThenControl` to place
+the label before the switch; the default is `ControlThenLabel`.
 
 The Cupertino switch uses a 51 x 31 dp track with a shadowed thumb; Fluent 2 uses
 a 40 x 20 dp track with an outlined off state and hover/pressed colors. Both
@@ -19,6 +21,7 @@ StyledSwitch(
     checked = checked,
     onCheckedChange = { checked = it },
     clickBehavior = StyledToggleBehavior.FullItem,
+    labelArrangement = StyledToggleLabelArrangement.LabelThenControl,
     label = { StyledText("Enable notifications") },
 )
 ```

@@ -7,6 +7,7 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.animation.core.updateTransition
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,8 +16,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.saveable.SaveableStateHolder
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -40,12 +44,11 @@ import com.michaelflisar.composepreferences.styled.internal.LocalPreferenceRunti
 import com.michaelflisar.composepreferences.styled.internal.LocalPreferenceStyle
 import com.michaelflisar.composepreferences.styled.internal.PreferenceFilterResultTracker
 import com.michaelflisar.composepreferences.styled.internal.PreferenceIdentityAllocator
-import com.michaelflisar.composepreferences.styled.internal.PreferenceListSpacingArrangement
+import com.michaelflisar.composepreferences.styled.internal.PreferenceListSpacing
 import com.michaelflisar.composepreferences.styled.internal.PreferenceListSpacingTracker
 import com.michaelflisar.composepreferences.styled.internal.PreferenceRuntime
 import com.michaelflisar.composepreferences.styled.internal.PreferenceSectionSeparatorTracker
 import com.michaelflisar.composepreferences.styled.internal.PreferenceSectionShapeTracker
-import com.michaelflisar.composepreferences.styled.internal.accountForPreferenceListSpacing
 import com.michaelflisar.composepreferences.styled.rememberPreferenceStyle
 import com.michaelflisar.composestyled.ui.components.StyledIcon
 import com.michaelflisar.composestyled.ui.components.StyledListItem
@@ -56,7 +59,7 @@ import com.michaelflisar.composestyled.ui.primitives.StyledText
 class PreferenceScreenState internal constructor(
     routes: List<PreferenceRoute>,
 ) {
-    internal var routes by mutableStateOf(routes)
+    var routes by mutableStateOf(routes)
         private set
 
     internal fun navigate(route: PreferenceRoute, parentDepth: Int) {
@@ -72,7 +75,7 @@ class PreferenceScreenState internal constructor(
     }
 }
 
-internal data class PreferenceRoute(
+data class PreferenceRoute(
     val id: String,
     val title: String,
 )
@@ -283,6 +286,12 @@ private fun PreferencePage(
     val sectionSeparatorTracker = remember { PreferenceSectionSeparatorTracker() }
     val sectionShapeTracker = remember { PreferenceSectionShapeTracker() }
     val listSpacingTracker = remember { PreferenceListSpacingTracker() }
+    var initialLayoutReady by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        withFrameNanos { }
+        withFrameNanos { }
+        initialLayoutReady = true
+    }
     val groupHeader = when (val openGroupHeaderStyle = style.openedGroupHeader) {
         PreferenceOpenGroupHeaderStyle.Disabled -> null
         is PreferenceOpenGroupHeaderStyle.Style ->
@@ -293,20 +302,21 @@ private fun PreferencePage(
     } else {
         style.spacing.itemSpacing
     }
-    val listSpacingArrangement = PreferenceListSpacingArrangement(
+    val listSpacing = PreferenceListSpacing(
         tracker = listSpacingTracker,
         scope = emptyList(),
         itemSpacing = pageSpacing,
         sectionSpacing = style.spacing.sectionSpacing,
         leadingItems = if (groupHeader == null) 0 else 1,
+        animateChanges = navigationPaths.size <= 1 &&
+            (query.isNotEmpty() || initialLayoutReady),
     )
     Column(
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
-            .padding(style.outerPadding)
-            .accountForPreferenceListSpacing(listSpacingArrangement),
-        verticalArrangement = listSpacingArrangement,
+            .padding(style.outerPadding),
+        verticalArrangement = Arrangement.Top,
     ) {
         if (groupHeader != null) {
             val (groupHeaderTitle, groupHeaderStyle) = groupHeader
@@ -338,6 +348,7 @@ private fun PreferencePage(
                 sectionSeparatorTracker = sectionSeparatorTracker,
                 sectionShapeTracker = sectionShapeTracker,
                 listSpacingTracker = listSpacingTracker,
+                listSpacing = listSpacing,
                 filterQuery = query,
                 includeHierarchyInFilter = includeHierarchyInFilter,
                 filterScope = filterScope,

@@ -12,6 +12,7 @@ import com.michaelflisar.composestyled.ui.layout.StyledFlowRow
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.ui.components.StyledCheckbox
 import com.michaelflisar.composestyled.ui.components.StyledToggleBehavior
+import com.michaelflisar.composestyled.ui.components.StyledToggleLabelArrangement
 import com.michaelflisar.demo.helper.RegionContainer
 import com.michaelflisar.demo.helper.SubTitle
 import com.michaelflisar.composestyled.utils.ExpandState
@@ -21,6 +22,7 @@ internal fun DemoCheckboxes(baseId: Int, expandState: ExpandState) {
     val checked = rememberSaveable { mutableStateOf(false) }
     val unlabeledChecked = rememberSaveable { mutableStateOf(false) }
     val controlOnlyChecked = rememberSaveable { mutableStateOf(false) }
+    val reversedLabelChecked = rememberSaveable { mutableStateOf(false) }
     val customChecked = rememberSaveable { mutableStateOf(true) }
     RegionContainer(
         title = "Checkboxes",
@@ -42,6 +44,11 @@ internal fun DemoCheckboxes(baseId: Int, expandState: ExpandState) {
                 checked = controlOnlyChecked,
                 clickBehavior = StyledToggleBehavior.ControlOnly,
                 label = { StyledText("Control only") },
+            )
+            StyledCheckbox(
+                checked = reversedLabelChecked,
+                labelArrangement = StyledToggleLabelArrangement.LabelThenControl,
+                label = { StyledText("Label before checkbox") },
             )
             StyledText("Checked: ${checked.value}; control only: ${controlOnlyChecked.value}")
         }

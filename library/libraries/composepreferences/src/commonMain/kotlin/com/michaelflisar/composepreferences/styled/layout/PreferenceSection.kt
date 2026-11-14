@@ -3,7 +3,10 @@ package com.michaelflisar.composepreferences.styled.layout
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
@@ -45,9 +48,10 @@ import com.michaelflisar.composepreferences.styled.PreferenceSectionContentSepar
 import com.michaelflisar.composepreferences.styled.internal.LocalPreferenceRuntime
 import com.michaelflisar.composepreferences.styled.internal.PreferenceAncestor
 import com.michaelflisar.composepreferences.styled.internal.PreferenceEntry
-import com.michaelflisar.composepreferences.styled.internal.PreferenceListSpacingArrangement
+import com.michaelflisar.composepreferences.styled.internal.PreferenceListSpacing
 import com.michaelflisar.composepreferences.styled.internal.PreferenceSectionShapeEntry
-import com.michaelflisar.composepreferences.styled.internal.accountForPreferenceListSpacing
+import com.michaelflisar.composepreferences.styled.internal.animatedPreferenceListSpacing
+import com.michaelflisar.composepreferences.styled.internal.animatedPreferenceSpacing
 import com.michaelflisar.composepreferences.styled.internal.currentPreferenceRuntime
 import com.michaelflisar.composestyled.ui.components.StyledIconDefaults
 import com.michaelflisar.composestyled.ui.components.StyledListItem
@@ -181,10 +185,35 @@ private fun PreferenceSectionImpl(
     val hasVisibleContent = parent.listSpacingTracker.hasVisibleEntries(
         parent.identityScope + identity,
     )
+    val hasPresentContent = parent.listSpacingTracker.hasPresentEntries(
+        parent.identityScope + identity,
+    )
+    val sectionIsVisible = visible && (showHeader || hasVisibleContent)
+    val sectionIsPresent = sectionIsVisible || hasPresentContent
     val sectionStyle = parent.style.section
-    val clipsSectionShape = !parent.isFiltering &&
-        sectionIsExpanded &&
-        (!sectionStyle.headerIsPartOfShape || (isCurrentLevel && visible))
+    val sectionListSpacing = PreferenceListSpacing(
+        tracker = parent.listSpacingTracker,
+        scope = parent.identityScope + identity,
+        itemSpacing = if (parent.isFiltering) {
+            0.dp
+        } else {
+            parent.style.spacing.sectionContentSeparator.spacingOrZero
+        },
+        sectionSpacing = parent.style.spacing.sectionSpacing,
+        ordinaryItemSpacing = if (parent.isFiltering) {
+            0.dp
+        } else {
+            parent.style.spacing.itemSpacing
+        },
+        animateChanges = parent.listSpacing.animateChanges,
+    )
+    val sectionSpacingBefore = animatedPreferenceListSpacing(
+        parent.listSpacing,
+        identity,
+        sectionIsVisible,
+    )
+    val clipsSectionShape = sectionIsExpanded &&
+        (parent.isFiltering || !sectionStyle.headerIsPartOfShape || (isCurrentLevel && visible))
     val sectionShapeCoordinates = remember(identity) {
         mutableStateOf<LayoutCoordinates?>(null)
     }
@@ -198,7 +227,8 @@ private fun PreferenceSectionImpl(
             identity = identity,
             scope = parent.identityScope,
             order = parent.identityAllocator.order(identity),
-            isVisible = visible && (showHeader || hasVisibleContent),
+            isVisible = sectionIsVisible,
+            isTransitionVisible = sectionIsPresent,
             isInsideSection = parent.insideSection && sectionStyle.headerIsPartOfShape,
             isDetachedSection = showHeader && !sectionStyle.headerIsPartOfShape,
         )
@@ -215,14 +245,27 @@ private fun PreferenceSectionImpl(
         parentExpanded = parent.parentExpanded,
         insideSection = if (parent.isFiltering) false else true,
         sectionShapeCoordinates = sectionShapeCoordinates.value.takeIf { clipsSectionShape },
+        listSpacing = sectionListSpacing,
     )
     val sectionShape = PreferenceSectionClipShape(
         shape = sectionStyle.shape,
         entries = parent.sectionShapeTracker.entries(current.identityScope),
-        breakSpacing = parent.style.spacing.itemSpacing,
+        breakSpacing = if (parent.isFiltering) {
+            0.dp
+        } else {
+            parent.style.spacing.itemSpacing
+        },
     )
-    val firstItemIsOrdinary = parent.listSpacingTracker
-        .firstIsOrdinaryItem(current.identityScope)
+    val firstItemIsOrdinary = sectionListSpacing.firstIsOrdinaryItem()
+    val sectionHeaderBottomSpacing = animatedPreferenceSpacing(
+        targetSpacing = if (firstItemIsOrdinary) {
+            parent.style.spacing.itemSpacing
+        } else {
+            parent.style.spacing.sectionSpacing
+        },
+        animateChanges = parent.listSpacing.animateChanges,
+        label = "Preference section header spacing",
+    )
     val pageContent = @Composable {
         CompositionLocalProvider(LocalPreferenceRuntime provides current) {
             content()
@@ -244,30 +287,12 @@ private fun PreferenceSectionImpl(
         sectionStyle.shape
     }
 
-    val sectionListSpacingArrangement = PreferenceListSpacingArrangement(
-        tracker = parent.listSpacingTracker,
-        scope = current.identityScope,
-        itemSpacing = if (parent.isFiltering) {
-            0.dp
-        } else {
-            parent.style.spacing.sectionContentSeparator.spacingOrZero
-        },
-        sectionSpacing = parent.style.spacing.sectionSpacing,
-        ordinaryItemSpacing = if (parent.isFiltering) {
-            0.dp
-        } else {
-            parent.style.spacing.itemSpacing
-        },
-    )
     val sectionChildren: @Composable () -> Unit = {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .then(
-                    if (!parent.isFiltering &&
-                        !sectionStyle.headerIsPartOfShape &&
-                        sectionIsExpanded
-                    ) {
+                    if (!sectionStyle.headerIsPartOfShape && sectionIsExpanded) {
                         Modifier
                             .onGloballyPositioned {
                                 sectionShapeCoordinates.value = it
@@ -276,9 +301,8 @@ private fun PreferenceSectionImpl(
                     } else {
                         Modifier
                     }
-                )
-                .accountForPreferenceListSpacing(sectionListSpacingArrangement),
-            verticalArrangement = sectionListSpacingArrangement,
+                ),
+            verticalArrangement = Arrangement.Top,
         ) {
             pageContent()
         }
@@ -287,9 +311,9 @@ private fun PreferenceSectionImpl(
     Column(
         modifier = modifier
             .fillMaxWidth()
+            .padding(top = sectionSpacingBefore)
             .then(
-                if (!parent.isFiltering &&
-                    isCurrentLevel &&
+                if ((parent.isFiltering || isCurrentLevel) &&
                     visible &&
                     sectionStyle.headerIsPartOfShape &&
                     sectionIsExpanded
@@ -322,11 +346,7 @@ private fun PreferenceSectionImpl(
                     .then(
                         if (!sectionStyle.headerIsPartOfShape) {
                             Modifier.padding(
-                                bottom = if (firstItemIsOrdinary) {
-                                    parent.style.spacing.itemSpacing
-                                } else {
-                                    parent.style.spacing.sectionSpacing
-                                },
+                                bottom = sectionHeaderBottomSpacing,
                             )
                         } else {
                             Modifier
@@ -378,6 +398,7 @@ private fun PreferenceSectionImpl(
                         parent.style,
                         sectionStyle,
                         firstItemIsOrdinary,
+                        parent.listSpacing.animateChanges,
                     )
                 }
                 sectionChildren()
@@ -401,6 +422,7 @@ private fun PreferenceSectionImpl(
                             parent.style,
                             sectionStyle,
                             firstItemIsOrdinary,
+                            parent.listSpacing.animateChanges,
                         )
                     }
                     sectionChildren()
@@ -444,7 +466,7 @@ private class PreferenceSectionClipShape(
             val bounds = checkNotNull(entry.bounds)
             val breakTop = bounds.top.coerceIn(0f, size.height)
             val breakBottom = bounds.bottom.coerceIn(0f, size.height)
-            val segmentTop = (breakTop - breakSpacingPx).coerceIn(0f, size.height)
+            val segmentTop = breakTop
             val segmentBottom = (breakBottom + breakSpacingPx).coerceIn(0f, size.height)
             addSectionSegment(segmentStart, segmentTop)
 
@@ -477,17 +499,50 @@ private fun PreferenceSectionHeaderSeparator(
     style: com.michaelflisar.composepreferences.styled.PreferenceStyle,
     sectionStyle: com.michaelflisar.composepreferences.styled.PreferenceSectionStyle,
     firstItemIsOrdinary: Boolean,
+    animateSpacing: Boolean,
 ) {
     if (sectionStyle.headerIsPartOfShape) {
-        if (firstItemIsOrdinary) {
-            Spacer(Modifier.height(style.spacing.itemSpacing))
-        } else {
-            when (val separator = style.spacing.sectionContentSeparator) {
-                is PreferenceSectionContentSeparatorStyle.Spacing ->
-                    Spacer(Modifier.height(separator.spacing))
+        when (val separator = style.spacing.sectionContentSeparator) {
+            is PreferenceSectionContentSeparatorStyle.Spacing -> {
+                val spacing = animatedPreferenceSpacing(
+                    targetSpacing = if (firstItemIsOrdinary) {
+                        style.spacing.itemSpacing
+                    } else {
+                        separator.spacing
+                    },
+                    animateChanges = animateSpacing,
+                    label = "Preference section content spacing",
+                )
+                Spacer(Modifier.height(spacing))
+            }
 
-                is PreferenceSectionContentSeparatorStyle.Divider ->
-                    PreferenceSectionContentDivider(style)
+            is PreferenceSectionContentSeparatorStyle.Divider -> {
+                if (!animateSpacing) {
+                    if (firstItemIsOrdinary) {
+                        Spacer(Modifier.height(style.spacing.itemSpacing))
+                    } else {
+                        PreferenceSectionContentDivider(style)
+                    }
+                } else {
+                    val spacing = animatedPreferenceSpacing(
+                        targetSpacing = if (firstItemIsOrdinary) {
+                            style.spacing.itemSpacing
+                        } else {
+                            0.dp
+                        },
+                        animateChanges = animateSpacing,
+                        label = "Preference section divider spacing",
+                    )
+                    Spacer(Modifier.height(spacing))
+                    AnimatedVisibility(
+                        visible = !firstItemIsOrdinary,
+                        enter = fadeIn() + expandVertically(expandFrom = Alignment.Top),
+                        exit = fadeOut() + shrinkVertically(shrinkTowards = Alignment.Top),
+                        label = "Preference section header divider",
+                    ) {
+                        PreferenceSectionContentDivider(style)
+                    }
+                }
             }
         }
     }

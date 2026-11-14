@@ -21,7 +21,8 @@ object StyledCheckbox {
     // -------------
 
     val Key = StyledKey<Implementation>("StyledCheckbox")
-        val DefaultsKey = StyledKey<Defaults>("StyledCheckboxDefaults")
+    val DefaultsKey = StyledKey<Defaults>("StyledCheckboxDefaults")
+
     // -------------
     // 2) defaults
     // -------------
@@ -84,6 +85,7 @@ fun StyledCheckbox(
     interactionSource: MutableInteractionSource? = null,
     clickBehavior: StyledToggleBehavior = StyledCheckboxDefaults.clickBehavior,
     shape: Shape = StyledCheckboxDefaults.shape,
+    labelArrangement: StyledToggleLabelArrangement = StyledToggleLabelArrangement.ControlThenLabel,
     label: @Composable (() -> Unit)? = null,
 ) {
     StyledCheckbox(
@@ -97,6 +99,7 @@ fun StyledCheckbox(
         clickBehavior = clickBehavior,
         shape = shape,
         label = label,
+        labelArrangement = labelArrangement,
     )
 }
 
@@ -112,6 +115,7 @@ fun StyledCheckbox(
     interactionSource: MutableInteractionSource? = null,
     clickBehavior: StyledToggleBehavior = StyledCheckboxDefaults.clickBehavior,
     shape: Shape = StyledCheckboxDefaults.shape,
+    labelArrangement: StyledToggleLabelArrangement = StyledToggleLabelArrangement.ControlThenLabel,
     label: @Composable (() -> Unit)? = null,
 ) {
     val implementation = LocalStyledRegistry.current[StyledCheckbox.Key]
@@ -125,6 +129,7 @@ fun StyledCheckbox(
         shape = shape,
         role = androidx.compose.ui.semantics.Role.Checkbox,
         label = label,
+        labelArrangement = labelArrangement,
     ) { controlModifier, controlOnValueChange ->
         implementation.Render(
             checked = checked,

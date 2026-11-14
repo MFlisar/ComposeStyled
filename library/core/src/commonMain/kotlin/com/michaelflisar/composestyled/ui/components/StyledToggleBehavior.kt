@@ -8,3 +8,12 @@ enum class StyledToggleBehavior {
     /** Clicking anywhere on the item toggles the control. */
     FullItem,
 }
+
+/** Controls whether a toggle's control appears before or after its label. */
+enum class StyledToggleLabelArrangement {
+    /** Place the checkbox, radio button or switch before its label. */
+    ControlThenLabel,
+
+    /** Place the label before the checkbox, radio button or switch. */
+    LabelThenControl,
+}

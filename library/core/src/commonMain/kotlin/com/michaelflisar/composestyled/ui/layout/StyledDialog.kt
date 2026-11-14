@@ -389,7 +389,7 @@ object StyledDialogDefaults {
 
     /** Wraps dialog content in the standard full-width column and applies its content padding. */
     fun content(
-        content: @Composable ColumnScope.() -> Unit,
+        content: @Composable ColumnScope.() -> Unit
     ): @Composable ColumnScope.(PaddingValues) -> Unit = { contentPadding ->
         Column(
             modifier = Modifier.fillMaxWidth().padding(contentPadding),

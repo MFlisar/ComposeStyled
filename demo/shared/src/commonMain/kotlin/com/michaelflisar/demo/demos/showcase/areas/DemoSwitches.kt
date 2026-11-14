@@ -12,6 +12,7 @@ import com.michaelflisar.composestyled.ui.layout.StyledFlowRow
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.ui.components.StyledSwitch
 import com.michaelflisar.composestyled.ui.components.StyledToggleBehavior
+import com.michaelflisar.composestyled.ui.components.StyledToggleLabelArrangement
 import com.michaelflisar.composestyled.utils.ExpandState
 import com.michaelflisar.demo.helper.RegionContainer
 import com.michaelflisar.demo.helper.SubTitle
@@ -20,6 +21,7 @@ import com.michaelflisar.demo.helper.SubTitle
 internal fun DemoSwitches(baseId: Int, expandState: ExpandState) {
     val switched = rememberSaveable { mutableStateOf(true) }
     val fullItemSwitched = rememberSaveable { mutableStateOf(false) }
+    val reversedLabelSwitched = rememberSaveable { mutableStateOf(false) }
     val customSwitched = rememberSaveable { mutableStateOf(false) }
     RegionContainer(
         title = "Switches",
@@ -38,6 +40,12 @@ internal fun DemoSwitches(baseId: Int, expandState: ExpandState) {
                 onCheckedChange = { fullItemSwitched.value = it },
                 clickBehavior = StyledToggleBehavior.FullItem,
                 label = { StyledText("Full item click") },
+            )
+            StyledSwitch(
+                checked = reversedLabelSwitched.value,
+                onCheckedChange = { reversedLabelSwitched.value = it },
+                labelArrangement = StyledToggleLabelArrangement.LabelThenControl,
+                label = { StyledText("Label before switch") },
             )
             StyledText(
                 "Checked: ${switched.value}; full item: ${fullItemSwitched.value}"

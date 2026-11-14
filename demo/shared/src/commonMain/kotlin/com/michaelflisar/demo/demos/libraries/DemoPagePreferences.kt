@@ -339,6 +339,7 @@ internal fun DemoPagePreferences(onBack: () -> Unit) {
                             PreferenceItem(
                                 title = "Custom shape",
                                 subtitle = "This row separates the section shape",
+                                contentColor = StyledTheme.colorScheme.warning,
                                 shape = StyledTheme.shapes.small,
                             )
                             PreferenceBool(

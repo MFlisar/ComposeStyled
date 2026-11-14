@@ -21,7 +21,8 @@ object StyledSwitch {
     // -------------
 
     val Key = StyledKey<Implementation>("StyledSwitch")
-        val DefaultsKey = StyledKey<Defaults>("StyledSwitchDefaults")
+    val DefaultsKey = StyledKey<Defaults>("StyledSwitchDefaults")
+
     // -------------
     // 2) defaults
     // -------------
@@ -84,6 +85,7 @@ fun StyledSwitch(
     interactionSource: MutableInteractionSource? = null,
     clickBehavior: StyledToggleBehavior = StyledSwitchDefaults.clickBehavior,
     shape: Shape = StyledSwitchDefaults.shape,
+    labelArrangement: StyledToggleLabelArrangement = StyledToggleLabelArrangement.ControlThenLabel,
     label: @Composable (() -> Unit)? = null,
 ) {
     StyledSwitch(
@@ -97,6 +99,7 @@ fun StyledSwitch(
         clickBehavior = clickBehavior,
         shape = shape,
         label = label,
+        labelArrangement = labelArrangement,
     )
 }
 
@@ -112,6 +115,7 @@ fun StyledSwitch(
     interactionSource: MutableInteractionSource? = null,
     clickBehavior: StyledToggleBehavior = StyledSwitchDefaults.clickBehavior,
     shape: Shape = StyledSwitchDefaults.shape,
+    labelArrangement: StyledToggleLabelArrangement = StyledToggleLabelArrangement.ControlThenLabel,
     label: @Composable (() -> Unit)? = null,
 ) {
     val implementation = LocalStyledRegistry.current[StyledSwitch.Key]
@@ -125,6 +129,7 @@ fun StyledSwitch(
         shape = shape,
         role = androidx.compose.ui.semantics.Role.Switch,
         label = label,
+        labelArrangement = labelArrangement,
     ) { controlModifier, controlOnValueChange ->
         implementation.Render(
             checked = checked,
@@ -137,4 +142,3 @@ fun StyledSwitch(
         )
     }
 }
-

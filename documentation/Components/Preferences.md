@@ -80,7 +80,10 @@ opened; leaving a group resets its scroll position and internally managed
 section expansion state for the next visit. Caller-owned `expanded` state
 remains under the caller's control.
 Standalone preferences on a group page keep their own item shape; only rows
-inside a `PreferenceSection` use the section's grouped shape.
+inside a `PreferenceSection` use the section's grouped shape. Groups directly
+inside a section also join that shared shape, so adjacent groups have no item
+spacing between them and their shared edge stays straight. A group's `shape`
+applies when it is outside a section.
 Groups can also display an optional leading `IconComposable` through the `icon`
 parameter.
 `rememberPreferenceScreenState()` can be supplied to `PreferenceScreen` when the
@@ -142,7 +145,7 @@ treated like ordinary sibling items: `sectionContentSeparator` dividers are
 omitted, and `itemSpacing` is used. If it is the first row, the same spacing
 replaces the section-header separator. The section shape resumes after the gaps
 around the row. This applies to `PreferenceItem`, `PreferenceBool`,
-`PreferenceCustomItem`, `PreferenceGroup`, the input and number preferences,
+`PreferenceCustomItem`, the input and number preferences,
 split preferences, and both `PreferenceList` variants. For lists, `shape`
 affects only the preference row; dropdown popup and option shapes keep their
 defaults.

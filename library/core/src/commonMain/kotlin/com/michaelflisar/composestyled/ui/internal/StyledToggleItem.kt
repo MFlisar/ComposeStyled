@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.semantics.Role
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.ui.components.StyledToggleBehavior
+import com.michaelflisar.composestyled.ui.components.StyledToggleLabelArrangement
 
 @Composable
 internal fun StyledToggleItem(
@@ -30,6 +31,7 @@ internal fun StyledToggleItem(
         horizontal = StyledTheme.padding.medium,
         vertical = StyledTheme.padding.small,
     ),
+    labelArrangement: StyledToggleLabelArrangement = StyledToggleLabelArrangement.ControlThenLabel,
     role: Role,
     label: (@Composable () -> Unit)?,
     control: @Composable (Modifier, ((Boolean) -> Unit)?) -> Unit,
@@ -72,7 +74,13 @@ internal fun StyledToggleItem(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.small),
     ) {
-        control(Modifier, if (fullItemClick) null else onValueChange)
-        label()
+        val controlOnValueChange = if (fullItemClick) null else onValueChange
+        if (labelArrangement == StyledToggleLabelArrangement.ControlThenLabel) {
+            control(Modifier, controlOnValueChange)
+            label()
+        } else {
+            label()
+            control(Modifier, controlOnValueChange)
+        }
     }
 }
