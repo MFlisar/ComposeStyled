@@ -1,14 +1,14 @@
 package com.michaelflisar.composepreferences.styled.layout
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
-import androidx.compose.animation.core.updateTransition
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -19,16 +19,15 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.saveable.SaveableStateHolder
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.withFrameNanos
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.backhandler.BackHandler
@@ -38,8 +37,8 @@ import androidx.compose.ui.unit.dp
 import com.michaelflisar.composepreferences.styled.LocalPreferenceStrings
 import com.michaelflisar.composepreferences.styled.PreferenceFilter
 import com.michaelflisar.composepreferences.styled.PreferenceOpenGroupHeaderStyle
-import com.michaelflisar.composepreferences.styled.PreferenceStyle
 import com.michaelflisar.composepreferences.styled.PreferenceStrings
+import com.michaelflisar.composepreferences.styled.PreferenceStyle
 import com.michaelflisar.composepreferences.styled.internal.LocalPreferenceRuntime
 import com.michaelflisar.composepreferences.styled.internal.LocalPreferenceStyle
 import com.michaelflisar.composepreferences.styled.internal.PreferenceFilterResultTracker
@@ -62,15 +61,15 @@ class PreferenceScreenState internal constructor(
     var routes by mutableStateOf(routes)
         private set
 
-    internal fun navigate(route: PreferenceRoute, parentDepth: Int) {
+    fun navigate(route: PreferenceRoute, parentDepth: Int) {
         routes = routes.take(parentDepth) + route
     }
 
-    internal fun navigateBack() {
+    fun navigateBack() {
         if (routes.isNotEmpty()) routes = routes.dropLast(1)
     }
 
-    internal fun navigateToDepth(depth: Int) {
+    fun navigateToDepth(depth: Int) {
         routes = routes.take(depth)
     }
 }
@@ -182,7 +181,9 @@ private fun PreferenceScreenImpl(
             if (isFiltering) {
                 val currentPath = when (filterScope) {
                     PreferenceFilter.Scope.CurrentLevel,
-                    PreferenceFilter.Scope.CurrentBranch -> state.routes.map { it.id }
+                    PreferenceFilter.Scope.CurrentBranch,
+                        -> state.routes.map { it.id }
+
                     PreferenceFilter.Scope.Global -> emptyList()
                 }
                 val filterKey = buildString {
@@ -309,7 +310,7 @@ private fun PreferencePage(
         sectionSpacing = style.spacing.sectionSpacing,
         leadingItems = if (groupHeader == null) 0 else 1,
         animateChanges = navigationPaths.size <= 1 &&
-            (query.isNotEmpty() || initialLayoutReady),
+                (query.isNotEmpty() || initialLayoutReady),
     )
     Column(
         modifier = modifier

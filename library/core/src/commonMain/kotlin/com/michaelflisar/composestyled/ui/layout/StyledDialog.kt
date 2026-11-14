@@ -278,7 +278,7 @@ object StyledDialog {
             onClick, enabled, dismissOnClick, label, icon, presentation, variant,
             content = { StyledText(label) },
         ) {
-            require(label.isNotBlank()) { "Dialog button label must not be blank" }
+            //require(label.isNotBlank()) { "Dialog button label must not be blank" }
             require(presentation != ButtonPresentation.Icon || icon != null) {
                 "Dialog button presentation Icon requires an icon"
             }

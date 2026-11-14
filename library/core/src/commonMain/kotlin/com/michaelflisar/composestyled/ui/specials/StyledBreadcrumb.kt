@@ -84,6 +84,7 @@ fun rememberStyledBreadcrumbStyle(
 /**
  * Displays a horizontally scrollable path. Items before the last are clickable when they have an
  * [StyledBreadcrumbItem.onClick] action; the last item is always treated as the current location.
+ * Set [showRootItem] to `false` to hide the first item.
  * When [scrollToEndOnItemsAdded] is enabled, adding items animates the scroll to the end.
  */
 @Composable
@@ -95,6 +96,7 @@ fun StyledBreadcrumb(
     maxLines: Int = 1,
     overflow: TextOverflow = TextOverflow.Ellipsis,
     scrollToEndOnItemsAdded: Boolean = true,
+    showRootItem: Boolean = true,
 ) {
     val scrollState = rememberScrollState()
     val previousItemCount = remember { mutableIntStateOf(items.size) }
@@ -107,7 +109,8 @@ fun StyledBreadcrumb(
         previousItemCount.intValue = itemCount
     }
 
-    if (items.isEmpty()) return
+    val firstVisibleIndex = if (showRootItem) 0 else 1
+    if (items.size <= firstVisibleIndex) return
 
     StyledRow(
         itemSpacing = style.itemSpacing,
@@ -115,8 +118,10 @@ fun StyledBreadcrumb(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         items.forEachIndexed { index, item ->
+            if (index < firstVisibleIndex) return@forEachIndexed
+
             val isCurrent = index == items.lastIndex
-            if (index > 0) {
+            if (index > firstVisibleIndex) {
                 StyledIcon(
                     icon = separatorIcon,
                     contentDescription = null,

@@ -21,6 +21,7 @@ fun PreferenceBreadcrumb(
     style: StyledBreadcrumbStyle = rememberStyledBreadcrumbStyle(),
     separatorIcon: IconComposable = StyledIcons.Submenu,
     filter: PreferenceFilter? = null,
+    showRootItem: Boolean = true,
 ) {
     val strings = LocalPreferenceStrings.current
     val routes = state.routes
@@ -69,5 +70,6 @@ fun PreferenceBreadcrumb(
         modifier = modifier,
         style = style,
         separatorIcon = separatorIcon,
+        showRootItem = showRootItem,
     )
 }
