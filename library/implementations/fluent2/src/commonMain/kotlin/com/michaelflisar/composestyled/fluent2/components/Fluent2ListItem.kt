@@ -76,7 +76,13 @@ class Fluent2ListItem internal constructor() : StyledListItem.Implementation {
             content = content,
             defaultContainerColor = StyledTheme.colorScheme.surface,
             defaultContentColor = StyledTheme.colorScheme.onSurface,
-            defaultSupportingColor = StyledTheme.supportingOnColor(StyledTheme.colorScheme.surface),
+            defaultSupportingColor = StyledTheme.supportingContentColor(
+                containerColor = StyledTheme.colorScheme.surface,
+                contentColor = StyledTheme.contentColorFor(
+                    backgroundColor = StyledTheme.colorScheme.surface,
+                    fallback = StyledTheme.ContentColorFallback.BlackWhite,
+                ),
+            ),
             headlineStyle = StyledTheme.typography.bodyMedium,
             supportingStyle = StyledTheme.typography.bodySmall,
             overlineStyle = StyledTheme.typography.labelSmall,

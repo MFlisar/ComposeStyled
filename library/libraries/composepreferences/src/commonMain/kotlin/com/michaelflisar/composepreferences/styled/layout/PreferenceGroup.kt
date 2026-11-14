@@ -68,6 +68,9 @@ fun PreferenceGroup(
         insideSection = false,
         sectionShapeCoordinates = null,
     )
+    val hasVisibleContent = parent.listSpacingTracker.hasVisibleEntries(
+        childRuntime.identityScope,
+    )
     DisposableEffect(parent.listSpacingTracker, identity) {
         onDispose {
             parent.listSpacingTracker.remove(identity)
@@ -78,7 +81,7 @@ fun PreferenceGroup(
             identity = identity,
             scope = parent.identityScope,
             order = parent.identityAllocator.order(identity),
-            isVisible = true,
+            isVisible = visible && (showGroup || groupIsCurrentPage || hasVisibleContent),
             isInsideSection = parent.insideSection && shape == null,
         )
     }

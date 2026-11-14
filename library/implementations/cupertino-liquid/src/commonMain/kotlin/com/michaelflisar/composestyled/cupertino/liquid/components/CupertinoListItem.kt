@@ -76,7 +76,13 @@ class CupertinoLiquidListItem internal constructor() : StyledListItem.Implementa
             content = content,
             defaultContainerColor = StyledTheme.colorScheme.surface,
             defaultContentColor = StyledTheme.colorScheme.onSurface,
-            defaultSupportingColor = StyledTheme.supportingOnColor(StyledTheme.colorScheme.surface),
+            defaultSupportingColor = StyledTheme.supportingContentColor(
+                containerColor = StyledTheme.colorScheme.surface,
+                contentColor = StyledTheme.contentColorFor(
+                    backgroundColor = StyledTheme.colorScheme.surface,
+                    fallback = StyledTheme.ContentColorFallback.BlackWhite,
+                ),
+            ),
             headlineStyle = StyledTheme.typography.bodyLarge,
             supportingStyle = StyledTheme.typography.bodySmall,
             overlineStyle = StyledTheme.typography.labelSmall,

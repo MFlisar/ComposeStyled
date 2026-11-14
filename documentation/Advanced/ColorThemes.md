@@ -126,11 +126,10 @@ white only as much as required. Applications should still check their complete
 UI and custom renderer colors, which may introduce additional color
 combinations.
 
-Use `StyledTheme.supportingOnColor(backgroundColor)` to derive a less prominent
-theme foreground for supporting text. It blends the matching content color
-toward the background and keeps at least a 4.5:1 contrast ratio when the
-original pair allows it. Pass `minimumContrastRatio` to choose a different
-floor. For a manually chosen foreground, use
-`backgroundColor.supportingOnColor(onColor)` directly. This is a color
-calculation; `StyledTheme.contentColorFor(backgroundColor)` remains the
-theme-role lookup.
+Use `StyledTheme.supportingContentColor(containerColor, contentColor)` to derive
+a less prominent foreground for supporting text. `containerColor` is required;
+`contentColor` defaults to `LocalStyledContentColor.current`. It blends the
+content color toward the container and keeps at least a 4.5:1 contrast ratio
+when the original pair allows it. Pass `minimumContrastRatio` to choose a
+different floor. This is a color calculation;
+`StyledTheme.contentColorFor(backgroundColor)` remains the theme-role lookup.

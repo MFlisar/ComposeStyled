@@ -199,6 +199,9 @@ internal class PreferenceListSpacingTracker {
         entries.remove(identity)
     }
 
+    fun hasVisibleEntries(scope: List<String>): Boolean =
+        entries.values.any { it.scope == scope }
+
     fun spacingKinds(scope: List<String>): List<PreferenceListSpacingKind> =
         entries.values
             .filter { it.scope == scope }
@@ -493,7 +496,7 @@ internal fun PreferenceEntry(
                 identity = identity,
                 scope = runtime.identityScope,
                 order = runtime.identityAllocator.order(identity),
-                isVisible = shouldRender || runtime.isFiltering,
+                isVisible = shouldRender,
                 isInsideSection = insideSection,
                 hasDividerAfter = hasNextSectionContentEntry,
             )

@@ -408,7 +408,7 @@ object StyledDialogDefaults {
         return {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.small),
+                horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
             ) {
                 icon?.invoke()
                 title?.invoke()

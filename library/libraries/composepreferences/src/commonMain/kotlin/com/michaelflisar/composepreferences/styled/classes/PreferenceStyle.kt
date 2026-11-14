@@ -142,7 +142,10 @@ object PreferenceStyleDefaults {
     fun rowColors(
         containerColor: Color = StyledTheme.colorScheme.surfaceVariant,
         contentColor: Color = StyledTheme.colorScheme.onSurfaceVariant,
-        supportingColor: Color = StyledTheme.supportColorOf(contentColor, containerColor),
+        supportingColor: Color = StyledTheme.supportingContentColor(
+            containerColor = containerColor,
+            contentColor = contentColor,
+        ),
     ): PreferenceRowColors = PreferenceRowColors(
         containerColor = containerColor,
         contentColor = contentColor,

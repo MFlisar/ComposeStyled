@@ -178,6 +178,9 @@ private fun PreferenceSectionImpl(
     val isCurrentLevel = parent.currentPath == parent.treePath
     val showHeader = title != null && !parent.isFiltering && isCurrentLevel &&
         parent.parentExpanded && visible
+    val hasVisibleContent = parent.listSpacingTracker.hasVisibleEntries(
+        parent.identityScope + identity,
+    )
     val sectionStyle = parent.style.section
     val clipsSectionShape = !parent.isFiltering &&
         sectionIsExpanded &&
@@ -195,7 +198,7 @@ private fun PreferenceSectionImpl(
             identity = identity,
             scope = parent.identityScope,
             order = parent.identityAllocator.order(identity),
-            isVisible = true,
+            isVisible = visible && (showHeader || hasVisibleContent),
             isInsideSection = parent.insideSection && sectionStyle.headerIsPartOfShape,
             isDetachedSection = showHeader && !sectionStyle.headerIsPartOfShape,
         )

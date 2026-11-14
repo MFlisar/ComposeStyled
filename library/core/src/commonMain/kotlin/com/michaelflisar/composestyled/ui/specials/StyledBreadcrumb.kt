@@ -50,7 +50,13 @@ data class StyledBreadcrumbStyle(
 fun rememberStyledBreadcrumbStyle(
     itemColor: Color = StyledTheme.colorScheme.onSurfaceVariant,
     currentItemColor: Color = StyledTheme.colorScheme.onSurface,
-    separatorColor: Color = StyledTheme.supportingOnColor(StyledTheme.colorScheme.surfaceVariant),
+    separatorColor: Color = StyledTheme.supportingContentColor(
+        containerColor = StyledTheme.colorScheme.surfaceVariant,
+        contentColor = StyledTheme.contentColorFor(
+            backgroundColor = StyledTheme.colorScheme.surfaceVariant,
+            fallback = StyledTheme.ContentColorFallback.BlackWhite,
+        ),
+    ),
     itemTextStyle: TextStyle = StyledTheme.typography.bodyMedium,
     currentItemTextStyle: TextStyle = itemTextStyle.copy(fontWeight = FontWeight.Medium),
     itemSpacing: Dp = StyledTheme.spacing.small,
