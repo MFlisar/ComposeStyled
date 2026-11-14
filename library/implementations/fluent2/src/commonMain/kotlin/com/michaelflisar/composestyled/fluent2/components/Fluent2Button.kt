@@ -190,6 +190,7 @@ private fun Fluent2Button(
         hovered = hovered,
         pressed = pressed,
         colors = customization?.colors,
+        disabledColors = customization?.disabledColors,
         border = customization?.border,
         inheritedContentColor = defaultContentColor,
     )
@@ -250,7 +251,7 @@ private fun Fluent2Button(
                     if (isGroupBox) {
                         Modifier
                     } else {
-                        Modifier.border(1.dp, border, shape)
+                        Modifier.border(customization?.borderThickness ?: 1.dp, border, shape)
                     }
                 )
                 .then(

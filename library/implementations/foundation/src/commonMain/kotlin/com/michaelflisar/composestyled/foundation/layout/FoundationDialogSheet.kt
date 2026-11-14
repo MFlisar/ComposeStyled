@@ -3,6 +3,7 @@ package com.michaelflisar.composestyled.foundation.layout
 import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -26,10 +27,12 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.only
@@ -92,6 +95,7 @@ import com.michaelflisar.composestyled.ui.components.StyledTopBar
 import com.michaelflisar.composestyled.ui.internal.DialogActions
 import com.michaelflisar.composestyled.ui.internal.DialogButton
 import com.michaelflisar.composestyled.ui.internal.DIALOG_VISIBILITY_ANIMATION_DURATION_MILLIS
+import com.michaelflisar.composestyled.ui.internal.LocalStyledDialogEnterAnimationEnabled
 import com.michaelflisar.composestyled.ui.internal.dialogInput
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -197,12 +201,22 @@ internal fun FoundationDialogSheet(
         } else {
             maxOf(measuredContentHeight.toFloat(), minimumSheetHeight)
         }
+        val maxPeekHeight = regularViewportHeight * options.peekHeightFraction
+        val maxPeekHeightDp = with(density) { maxPeekHeight.toDp() }
+        val collapsedSheetHeight = maxOf(
+            minOf(measuredSheetHeight, maxPeekHeight),
+            minimumSheetHeight,
+        ).coerceAtMost(viewportHeight)
         val sheetHeight = if (expandsToFullScreen) {
             viewportHeight
         } else {
             minOf(contentMaxHeight, measuredSheetHeight)
         }
-        val peekOffset = (sheetHeight - regularViewportHeight * options.peekHeightFraction).coerceAtLeast(0f)
+        val peekOffset = if (expandsToFullScreen) {
+            (viewportHeight - collapsedSheetHeight).coerceAtLeast(0f)
+        } else {
+            (sheetHeight - maxPeekHeight).coerceAtLeast(0f)
+        }
         val drag = rememberSaveable(
             options.initiallyExpanded,
             saver = sheetDragStateSaver(sheetHeight, peekOffset, options),
@@ -284,8 +298,15 @@ internal fun FoundationDialogSheet(
             }
         }
         val visibleHeight = (sheetHeight - drag.offset).coerceAtLeast(0f)
+        val visibleHeightDp = with(density) { visibleHeight.toDp() }
+        val fillExpandedContent =
+            expandsToFullScreen && measuredContentHeight > 0 &&
+                (drag.offset < peekOffset || drag.offset <= 0.5f)
         val footerOffset = (protectedHeight + footerHeight - visibleHeight).coerceAtLeast(0f)
         val bottomInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom)
+        val bodyBottomInset = with(density) {
+            WindowInsets.safeDrawing.exclude(WindowInsets.ime).getBottom(this).toDp()
+        }
         val footerInsets = if (modal && expandsToFullScreen) {
             WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal)
         } else bottomInsets
@@ -307,9 +328,13 @@ internal fun FoundationDialogSheet(
         AnimatedVisibility(
             visibleState = visibility,
             modifier = Modifier.fillMaxSize(),
-            enter = slideInVertically(
-                animationSpec = tween(DIALOG_VISIBILITY_ANIMATION_DURATION_MILLIS),
-            ) { visibleHeight.roundToInt() },
+            enter = if (LocalStyledDialogEnterAnimationEnabled.current) {
+                slideInVertically(
+                    animationSpec = tween(DIALOG_VISIBILITY_ANIMATION_DURATION_MILLIS),
+                ) { visibleHeight.roundToInt() }
+            } else {
+                EnterTransition.None
+            },
             exit = slideOutVertically(
                 animationSpec = tween(DIALOG_VISIBILITY_ANIMATION_DURATION_MILLIS),
             ) { visibleHeight.roundToInt() },
@@ -320,7 +345,10 @@ internal fun FoundationDialogSheet(
                         .align(Alignment.TopCenter)
                         .width(sheetWidth)
                         .offset { IntOffset(0, sheetTop.roundToInt()) }
-                        .heightIn(max = with(density) { contentMaxHeight.toDp() })
+                        .heightIn(
+                            min = if (expandsToFullScreen) visibleHeightDp else 0.dp,
+                            max = with(density) { contentMaxHeight.toDp() },
+                        )
                         .nestedScroll(connection)
                         .draggable(
                             state = rememberDraggableState { drag.drag(it) },
@@ -349,7 +377,11 @@ internal fun FoundationDialogSheet(
                             Modifier.windowInsetsPadding(sheetHorizontalInsets)
                                 .then(
                                     if (expandsToFullScreen) {
-                                        Modifier.height(with(density) { contentMaxHeight.toDp() })
+                                        if (fillExpandedContent) {
+                                            Modifier.height(visibleHeightDp)
+                                        } else {
+                                            Modifier.heightIn(max = maxPeekHeightDp)
+                                        }
                                     } else {
                                         Modifier.heightIn(
                                             min = with(density) {
@@ -358,8 +390,18 @@ internal fun FoundationDialogSheet(
                                             max = with(density) { contentMaxHeight.toDp() },
                                         )
                                     },
-                                ).then(if (fixedButtons) Modifier else Modifier.windowInsetsPadding(bottomInsets))
-                                .onSizeChanged { measuredContentHeight = it.height },
+                                ).then(
+                                    if (fixedButtons || buttons.isEmpty) {
+                                        Modifier
+                                    } else {
+                                        Modifier.windowInsetsPadding(bottomInsets)
+                                    },
+                                )
+                                .onSizeChanged {
+                                    if (!fillExpandedContent) {
+                                        measuredContentHeight = it.height
+                                    }
+                                },
                         ) {
                             AnimatedVisibility(
                                 visible = fullscreenToolbarVisible,
@@ -469,7 +511,7 @@ internal fun FoundationDialogSheet(
                                 }
                             }
                             Column(
-                                Modifier.then(if (expandsToFullScreen) Modifier.weight(1f) else Modifier)
+                                Modifier.then(if (fillExpandedContent) Modifier.weight(1f) else Modifier)
                                     .fillMaxWidth(),
                             ) {
                                 content(
@@ -483,6 +525,8 @@ internal fun FoundationDialogSheet(
                                         end = contentPadding,
                                         bottom = if (fixedButtons) {
                                             with(density) { footerHeight.toDp() }
+                                        } else if (buttons.isEmpty) {
+                                            contentPadding + bodyBottomInset
                                         } else contentPadding,
                                     ),
                                 )

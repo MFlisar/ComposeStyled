@@ -21,7 +21,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotEnabled
-import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
@@ -35,6 +34,7 @@ import androidx.compose.ui.test.swipe
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.StyledTheme
+import com.michaelflisar.composestyled.StyledThemeConfig
 import com.michaelflisar.composestyled.classes.IconComposable
 import com.michaelflisar.composestyled.classes.StyledThemeProvider
 import com.michaelflisar.composestyled.cupertino.flat.components.CupertinoFlatButton
@@ -461,10 +461,14 @@ class DialogButtonTest(private val theme: Int) {
             Box(modifier.background(tint))
         }
         setContent {
+            val provider = rememberFluent2ThemeProvider()
             StyledTheme(
                 Platform.JvmWindows,
-                rememberFluent2ThemeProvider(),
-                themeAppearance = StyledThemeAppearance.Light,
+                provider,
+                config = StyledThemeConfig(
+                    colors = provider.defaultThemeColors,
+                    appearance = StyledThemeAppearance.Light,
+                ),
             ) {
                 Theme(
                     customization = {
@@ -903,7 +907,10 @@ class DialogButtonTest(private val theme: Int) {
         StyledTheme(
             Platform.JvmWindows,
             provider,
-            themeAppearance = appearance,
+            config = StyledThemeConfig(
+                colors = provider.defaultThemeColors,
+                appearance = appearance,
+            ),
             typography = typography ?: PlatformDefaults.typography(Platform.JvmWindows),
             customization = customization,
             content = content,

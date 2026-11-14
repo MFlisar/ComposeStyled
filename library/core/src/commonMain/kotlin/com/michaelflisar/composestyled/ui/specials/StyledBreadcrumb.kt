@@ -4,6 +4,8 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,11 +24,13 @@ import com.michaelflisar.composestyled.ui.layout.StyledHorizontalScrollbarLayout
 import com.michaelflisar.composestyled.ui.layout.StyledRow
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 
-/** One label in a [StyledBreadcrumb]. */
+/** One text and/or icon segment in a [StyledBreadcrumb]. */
 @Immutable
 data class StyledBreadcrumbItem(
-    val label: String,
+    val label: String? = null,
     val onClick: (() -> Unit)? = null,
+    val icon: IconComposable? = null,
+    val iconContentDescription: String? = null,
 )
 
 /** Colors, typography and spacing used by [StyledBreadcrumb]. */
@@ -74,6 +78,7 @@ fun rememberStyledBreadcrumbStyle(
 /**
  * Displays a horizontally scrollable path. Items before the last are clickable when they have an
  * [StyledBreadcrumbItem.onClick] action; the last item is always treated as the current location.
+ * When [scrollToEndOnItemsAdded] is enabled, adding items animates the scroll to the end.
  */
 @Composable
 fun StyledBreadcrumb(
@@ -83,12 +88,24 @@ fun StyledBreadcrumb(
     separatorIcon: IconComposable = StyledIcons.NavigateForward,
     maxLines: Int = 1,
     overflow: TextOverflow = TextOverflow.Ellipsis,
+    scrollToEndOnItemsAdded: Boolean = true,
 ) {
+    val scrollState = rememberScrollState()
+    val previousItemCount = remember { mutableIntStateOf(items.size) }
+
+    LaunchedEffect(items.size, scrollToEndOnItemsAdded) {
+        val itemCount = items.size
+        if (scrollToEndOnItemsAdded && itemCount > previousItemCount.intValue) {
+            scrollState.animateScrollTo(scrollState.maxValue)
+        }
+        previousItemCount.intValue = itemCount
+    }
+
     if (items.isEmpty()) return
 
     StyledRow(
         itemSpacing = style.itemSpacing,
-        modifier = modifier.horizontalScroll(rememberScrollState()),
+        modifier = modifier.horizontalScroll(scrollState),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         items.forEachIndexed { index, item ->
@@ -110,13 +127,27 @@ fun StyledBreadcrumb(
                 onClick = { onClick?.invoke() },
                 enabled = onClick != null,
             ) {
-                StyledText(
-                    text = item.label,
-                    color = itemColor,
-                    style = itemTextStyle,
-                    maxLines = maxLines,
-                    overflow = overflow,
-                )
+                StyledRow(
+                    itemSpacing = style.itemSpacing,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    item.icon?.let {
+                        StyledIcon(
+                            icon = it,
+                            contentDescription = item.iconContentDescription,
+                            tint = itemColor,
+                        )
+                    }
+                    item.label?.let {
+                        StyledText(
+                            text = it,
+                            color = itemColor,
+                            style = itemTextStyle,
+                            maxLines = maxLines,
+                            overflow = overflow,
+                        )
+                    }
+                }
             }
         }
     }

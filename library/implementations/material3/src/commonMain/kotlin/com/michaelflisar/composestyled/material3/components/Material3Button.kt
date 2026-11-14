@@ -1,6 +1,7 @@
 package com.michaelflisar.composestyled.material3.components
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
@@ -130,11 +131,20 @@ class Material3Button internal constructor(
             (variant == StyledButton.Variant.Auto &&
                 (context is StyledTopBar.Context ||
                     context == StyledMenuBar.Context.MenuItem))
+        val disabledFilledBackground = customization?.disabledColors?.filledBackground?.resolve()
+            ?.takeUnless { it == Color.Unspecified }
+        val disabledFilledForeground = customization?.disabledColors?.filledForeground?.resolve()
+            ?.takeUnless { it == Color.Unspecified }
+        val disabledTextForeground = customization?.disabledColors?.textForeground?.resolve()
+            ?.takeUnless { it == Color.Unspecified }
         @Composable
-        fun styledContentColor(color: Color) =
-            if (enabled) color else color.copy(
+        fun styledContentColor(color: Color, disabledColor: Color? = null) = when {
+            enabled -> color
+            disabledColor != null -> disabledColor
+            else -> color.copy(
                 alpha = color.alpha * StyledTheme.colorScheme.disableFactors.content,
             )
+        }
         val textForeground = customization?.colors?.textForeground?.resolve()
             ?.takeUnless { it == Color.Unspecified }
 
@@ -151,6 +161,8 @@ class Material3Button internal constructor(
                             ?: StyledTheme.colorScheme.secondarySurface,
                         contentColor = customization?.colors?.filledForeground?.resolve()
                             ?: StyledTheme.colorScheme.onSecondarySurface,
+                        disabledContainerColor = disabledFilledBackground ?: Color.Unspecified,
+                        disabledContentColor = disabledFilledForeground ?: Color.Unspecified,
                     ),
                     contentPadding = if (isGroupBox) {
                         PaddingValues(0.dp)
@@ -162,7 +174,8 @@ class Material3Button internal constructor(
                         contentColor = styledContentColor(
                             customization?.colors?.filledForeground?.resolve()
                                 ?.takeUnless { it == Color.Unspecified }
-                                ?: StyledTheme.colorScheme.onSecondarySurface
+                                ?: StyledTheme.colorScheme.onSecondarySurface,
+                            disabledFilledForeground,
                         ),
                         textStyle = StyledTheme.typography.labelLarge,
                     ) {
@@ -182,7 +195,9 @@ class Material3Button internal constructor(
                         containerColor = customization?.colors?.filledBackground?.resolve()
                             ?: StyledTheme.colorScheme.primary,
                         contentColor = customization?.colors?.filledForeground?.resolve()
-                            ?: StyledTheme.colorScheme.onPrimary
+                            ?: StyledTheme.colorScheme.onPrimary,
+                        disabledContainerColor = disabledFilledBackground ?: Color.Unspecified,
+                        disabledContentColor = disabledFilledForeground ?: Color.Unspecified,
                     ),
                     contentPadding = if (isGroupBox) {
                         PaddingValues(0.dp)
@@ -194,7 +209,8 @@ class Material3Button internal constructor(
                         contentColor = styledContentColor(
                             customization?.colors?.filledForeground?.resolve()
                                 ?.takeUnless { it == Color.Unspecified }
-                                ?: StyledTheme.colorScheme.onPrimary
+                                ?: StyledTheme.colorScheme.onPrimary,
+                            disabledFilledForeground,
                         ),
                         textStyle = StyledTheme.typography.labelLarge,
                     ) {
@@ -216,7 +232,9 @@ class Material3Button internal constructor(
                         containerColor = customization?.colors?.filledBackground?.resolve()
                             ?: StyledTheme.colorScheme.secondary,
                         contentColor = customization?.colors?.filledForeground?.resolve()
-                            ?: StyledTheme.colorScheme.onSecondary
+                            ?: StyledTheme.colorScheme.onSecondary,
+                        disabledContainerColor = disabledFilledBackground ?: Color.Unspecified,
+                        disabledContentColor = disabledFilledForeground ?: Color.Unspecified,
                     ),
                     contentPadding = if (isGroupBox) {
                         PaddingValues(0.dp)
@@ -228,7 +246,8 @@ class Material3Button internal constructor(
                         contentColor = styledContentColor(
                             customization?.colors?.filledForeground?.resolve()
                                 ?.takeUnless { it == Color.Unspecified }
-                                ?: StyledTheme.colorScheme.onSecondary
+                                ?: StyledTheme.colorScheme.onSecondary,
+                            disabledFilledForeground,
                         ),
                         textStyle = StyledTheme.typography.labelLarge,
                     ) {
@@ -248,7 +267,9 @@ class Material3Button internal constructor(
                         containerColor = customization?.colors?.filledBackground?.resolve()
                             ?: Color.Unspecified,
                         contentColor = customization?.colors?.filledForeground?.resolve()
-                            ?: StyledTheme.colorScheme.primary
+                            ?: StyledTheme.colorScheme.primary,
+                        disabledContainerColor = disabledFilledBackground ?: Color.Unspecified,
+                        disabledContentColor = disabledFilledForeground ?: Color.Unspecified,
                     ),
                     contentPadding = if (isGroupBox) {
                         PaddingValues(0.dp)
@@ -260,7 +281,8 @@ class Material3Button internal constructor(
                         contentColor = styledContentColor(
                             customization?.colors?.filledForeground?.resolve()
                                 ?.takeUnless { it == Color.Unspecified }
-                                ?: StyledTheme.colorScheme.primary
+                                ?: StyledTheme.colorScheme.primary,
+                            disabledFilledForeground,
                         ),
                         textStyle = StyledTheme.typography.labelLarge,
                     ) {
@@ -276,6 +298,8 @@ class Material3Button internal constructor(
                 CopyStyledLocals(
                     outlineVariant = customization?.border?.resolve()
                 ) {
+                    val borderThickness = customization?.borderThickness
+                    val defaultBorder = ButtonDefaults.outlinedButtonBorder(enabled)
                     OutlinedButton(
                         onClick = onClick,
                         modifier = buttonModifier,
@@ -285,12 +309,18 @@ class Material3Button internal constructor(
                         colors = ButtonDefaults.outlinedButtonColors(
                             containerColor = Color.Unspecified,
                             contentColor = customization?.colors?.textForeground?.resolve()
-                                ?: StyledTheme.colorScheme.onSurfaceVariant
+                                ?: StyledTheme.colorScheme.onSurfaceVariant,
+                            disabledContentColor = disabledTextForeground ?: Color.Unspecified,
                         ),
                         border = if (isGroupBox) {
                             null
+                        } else if (borderThickness != null) {
+                            BorderStroke(
+                                width = borderThickness,
+                                brush = defaultBorder.brush,
+                            )
                         } else {
-                            ButtonDefaults.outlinedButtonBorder(enabled)
+                            defaultBorder
                         },
                         contentPadding = if (isGroupBox) {
                             PaddingValues(0.dp)
@@ -302,7 +332,8 @@ class Material3Button internal constructor(
                             contentColor = styledContentColor(
                                 customization?.colors?.textForeground?.resolve()
                                     ?.takeUnless { it == Color.Unspecified }
-                                    ?: StyledTheme.colorScheme.onSurfaceVariant
+                                    ?: StyledTheme.colorScheme.onSurfaceVariant,
+                                disabledTextForeground,
                             ),
                             textStyle = StyledTheme.typography.labelLarge,
                         ) {
@@ -323,7 +354,8 @@ class Material3Button internal constructor(
                         containerColor = Color.Unspecified,
                         contentColor = textForeground
                             ?: if (inheritsStyledContentColor) LocalStyledContentColor.current
-                            else StyledTheme.colorScheme.primary
+                            else StyledTheme.colorScheme.primary,
+                        disabledContentColor = disabledTextForeground ?: Color.Unspecified,
                     ),
                     contentPadding = if (isGroupBox) {
                         PaddingValues(0.dp)
@@ -335,7 +367,8 @@ class Material3Button internal constructor(
                         contentColor = styledContentColor(
                             textForeground
                                 ?: if (inheritsStyledContentColor) LocalStyledContentColor.current
-                                else StyledTheme.colorScheme.primary
+                                else StyledTheme.colorScheme.primary,
+                            disabledTextForeground,
                         ),
                         textStyle = StyledTheme.typography.labelLarge,
                     ) {

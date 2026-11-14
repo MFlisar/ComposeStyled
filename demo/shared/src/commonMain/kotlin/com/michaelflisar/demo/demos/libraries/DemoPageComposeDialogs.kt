@@ -7,20 +7,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import com.michaelflisar.composedialogs.dialogs.date.ui.DatePickerRange
-import com.michaelflisar.composedialogs.dialogs.date.ui.DatePickerSetup
+import com.michaelflisar.composedialogs.dialogs.date.DatePickerDefaults
 import com.michaelflisar.composedialogs.dialogs.frequency.classes.Frequency
+import com.michaelflisar.composedialogs.styled.DialogColor
+import com.michaelflisar.composedialogs.styled.DialogDate
+import com.michaelflisar.composedialogs.styled.DialogFrequency
 import com.michaelflisar.composedialogs.styled.DialogInfo
 import com.michaelflisar.composedialogs.styled.DialogInput
 import com.michaelflisar.composedialogs.styled.DialogList
 import com.michaelflisar.composedialogs.styled.DialogMenu
+import com.michaelflisar.composedialogs.styled.DialogMenu.Entry
 import com.michaelflisar.composedialogs.styled.DialogNumber
 import com.michaelflisar.composedialogs.styled.DialogProgress
-import com.michaelflisar.composedialogs.styled.DialogMenu.Entry
-import com.michaelflisar.composedialogs.styled.DialogColor
-import com.michaelflisar.composedialogs.styled.DialogDate
-import com.michaelflisar.composedialogs.styled.DialogFrequency
 import com.michaelflisar.composedialogs.styled.DialogTime
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.classes.CustomColors
@@ -37,7 +35,6 @@ import com.michaelflisar.composestyled.ui.layout.StyledScaffold
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.ui.state.rememberDialogState
 import com.michaelflisar.demo.helper.DemoTopBar
-import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 
@@ -63,7 +60,14 @@ internal fun DemoPageComposeDialogs(onBack: () -> Unit) {
     val input = remember { mutableStateOf("") }
     val number = remember { mutableStateOf(5) }
     val selectedItem = remember { mutableStateOf("") }
-    val dialogStyles = remember { listOf("Dialog", "Bottom sheet", "Bottom sheet + expand to full screen", "Full screen") }
+    val dialogStyles = remember {
+        listOf(
+            "Dialog",
+            "Bottom sheet",
+            "Bottom sheet + expand to full screen",
+            "Full screen"
+        )
+    }
     val selectedDialogStyle = remember { mutableStateOf(dialogStyles.first()) }
     val dialogStyle = when (selectedDialogStyle.value) {
         "Bottom sheet" -> StyledDialog.Style.BottomSheet()
@@ -72,23 +76,11 @@ internal fun DemoPageComposeDialogs(onBack: () -> Unit) {
                 expandToFullScreen = StyledDialog.ExpandToFullScreen.Enabled(),
             )
         )
+
         "Full screen" -> StyledDialog.Style.Fullscreen()
         else -> StyledDialog.Style.Dialog()
     }
-    val datePickerRange = DatePickerRange(1900..2100)
-    val datePickerSetup = DatePickerSetup(
-        buttonToday = { StyledText("Today") },
-        firstDayOfWeek = DayOfWeek.MONDAY,
-        formatterWeekDayLabel = { it.name.take(3) },
-        formatterSelectedDate = { it.toString() },
-        formatterSelectedMonth = { it.name.lowercase().replaceFirstChar { char -> char.uppercase() } },
-        formatterSelectedYear = { it.toString() },
-        formatterMonthSelectorList = { it.name.lowercase().replaceFirstChar { char -> char.uppercase() } },
-        formatterYearSelectorList = { it.toString() },
-        dateCellHeight = 48.dp,
-        showNextPreviousMonthButtons = true,
-        showNextPreviousYearButtons = true,
-    )
+    val datePickerConfig = DatePickerDefaults.config()
 
     val scaffoldColor = StyledTheme.colorScheme.surface
     val topBarColor = StyledTheme.colorScheme.primary
@@ -140,7 +132,7 @@ internal fun DemoPageComposeDialogs(onBack: () -> Unit) {
             StyledText("Selected time: ${selectedTime.value}")
             StyledText(
                 "Selected frequency: ${selectedFrequency.value.type}, every " +
-                    "${selectedFrequency.value.interval}, at ${selectedFrequency.value.time}"
+                        "${selectedFrequency.value.interval}, at ${selectedFrequency.value.time}"
             )
             StyledText("Selected list item: ${selectedItem.value}")
             StyledText("Selected number: ${number.value}")
@@ -151,14 +143,14 @@ internal fun DemoPageComposeDialogs(onBack: () -> Unit) {
         state = colorDialog,
         color = selectedColor,
         style = dialogStyle,
+        directEditSupported = true,
         title = { StyledText("Choose a color") },
         buttons = doneButton(),
     )
     DialogDate(
         state = dateDialog,
         date = selectedDate,
-        dateRange = datePickerRange,
-        setup = datePickerSetup,
+        config = datePickerConfig,
         style = dialogStyle,
         title = { StyledText("Choose a date") },
         buttons = doneButton(),
@@ -200,7 +192,7 @@ internal fun DemoPageComposeDialogs(onBack: () -> Unit) {
     )
     DialogList(
         state = listDialog,
-        items = listOf("First", "Second", "Third"),
+        items = listOf("First", "Second", "Third", "Fourth"),
         onItemClick = { selectedItem.value = it },
         itemContent = { StyledText(it) },
         supportingContent = { StyledText("Choose this option") },

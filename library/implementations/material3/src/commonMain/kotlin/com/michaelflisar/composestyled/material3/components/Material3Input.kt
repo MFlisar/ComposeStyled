@@ -2,19 +2,22 @@ package com.michaelflisar.composestyled.material3.components
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.semantics
@@ -153,36 +156,8 @@ class Material3Input internal constructor(
             if (isError && errorMessage != null) error(errorMessage)
         }
         when (mappedVariant) {
-            Variant.Outlined -> OutlinedTextField(
-                value = value,
-                onValueChange = onValueChange,
-                modifier = fieldModifier,
-                enabled = enabled && interactionEnabled,
-                readOnly = readOnly,
-                isError = isError,
-                singleLine = singleLine,
-                minLines = minLines,
-                maxLines = maxLines,
-                shape = shape,
-                textStyle = textStyle,
-                keyboardOptions = keyboardOptions,
-                keyboardActions = keyboardActions,
-                visualTransformation = visualTransformation,
-                interactionSource = resolvedInteractionSource,
-                label = styledInputSlot(label, labelColor, StyledTheme.typography.bodySmall),
-                placeholder = styledInputSlot(
-                    placeholder,
-                    if (isFieldEnabled) unfocusedDecorationColor else disabledDecorationColor,
-                    textStyle,
-                ),
-                leadingIcon = styledInputSlot(leadingIcon, iconContentColor),
-                trailingIcon = styledInputSlot(trailingIcon, iconContentColor),
-                supportingText = styledInputSlot(
-                    supportingText,
-                    styledSupportingColor,
-                    StyledTheme.typography.bodySmall,
-                ),
-                colors = OutlinedTextFieldDefaults.colors(
+            Variant.Outlined -> {
+                val colors = OutlinedTextFieldDefaults.colors(
                     focusedContainerColor = Color.Unspecified,
                     unfocusedContainerColor = Color.Unspecified,
                     disabledContainerColor = Color.Unspecified,
@@ -214,38 +189,84 @@ class Material3Input internal constructor(
                     disabledLabelColor = disabledDecorationColor,
                     disabledPlaceholderColor = disabledDecorationColor,
                     disabledSupportingTextColor = disabledDecorationColor,
-                ),
-            )
-            Variant.Filled -> TextField(
-                value = value,
-                onValueChange = onValueChange,
-                modifier = fieldModifier,
-                enabled = enabled && interactionEnabled,
-                readOnly = readOnly,
-                isError = isError,
-                singleLine = singleLine,
-                minLines = minLines,
-                maxLines = maxLines,
-                shape = shape,
-                textStyle = textStyle,
-                keyboardOptions = keyboardOptions,
-                keyboardActions = keyboardActions,
-                visualTransformation = visualTransformation,
-                interactionSource = resolvedInteractionSource,
-                label = styledInputSlot(label, labelColor, StyledTheme.typography.bodySmall),
-                placeholder = styledInputSlot(
-                    placeholder,
-                    if (isFieldEnabled) unfocusedDecorationColor else disabledDecorationColor,
-                    textStyle,
-                ),
-                leadingIcon = styledInputSlot(leadingIcon, iconContentColor),
-                trailingIcon = styledInputSlot(trailingIcon, iconContentColor),
-                supportingText = styledInputSlot(
-                    supportingText,
-                    styledSupportingColor,
-                    StyledTheme.typography.bodySmall,
-                ),
-                colors = TextFieldDefaults.colors(
+                )
+                BasicTextField(
+                    value = value,
+                    onValueChange = onValueChange,
+                    modifier = fieldModifier
+                        .then(
+                            if (label != null) {
+                                Modifier.semantics(mergeDescendants = true) {}
+                                    .padding(top = minimizedLabelHalfHeight())
+                            } else {
+                                Modifier
+                            }
+                        )
+                        .defaultMinSize(
+                            minWidth = OutlinedTextFieldDefaults.MinWidth,
+                            minHeight = OutlinedTextFieldDefaults.MinHeight,
+                        ),
+                    enabled = enabled && interactionEnabled,
+                    readOnly = readOnly,
+                    textStyle = textStyle.merge(
+                        TextStyle(color = textStyle.color.takeOrElse { textColor })
+                    ),
+                    keyboardOptions = keyboardOptions,
+                    keyboardActions = keyboardActions,
+                    visualTransformation = visualTransformation,
+                    interactionSource = resolvedInteractionSource,
+                    cursorBrush = SolidColor(
+                        if (isError) StyledTheme.colorScheme.error else StyledTheme.colorScheme.primary
+                    ),
+                    singleLine = singleLine,
+                    maxLines = maxLines,
+                    minLines = minLines,
+                    decorationBox = { innerTextField ->
+                        OutlinedTextFieldDefaults.DecorationBox(
+                            value = value.text,
+                            visualTransformation = visualTransformation,
+                            innerTextField = innerTextField,
+                            placeholder = styledInputSlot(
+                                placeholder,
+                                if (isFieldEnabled) unfocusedDecorationColor else disabledDecorationColor,
+                                textStyle,
+                            ),
+                            label = styledInputSlot(
+                                label,
+                                labelColor,
+                                StyledTheme.typography.bodySmall,
+                            ),
+                            leadingIcon = styledInputSlot(leadingIcon, iconContentColor),
+                            trailingIcon = styledInputSlot(trailingIcon, iconContentColor),
+                            supportingText = styledInputSlot(
+                                supportingText,
+                                styledSupportingColor,
+                                StyledTheme.typography.bodySmall,
+                            ),
+                            singleLine = singleLine,
+                            enabled = enabled && interactionEnabled,
+                            isError = isError,
+                            interactionSource = resolvedInteractionSource,
+                            colors = colors,
+                            container = {
+                                OutlinedTextFieldDefaults.Container(
+                                    enabled = enabled && interactionEnabled,
+                                    isError = isError,
+                                    interactionSource = resolvedInteractionSource,
+                                    colors = colors,
+                                    shape = shape,
+                                    focusedBorderThickness = customization?.borderThickness
+                                        ?: OutlinedTextFieldDefaults.FocusedBorderThickness,
+                                    unfocusedBorderThickness = customization?.borderThickness
+                                        ?: OutlinedTextFieldDefaults.UnfocusedBorderThickness,
+                                )
+                            },
+                        )
+                    },
+                )
+            }
+            Variant.Filled -> {
+                val colors = TextFieldDefaults.colors(
                     focusedContainerColor = filledBackground,
                     unfocusedContainerColor = filledBackground,
                     disabledContainerColor = filledBackground,
@@ -277,8 +298,74 @@ class Material3Input internal constructor(
                     disabledLabelColor = disabledDecorationColor,
                     disabledPlaceholderColor = disabledDecorationColor,
                     disabledSupportingTextColor = disabledDecorationColor,
-                ),
-            )
+                )
+                BasicTextField(
+                    value = value,
+                    onValueChange = onValueChange,
+                    modifier = fieldModifier.defaultMinSize(
+                        minWidth = TextFieldDefaults.MinWidth,
+                        minHeight = TextFieldDefaults.MinHeight,
+                    ),
+                    enabled = enabled && interactionEnabled,
+                    readOnly = readOnly,
+                    textStyle = textStyle.merge(
+                        TextStyle(color = textStyle.color.takeOrElse { textColor })
+                    ),
+                    keyboardOptions = keyboardOptions,
+                    keyboardActions = keyboardActions,
+                    visualTransformation = visualTransformation,
+                    interactionSource = resolvedInteractionSource,
+                    cursorBrush = SolidColor(
+                        if (isError) StyledTheme.colorScheme.error else StyledTheme.colorScheme.primary
+                    ),
+                    singleLine = singleLine,
+                    maxLines = maxLines,
+                    minLines = minLines,
+                    decorationBox = { innerTextField ->
+                        TextFieldDefaults.DecorationBox(
+                            value = value.text,
+                            innerTextField = innerTextField,
+                            enabled = enabled && interactionEnabled,
+                            singleLine = singleLine,
+                            visualTransformation = visualTransformation,
+                            interactionSource = resolvedInteractionSource,
+                            isError = isError,
+                            label = styledInputSlot(
+                                label,
+                                labelColor,
+                                StyledTheme.typography.bodySmall,
+                            ),
+                            placeholder = styledInputSlot(
+                                placeholder,
+                                if (isFieldEnabled) unfocusedDecorationColor else disabledDecorationColor,
+                                textStyle,
+                            ),
+                            leadingIcon = styledInputSlot(leadingIcon, iconContentColor),
+                            trailingIcon = styledInputSlot(trailingIcon, iconContentColor),
+                            supportingText = styledInputSlot(
+                                supportingText,
+                                styledSupportingColor,
+                                StyledTheme.typography.bodySmall,
+                            ),
+                            shape = shape,
+                            colors = colors,
+                            container = {
+                                TextFieldDefaults.Container(
+                                    enabled = enabled && interactionEnabled,
+                                    isError = isError,
+                                    interactionSource = resolvedInteractionSource,
+                                    colors = colors,
+                                    shape = shape,
+                                    focusedIndicatorLineThickness = customization?.borderThickness
+                                        ?: TextFieldDefaults.FocusedIndicatorThickness,
+                                    unfocusedIndicatorLineThickness = customization?.borderThickness
+                                        ?: TextFieldDefaults.UnfocusedIndicatorThickness,
+                                )
+                            },
+                        )
+                    },
+                )
+            }
         }
     }
 }

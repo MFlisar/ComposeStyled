@@ -19,9 +19,13 @@ interface DialogState {
 
 /** Visibility-backed state for dialogs whose content does not require associated data. */
 @Stable
-class VisibilityDialogState internal constructor(initialVisible: Boolean) : DialogState {
+class VisibilityDialogState internal constructor(
+    initialVisible: Boolean,
+    wasRestoredVisible: Boolean = false,
+) : DialogState {
     override var visible by mutableStateOf(initialVisible)
         private set
+    private var wasRestoredVisible = wasRestoredVisible
 
     /** Marks the dialog visible. */
     fun show() {
@@ -31,15 +35,25 @@ class VisibilityDialogState internal constructor(initialVisible: Boolean) : Dial
     override fun dismiss() {
         visible = false
     }
+
+    internal fun consumeRestoredVisible(): Boolean {
+        val restoredVisible = wasRestoredVisible
+        wasRestoredVisible = false
+        return restoredVisible
+    }
 }
 
 /** Non-null data is the single source of truth for visibility. */
 @Stable
-class DataDialogState<T : Any> internal constructor(initialData: T?) : DialogState {
+class DataDialogState<T : Any> internal constructor(
+    initialData: T?,
+    wasRestoredVisible: Boolean = false,
+) : DialogState {
     var data by mutableStateOf(initialData)
         private set
     private var dismissedData: T? = null
     private var dismissalAnimationEnabled = false
+    private var wasRestoredVisible = wasRestoredVisible
 
     override val visible: Boolean
         get() = data != null
@@ -66,6 +80,12 @@ class DataDialogState<T : Any> internal constructor(initialData: T?) : DialogSta
 
     internal fun setDismissalAnimationEnabled(enabled: Boolean) {
         dismissalAnimationEnabled = enabled
+    }
+
+    internal fun consumeRestoredVisible(): Boolean {
+        val restoredVisible = wasRestoredVisible
+        wasRestoredVisible = false
+        return restoredVisible
     }
 }
 
@@ -141,7 +161,7 @@ fun <T : Any, S : Any> rememberDialogState(
                 } else {
                     null
                 }
-                DataDialogState(data)
+                DataDialogState(data, wasRestoredVisible = data != null)
             },
         )
     }
@@ -150,5 +170,11 @@ fun <T : Any, S : Any> rememberDialogState(
 
 private val VisibilityDialogStateSaver: Saver<VisibilityDialogState, Boolean> = Saver(
     save = { it.visible },
-    restore = { VisibilityDialogState(it) },
+    restore = { VisibilityDialogState(it, wasRestoredVisible = it) },
 )
+
+internal fun DialogState.consumeRestoredVisible(): Boolean = when (this) {
+    is VisibilityDialogState -> consumeRestoredVisible()
+    is DataDialogState<*> -> consumeRestoredVisible()
+    else -> false
+}

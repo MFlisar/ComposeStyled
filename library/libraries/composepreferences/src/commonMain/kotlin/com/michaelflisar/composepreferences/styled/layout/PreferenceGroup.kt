@@ -1,6 +1,5 @@
 package com.michaelflisar.composepreferences.styled.layout
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -55,14 +54,6 @@ fun PreferenceGroup(
         parent.currentPath == parent.treePath
     }
     val groupIsCurrentPage = !parent.isFiltering && parent.currentPath == groupPath
-    val groupContentIsActive = parent.isFiltering ||
-            (parent.currentPath.size >= groupPath.size &&
-                    parent.currentPath.take(groupPath.size) == groupPath)
-    val groupSeparatorSpacing = when {
-        parent.isFiltering -> 0.dp
-        groupContentIsActive && visible -> parent.style.spacing.inGroupSeparator.spacingOrZero
-        else -> 0.dp
-    }
     val childRuntime = parent.copy(
         identityScope = parent.identityScope + identity,
         treePath = groupPath,
@@ -94,7 +85,6 @@ fun PreferenceGroup(
 
     Column(
         modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(groupSeparatorSpacing),
     ) {
         // Reserve the identity even when the row is hidden to keep navigation IDs stable.
         PreferenceEntry(
@@ -138,7 +128,7 @@ fun PreferenceGroup(
         val groupListSpacingArrangement = PreferenceListSpacingArrangement(
             tracker = parent.listSpacingTracker,
             scope = childRuntime.identityScope,
-            itemSpacing = parent.style.spacing.inGroupSeparator.spacingOrZero,
+            itemSpacing = parent.style.spacing.itemSpacing,
             sectionSpacing = parent.style.spacing.sectionSpacing,
         )
         val groupContent: @Composable () -> Unit = {

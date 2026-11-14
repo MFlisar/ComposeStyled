@@ -130,6 +130,7 @@ class Fluent2IconButton internal constructor(
             hovered = hovered,
             pressed = pressed,
             colors = customization?.colors,
+            disabledColors = customization?.disabledColors,
             border = customization?.border,
             inheritedContentColor = defaultContentColor,
         )
@@ -156,7 +157,7 @@ class Fluent2IconButton internal constructor(
                     .hoverable(interactionSource = source, enabled = enabled)
                     .clip(shape)
                     .background(background, shape)
-                    .border(1.dp, border, shape)
+                    .border(customization?.borderThickness ?: 1.dp, border, shape)
                     .clickable(
                         interactionSource = source,
                         indication = null,

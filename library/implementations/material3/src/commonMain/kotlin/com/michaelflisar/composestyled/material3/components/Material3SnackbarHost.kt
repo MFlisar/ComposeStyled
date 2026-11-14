@@ -14,10 +14,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.paneTitle
 import androidx.compose.ui.semantics.semantics
 import com.michaelflisar.composestyled.StyledTheme
+import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.ui.components.StyledSnackbarData
 import com.michaelflisar.composestyled.ui.components.StyledSnackbarDuration
 import com.michaelflisar.composestyled.ui.components.StyledSnackbarHost
 import com.michaelflisar.composestyled.ui.components.StyledSnackbarHostState
+import com.michaelflisar.composestyled.ui.internal.swipeToDismissSnackbar
 
 class Material3SnackbarHost internal constructor() : StyledSnackbarHost.Implementation {
 
@@ -31,6 +33,7 @@ class Material3SnackbarHost internal constructor() : StyledSnackbarHost.Implemen
         fun create() = remember { Material3SnackbarHost() }
     }
 
+    @OptIn(InternalComposeStyledApi::class)
     @Composable
     override fun Render(
         hostState: StyledSnackbarHostState,
@@ -59,6 +62,10 @@ class Material3SnackbarHost internal constructor() : StyledSnackbarHost.Implemen
             Box(
                 Modifier.padding(StyledTheme.padding.content).semantics {
                     paneTitle = snackbarPaneTitle
+                }.swipeToDismissSnackbar(
+                    enabled = visuals.data.swipeToDismissEnabled,
+                ) {
+                    visuals.data.dismiss()
                 }
             ) {
                 snackbar(visuals.data)

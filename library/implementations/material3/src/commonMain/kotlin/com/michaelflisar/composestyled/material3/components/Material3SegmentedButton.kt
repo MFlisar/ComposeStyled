@@ -48,14 +48,23 @@ class Material3SegmentedButton internal constructor() : StyledSegmentedButtonApi
         onClick: () -> Unit,
     ) {
         val colors = segmentedButtonColors(customization)
+        val borderThickness = customization?.borderThickness ?: SegmentedButtonDefaults.BorderWidth
+        val borderColor = when {
+            enabled && selected -> colors.activeBorderColor
+            enabled -> colors.inactiveBorderColor
+            selected -> colors.disabledActiveBorderColor
+            else -> colors.disabledInactiveBorderColor
+        }
+        val border = SegmentedButtonDefaults.borderStroke(borderColor, borderThickness)
         if (multiSelect) {
-            MultiChoiceSegmentedButtonRow(modifier = modifier) {
+            MultiChoiceSegmentedButtonRow(modifier = modifier, space = borderThickness) {
                 SegmentedButton(
                     checked = selected,
                     onCheckedChange = { onClick() },
                     enabled = enabled,
                     shape = itemShape,
                     colors = colors,
+                    border = border,
                     icon = {
                         if (showSelectedIcon) {
                             SegmentedButtonDefaults.Icon(active = selected)
@@ -67,13 +76,14 @@ class Material3SegmentedButton internal constructor() : StyledSegmentedButtonApi
                 }
             }
         } else {
-            SingleChoiceSegmentedButtonRow(modifier = modifier) {
+            SingleChoiceSegmentedButtonRow(modifier = modifier, space = borderThickness) {
                 SegmentedButton(
                     selected = selected,
                     onClick = onClick,
                     enabled = enabled,
                     shape = itemShape,
                     colors = colors,
+                    border = border,
                     icon = {
                         if (showSelectedIcon) {
                             SegmentedButtonDefaults.Icon(active = selected)
@@ -101,10 +111,19 @@ private fun renderContent(
     val unselectedColor = customization?.colors?.textForeground?.resolve()
         ?.takeUnless { it == Color.Unspecified }
         ?: StyledTheme.colorScheme.onSurface
-    val contentColor = (if (selected) selectedColor else unselectedColor).let { color ->
-        if (enabled) color else color.copy(
-            alpha = color.alpha * StyledTheme.colorScheme.disableFactors.content,
-        )
+    val disabledColor = if (selected) {
+        customization?.disabledColors?.filledForeground?.resolve()
+    } else {
+        customization?.disabledColors?.textForeground?.resolve()
+    }?.takeUnless { it == Color.Unspecified }
+    val contentColor = if (!enabled && disabledColor != null) {
+        disabledColor
+    } else {
+        (if (selected) selectedColor else unselectedColor).let { color ->
+            if (enabled) color else color.copy(
+                alpha = color.alpha * StyledTheme.colorScheme.disableFactors.content,
+            )
+        }
     }
     ProvideStyledLocals(
         contentColor = contentColor,
@@ -133,4 +152,13 @@ private fun segmentedButtonColors(
     inactiveBorderColor = customization?.border?.resolve()
         ?.takeUnless { it == Color.Unspecified }
         ?: StyledTheme.colorScheme.outline,
+    disabledActiveContainerColor = customization?.disabledColors?.filledBackground?.resolve()
+        ?.takeUnless { it == Color.Unspecified }
+        ?: Color.Unspecified,
+    disabledActiveContentColor = customization?.disabledColors?.filledForeground?.resolve()
+        ?.takeUnless { it == Color.Unspecified }
+        ?: Color.Unspecified,
+    disabledInactiveContentColor = customization?.disabledColors?.textForeground?.resolve()
+        ?.takeUnless { it == Color.Unspecified }
+        ?: Color.Unspecified,
 )

@@ -50,7 +50,9 @@ object StyledIconButton {
     @Immutable
     class Customization internal constructor(
         val colors: CustomColors?,
+        val disabledColors: CustomColors?,
         val border: ColorToken?,
+        val borderThickness: Dp?,
     )
 
     // -------------
@@ -95,17 +97,22 @@ object StyledIconButtonDefaults {
 
     fun customize(
         colors: CustomColors? = null,
-    ) = StyledIconButton.Customization(colors, null)
+        disabledColors: CustomColors? = null,
+    ) = StyledIconButton.Customization(colors, disabledColors, null, null)
 
     fun customize(
         colors: CustomColors? = null,
         border: Color,
-    ) = customize(colors, border.asColorToken())
+        borderThickness: Dp = 1.dp,
+        disabledColors: CustomColors? = null,
+    ) = customize(colors, border.asColorToken(), borderThickness, disabledColors)
 
     fun customize(
         colors: CustomColors? = null,
         border: ColorToken,
-    ) = StyledIconButton.Customization(colors, border)
+        borderThickness: Dp = 1.dp,
+        disabledColors: CustomColors? = null,
+    ) = StyledIconButton.Customization(colors, disabledColors, border, borderThickness)
 }
 
 // -------------------------

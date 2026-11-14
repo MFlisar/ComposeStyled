@@ -6,6 +6,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.classes.toIconComposable
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.ui.components.StyledChip
@@ -52,6 +53,7 @@ internal fun DemoChips(
                     container = StyledTheme.colorScheme.secondarySurface,
                     content = StyledTheme.colorScheme.onSurface,
                     border = StyledTheme.colorScheme.outline,
+                    borderThickness = 2.dp,
                     //selectedContainer = StyledTheme.colorScheme.primarySurface,
                     //selectedContent = StyledTheme.colorScheme.onPrimarySurface,
                     //selectedBorder = StyledTheme.colorScheme.primary,
@@ -108,6 +110,7 @@ internal fun DemoChips(
                     selectedContainer = StyledTheme.colorScheme.primarySurface,
                     selectedContent = StyledTheme.colorScheme.onPrimarySurface,
                     selectedBorder = StyledTheme.colorScheme.primary,
+                    borderThickness = 2.dp,
                 ),
             ) {
                 StyledText("Customized selectable")

@@ -9,6 +9,8 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.classes.ColorToken
 import com.michaelflisar.composestyled.classes.CustomColors
 import com.michaelflisar.composestyled.classes.IconComposable
@@ -65,7 +67,9 @@ object StyledButton {
     @Immutable
     class Customization internal constructor(
         val colors: CustomColors?,
+        val disabledColors: CustomColors?,
         val border: ColorToken?,
+        val borderThickness: Dp?,
     )
 
     // -------------
@@ -103,18 +107,23 @@ object StyledButtonDefaults {
         @Composable get() = LocalStyledRegistry.current[StyledButton.DefaultsKey].shape
 
     fun customize(
-        colors: CustomColors? = null
-    ) = Customization(colors, null)
+        colors: CustomColors? = null,
+        disabledColors: CustomColors? = null,
+    ) = Customization(colors, disabledColors, null, null)
 
     fun customize(
         colors: CustomColors? = null,
         border: Color,
-    ) = customize(colors, border.asColorToken())
+        borderThickness: Dp = 1.dp,
+        disabledColors: CustomColors? = null,
+    ) = customize(colors, border.asColorToken(), borderThickness, disabledColors)
 
     fun customize(
         colors: CustomColors? = null,
         border: ColorToken,
-    ) = Customization(colors, border)
+        borderThickness: Dp = 1.dp,
+        disabledColors: CustomColors? = null,
+    ) = Customization(colors, disabledColors, border, borderThickness)
 
 }
 

@@ -136,7 +136,7 @@ class CupertinoLiquidIconButton internal constructor(
                     .liquidGlass(shape, colors.background)
                     .then(
                         if (rendererVariant == Variant.Outlined) {
-                            Modifier.border(1.dp, colors.border, shape)
+                            Modifier.border(customization?.borderThickness ?: 1.dp, colors.border, shape)
                         } else {
                             Modifier
                         }
@@ -179,14 +179,35 @@ private fun cupertinoIconButtonColors(
 ): CupertinoLiquidIconButtonColors {
     val theme = StyledTheme.colorScheme
     if (!enabled) {
-        val disabled = theme.onSurface.copy(alpha = theme.onSurface.alpha * 0.30f)
+        val defaultDisabled = theme.onSurface.copy(alpha = theme.onSurface.alpha * 0.30f)
+        val disabledColors = customization?.disabledColors
+        val customFilledBackground = disabledColors?.filledBackground?.resolve()
+            ?.takeIf { it != Color.Unspecified }
+        val disabledForeground = when {
+            disabledColors == null -> defaultDisabled
+            variant == CupertinoLiquidIconButton.Variant.Filled -> disabledColors.filledForeground.resolve()
+                .takeIf { it != Color.Unspecified } ?: defaultDisabled
+            else -> disabledColors.textForeground.resolve()
+                .takeIf { it != Color.Unspecified } ?: defaultDisabled
+        }
         return CupertinoLiquidIconButtonColors(
             background = if (variant == CupertinoLiquidIconButton.Variant.Filled ||
                 variant == CupertinoLiquidIconButton.Variant.FilledTonal ||
                 variant == CupertinoLiquidIconButton.Variant.Gray
-            ) theme.onSurface.copy(alpha = theme.onSurface.alpha * 0.08f) else Color.Transparent,
-            foreground = disabled,
-            border = disabled,
+            ) {
+                when {
+                    customFilledBackground == null || variant == CupertinoLiquidIconButton.Variant.Gray ->
+                        theme.onSurface.copy(alpha = theme.onSurface.alpha * 0.08f)
+                    variant == CupertinoLiquidIconButton.Variant.Filled -> customFilledBackground
+                    else -> customFilledBackground.copy(
+                        alpha = customFilledBackground.alpha * if (theme.isDarkTheme) 0.24f else 0.12f,
+                    )
+                }
+            } else {
+                Color.Transparent
+            },
+            foreground = disabledForeground,
+            border = disabledForeground,
         )
     }
 

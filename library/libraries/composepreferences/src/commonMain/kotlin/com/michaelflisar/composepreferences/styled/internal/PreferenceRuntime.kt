@@ -27,9 +27,9 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import com.michaelflisar.composepreferences.styled.PreferenceFilter
-import com.michaelflisar.composepreferences.styled.PreferenceInGroupSeparatorStyle
+import com.michaelflisar.composepreferences.styled.PreferenceSectionContentSeparatorStyle
 import com.michaelflisar.composepreferences.styled.PreferenceStyle
-import com.michaelflisar.composepreferences.styled.layout.PreferenceInGroupDivider
+import com.michaelflisar.composepreferences.styled.layout.PreferenceSectionContentDivider
 import com.michaelflisar.composepreferences.styled.layout.PreferenceScreenState
 
 internal data class PreferenceAncestor(
@@ -53,7 +53,7 @@ internal class PreferenceIdentityAllocator {
         checkNotNull(entryOrders[identity]) { "Unknown preference identity: $identity" }
 }
 
-internal class PreferenceGroupSeparatorTracker {
+internal class PreferenceSectionSeparatorTracker {
     private data class Entry(
         val scope: List<String>,
         val order: Int,
@@ -157,7 +157,7 @@ internal class PreferenceSectionShapeTracker {
 
 internal enum class PreferenceListSpacingKind {
     Ordinary,
-    InGroup,
+    InSectionContent,
     DetachedSection,
 }
 
@@ -209,12 +209,12 @@ internal class PreferenceListSpacingTracker {
                         when {
                             entry.isDetachedSection ->
                                 PreferenceListSpacingKind.DetachedSection
-                            entry.isInsideSection -> PreferenceListSpacingKind.InGroup
+                            entry.isInsideSection -> PreferenceListSpacingKind.InSectionContent
                             else -> PreferenceListSpacingKind.Ordinary
                         },
                     )
                     if (entry.hasDividerAfter) {
-                        add(PreferenceListSpacingKind.InGroup)
+                        add(PreferenceListSpacingKind.InSectionContent)
                     }
                 }
             }
@@ -282,8 +282,8 @@ internal class PreferenceListSpacingArrangement(
         current: PreferenceListSpacingKind,
     ): Dp = when {
         current == PreferenceListSpacingKind.DetachedSection -> sectionSpacing
-        previous == PreferenceListSpacingKind.InGroup &&
-                current == PreferenceListSpacingKind.InGroup -> itemSpacing
+        previous == PreferenceListSpacingKind.InSectionContent &&
+                current == PreferenceListSpacingKind.InSectionContent -> itemSpacing
         else -> ordinaryItemSpacing
     }
 
@@ -323,7 +323,7 @@ internal data class PreferenceRuntime(
     val identityAllocator: PreferenceIdentityAllocator,
     val style: PreferenceStyle,
     val filterResultTracker: PreferenceFilterResultTracker,
-    val groupSeparatorTracker: PreferenceGroupSeparatorTracker,
+    val sectionSeparatorTracker: PreferenceSectionSeparatorTracker,
     val sectionShapeTracker: PreferenceSectionShapeTracker,
     val listSpacingTracker: PreferenceListSpacingTracker,
     val filterQuery: String,
@@ -384,7 +384,7 @@ internal fun PreferenceEntry(
     isEnabled: @Composable () -> Boolean,
     isVisible: @Composable () -> Boolean,
     renderInFilter: Boolean = true,
-    trackInGroupSeparator: Boolean = true,
+    trackSectionSeparator: Boolean = true,
     trackInListSpacing: Boolean = true,
     breaksSectionShape: Boolean = false,
     content: @Composable (PreferenceEntryVisuals) -> Unit,
@@ -458,18 +458,18 @@ internal fun PreferenceEntry(
             )
         }
     }
-    val tracksInGroupDivider = trackInGroupSeparator &&
+    val tracksSectionContentDivider = trackSectionSeparator &&
             !runtime.isFiltering &&
             runtime.insideSection &&
-            runtime.style.spacing.inGroupSeparator is PreferenceInGroupSeparatorStyle.Divider
-    if (tracksInGroupDivider) {
-        DisposableEffect(runtime.groupSeparatorTracker, identity) {
+            runtime.style.spacing.sectionContentSeparator is PreferenceSectionContentSeparatorStyle.Divider
+    if (tracksSectionContentDivider) {
+        DisposableEffect(runtime.sectionSeparatorTracker, identity) {
             onDispose {
-                runtime.groupSeparatorTracker.remove(identity)
+                runtime.sectionSeparatorTracker.remove(identity)
             }
         }
         SideEffect {
-            runtime.groupSeparatorTracker.update(
+            runtime.sectionSeparatorTracker.update(
                 identity = identity,
                 scope = runtime.identityScope,
                 order = runtime.identityAllocator.order(identity),
@@ -478,10 +478,10 @@ internal fun PreferenceEntry(
             )
         }
     }
-    val hasNextInGroupEntry = tracksInGroupDivider &&
+    val hasNextSectionContentEntry = tracksSectionContentDivider &&
             insideSection &&
             shouldRender &&
-            runtime.groupSeparatorTracker.hasNext(identity, runtime.identityScope)
+            runtime.sectionSeparatorTracker.hasNext(identity, runtime.identityScope)
     if (trackInListSpacing) {
         DisposableEffect(runtime.listSpacingTracker, identity) {
             onDispose {
@@ -495,7 +495,7 @@ internal fun PreferenceEntry(
                 order = runtime.identityAllocator.order(identity),
                 isVisible = shouldRender || runtime.isFiltering,
                 isInsideSection = insideSection,
-                hasDividerAfter = hasNextInGroupEntry,
+                hasDividerAfter = hasNextSectionContentEntry,
             )
         }
     }
@@ -556,8 +556,8 @@ internal fun PreferenceEntry(
     } else if (shouldRender) {
         val renderedContent: @Composable () -> Unit = {
             entryContent()
-            if (hasNextInGroupEntry) {
-                PreferenceInGroupDivider(runtime.style)
+            if (hasNextSectionContentEntry) {
+                PreferenceSectionContentDivider(runtime.style)
             }
         }
         if (tracksSectionShape) {

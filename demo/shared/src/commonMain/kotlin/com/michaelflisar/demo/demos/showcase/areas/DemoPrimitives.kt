@@ -16,12 +16,15 @@ import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.classes.toIconComposable
 import com.michaelflisar.composestyled.ui.components.StyledCheckbox
 import com.michaelflisar.composestyled.ui.components.StyledSlider
+import com.michaelflisar.composestyled.ui.icons.StyledIcons
 import com.michaelflisar.composestyled.ui.layout.StyledRow
 import com.michaelflisar.composestyled.ui.primitives.StyledExpandIcon
 import com.michaelflisar.composestyled.ui.primitives.StyledHorizontalSpacer
 import com.michaelflisar.composestyled.ui.primitives.StyledInputAction
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.ui.primitives.StyledVerticalSpacer
+import com.michaelflisar.composestyled.ui.specials.StyledBreadcrumb
+import com.michaelflisar.composestyled.ui.specials.StyledBreadcrumbItem
 import com.michaelflisar.composestyled.utils.ExpandState
 import com.michaelflisar.demo.helper.RegionContainer
 import com.michaelflisar.demo.helper.SubTitle
@@ -35,12 +38,51 @@ internal fun DemoPrimitives(
     val expanded = rememberSaveable { mutableStateOf(false) }
     val progress = rememberSaveable { mutableStateOf(0f) }
     val rtl = rememberSaveable { mutableStateOf(false) }
+    val breadcrumbItemCount = rememberSaveable { mutableStateOf(3) }
 
     RegionContainer(
         title = "Text, spacing and input actions",
         id = baseId + 1,
         expanded = expandState,
     ) {
+        SubTitle("Breadcrumb items")
+        StyledBreadcrumb(
+            items = buildList {
+                add(
+                    StyledBreadcrumbItem(
+                        label = "Home",
+                        onClick = { showMessage("Home clicked") },
+                        icon = StyledIcons.Home,
+                    ),
+                )
+                add(
+                    StyledBreadcrumbItem(
+                        onClick = { showMessage("Settings clicked") },
+                        icon = StyledIcons.Settings,
+                        iconContentDescription = "Settings",
+                    ),
+                )
+                repeat((breadcrumbItemCount.value - 2).coerceAtLeast(0)) { index ->
+                    add(
+                        StyledBreadcrumbItem(
+                            label = if (index == 0) "Profile" else "Page ${index + 1}",
+                        ),
+                    )
+                }
+            },
+        )
+        StyledRow(
+            itemSpacing = StyledTheme.spacing.medium,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            StyledText("Add a breadcrumb item")
+            StyledInputAction(
+                icon = Icons.Default.Add.toIconComposable(),
+                onClick = { breadcrumbItemCount.value++ },
+                contentDescription = "Add breadcrumb item",
+            )
+        }
+
         SubTitle("Styled text")
         StyledText("Text inherits the current theme style and content color.")
         StyledText(

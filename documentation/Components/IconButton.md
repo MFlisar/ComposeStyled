@@ -14,8 +14,13 @@ not accept a variant override.
 | Fluent 2 | Filled | Standard |
 
 It supports `shape`, `interactionSource` and
-`StyledIconButtonDefaults.customize(CustomColors, border)`. The `colors`
-argument is optional when only overriding the outline border. The content overload
+`StyledIconButtonDefaults.customize(colors, border, borderThickness,
+disabledColors)`. `disabledColors` applies a separate `CustomColors` mapping
+when `enabled` is false; those tokens are used directly, while omitting the
+argument preserves the active theme's disabled appearance. Filled styles use
+its filled background and foreground, while standard and outlined styles use
+its text foreground. The `colors` argument is optional when only overriding the
+outline border; a custom border defaults to `1.dp`. The content overload
 accepts an arbitrary composable slot; the `IconComposable` overload applies the
 configured icon size and optional padding:
 
@@ -40,6 +45,6 @@ including the `contentColor` provided by a `StyledSurface`. A configured
 `CustomColors.textForeground` takes precedence.
 
 Use `CustomColors` for filled background/foreground or standard foreground;
-`border` optionally overrides the outline. Fluent 2 buttons and icon buttons
-share an internal color resolver for default, hover, pressed and disabled
-states.
+`border` optionally overrides the outline, with `borderThickness` controlling
+its width. Fluent 2 buttons and icon buttons share an internal color resolver
+for default, hover, pressed and disabled states.

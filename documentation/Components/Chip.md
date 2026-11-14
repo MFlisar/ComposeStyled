@@ -13,7 +13,9 @@ values.
 
 `StyledChipDefaults.colors(...)` customizes the unselected `container`,
 `content` and `border`, with optional `selectedContainer`, `selectedContent` and
-`selectedBorder` overrides for selected chips. Omitted colors retain each
-renderer's defaults. To customize Material 3's variant mapping, register a
+`selectedBorder` overrides for selected chips. Set `borderThickness` to adjust
+both custom border colors; it defaults to `1.dp` when either border color is
+provided. Omitted colors retain each renderer's defaults. To customize Material
+3's variant mapping, register a
 configured `Material3Chip.create(...)` through
 `StyledTheme(customization = ...)`.

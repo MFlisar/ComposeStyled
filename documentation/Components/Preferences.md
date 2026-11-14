@@ -71,7 +71,9 @@ internally-managed section collapsed. The screen-wide default is configurable wi
 override it. The overload with caller-owned `MutableState<Boolean>` state is
 expandable by default; passing that state opts into controlled expansion.
 `isExpandable = false` keeps its rows visible instead. Internally managed state
-resets to `isInitiallyExpanded` when its group page is closed.
+resets to `isInitiallyExpanded` when its group page is closed. A titleless
+`PreferenceSection` groups rows with the active section style and no header; it
+is always expanded and cannot be collapsed.
 `PreferenceGroup` opens a separate list level with a slide transition. The root
 list preserves its scroll position, while each group page starts at the top when
 opened; leaving a group resets its scroll position and internally managed
@@ -91,22 +93,29 @@ Nested group pages show a title row with a back button by default. When a
 `rememberPreferenceStyle(openedGroupHeader = PreferenceOpenGroupHeaderStyle.Disabled)`.
 Disabling the header also removes its top spacing above the group content.
 
+```kotlin
+PreferenceSection {
+    PreferenceItem(title = "Grouped item")
+    PreferenceItem(title = "Another grouped item")
+}
+```
+
 By default, an expanded section is one clipped, rounded container containing
 its header and rows. `PreferenceSectionStyle.headerIsPartOfShape = false` makes
 the header and its rows use separate shapes instead. `PreferenceStyle.spacing`
 groups the spacing configuration. `itemSpacing` controls the vertical gaps
-between ordinary sibling entries. Independently, `sectionSpacing` is used
-before a section header when `headerIsPartOfShape` is false, replacing the
+between ordinary sibling entries, including rows in opened groups and rows
+whose shape is separate from their section. Independently, `sectionSpacing` is
+used before a section header when `headerIsPartOfShape` is false, replacing the
 list's regular gap at that boundary, and between the detached header and its
-content. When the header is part of the shape, `inGroupSeparator` controls the
-boundary between the header and its first row instead. It also controls
-separation between rows inside an optically grouped section or group. It
-defaults to a divider with no vertical padding; use
-`PreferenceInGroupSeparatorStyle.Spacing` for gaps instead. No divider is drawn
-after the last visible entry. Divider insets follow the preference item text
-column, including `reserveLeadingIconSpace`, with `verticalPadding`
-configurable. No divider is drawn between a detached section header and its
-rows.
+content. `sectionContentSeparator` controls separation between rows that share
+a section shape. When the header is part of that shape, it also controls the
+boundary between the header and its first row. It defaults to a divider with no
+vertical padding; use `PreferenceSectionContentSeparatorStyle.Spacing` for gaps
+instead. No divider is drawn after the last visible entry. Divider insets
+follow the preference item text column, including `reserveLeadingIconSpace`,
+with `verticalPadding` configurable. No divider is drawn between a detached
+section header and its rows.
 
 Non-expandable section headers default to a minimum height of `0.dp`;
 expandable headers default to `PreferenceStyleDefaults.minimumItemHeight()`.
@@ -116,7 +125,9 @@ Configure them independently with `minimumItemHeight` and
 ```kotlin
 val preferenceStyle = rememberPreferenceStyle(
     spacing = PreferenceStyleDefaults.spacing(
-        inGroupSeparator = PreferenceInGroupSeparatorStyle.Divider(verticalPadding = 4.dp),
+        sectionContentSeparator = PreferenceSectionContentSeparatorStyle.Divider(
+            verticalPadding = 4.dp,
+        ),
     ),
 )
 ```
@@ -127,10 +138,10 @@ Separators do not change a section's shape. When the header is part of the
 shape, its lower corners animate closed when collapsed and square when expanded.
 Passing a non-null `shape` to a preference row overrides that row's shape and
 breaks the section shape around it. The row and the gaps on both sides are
-treated like ordinary sibling items: `inGroupSeparator` dividers are omitted,
-and `itemSpacing` is used. If it is the first row, the same spacing replaces
-the section-header separator. The section shape resumes after the gaps around
-the row. This applies to `PreferenceItem`, `PreferenceBool`,
+treated like ordinary sibling items: `sectionContentSeparator` dividers are
+omitted, and `itemSpacing` is used. If it is the first row, the same spacing
+replaces the section-header separator. The section shape resumes after the gaps
+around the row. This applies to `PreferenceItem`, `PreferenceBool`,
 `PreferenceCustomItem`, `PreferenceGroup`, the input and number preferences,
 split preferences, and both `PreferenceList` variants. For lists, `shape`
 affects only the preference row; dropdown popup and option shapes keep their
@@ -261,8 +272,9 @@ theme-derived style based on the item config. Set it to
 `PreferenceOpenGroupHeaderStyle.Disabled` when a
 `PreferenceBreadcrumb` provides navigation, or use
 `PreferenceStyleDefaults.openedGroupHeader(...)` to customize the row.
-`spacing.inGroupSeparator` remains screen-wide because it separates grouped
-content inside sections and opened group pages.
+The gap below an opened group's back row and the gaps between its ordinary rows
+use `spacing.itemSpacing`. `spacing.sectionContentSeparator` remains
+screen-wide because it separates rows inside a section's shared shape.
 
 `rememberPreferenceStyle` remembers the complete immutable style, so nested
 style configs do not need their own `remember` calls.
@@ -306,9 +318,9 @@ PreferenceScreen(style = preferenceStyle) {
 ```
 
 The screen style also configures outer padding, reserved leading-icon space and
-`spacing` (`itemSpacing`, `sectionSpacing` and `inGroupSeparator`). Standard rows accept
-local shape, padding and color overrides; individual controls expose their
-relevant `Styled*` variants and customization options.
+`spacing` (`itemSpacing`, `sectionSpacing` and `sectionContentSeparator`).
+Standard rows accept local shape, padding and color overrides; individual
+controls expose their relevant `Styled*` variants and customization options.
 
 `reserveLeadingIconSpace` defaults to `true`, so standard rows without a leading
 icon keep the same alignment by rendering `StyledIcons.Empty`. Set

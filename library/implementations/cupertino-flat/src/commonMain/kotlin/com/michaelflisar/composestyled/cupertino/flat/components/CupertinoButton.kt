@@ -220,7 +220,7 @@ private fun CupertinoFlatButton(
                 .background(colors.background, shape)
                 .then(
                     if (variant == CupertinoFlatButton.Variant.Outlined && !isGroupBox) {
-                        Modifier.border(1.dp, colors.border, shape)
+                        Modifier.border(customization?.borderThickness ?: 1.dp, colors.border, shape)
                     } else {
                         Modifier
                     }
@@ -253,12 +253,28 @@ private fun cupertinoButtonColors(
     val gray = variant == CupertinoFlatButton.Variant.Gray
     val hasBackground = filled || tinted || gray
     if (!enabled) {
-        val foreground = theme.onSurface.copy(alpha = theme.onSurface.alpha * 0.30f)
+        val defaultForeground = theme.onSurface.copy(alpha = theme.onSurface.alpha * 0.30f)
+        val disabledColors = customization?.disabledColors
+        val customFilledBackground = disabledColors?.filledBackground?.resolve()
+            ?.takeIf { it != Color.Unspecified }
+        val foreground = when {
+            disabledColors == null -> defaultForeground
+            filled -> disabledColors.filledForeground.resolve()
+                .takeIf { it != Color.Unspecified } ?: defaultForeground
+            else -> disabledColors.textForeground.resolve()
+                .takeIf { it != Color.Unspecified } ?: defaultForeground
+        }
         return CupertinoFlatButtonColors(
-            background = if (hasBackground) {
-                theme.onSurface.copy(alpha = theme.onSurface.alpha * 0.08f)
-            } else {
-                Color.Transparent
+            background = when {
+                !hasBackground -> Color.Transparent
+                customFilledBackground == null -> theme.onSurface.copy(
+                    alpha = theme.onSurface.alpha * 0.08f,
+                )
+                filled -> customFilledBackground
+                tinted -> customFilledBackground.copy(
+                    alpha = customFilledBackground.alpha * if (theme.isDarkTheme) 0.24f else 0.12f,
+                )
+                else -> theme.onSurface.copy(alpha = theme.onSurface.alpha * 0.08f)
             },
             foreground = foreground,
             border = foreground,

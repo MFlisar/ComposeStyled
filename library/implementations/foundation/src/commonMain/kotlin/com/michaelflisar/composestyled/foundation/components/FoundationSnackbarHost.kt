@@ -26,6 +26,7 @@ import com.michaelflisar.composestyled.ui.components.StyledSnackbarData
 import com.michaelflisar.composestyled.ui.components.StyledSnackbarDuration
 import com.michaelflisar.composestyled.ui.components.StyledSnackbarHost
 import com.michaelflisar.composestyled.ui.components.StyledSnackbarHostState
+import com.michaelflisar.composestyled.ui.internal.swipeToDismissSnackbar
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -80,6 +81,10 @@ class FoundationSnackbarHost : StyledSnackbarHost.Implementation {
                             visibleData.dismiss()
                             true
                         }
+                    }.swipeToDismissSnackbar(
+                        enabled = visibleData.swipeToDismissEnabled,
+                    ) {
+                        visibleData.dismiss()
                     }
                 ) {
                     snackbar(visibleData)

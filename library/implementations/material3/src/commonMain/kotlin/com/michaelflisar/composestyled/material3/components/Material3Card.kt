@@ -85,7 +85,7 @@ class Material3Card internal constructor(
         }
         val customBorder = customization?.border?.resolve()
             ?.takeIf { it != Color.Unspecified }
-            ?.let { BorderStroke(1.dp, it) }
+            ?.let { BorderStroke(customization?.borderThickness ?: 1.dp, it) }
         val colors = when (mapped) {
             Variant.Filled -> CardDefaults.cardColors(
                 containerColor = filledBackground,

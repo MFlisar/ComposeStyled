@@ -10,17 +10,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.platform.SystemBarStyleEffectIfNeeded
-import com.michaelflisar.composestyled.ui.components.StyledButtonDefaults
-import com.michaelflisar.composestyled.ui.components.StyledIcon
 import com.michaelflisar.composestyled.ui.components.StyledListItem
-import com.michaelflisar.composestyled.ui.icons.StyledIcons
 import com.michaelflisar.composestyled.ui.layout.StyledColumn
 import com.michaelflisar.composestyled.ui.layout.StyledScaffold
 import com.michaelflisar.composestyled.ui.primitives.StyledText
-import com.michaelflisar.demo.demos.recipes.examples.DemoPageTemplate
+import com.michaelflisar.demo.demos.recipes.examples.DemoRecipeAppTemplate
 import com.michaelflisar.demo.demos.recipes.examples.DemoRecipeSelection
 import com.michaelflisar.demo.helper.DemoTopBar
-import com.michaelflisar.demo.recipes.ScaffoldStarterTemplate
+import com.michaelflisar.demo.recipes.DemoRecipeSimpleStarterTemplate
 
 private data class Recipe(
     val name: String,
@@ -37,14 +34,14 @@ private object DemoPageRecipes {
             content = ::DemoRecipeSelection
         ),
         Recipe(
-            name = "Template App",
+            name = "App Template",
             description = "A full example app template",
-            content = ::DemoPageTemplate
+            content = ::DemoRecipeAppTemplate
         ),
         Recipe(
-            name = "Template Scaffold",
-            description = "A themed scaffold with examples for each slot.",
-            content = ::ScaffoldStarterTemplate
+            name = "Simple Template",
+            description = "A simple scaffold example.",
+            content = ::DemoRecipeSimpleStarterTemplate
         )
     )
 }

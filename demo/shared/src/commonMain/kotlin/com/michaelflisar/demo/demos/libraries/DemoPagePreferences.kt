@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.michaelflisar.composepreferences.styled.navigation.PreferenceBreadcrumb
 import com.michaelflisar.composepreferences.styled.PreferenceFilter
 import com.michaelflisar.composepreferences.styled.PreferenceOpenGroupHeaderStyle
-import com.michaelflisar.composepreferences.styled.PreferenceInGroupSeparatorStyle
+import com.michaelflisar.composepreferences.styled.PreferenceSectionContentSeparatorStyle
 import com.michaelflisar.composepreferences.styled.PreferenceStyleDefaults
 import com.michaelflisar.composepreferences.styled.layout.PreferenceScreen
 import com.michaelflisar.composepreferences.styled.PreferenceBool
@@ -93,6 +93,11 @@ internal fun DemoPagePreferences(onBack: () -> Unit) {
     val preferenceState = rememberPreferenceScreenState()
     val preferenceStyle = rememberPreferenceStyle(
         openedGroupHeader = PreferenceOpenGroupHeaderStyle.Disabled,
+        spacing = PreferenceStyleDefaults.spacing(
+            sectionContentSeparator = PreferenceSectionContentSeparatorStyle.Divider(
+                verticalPadding = 4.dp,
+            ),
+        ),
     )
 
     val scaffoldColor = StyledTheme.colorScheme.surface
@@ -398,6 +403,26 @@ internal fun DemoPagePreferences(onBack: () -> Unit) {
                             StyledText("It has no built-in title or subtitle.")
                         }
                     }
+                }
+
+                PreferenceGroup(
+                    title = "Test with simple items in group"
+                ) {
+                    PreferenceItem(title = "Item 1")
+                    PreferenceItem(title = "Item 2")
+                    PreferenceGroup(
+                        title = "Item 3 - with sub items"
+                    ) {
+                        PreferenceItem(title = "Item 1")
+                        PreferenceItem(title = "Item 2")
+                        PreferenceItem(title = "Item 3")
+                    }
+                    PreferenceItem(title = "Item 4")
+                }
+
+                PreferenceSection {
+                    PreferenceItem(title = "Grouped without a section title")
+                    PreferenceItem(title = "Another grouped item")
                 }
 
                 PreferenceSection(

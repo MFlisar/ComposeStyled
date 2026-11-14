@@ -2,6 +2,10 @@
 
 No need to check github status at any time. You can always work with local files!
 
+## Binary compatibility
+
+Currently this library was not released yet! So keep code clean instead of binary compatible!
+
 ## Build and verification
 
 Use the Gradle wrapper from the repository root:

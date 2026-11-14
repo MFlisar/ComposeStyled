@@ -72,6 +72,7 @@ import com.michaelflisar.composestyled.ui.internal.DialogActions
 import com.michaelflisar.composestyled.ui.internal.DialogButton
 import com.michaelflisar.composestyled.ui.internal.DIALOG_VISIBILITY_ANIMATION_DURATION_MILLIS
 import com.michaelflisar.composestyled.ui.internal.DialogScrimEffect
+import com.michaelflisar.composestyled.ui.internal.LocalStyledDialogEnterAnimationEnabled
 import com.michaelflisar.composestyled.ui.internal.edgeToEdgeDialogProperties
 import com.michaelflisar.composestyled.ui.internal.dialogInput
 
@@ -106,6 +107,7 @@ abstract class FoundationDialog : StyledDialog.Implementation {
         @Composable get() = containerColor
 
     @Composable
+    @OptIn(InternalComposeStyledApi::class)
     final override fun Render(
         style: StyledDialog.Style,
         onDismissRequest: () -> Unit,
@@ -264,7 +266,11 @@ abstract class FoundationDialog : StyledDialog.Implementation {
                                 visibleState = fullscreenVisibility,
                                 modifier = bounds.then(modifier)
                                     .dialogInput(properties.dismissOnBackPress, onDismissRequest),
-                                enter = fullscreenEnterTransition(style.animation),
+                                enter = if (LocalStyledDialogEnterAnimationEnabled.current) {
+                                    fullscreenEnterTransition(style.animation)
+                                } else {
+                                    EnterTransition.None
+                                },
                                 exit = fullscreenExitTransition(style.animation),
                             ) {
                                 val entering = !fullscreenVisibility.isIdle &&
@@ -418,7 +424,14 @@ abstract class FoundationDialog : StyledDialog.Implementation {
                     Modifier.weight(1f, fill = false).fillMaxWidth()
                         .padding(bottom = if (buttons.isEmpty) 0.dp else alertActionSpacing),
                 ) {
-                    content(PaddingValues(alertPadding))
+                    content(
+                        PaddingValues(
+                            start = alertPadding,
+                            top = if (title == null) alertPadding else 0.dp,
+                            end = alertPadding,
+                            bottom = if (buttons.isEmpty) alertPadding else 0.dp,
+                        ),
+                    )
                 }
                 DialogActions(
                     buttons, StyledDialog.Context.DialogAction,

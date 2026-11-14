@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.classes.ColorToken
 import com.michaelflisar.composestyled.classes.CustomColors
 import com.michaelflisar.composestyled.classes.asColorToken
@@ -52,6 +53,7 @@ object StyledCard {
     class Customization internal constructor(
         val colors: CustomColors?,
         val border: ColorToken?,
+        val borderThickness: Dp?,
         val elevation: Dp?,
     )
 
@@ -94,19 +96,21 @@ object StyledCardDefaults {
     fun customize(
         colors: CustomColors? = null,
         elevation: Dp? = null,
-    ) = StyledCard.Customization(colors, null, elevation)
+    ) = StyledCard.Customization(colors, null, null, elevation)
 
     fun customize(
         colors: CustomColors? = null,
         border: Color,
         elevation: Dp? = null,
-    ) = customize(colors, border.asColorToken(), elevation)
+        borderThickness: Dp = 1.dp,
+    ) = customize(colors, border.asColorToken(), elevation, borderThickness)
 
     fun customize(
         colors: CustomColors? = null,
         border: ColorToken,
         elevation: Dp? = null,
-    ) = StyledCard.Customization(colors, border, elevation)
+        borderThickness: Dp = 1.dp,
+    ) = StyledCard.Customization(colors, border, borderThickness, elevation)
 }
 
 // -------------------------

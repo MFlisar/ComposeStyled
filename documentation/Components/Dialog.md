@@ -87,7 +87,10 @@ The body slot receives style-specific `PaddingValues`. Apply them exactly once
 inside the body; renderers do not also apply those body insets. For a scrolling
 `Column`, put `.padding(contentPadding)` after `verticalScroll` so the padding
 scrolls with the content. For a `LazyColumn`, pass the values to its
-`contentPadding`. Title, toolbar and action-footer spacing remain renderer-owned.
+`contentPadding`. In content-height alerts, the body does not add top padding
+when a title is present or bottom padding when actions are present; the
+renderer-owned spacing between those slots already provides those insets.
+Title, toolbar and action-footer spacing remain renderer-owned.
 
 Fullscreen dialogs use a fade transition by default. Choose `Fade` or
 `Slide(direction = ...)` with `StyledDialog.Style.Fullscreen(animation = ...)`.
@@ -374,7 +377,8 @@ the available height up to that limit. The renderer passes body-only
 `PaddingValues`; the caller applies them once. Fixed sheet footers include
 their measured height in the body's bottom padding, so scrollable content
 clears the footer without an extra gap above it. Without a footer, the body
-receives its ordinary bottom inset.
+receives the bottom safe-area inset as padding so its final content remains
+above system navigation while the sheet surface fills that area.
 
 Short content in a height-filling workspace can therefore leave substantial
 free space above the footer. This is intentional workspace space, not an
@@ -388,7 +392,10 @@ State factories remain in `com.michaelflisar.composestyled.ui.state`.
 `rememberDialogState()` creates a `VisibilityDialogState` with `visible`,
 `show()` and `dismiss()`. Pass `initialVisible = true` to start visible. Its
 visibility is saved across supported host recreation, so a visible dialog or
-sheet remains visible after a configuration change.
+sheet remains visible after a configuration change without replaying its Styled
+entry animation. After that restored presentation is dismissed, later openings
+animate normally. An initially visible state created with `initialVisible = true`
+still uses the regular entry animation.
 
 For visibility owned by another state object, use the adapter overload with
 `visible` and `onDismiss`. It keeps a stable `DialogState` while forwarding
@@ -434,8 +441,9 @@ val state = rememberDialogState(
 )
 ```
 
-The saver stores the currently shown data; dismissal-animation bookkeeping and
-callbacks are recreated rather than persisted.
+The saver stores the currently shown data; a restored visible dialog also skips
+its first Styled entry animation. Dismissal-animation bookkeeping and callbacks
+are recreated rather than persisted.
 
 The Foundation bottom sheet also restores its last settled peek/expanded choice.
 Floating-window size, position, minimized/maximized mode and bubble position
@@ -565,7 +573,10 @@ StyledDialog(
 ```
 
 Height fractions refer to the viewport after remaining top/side safe-area and
-keyboard insets. Bottom safe-area insets are reserved inside the sheet.
+keyboard insets. Bottom safe-area insets are passed as body padding when there
+is no action footer, so scrollable content clears the system navigation area
+while the sheet background can draw behind it. With an action footer, the
+renderer reserves that area for the footer.
 Embedded sheets recalculate insets from their actual window bounds: a sheet at the
 window's bottom edge reserves navigation space, while one above that area does not.
 `peekHeightFraction` must be in `(0, 1]` and is clamped to the maximum sheet
@@ -589,7 +600,9 @@ are enabled and these positions differ; only its centered tap target is clickabl
 with no visual press indication. It does not dismiss the sheet.
 `expandToFullScreen` makes the expanded position fill the sheet viewport (the
 dialog window for modal sheets). The expanded height takes precedence over
-`maxHeightFraction`. The sheet animates its handle/title into a safe-area-aware
+`maxHeightFraction`. At peek, the sheet uses the measured content height when
+that is smaller than the configured peek height; fixed-footer requirements may
+still set a larger minimum. The sheet animates its handle/title into a safe-area-aware
 top bar; themes that place fullscreen actions in the toolbar move
 positive/negative actions there while neutral actions remain in the footer.
 The toolbar background matches the sheet content, and its content color is

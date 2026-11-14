@@ -48,6 +48,16 @@ internal expect fun platformDynamicThemeColors(): StyledThemeColors?
 // only on android 34+
 expect val StyledTheme.isSystemContrastSupported: Boolean
 
+/** Theme palette and color-resolution options used by [StyledTheme]. */
+@Immutable
+data class StyledThemeConfig(
+    val colors: StyledThemeColors,
+    val variant: StyledThemeVariant = StyledThemeVariant.Colorful,
+    val appearance: StyledThemeAppearance = StyledThemeAppearance.System,
+    val contrast: StyledThemeContrast = StyledThemeContrast.System,
+    val dynamicColors: Boolean = false,
+)
+
 /** Read-only accessors for the theme and tokens provided by [StyledTheme]. */
 object StyledTheme {
 
@@ -173,18 +183,14 @@ object StyledTheme {
  * Use this as the root of a Styled UI subtree. [customization] is applied after the provider's
  * default registrations, so it can replace renderers and update their defaults.
  *
- * When [themeDynamic] is enabled and dynamic colors are supported, Android system colors provide
- * the base palette instead of [themeColors].
+ * When [config.dynamicColors] is enabled and dynamic colors are supported, Android system
+ * colors provide the base palette instead of [config.colors].
  */
 @Composable
 fun StyledTheme(
     platform: Platform,
-    themeProvider: StyledThemeProvider,
-    themeColors: StyledThemeColors = themeProvider.defaultThemeColors,
-    themeVariant: StyledThemeVariant = StyledThemeVariant.Colorful,
-    themeAppearance: StyledThemeAppearance = StyledThemeAppearance.System,
-    themeContrast: StyledThemeContrast = StyledThemeContrast.System,
-    themeDynamic: Boolean = false,
+    provider: StyledThemeProvider,
+    config: StyledThemeConfig = StyledThemeConfig(colors = provider.defaultThemeColors),
     typography: StyledTypography = PlatformDefaults.typography(platform),
     shapes: StyledShapes = PlatformDefaults.shapes(platform),
     paddings: StyledPadding = PlatformDefaults.paddings(platform),
@@ -196,23 +202,24 @@ fun StyledTheme(
     customization: (@Composable StyledRegistry.Builder.() -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
-    val isDark = when (themeAppearance) {
+    val isDark = when (config.appearance) {
         StyledThemeAppearance.System -> isSystemInDarkTheme()
         StyledThemeAppearance.Light -> false
         StyledThemeAppearance.Dark -> true
     }
-    val contrast = when (themeContrast) {
+    val contrast = when (config.contrast) {
         StyledThemeContrast.System -> PlatformDefaults.systemContrastLevel()
         StyledThemeContrast.Normal -> StyledContrastLevel.Normal
         StyledThemeContrast.Medium -> StyledContrastLevel.Medium
         StyledThemeContrast.High -> StyledContrastLevel.High
     }
-    val resolvedThemeColors = if (themeDynamic && StyledTheme.isDynamicColorsSupported) {
-        platformDynamicThemeColors() ?: themeColors
-    } else {
-        themeColors
-    }
-    val colors = resolvedThemeColors.resolve(themeVariant, isDark, contrast)
+    val resolvedThemeColors =
+        if (config.dynamicColors && StyledTheme.isDynamicColorsSupported) {
+            platformDynamicThemeColors() ?: config.colors
+        } else {
+            config.colors
+        }
+    val colors = resolvedThemeColors.resolve(config.variant, isDark, contrast)
 
     CompositionLocalProvider(
         LocalPlatform provides platform,
@@ -228,10 +235,10 @@ fun StyledTheme(
         LocalStyledBehavior provides behavior
     ) {
         ProvideFloatingHostIfMissing {
-            themeProvider.Root {
-                val definition = themeProvider.definition()
+            provider.Root {
+                val definition = provider.definition()
                 val defaultRegistry = StyledRegistry.createComposable(definition.registry) {
-                    register(themeProvider.defaultIconSet)
+                    register(provider.defaultIconSet)
                 }
                 val registry = customization?.let {
                     StyledRegistry.createComposable(defaultRegistry, it)

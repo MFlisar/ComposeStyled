@@ -9,6 +9,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.classes.toIconComposable
 import com.michaelflisar.composestyled.classes.CustomColors
@@ -97,7 +98,11 @@ internal fun DemoInputs(baseId: Int, expandState: ExpandState) {
             onValueChange = { custom.value = it },
             modifier = modifier,
             shape = StyledTheme.shapes.large,
-            customization = StyledInputDefaults.customize(CustomColors.PrimarySurface),
+            customization = StyledInputDefaults.customize(
+                colors = CustomColors.PrimarySurface,
+                border = StyledTheme.colorScheme.primary,
+                borderThickness = 2.dp,
+            ),
             label = { StyledText("Custom shape and colors") },
             trailingIcon = { StyledIcon(icon = Icons.Default.Check.toIconComposable(), contentDescription = null) },
         )

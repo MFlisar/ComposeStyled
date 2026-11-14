@@ -5,6 +5,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.classes.CustomColors
 import com.michaelflisar.composestyled.classes.toIconComposable
@@ -83,6 +84,7 @@ internal fun DemoButtons(
             val customization = StyledIconButtonDefaults.customize(
                 colors = CustomColors(Color.Magenta, Color.White, Color.Magenta),
                 border = Color.Magenta,
+                borderThickness = 2.dp,
             )
             StyledButton.Variant.entries.forEach { variant ->
                 IconButtonForVariant(
@@ -129,7 +131,8 @@ internal fun DemoButtons(
                         filledForeground = onColor,
                         textForeground = color,
                     ),
-                    border = color
+                    border = color,
+                    borderThickness = 2.dp,
                 )
                 ButtonForVariant(
                     variant = variant,

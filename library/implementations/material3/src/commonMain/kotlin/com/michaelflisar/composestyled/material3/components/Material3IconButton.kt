@@ -100,6 +100,12 @@ class Material3IconButton internal constructor(
             ?.takeIf { it != Color.Unspecified }
         val textForeground = customization?.colors?.textForeground?.resolve()
             ?.takeIf { it != Color.Unspecified }
+        val disabledFilledBackground = customization?.disabledColors?.filledBackground?.resolve()
+            ?.takeIf { it != Color.Unspecified }
+        val disabledFilledForeground = customization?.disabledColors?.filledForeground?.resolve()
+            ?.takeIf { it != Color.Unspecified }
+        val disabledTextForeground = customization?.disabledColors?.textForeground?.resolve()
+            ?.takeIf { it != Color.Unspecified }
         val context = LocalStyledContext.current
         val inheritsStyledContentColor = variant == StyledButton.Variant.Plain ||
             (variant == StyledButton.Variant.Auto &&
@@ -113,10 +119,13 @@ class Material3IconButton internal constructor(
             null
         }
         @Composable
-        fun styledSlotColor(color: Color) =
-            if (enabled) color else color.copy(
+        fun styledSlotColor(color: Color, disabledColor: Color? = null) = when {
+            enabled -> color
+            disabledColor != null -> disabledColor
+            else -> color.copy(
                 alpha = color.alpha * StyledTheme.colorScheme.disableFactors.content,
             )
+        }
         when (variantMapping(variant, LocalStyledContext.current)) {
             Variant.Standard -> IconButton(
                 onClick = onClick,
@@ -127,14 +136,16 @@ class Material3IconButton internal constructor(
                 colors = IconButtonDefaults.iconButtonColors(
                     contentColor = textForeground ?: if (inheritsStyledContentColor) {
                         LocalStyledContentColor.current
-                    } else StyledTheme.colorScheme.onSurfaceVariant
+                    } else StyledTheme.colorScheme.onSurfaceVariant,
+                    disabledContentColor = disabledTextForeground ?: Color.Unspecified,
                 ),
             ) {
                 ProvideStyledLocals(
                     contentColor = styledSlotColor(
                         textForeground ?: if (inheritsStyledContentColor) {
                             LocalStyledContentColor.current
-                        } else StyledTheme.colorScheme.onSurfaceVariant
+                        } else StyledTheme.colorScheme.onSurfaceVariant,
+                        disabledTextForeground,
                     ),
                     content = content,
                 )
@@ -147,14 +158,18 @@ class Material3IconButton internal constructor(
                 shape = shape,
                 interactionSource = interactionSource,
                 colors = IconButtonDefaults.outlinedIconButtonColors(
-                    contentColor = textForeground ?: StyledTheme.colorScheme.onSurfaceVariant
+                    contentColor = textForeground ?: StyledTheme.colorScheme.onSurfaceVariant,
+                    disabledContentColor = disabledTextForeground ?: Color.Unspecified,
                 ),
-                border = borderTint?.let { BorderStroke(1.dp, it) }
+                border = borderTint?.let {
+                    BorderStroke(customization?.borderThickness ?: 1.dp, it)
+                }
                     ?: IconButtonDefaults.outlinedIconButtonBorder(enabled),
             ) {
                 ProvideStyledLocals(
                     contentColor = styledSlotColor(
-                        textForeground ?: StyledTheme.colorScheme.onSurfaceVariant
+                        textForeground ?: StyledTheme.colorScheme.onSurfaceVariant,
+                        disabledTextForeground,
                     ),
                     content = content,
                 )
@@ -169,11 +184,14 @@ class Material3IconButton internal constructor(
                 colors = IconButtonDefaults.filledIconButtonColors(
                     contentColor = filledForeground ?: StyledTheme.colorScheme.onPrimary,
                     containerColor = filledBackground ?: Color.Unspecified,
+                    disabledContentColor = disabledFilledForeground ?: Color.Unspecified,
+                    disabledContainerColor = disabledFilledBackground ?: Color.Unspecified,
                 ),
             ) {
                 ProvideStyledLocals(
                     contentColor = styledSlotColor(
-                        filledForeground ?: StyledTheme.colorScheme.onPrimary
+                        filledForeground ?: StyledTheme.colorScheme.onPrimary,
+                        disabledFilledForeground,
                     ),
                     content = content,
                 )
@@ -188,11 +206,14 @@ class Material3IconButton internal constructor(
                 colors = IconButtonDefaults.filledTonalIconButtonColors(
                     contentColor = filledForeground ?: StyledTheme.colorScheme.onSecondarySurface,
                     containerColor = filledBackground ?: Color.Unspecified,
+                    disabledContentColor = disabledFilledForeground ?: Color.Unspecified,
+                    disabledContainerColor = disabledFilledBackground ?: Color.Unspecified,
                 ),
             ) {
                 ProvideStyledLocals(
                     contentColor = styledSlotColor(
-                        filledForeground ?: StyledTheme.colorScheme.onSecondarySurface
+                        filledForeground ?: StyledTheme.colorScheme.onSecondarySurface,
+                        disabledFilledForeground,
                     ),
                     content = content,
                 )

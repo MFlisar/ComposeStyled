@@ -26,6 +26,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.classes.ColorToken
 import com.michaelflisar.composestyled.classes.CustomColors
@@ -87,6 +88,7 @@ object StyledInput {
     class Customization internal constructor(
         val colors: CustomColors?,
         val border: ColorToken?,
+        val borderThickness: Dp?,
     )
 
     // -------------
@@ -161,13 +163,13 @@ object StyledInputDefaults {
     val showConditionalClearIconForNumericOptionalInputs: Boolean
         @Composable get() = LocalStyledRegistry.current[StyledInput.DefaultsKey].showConditionalClearIconForNumericOptionalInputs
 
-    fun customize(colors: CustomColors? = null) = StyledInput.Customization(colors, null)
+    fun customize(colors: CustomColors? = null) = StyledInput.Customization(colors, null, null)
 
-    fun customize(colors: CustomColors? = null, border: Color) =
-        customize(colors, border.asColorToken())
+    fun customize(colors: CustomColors? = null, border: Color, borderThickness: Dp = 1.dp) =
+        customize(colors, border.asColorToken(), borderThickness)
 
-    fun customize(colors: CustomColors? = null, border: ColorToken) =
-        StyledInput.Customization(colors, border)
+    fun customize(colors: CustomColors? = null, border: ColorToken, borderThickness: Dp = 1.dp) =
+        StyledInput.Customization(colors, border, borderThickness)
 
     @Composable
     internal fun trailingIcon(

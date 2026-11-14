@@ -29,6 +29,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.StyledTheme
+import com.michaelflisar.composestyled.StyledThemeConfig
 import com.michaelflisar.composestyled.adaptive.StyledAdaptive
 import com.michaelflisar.composestyled.adaptive.StyledAdaptiveInfo
 import com.michaelflisar.composestyled.adaptive.StyledAdaptiveContainer
@@ -77,7 +78,7 @@ import com.michaelflisar.demo.helper.DemoTopBar
 import com.michaelflisar.demo.helper.SubTitle
 
 @Composable
-internal fun DemoPageTemplate(
+internal fun DemoRecipeAppTemplate(
     onBack: () -> Unit,
 ) {
     // main setup - detect platform and select platform specific theme and color scheme
@@ -124,11 +125,13 @@ internal fun DemoPageTemplate(
 
     StyledTheme(
         platform = hostPlatform,
-        themeProvider = themeProvider,
-        themeColors = themeColors.value,
-        themeVariant = themeVariant.value,
-        themeAppearance = themeAppearance.value,
-        themeContrast = themeContrast.value,
+        provider = themeProvider,
+        config = StyledThemeConfig(
+            colors = themeColors.value,
+            variant = themeVariant.value,
+            appearance = themeAppearance.value,
+            contrast = themeContrast.value,
+        ),
         behavior = StyledTheme.Behavior(
             showScrollbars = PlatformDefaults.showScrollbars(hostPlatform),
         )

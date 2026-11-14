@@ -1,6 +1,7 @@
 package com.michaelflisar.composestyled.ui.components
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -15,6 +16,7 @@ import com.michaelflisar.composestyled.registry.StyledComponent
 import com.michaelflisar.composestyled.registry.StyledKey
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.ui.icons.StyledIcons
+import com.michaelflisar.composestyled.ui.internal.LocalStyledSnackbarHostSwipeToDismissEnabled
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
@@ -59,6 +61,8 @@ interface StyledSnackbarData {
     val message: String
     val actionLabel: String?
     val withDismissAction: Boolean
+    val swipeToDismissEnabled: Boolean
+        get() = true
     val duration: StyledSnackbarDuration
 
     /** Completes the pending message with [StyledSnackbarResult.ActionPerformed]. */
@@ -82,6 +86,7 @@ class StyledSnackbarHostState {
     /**
      * Queues [message] until dismissed or acted on, then returns the corresponding result.
      * Calls are serialized; cancellation removes the waiting or visible message.
+     * Set [swipeToDismissEnabled] to false to prevent this message from being swiped away.
      */
     suspend fun showSnackbar(
         message: String,
@@ -92,11 +97,17 @@ class StyledSnackbarHostState {
         } else {
             StyledSnackbarDuration.Indefinite
         },
+        swipeToDismissEnabled: Boolean = true,
     ): StyledSnackbarResult = mutex.withLock {
         try {
             suspendCancellableCoroutine { continuation ->
                 currentSnackbarData = SnackbarData(
-                    message, actionLabel, withDismissAction, duration, continuation,
+                    message,
+                    actionLabel,
+                    withDismissAction,
+                    swipeToDismissEnabled,
+                    duration,
+                    continuation,
                 )
             }
         } finally {
@@ -108,6 +119,7 @@ class StyledSnackbarHostState {
         override val message: String,
         override val actionLabel: String?,
         override val withDismissAction: Boolean,
+        override val swipeToDismissEnabled: Boolean,
         override val duration: StyledSnackbarDuration,
         private val continuation: CancellableContinuation<StyledSnackbarResult>,
     ) : StyledSnackbarData {
@@ -128,6 +140,7 @@ class StyledSnackbarHostState {
 /**
  * Place in StyledScaffold.snackbarHost. The outgoing message remains composed during fade-out.
  * Supply localized accessibility labels, or replace snackbar for custom action rendering.
+ * Swipe dismissal defaults to enabled; a message may opt out, but cannot override a disabled host.
  */
 @Composable
 fun StyledSnackbarHost(
@@ -135,6 +148,7 @@ fun StyledSnackbarHost(
     modifier: Modifier = Modifier,
     dismissActionContentDescription: String = "Dismiss",
     snackbarPaneTitle: String = "Snackbar",
+    swipeToDismissEnabled: Boolean = true,
     snackbar: @Composable (StyledSnackbarData) -> Unit = { data ->
         StyledSnackbar(
             data = data,
@@ -142,12 +156,16 @@ fun StyledSnackbarHost(
         )
     },
 ) {
-    LocalStyledRegistry.current[StyledSnackbarHost.Key].Render(
-        hostState = hostState,
-        modifier = modifier,
-        snackbarPaneTitle = snackbarPaneTitle,
-        snackbar = snackbar,
-    )
+    CompositionLocalProvider(
+        LocalStyledSnackbarHostSwipeToDismissEnabled provides swipeToDismissEnabled,
+    ) {
+        LocalStyledRegistry.current[StyledSnackbarHost.Key].Render(
+            hostState = hostState,
+            modifier = modifier,
+            snackbarPaneTitle = snackbarPaneTitle,
+            snackbar = snackbar,
+        )
+    }
 }
 
 /** Renders one snackbar message and its optional action and dismiss controls. */

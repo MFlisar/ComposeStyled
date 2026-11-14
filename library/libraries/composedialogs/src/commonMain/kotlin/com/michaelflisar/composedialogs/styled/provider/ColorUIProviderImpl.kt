@@ -1,6 +1,7 @@
 package com.michaelflisar.composedialogs.styled.provider
 
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -8,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import com.michaelflisar.composedialogs.dialogs.color.ColorPickerIcon
 import com.michaelflisar.composedialogs.dialogs.color.ColorTextStyle
 import com.michaelflisar.composedialogs.dialogs.color.ColorUIProvider
@@ -61,7 +63,11 @@ internal object ColorUIProviderImpl : ColorUIProvider {
 
     @Composable
     override fun Card(modifier: Modifier, content: @Composable () -> Unit) {
-        StyledCard(modifier = modifier, content = content)
+        StyledCard(
+            modifier = modifier,
+            content = content,
+            applyContentPadding = false
+        )
     }
 
     @Composable
@@ -129,9 +135,9 @@ internal object ColorUIProviderImpl : ColorUIProvider {
             isError = !isInputValid(value.value),
             errorMessage = invalidInputMessage.takeIf { !isInputValid(value.value) },
             leadingIcon = {
-                com.michaelflisar.composestyled.ui.primitives.StyledText("#")
+                StyledText("#")
             },
-            title = { com.michaelflisar.composestyled.ui.primitives.StyledText(title) },
+            title = { StyledText(title) },
             buttons = StyledDialog.Buttons(
                 positive = StyledDialog.Button(
                     onClick = {

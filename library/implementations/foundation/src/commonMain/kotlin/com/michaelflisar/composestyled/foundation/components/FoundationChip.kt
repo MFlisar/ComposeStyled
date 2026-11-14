@@ -88,7 +88,7 @@ class FoundationChip internal constructor(
             .then(
                 if (borderColor != null) {
                     Modifier.border(
-                        width = 1.dp,
+                        width = customization?.borderThickness ?: 1.dp,
                         color = borderColor.copy(alpha = borderColor.alpha * outlineAlpha),
                         shape = shape,
                     )

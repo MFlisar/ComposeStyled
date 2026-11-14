@@ -37,6 +37,8 @@ import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.runtime.StyledContext
 import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.ui.internal.dialogButtons
+import com.michaelflisar.composestyled.ui.internal.LocalStyledDialogEnterAnimationEnabled
+import com.michaelflisar.composestyled.ui.internal.rememberDialogEnterAnimationEnabled
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.ui.state.DialogState
 
@@ -433,6 +435,7 @@ fun StyledDialog(
     content: @Composable ColumnScope.(PaddingValues) -> Unit,
 ) {
     val visible = state.visible
+    val enterAnimationEnabled = rememberDialogEnterAnimationEnabled(state)
     val skipExitAnimation = remember(state) { mutableStateOf(false) }
     LaunchedEffect(state, visible) {
         if (visible) skipExitAnimation.value = false
@@ -463,10 +466,14 @@ fun StyledDialog(
             val render: @Composable () -> Unit = {
                 CompositionLocalProvider(compositionLocalContext) {
                     CompositionLocalProvider(LocalFloatingDialogEntry provides entry) {
-                        implementation.Render(
-                            style, onDismissRequest, dismissWithoutAnimation, modifier, properties,
-                            title, resolvedButtons, visible, { state.visible }, content,
-                        )
+                        CompositionLocalProvider(
+                            LocalStyledDialogEnterAnimationEnabled provides enterAnimationEnabled,
+                        ) {
+                            implementation.Render(
+                                style, onDismissRequest, dismissWithoutAnimation, modifier, properties,
+                                title, resolvedButtons, visible, { state.visible }, content,
+                            )
+                        }
                     }
                 }
             }
@@ -477,10 +484,14 @@ fun StyledDialog(
                 onDispose { host.unregister(entry) }
             }
         } else {
-            implementation.Render(
-                style, onDismissRequest, dismissWithoutAnimation, modifier, properties,
-                title, resolvedButtons, visible, { state.visible }, content,
-            )
+            CompositionLocalProvider(
+                LocalStyledDialogEnterAnimationEnabled provides enterAnimationEnabled,
+            ) {
+                implementation.Render(
+                    style, onDismissRequest, dismissWithoutAnimation, modifier, properties,
+                    title, resolvedButtons, visible, { state.visible }, content,
+                )
+            }
         }
     }
 }

@@ -367,6 +367,7 @@ internal fun DemoPageShowCase(
                 message = message,
                 actionLabel = "Undo",
                 withDismissAction = true,
+                swipeToDismissEnabled = false,
             )
             if (result == StyledSnackbarResult.ActionPerformed) {
                 snackbarState.showSnackbar("Undo clicked")

@@ -471,9 +471,9 @@ internal fun DemoComponentParts(
         ) {
             StyledText("Changes saved with action")
         }
-        SubTitle("Scaffold Snackbar Host")
+        SubTitle("Scaffold Snackbar Host (swipe enabled by default)")
         StyledButton(onClick = showSnackbar, variant = StyledButton.Variant.Filled) {
-            StyledText("Show snackbar with action")
+            StyledText("Show snackbar with action (swipe disabled)")
         }
     }
 }

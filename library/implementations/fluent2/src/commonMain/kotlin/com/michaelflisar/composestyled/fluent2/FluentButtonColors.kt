@@ -25,6 +25,7 @@ internal class FluentButtonColors(
             hovered: Boolean,
             pressed: Boolean,
             colors: CustomColors?,
+            disabledColors: CustomColors? = null,
             border: ColorToken?,
             inheritedContentColor: Color? = null,
         ): FluentButtonColors {
@@ -42,11 +43,26 @@ internal class FluentButtonColors(
             val idleBackground = overlay.copy(alpha = 0f)
 
             if (!enabled) {
+                val defaultBackground = if (filled) {
+                    if (dark) Color(0xFF141414) else Color(0xFFF0F0F0)
+                } else {
+                    idleBackground
+                }
+                val defaultForeground = if (dark) Color(0xFF5C5C5C) else Color(0xFFBDBDBD)
+                val customBackground = if (filled) {
+                    disabledColors?.filledBackground?.resolve()
+                        ?.takeIf { it != Color.Unspecified }
+                } else {
+                    null
+                }
+                val customForeground = if (filled) {
+                    disabledColors?.filledForeground?.resolve()
+                } else {
+                    disabledColors?.textForeground?.resolve()
+                }?.takeIf { it != Color.Unspecified }
                 return FluentButtonColors(
-                    background = if (filled) {
-                        if (dark) Color(0xFF141414) else Color(0xFFF0F0F0)
-                    } else idleBackground,
-                    foreground = if (dark) Color(0xFF5C5C5C) else Color(0xFFBDBDBD),
+                    background = customBackground ?: defaultBackground,
+                    foreground = customForeground ?: defaultForeground,
                     border = if (secondary || outlined) {
                         if (dark) Color(0xFF424242) else Color(0xFFE0E0E0)
                     } else Color.Transparent,

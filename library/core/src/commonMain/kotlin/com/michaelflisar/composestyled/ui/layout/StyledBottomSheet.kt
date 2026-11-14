@@ -3,6 +3,7 @@ package com.michaelflisar.composestyled.ui.layout
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateOf
@@ -15,7 +16,10 @@ import com.michaelflisar.composestyled.registry.LocalStyledRegistry
 import com.michaelflisar.composestyled.registry.StyledComponent
 import com.michaelflisar.composestyled.registry.StyledComponentWithDefaults
 import com.michaelflisar.composestyled.registry.StyledKey
+import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.ui.internal.dialogButtons
+import com.michaelflisar.composestyled.ui.internal.LocalStyledDialogEnterAnimationEnabled
+import com.michaelflisar.composestyled.ui.internal.rememberDialogEnterAnimationEnabled
 import com.michaelflisar.composestyled.ui.state.DialogState
 
 object StyledBottomSheet {
@@ -81,6 +85,7 @@ object StyledBottomSheetDefaults {
 /** Non-modal overlay. Place last in a bounded Box to draw above sibling content. */
 /** Shows a non-modal bottom-sheet overlay using the active dialog renderer and [state]. */
 @Composable
+@OptIn(InternalComposeStyledApi::class)
 fun StyledBottomSheet(
     state: DialogState,
     modifier: Modifier = Modifier,
@@ -92,6 +97,7 @@ fun StyledBottomSheet(
     content: @Composable ColumnScope.(PaddingValues) -> Unit,
 ) {
     val visible = state.visible
+    val enterAnimationEnabled = rememberDialogEnterAnimationEnabled(state)
     val skipExitAnimation = remember(state) { mutableStateOf(false) }
     LaunchedEffect(state, visible) {
         if (visible) skipExitAnimation.value = false
@@ -106,10 +112,14 @@ fun StyledBottomSheet(
         if (state.visible) skipExitAnimation.value = false
     }
     if (retained) {
-        LocalStyledRegistry.current[StyledBottomSheet.Key].Render(
-            onDismissRequest, dismissWithoutAnimation, modifier, properties, style, title,
-            dialogButtons(state, properties, buttons, onDismissRequest),
-            visible, { state.visible }, content,
-        )
+        CompositionLocalProvider(
+            LocalStyledDialogEnterAnimationEnabled provides enterAnimationEnabled,
+        ) {
+            LocalStyledRegistry.current[StyledBottomSheet.Key].Render(
+                onDismissRequest, dismissWithoutAnimation, modifier, properties, style, title,
+                dialogButtons(state, properties, buttons, onDismissRequest),
+                visible, { state.visible }, content,
+            )
+        }
     }
 }

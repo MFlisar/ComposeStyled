@@ -5,6 +5,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.classes.ColorToken
 import com.michaelflisar.composestyled.classes.asColorTokenOrNull
 import com.michaelflisar.composestyled.classes.IconComposable
@@ -40,6 +42,7 @@ object StyledChip {
         val container: ColorToken?,
         val content: ColorToken?,
         val border: ColorToken?,
+        val borderThickness: Dp?,
         val selectedContainer: ColorToken?,
         val selectedContent: ColorToken?,
         val selectedBorder: ColorToken?,
@@ -83,14 +86,20 @@ object StyledChipDefaults {
         selectedContainer: Color = Color.Unspecified,
         selectedContent: Color = Color.Unspecified,
         selectedBorder: Color = Color.Unspecified,
-    ) = StyledChip.Customization(
-        container = container.asColorTokenOrNull(),
-        content = content.asColorTokenOrNull(),
-        border = border.asColorTokenOrNull(),
-        selectedContainer = selectedContainer.asColorTokenOrNull(),
-        selectedContent = selectedContent.asColorTokenOrNull(),
-        selectedBorder = selectedBorder.asColorTokenOrNull(),
-    )
+        borderThickness: Dp = 1.dp,
+    ): StyledChip.Customization {
+        val borderToken = border.asColorTokenOrNull()
+        val selectedBorderToken = selectedBorder.asColorTokenOrNull()
+        return StyledChip.Customization(
+            container = container.asColorTokenOrNull(),
+            content = content.asColorTokenOrNull(),
+            border = borderToken,
+            borderThickness = if (borderToken != null || selectedBorderToken != null) borderThickness else null,
+            selectedContainer = selectedContainer.asColorTokenOrNull(),
+            selectedContent = selectedContent.asColorTokenOrNull(),
+            selectedBorder = selectedBorderToken,
+        )
+    }
 }
 
 // -------------------------

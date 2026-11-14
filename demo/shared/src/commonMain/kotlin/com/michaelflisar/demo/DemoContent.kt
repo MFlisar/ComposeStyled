@@ -20,11 +20,11 @@ import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.StyledTheme
+import com.michaelflisar.composestyled.StyledThemeConfig
 import com.michaelflisar.composestyled.classes.toIconComposable
 import com.michaelflisar.composestyled.platform.Platform
 import com.michaelflisar.composestyled.platform.PlatformDefaults
@@ -95,12 +95,14 @@ fun DemoContent(
 
     StyledTheme(
         platform = selectedPlatform,
-        themeProvider = selectedThemeProvider,
-        themeColors = themeColors.value,
-        themeVariant = themeVariant.value,
-        themeAppearance = themeAppearance.value,
-        themeContrast = themeContrast.value,
-        themeDynamic = themeDynamic.value,
+        provider = selectedThemeProvider,
+        config = StyledThemeConfig(
+            colors = themeColors.value,
+            variant = themeVariant.value,
+            appearance = themeAppearance.value,
+            contrast = themeContrast.value,
+            dynamicColors = themeDynamic.value,
+        ),
         behavior = StyledTheme.Behavior(
             showScrollbars = PlatformDefaults.showScrollbars(hostPlatform),
         ),

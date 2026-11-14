@@ -112,12 +112,28 @@ private fun SegmentedItem(
     val activeContainer = customization?.colors?.filledBackground?.resolve() ?: colors.secondarySurface
     val activeContent = customization?.colors?.filledForeground?.resolve() ?: colors.onSecondarySurface
     val inactiveContent = customization?.colors?.textForeground?.resolve() ?: colors.onSurface
+    val disabledContainer = customization?.disabledColors?.filledBackground?.resolve()
+        ?.takeUnless { it == Color.Unspecified }
+    val disabledContent = if (selected) {
+        customization?.disabledColors?.filledForeground?.resolve()
+    } else {
+        customization?.disabledColors?.textForeground?.resolve()
+    }?.takeUnless { it == Color.Unspecified }
     val borderColor = customization?.border?.resolve() ?: colors.outline
     val containerAlpha = if (enabled) 1f else colors.disableFactors.default
     val contentAlpha = if (enabled) 1f else colors.disableFactors.content
     val outlineAlpha = if (enabled) 1f else colors.disableFactors.outline
-    val foreground = (if (selected) activeContent else inactiveContent).let {
-        it.copy(alpha = it.alpha * contentAlpha)
+    val foreground = if (!enabled && disabledContent != null) {
+        disabledContent
+    } else {
+        (if (selected) activeContent else inactiveContent).let {
+            it.copy(alpha = it.alpha * contentAlpha)
+        }
+    }
+    val container = if (!enabled && disabledContainer != null) {
+        disabledContainer
+    } else {
+        activeContainer.copy(alpha = activeContainer.alpha * containerAlpha)
     }
     val contentOffset = animateDpAsState(
         targetValue = if (!showSelectedIcon || selected) {
@@ -134,10 +150,10 @@ private fun SegmentedItem(
         )
         .clip(itemShape)
         .background(
-            color = if (selected) activeContainer.copy(alpha = activeContainer.alpha * containerAlpha) else Color.Transparent,
+            color = if (selected) container else Color.Transparent,
         )
         .border(
-            width = 1.dp,
+            width = customization?.borderThickness ?: 1.dp,
             color = borderColor.copy(alpha = borderColor.alpha * outlineAlpha),
             shape = itemShape,
         )

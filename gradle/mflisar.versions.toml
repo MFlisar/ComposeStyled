@@ -12,7 +12,7 @@ composepreferences =   		"3.0.0"
 composethemer =   			"2.0.0"
 composecolors =             "2.0.0"
 
-composedialogs =   		    "5.0.0-alpha06"
+composedialogs =   		    "5.0.0-alpha08"
 composetable =              "0.0.1-alpha06"
 
 # plugins only

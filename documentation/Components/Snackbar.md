@@ -20,6 +20,13 @@ Cancelling its coroutine removes that message. Without an action, duration
 defaults to `Short`; with an action it defaults to `Indefinite`, so provide a
 dismiss action or dismiss programmatically. Explicit `Short` or `Long` durations
 are also supported. Finite durations honor accessibility timeout recommendations.
+Swipe a hosted snackbar horizontally in either direction to dismiss it; this
+works independently of `withDismissAction`, which controls only the visible
+dismiss button. Set `swipeToDismissEnabled = false` on `StyledSnackbarHost` to
+disable swipe dismissal for the whole host, or pass it to `showSnackbar` to
+disable it for an individual message. The host setting is a master switch;
+individual messages can opt out but cannot re-enable swiping when the host has
+disabled it.
 The host keeps outgoing text visible during the exit animation. Material 3
 delegates timing, accessibility and transitions to its native `SnackbarHost`.
 Cupertino and Fluent 2 share a Foundation host that fades and scales the snackbar

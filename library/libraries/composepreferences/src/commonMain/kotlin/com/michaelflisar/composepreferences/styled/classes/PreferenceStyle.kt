@@ -87,18 +87,18 @@ data class PreferenceTrailingStyle internal constructor(
     val maxWidthFraction: Float,
 )
 
-/** Separator used between entries inside an optically grouped section or group. */
+/** Separator used between entries inside a section's shared shape. */
 @Immutable
-sealed interface PreferenceInGroupSeparatorStyle {
-    /** Keeps grouped entries separated by vertical space. */
+sealed interface PreferenceSectionContentSeparatorStyle {
+    /** Keeps section content entries separated by vertical space. */
     @Immutable
-    data class Spacing(val spacing: Dp) : PreferenceInGroupSeparatorStyle
+    data class Spacing(val spacing: Dp) : PreferenceSectionContentSeparatorStyle
 
-    /** Draws a divider aligned with preference item content. */
+    /** Draws a divider between section content entries, aligned with preference item content. */
     @Immutable
     data class Divider(
         val verticalPadding: Dp = 0.dp,
-    ) : PreferenceInGroupSeparatorStyle
+    ) : PreferenceSectionContentSeparatorStyle
 
     val spacingOrZero: Dp
         get() = (this as? Spacing)?.spacing ?: 0.dp
@@ -112,8 +112,8 @@ data class PreferenceSpacingStyle internal constructor(
     val itemSpacing: Dp,
     /** Spacing before a detached section header and between it and its content. */
     val sectionSpacing: Dp,
-    /** Separator used between entries inside an optically grouped section or group. */
-    val inGroupSeparator: PreferenceInGroupSeparatorStyle,
+    /** Separator used between entries inside a section's shared shape. */
+    val sectionContentSeparator: PreferenceSectionContentSeparatorStyle,
 )
 
 /** Styling shared by preference lists and their standard rows. */
@@ -207,14 +207,14 @@ object PreferenceStyleDefaults {
     fun spacing(
         itemSpacing: Dp = StyledTheme.spacing.large,
         sectionSpacing: Dp = StyledTheme.spacing.small,
-        inGroupSeparator: PreferenceInGroupSeparatorStyle =
-            PreferenceInGroupSeparatorStyle.Divider(
+        sectionContentSeparator: PreferenceSectionContentSeparatorStyle =
+            PreferenceSectionContentSeparatorStyle.Divider(
                 verticalPadding = 0.dp,
             ),
     ): PreferenceSpacingStyle = PreferenceSpacingStyle(
         itemSpacing = itemSpacing,
         sectionSpacing = sectionSpacing,
-        inGroupSeparator = inGroupSeparator,
+        sectionContentSeparator = sectionContentSeparator,
     )
 
     /** Creates the default style for preference row trailing content. */

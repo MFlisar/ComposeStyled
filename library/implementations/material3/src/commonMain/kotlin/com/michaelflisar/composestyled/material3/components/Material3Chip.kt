@@ -161,6 +161,7 @@ class Material3Chip internal constructor(
                     AssistChipDefaults.assistChipBorder(
                         enabled = enabled,
                         borderColor = it,
+                        borderWidth = customization?.borderThickness ?: 1.dp,
                     )
                 } ?: AssistChipDefaults.assistChipBorder(enabled)
                 AssistChip(
@@ -185,6 +186,7 @@ class Material3Chip internal constructor(
                     AssistChipDefaults.assistChipBorder(
                         enabled = enabled,
                         borderColor = it,
+                        borderWidth = customization?.borderThickness ?: 1.dp,
                     )
                 }
                 ElevatedAssistChip(
@@ -210,6 +212,7 @@ class Material3Chip internal constructor(
                     AssistChipDefaults.assistChipBorder(
                         enabled = enabled,
                         borderColor = it,
+                        borderWidth = customization?.borderThickness ?: 1.dp,
                     )
                 }
                 AssistChip(
@@ -237,6 +240,8 @@ class Material3Chip internal constructor(
                         selected = selected,
                         borderColor = borderColor,
                         selectedBorderColor = selectedBorderColor,
+                        borderWidth = customization?.borderThickness ?: 1.dp,
+                        selectedBorderWidth = customization?.borderThickness ?: 1.dp,
                     )
                 } else {
                     FilterChipDefaults.filterChipBorder(enabled, selected)
@@ -270,6 +275,8 @@ class Material3Chip internal constructor(
                         selected = selected,
                         borderColor = borderColor,
                         selectedBorderColor = selectedBorderColor,
+                        borderWidth = customization?.borderThickness ?: 1.dp,
+                        selectedBorderWidth = customization?.borderThickness ?: 1.dp,
                     )
                 } else {
                     null
@@ -303,6 +310,8 @@ class Material3Chip internal constructor(
                         selected = selected,
                         borderColor = borderColor,
                         selectedBorderColor = selectedBorderColor,
+                        borderWidth = customization?.borderThickness ?: 1.dp,
+                        selectedBorderWidth = customization?.borderThickness ?: 1.dp,
                     )
                 } else {
                     null

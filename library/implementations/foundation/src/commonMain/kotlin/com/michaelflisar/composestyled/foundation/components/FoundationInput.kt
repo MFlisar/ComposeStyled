@@ -104,7 +104,13 @@ abstract class FoundationInput : StyledInput.Implementation {
         } else {
             Color.Transparent
         }
-        val indicatorWidth = if (focused) 2.dp else 1.dp
+        val indicatorWidth = if (customBorder != null) {
+            customization?.borderThickness ?: 1.dp
+        } else if (focused) {
+            2.dp
+        } else {
+            1.dp
+        }
         val indicator = if (isOutlined) {
             Modifier.border(indicatorWidth, accent, shape)
         } else {

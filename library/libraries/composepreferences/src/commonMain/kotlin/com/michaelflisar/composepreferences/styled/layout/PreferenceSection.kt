@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.michaelflisar.composestyled.classes.IconComposable
+import com.michaelflisar.composepreferences.styled.PreferenceSectionContentSeparatorStyle
 import com.michaelflisar.composepreferences.styled.internal.LocalPreferenceRuntime
 import com.michaelflisar.composepreferences.styled.internal.PreferenceAncestor
 import com.michaelflisar.composepreferences.styled.internal.PreferenceEntry
@@ -83,6 +84,31 @@ fun PreferenceSection(
     )
 }
 
+/** Groups preference rows with the active section style without a header row. */
+@Composable
+fun PreferenceSection(
+    modifier: Modifier = Modifier,
+    key: String? = null,
+    filterTags: List<String> = emptyList(),
+    isEnabled: @Composable () -> Boolean = { true },
+    isVisible: @Composable () -> Boolean = { true },
+    content: @Composable () -> Unit,
+) {
+    PreferenceSectionImpl(
+        title = null,
+        subtitle = null,
+        modifier = modifier,
+        key = key,
+        expanded = null,
+        isExpandable = false,
+        filterTags = filterTags,
+        isEnabled = isEnabled,
+        isVisible = isVisible,
+        isInitiallyExpanded = true,
+        content = content,
+    )
+}
+
 /** A preference section whose expanded state is controlled by the caller. */
 @Composable
 fun PreferenceSection(
@@ -114,7 +140,7 @@ fun PreferenceSection(
 
 @Composable
 private fun PreferenceSectionImpl(
-    title: String,
+    title: String?,
     subtitle: String?,
     modifier: Modifier,
     key: String?,
@@ -144,12 +170,13 @@ private fun PreferenceSectionImpl(
         }
     }
     val expandedState = expanded ?: internalExpanded
-    val canExpand = isExpandable ?: (expanded != null || parent.style.section.isExpandable)
+    val canExpand = title != null &&
+            (isExpandable ?: (expanded != null || parent.style.section.isExpandable))
     val sectionIsExpanded = !canExpand || expandedState.value
     val enabled = parent.parentEnabled && isEnabled()
     val visible = parent.parentVisible && isVisible()
     val isCurrentLevel = parent.currentPath == parent.treePath
-    val showHeader = !parent.isFiltering && isCurrentLevel &&
+    val showHeader = title != null && !parent.isFiltering && isCurrentLevel &&
         parent.parentExpanded && visible
     val sectionStyle = parent.style.section
     val clipsSectionShape = !parent.isFiltering &&
@@ -176,7 +203,7 @@ private fun PreferenceSectionImpl(
     val current = parent.copy(
         identityScope = parent.identityScope + identity,
         ancestors = parent.ancestors + PreferenceAncestor(
-            title,
+            title.orEmpty(),
             subtitle,
             filterTags
         ),
@@ -220,7 +247,7 @@ private fun PreferenceSectionImpl(
         itemSpacing = if (parent.isFiltering) {
             0.dp
         } else {
-            parent.style.spacing.inGroupSeparator.spacingOrZero
+            parent.style.spacing.sectionContentSeparator.spacingOrZero
         },
         sectionSpacing = parent.style.spacing.sectionSpacing,
         ordinaryItemSpacing = if (parent.isFiltering) {
@@ -276,14 +303,14 @@ private fun PreferenceSectionImpl(
     ) {
         // Reserve the identity even when the header is hidden to keep navigation IDs stable.
         PreferenceEntry(
-            title = title,
+            title = title.orEmpty(),
             subtitle = subtitle,
             filterTags = filterTags,
             key = "section-header:$identity",
             isEnabled = { enabled },
             isVisible = { showHeader },
             renderInFilter = false,
-            trackInGroupSeparator = false,
+            trackSectionSeparator = false,
             trackInListSpacing = false,
         ) {
             Column(
@@ -304,7 +331,7 @@ private fun PreferenceSectionImpl(
                     ),
             ) {
                 PreferenceRowContent(
-                    title = title,
+                    title = title.orEmpty(),
                     subtitle = subtitle,
                     trailing = if (canExpand) {
                         {
@@ -452,23 +479,23 @@ private fun PreferenceSectionHeaderSeparator(
         if (firstItemIsOrdinary) {
             Spacer(Modifier.height(style.spacing.itemSpacing))
         } else {
-            when (val separator = style.spacing.inGroupSeparator) {
-                is com.michaelflisar.composepreferences.styled.PreferenceInGroupSeparatorStyle.Spacing ->
+            when (val separator = style.spacing.sectionContentSeparator) {
+                is PreferenceSectionContentSeparatorStyle.Spacing ->
                     Spacer(Modifier.height(separator.spacing))
 
-                is com.michaelflisar.composepreferences.styled.PreferenceInGroupSeparatorStyle.Divider ->
-                    PreferenceInGroupDivider(style)
+                is PreferenceSectionContentSeparatorStyle.Divider ->
+                    PreferenceSectionContentDivider(style)
             }
         }
     }
 }
 
 @Composable
-internal fun PreferenceInGroupDivider(
+internal fun PreferenceSectionContentDivider(
     style: com.michaelflisar.composepreferences.styled.PreferenceStyle,
 ) {
     val verticalPadding =
-        (style.spacing.inGroupSeparator as? com.michaelflisar.composepreferences.styled.PreferenceInGroupSeparatorStyle.Divider)?.verticalPadding
+        (style.spacing.sectionContentSeparator as? PreferenceSectionContentSeparatorStyle.Divider)?.verticalPadding
             ?: 0.dp
     val layoutDirection = androidx.compose.ui.platform.LocalLayoutDirection.current
     val itemPadding = style.item.contentPadding

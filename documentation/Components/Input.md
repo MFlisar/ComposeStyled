@@ -15,11 +15,13 @@ Nullable numeric inputs use `StyledOptionalInput(variant = ...)` or the fixed
 The input supports enabled/read-only modes, single-line or multiline input
 (`singleLine = false`, `minLines`, `maxLines`), label, placeholder,
 leading/trailing icons and supporting text. Shape defaults follow the
-implementation; use `StyledInputDefaults.customize(CustomColors, border)` to
+implementation; use
+`StyledInputDefaults.customize(CustomColors, border, borderThickness)` to
 customize colors consistently across filled and outlined styles. The `colors`
-argument is optional when only overriding the outlined border. Filled input
-uses `filledBackground`/`filledForeground`; outlined input uses
-`textForeground` and the optional border color.
+argument is optional when only overriding the border. A customized border
+defaults to `1.dp`; Material 3 applies that thickness to both focused and
+unfocused borders. Filled input uses `filledBackground`/`filledForeground`;
+outlined input uses `textForeground` and the optional border color.
 
 Keyboard options/actions, visual transformation and interaction source are
 forwarded to the underlying text field. Leading and trailing slots provide an

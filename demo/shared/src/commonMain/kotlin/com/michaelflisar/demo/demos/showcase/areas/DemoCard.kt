@@ -71,6 +71,15 @@ internal fun DemoCard(baseId: Int, expandState: ExpandState) {
         ) {
             StyledText("Customized elevation without overriding colors")
         }
+        StyledOutlinedCard(
+            modifier = Modifier.fillMaxWidth(),
+            customization = StyledCardDefaults.customize(
+                border = StyledTheme.colorScheme.primary,
+                borderThickness = 2.dp,
+            ),
+        ) {
+            StyledText("Customized border thickness")
+        }
 
         StyledOutlinedCard(
             modifier = Modifier.fillMaxWidth(),

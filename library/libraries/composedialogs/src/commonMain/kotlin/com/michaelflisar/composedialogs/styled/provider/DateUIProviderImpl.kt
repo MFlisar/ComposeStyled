@@ -1,8 +1,7 @@
 package com.michaelflisar.composedialogs.styled.provider
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
@@ -22,6 +21,7 @@ import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.classes.CustomColors
 import com.michaelflisar.composestyled.tokens.LocalStyledContentColor
 import com.michaelflisar.composestyled.ui.components.StyledButton
+import com.michaelflisar.composestyled.ui.components.StyledButtonDefaults
 import com.michaelflisar.composestyled.ui.components.StyledCard
 import com.michaelflisar.composestyled.ui.components.StyledCardDefaults
 import com.michaelflisar.composestyled.ui.components.StyledIcon
@@ -31,8 +31,6 @@ import com.michaelflisar.composestyled.ui.layout.StyledLazyColumn
 import com.michaelflisar.composestyled.ui.primitives.StyledHorizontalDivider
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.ui.primitives.StyledVerticalDivider
-import com.michaelflisar.composestyled.UpdateStyledThemeLocals
-import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import kotlinx.datetime.LocalDate
 
 internal object DateUIProviderImpl : DateUIProvider {
@@ -70,8 +68,8 @@ internal object DateUIProviderImpl : DateUIProvider {
     ) {
         StyledIcon(
             icon = when (icon) {
-                DatePickerIcon.Previous -> StyledIcons.NavigateBack
-                DatePickerIcon.Next -> StyledIcons.NavigateForward
+                DatePickerIcon.Previous -> StyledIcons.SubmenuBack
+                DatePickerIcon.Next -> StyledIcons.Submenu
                 DatePickerIcon.DropDown -> StyledIcons.Dropdown
                 DatePickerIcon.Check -> StyledIcons.Check
             },
@@ -113,6 +111,14 @@ internal object DateUIProviderImpl : DateUIProvider {
                 DatePickerButtonType.SelectedDate -> StyledButton.Variant.Filled
                 DatePickerButtonType.Today -> StyledButton.Variant.Outlined
             },
+            customization = when (type) {
+                DatePickerButtonType.SelectedDate -> StyledButtonDefaults.customize(
+                    colors = CustomColors.Primary,
+                    disabledColors = CustomColors.Primary,
+                )
+
+                DatePickerButtonType.Today -> null
+            },
             content = { content() },
         )
     }
@@ -136,13 +142,14 @@ internal object DateUIProviderImpl : DateUIProvider {
     @Composable
     override fun smallShape(): Shape = StyledTheme.shapes.small
 
+    @Composable
     override fun Modifier.minimumInteractiveComponentSize(): Modifier =
-        heightIn(min = 48.dp)
+        heightIn(min = StyledTheme.sizes.minimumInteractiveSize)
 
     @Composable
     override fun ScrollableList(state: LazyListState, content: LazyListScope.() -> Unit) {
         StyledLazyColumn(
-            modifier = Modifier.heightIn(max = 320.dp),
+            modifier = Modifier,//.heightIn(max = 320.dp),
             state = state,
             content = content,
         )
@@ -156,27 +163,22 @@ internal object DateUIProviderImpl : DateUIProvider {
         modifier: Modifier,
         onClick: () -> Unit,
     ) {
-        val shape = StyledTheme.shapes.small
-        val cellModifier = if (today && !selected) {
-            modifier.border(2.dp, StyledTheme.colorScheme.primary, shape)
-        } else {
-            modifier
-        }
         StyledCard(
-            modifier = cellModifier,
-            shape = shape,
+            modifier = modifier,
+            shape = StyledTheme.shapes.small,
             contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp),
-            customization = if (selected) {
-                StyledCardDefaults.customize(CustomColors.Primary)
-            } else {
-                null
-            },
+            customization = if (!selected) {
+                val border = if (today) 2.dp else 1.dp
+                val color =
+                    if (today) StyledTheme.colorScheme.primary else StyledTheme.colorScheme.outline
+                StyledCardDefaults.customize(border = color, borderThickness = border)
+            } else StyledCardDefaults.customize(CustomColors.Primary),
             onClick = if (selected) null else onClick,
             applyContentPadding = false,
             variant = if (selected) StyledCard.Variant.Filled else StyledCard.Variant.Outlined,
         ) {
             Box(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center,
             ) {
                 StyledText(
@@ -187,12 +189,4 @@ internal object DateUIProviderImpl : DateUIProvider {
         }
     }
 
-    @OptIn(InternalComposeStyledApi::class)
-    @Composable
-    override fun DialogTitle(content: @Composable () -> Unit) {
-        UpdateStyledThemeLocals(
-            textStyle = StyledTheme.typography.headlineSmall,
-            content = content,
-        )
-    }
 }

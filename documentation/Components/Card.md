@@ -15,9 +15,10 @@ Override `contentPadding`, for example with
 part of `StyledPadding`.
 
 All variants support `shape` and optional
-`StyledCardDefaults.customize(colors, border, elevation)`. The `colors` argument
-is optional, so border and/or elevation can be customized without overriding
-colors. An optional `onClick`
+`StyledCardDefaults.customize(colors, border, elevation, borderThickness)`.
+The `colors` argument is optional, so border and/or elevation can be customized
+without overriding colors. A customized border defaults to `1.dp`; override it
+with `borderThickness`. An optional `onClick`
 enables button semantics, keyboard activation and an interaction source;
 `enabled = false` disables the action. Filled styles use
 `CustomColors.filledBackground` and `CustomColors.filledForeground`; outlined

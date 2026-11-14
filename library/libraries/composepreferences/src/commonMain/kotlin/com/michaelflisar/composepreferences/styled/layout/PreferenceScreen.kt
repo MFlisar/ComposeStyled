@@ -39,11 +39,11 @@ import com.michaelflisar.composepreferences.styled.PreferenceStrings
 import com.michaelflisar.composepreferences.styled.internal.LocalPreferenceRuntime
 import com.michaelflisar.composepreferences.styled.internal.LocalPreferenceStyle
 import com.michaelflisar.composepreferences.styled.internal.PreferenceFilterResultTracker
-import com.michaelflisar.composepreferences.styled.internal.PreferenceGroupSeparatorTracker
 import com.michaelflisar.composepreferences.styled.internal.PreferenceIdentityAllocator
 import com.michaelflisar.composepreferences.styled.internal.PreferenceListSpacingArrangement
 import com.michaelflisar.composepreferences.styled.internal.PreferenceListSpacingTracker
 import com.michaelflisar.composepreferences.styled.internal.PreferenceRuntime
+import com.michaelflisar.composepreferences.styled.internal.PreferenceSectionSeparatorTracker
 import com.michaelflisar.composepreferences.styled.internal.PreferenceSectionShapeTracker
 import com.michaelflisar.composepreferences.styled.internal.accountForPreferenceListSpacing
 import com.michaelflisar.composepreferences.styled.rememberPreferenceStyle
@@ -280,7 +280,7 @@ private fun PreferencePage(
     ) {
         PreferenceFilterResultTracker()
     }
-    val groupSeparatorTracker = remember { PreferenceGroupSeparatorTracker() }
+    val sectionSeparatorTracker = remember { PreferenceSectionSeparatorTracker() }
     val sectionShapeTracker = remember { PreferenceSectionShapeTracker() }
     val listSpacingTracker = remember { PreferenceListSpacingTracker() }
     val groupHeader = when (val openGroupHeaderStyle = style.openedGroupHeader) {
@@ -335,7 +335,7 @@ private fun PreferencePage(
                 identityAllocator = identityAllocator,
                 style = style,
                 filterResultTracker = filterResultTracker,
-                groupSeparatorTracker = groupSeparatorTracker,
+                sectionSeparatorTracker = sectionSeparatorTracker,
                 sectionShapeTracker = sectionShapeTracker,
                 listSpacingTracker = listSpacingTracker,
                 filterQuery = query,

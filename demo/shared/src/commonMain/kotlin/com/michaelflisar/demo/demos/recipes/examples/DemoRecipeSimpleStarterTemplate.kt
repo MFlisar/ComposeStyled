@@ -11,6 +11,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import com.michaelflisar.composestyled.StyledTheme
+import com.michaelflisar.composestyled.StyledThemeConfig
 import com.michaelflisar.composestyled.classes.toIconComposable
 import com.michaelflisar.composestyled.cupertino.flat.rememberCupertinoFlatThemeProvider
 import com.michaelflisar.composestyled.fluent2.rememberFluent2ThemeProvider
@@ -19,9 +20,6 @@ import com.michaelflisar.composestyled.platform.Platform
 import com.michaelflisar.composestyled.platform.PlatformDefaults
 import com.michaelflisar.composestyled.platform.SystemBarStyleEffectIfNeeded
 import com.michaelflisar.composestyled.platform.currentPlatform
-import com.michaelflisar.composestyled.themes.StyledThemeAppearance
-import com.michaelflisar.composestyled.themes.StyledThemeContrast
-import com.michaelflisar.composestyled.themes.StyledThemeVariant
 import com.michaelflisar.composestyled.ui.components.StyledBottomNavigationBar
 import com.michaelflisar.composestyled.ui.components.StyledBottomNavigationBarItem
 import com.michaelflisar.composestyled.ui.components.StyledFloatingActionButton
@@ -32,15 +30,16 @@ import com.michaelflisar.composestyled.ui.components.StyledSideNavigationItem
 import com.michaelflisar.composestyled.ui.components.StyledSnackbarHost
 import com.michaelflisar.composestyled.ui.components.StyledSnackbarHostState
 import com.michaelflisar.composestyled.ui.components.StyledTopBar
+import com.michaelflisar.composestyled.ui.icons.StyledIcons
 import com.michaelflisar.composestyled.ui.layout.StyledScaffold
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 import kotlinx.coroutines.launch
 
 /**
- * base starter template - simply applies a theme and styles and places the content inside it
+ * demo simple template - simply applies a theme and styles and places the content inside it
  */
 @Composable
-fun BaseStarterTemplate(
+fun DemoSimpleTemplate(
     content: @Composable () -> Unit,
 ) {
     // main setup - detect platform and select platform specific theme and color scheme
@@ -61,11 +60,8 @@ fun BaseStarterTemplate(
     // create a scaffold or a surface inside a StyledTheme() block and add your content inside it
     StyledTheme(
         platform = hostPlatform,
-        themeProvider = themeProvider,
-        themeColors = themeProvider.defaultThemeColors,
-        themeVariant = StyledThemeVariant.Colorful,
-        themeAppearance = StyledThemeAppearance.System,
-        themeContrast = StyledThemeContrast.System,
+        provider = themeProvider,
+        config = StyledThemeConfig(colors = themeProvider.defaultThemeColors),
         behavior = StyledTheme.Behavior(
             showScrollbars = PlatformDefaults.showScrollbars(hostPlatform),
         ),
@@ -83,7 +79,7 @@ fun BaseStarterTemplate(
  * Provides short examples for each scaffold slot; apply the received padding to the content root.
  */
 @Composable
-fun ScaffoldStarterTemplate(
+fun DemoRecipeSimpleStarterTemplate(
     onBack: (() -> Unit)? = null,
     content: @Composable (PaddingValues) -> Unit = { paddingValues ->
         StyledText(
@@ -98,7 +94,7 @@ fun ScaffoldStarterTemplate(
     val snackbarHostState = remember { StyledSnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
 
-    BaseStarterTemplate {
+    DemoSimpleTemplate {
 
         val topAppBarColor = StyledTheme.colorScheme.surface
         val scaffoldColor = StyledTheme.colorScheme.surface
@@ -157,7 +153,7 @@ fun ScaffoldStarterTemplate(
                         }
                     },
                 ) {
-                    StyledText("+")
+                    StyledIcon(StyledIcons.Add)
                 }
             },
             sideNavigation = {

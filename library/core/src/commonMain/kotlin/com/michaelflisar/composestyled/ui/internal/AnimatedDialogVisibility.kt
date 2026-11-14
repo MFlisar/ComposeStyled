@@ -7,15 +7,29 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.staticCompositionLocalOf
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.ui.specials.StyledSwipeActionSide
 import com.michaelflisar.composestyled.ui.state.DataDialogState
 import com.michaelflisar.composestyled.ui.state.DialogState
+import com.michaelflisar.composestyled.ui.state.consumeRestoredVisible
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
 
 @InternalComposeStyledApi
 const val DIALOG_VISIBILITY_ANIMATION_DURATION_MILLIS = 250
+
+@InternalComposeStyledApi
+val LocalStyledDialogEnterAnimationEnabled = staticCompositionLocalOf { true }
+
+@Composable
+internal fun rememberDialogEnterAnimationEnabled(state: DialogState): Boolean {
+    val skipRestoredEnter = remember(state) { mutableStateOf(state.consumeRestoredVisible()) }
+    LaunchedEffect(state, state.visible) {
+        if (!state.visible) skipRestoredEnter.value = false
+    }
+    return !skipRestoredEnter.value
+}
 
 @Composable
 @OptIn(InternalComposeStyledApi::class)

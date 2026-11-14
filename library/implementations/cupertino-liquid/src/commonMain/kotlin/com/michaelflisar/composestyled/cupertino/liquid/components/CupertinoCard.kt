@@ -86,7 +86,7 @@ class CupertinoLiquidCard internal constructor(
             contentColor = customContent ?: StyledTheme.contentColorFor(background),
             shadowElevation = 0.dp,
             border = when {
-                customBorder != null -> BorderStroke(0.5.dp, customBorder)
+                customBorder != null -> BorderStroke(customization?.borderThickness ?: 1.dp, customBorder)
                 mappedVariant == Variant.Alternative -> BorderStroke(0.5.dp, colors.outlineVariant)
                 else -> null
             },

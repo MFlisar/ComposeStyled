@@ -9,16 +9,31 @@ button's minimum width.
 ```kotlin
 StyledBreadcrumb(
     items = listOf(
-        StyledBreadcrumbItem("Settings", onClick = { /* navigate to settings */ }),
-        StyledBreadcrumbItem("Display", onClick = { /* navigate to display */ }),
-        StyledBreadcrumbItem("Font size"),
+        StyledBreadcrumbItem(
+            label = "Home",
+            icon = StyledIcons.Home,
+            onClick = { /* navigate to home */ },
+        ),
+        StyledBreadcrumbItem(
+            icon = StyledIcons.Settings,
+            iconContentDescription = "Settings",
+            onClick = { /* navigate to settings */ },
+        ),
+        StyledBreadcrumbItem(label = "Font size"),
     ),
 )
 ```
 
+Each item's `label` and `icon` are optional, allowing text-only, icon-only, or
+combined items. Provide `iconContentDescription` for icon-only items so they
+have an accessible name.
+
 Customize colors, typography, spacing and separator size with
 `rememberStyledBreadcrumbStyle`, or provide a different `separatorIcon`. Long
-paths remain on one line and can be scrolled horizontally.
+paths remain on one line and can be scrolled horizontally. By default, adding
+items animates the scroll to the end; set `scrollToEndOnItemsAdded = false` to
+disable this behavior. Replacing or removing items does not trigger an
+auto-scroll.
 
 ## Preference navigation
 

@@ -18,8 +18,20 @@ composables; they do not accept a variant override. Use
 `StyledButton(variant = StyledButton.Variant.Filled)` when a filled style must
 remain explicit in every context. Use `StyledButtonDefaults.customize` and
 `CustomColors` for color changes rather than primary/secondary role variants.
-The `colors` argument is optional when using customization for the outline
-border alone.
+`disabledColors` applies a separate `CustomColors` mapping when `enabled` is
+false; those tokens are used directly, while omitting the argument preserves
+the active theme's disabled appearance. Filled styles use its filled background
+and foreground, while plain and outlined styles use its text foreground. The
+`colors` argument is optional when using customization for the outline border
+alone. A customized border has a default thickness of `1.dp`; override it with
+`borderThickness`:
+
+```kotlin
+StyledButtonDefaults.customize(
+    border = StyledTheme.colorScheme.primary,
+    borderThickness = 2.dp,
+)
+```
 For caller-defined content that needs click feedback without a button's minimum
 width, use [`StyledClickable`](Clickable.md).
 

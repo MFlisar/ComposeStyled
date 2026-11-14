@@ -57,10 +57,20 @@ class Material3SegmentedButtonRow internal constructor() : StyledSegmentedButton
         onItemClick: (index: Int) -> Unit,
     ) {
         val colors = segmentedButtonColors(customization)
+        val borderThickness = customization?.borderThickness ?: SegmentedButtonDefaults.BorderWidth
         if (multiSelect) {
-            MultiChoiceSegmentedButtonRow(modifier = modifier.height(IntrinsicSize.Max)) {
+            MultiChoiceSegmentedButtonRow(
+                modifier = modifier.height(IntrinsicSize.Max),
+                space = borderThickness,
+            ) {
                 items.forEachIndexed { index, item ->
                     val selected = index in selectedIndices
+                    val borderColor = when {
+                        enabled && selected -> colors.activeBorderColor
+                        enabled -> colors.inactiveBorderColor
+                        selected -> colors.disabledActiveBorderColor
+                        else -> colors.disabledInactiveBorderColor
+                    }
                     SegmentedButton(
                         checked = selected,
                         onCheckedChange = { onItemClick(index) },
@@ -70,6 +80,7 @@ class Material3SegmentedButtonRow internal constructor() : StyledSegmentedButton
                         enabled = enabled,
                         shape = SegmentedButtonDefaults.itemShape(index, items.size, itemShape),
                         colors = colors,
+                        border = SegmentedButtonDefaults.borderStroke(borderColor, borderThickness),
                         icon = {
                             if (showSelectedIcon) {
                                 SegmentedButtonDefaults.Icon(active = selected)
@@ -84,9 +95,18 @@ class Material3SegmentedButtonRow internal constructor() : StyledSegmentedButton
                 }
             }
         } else {
-            SingleChoiceSegmentedButtonRow(modifier = modifier.height(IntrinsicSize.Max)) {
+            SingleChoiceSegmentedButtonRow(
+                modifier = modifier.height(IntrinsicSize.Max),
+                space = borderThickness,
+            ) {
                 items.forEachIndexed { index, item ->
                     val selected = index in selectedIndices
+                    val borderColor = when {
+                        enabled && selected -> colors.activeBorderColor
+                        enabled -> colors.inactiveBorderColor
+                        selected -> colors.disabledActiveBorderColor
+                        else -> colors.disabledInactiveBorderColor
+                    }
                     SegmentedButton(
                         selected = selected,
                         onClick = { onItemClick(index) },
@@ -96,6 +116,7 @@ class Material3SegmentedButtonRow internal constructor() : StyledSegmentedButton
                         enabled = enabled,
                         shape = SegmentedButtonDefaults.itemShape(index, items.size, itemShape),
                         colors = colors,
+                        border = SegmentedButtonDefaults.borderStroke(borderColor, borderThickness),
                         icon = {
                             if (showSelectedIcon) {
                                 SegmentedButtonDefaults.Icon(active = selected)
@@ -126,10 +147,19 @@ private fun renderContent(
     val unselectedColor = customization?.colors?.textForeground?.resolve()
         ?.takeUnless { it == Color.Unspecified }
         ?: StyledTheme.colorScheme.onSurface
-    val contentColor = (if (selected) selectedColor else unselectedColor).let { color ->
-        if (enabled) color else color.copy(
-            alpha = color.alpha * StyledTheme.colorScheme.disableFactors.content,
-        )
+    val disabledColor = if (selected) {
+        customization?.disabledColors?.filledForeground?.resolve()
+    } else {
+        customization?.disabledColors?.textForeground?.resolve()
+    }?.takeUnless { it == Color.Unspecified }
+    val contentColor = if (!enabled && disabledColor != null) {
+        disabledColor
+    } else {
+        (if (selected) selectedColor else unselectedColor).let { color ->
+            if (enabled) color else color.copy(
+                alpha = color.alpha * StyledTheme.colorScheme.disableFactors.content,
+            )
+        }
     }
     ProvideStyledLocals(
         contentColor = contentColor,
@@ -158,4 +188,13 @@ private fun segmentedButtonColors(
     inactiveBorderColor = customization?.border?.resolve()
         ?.takeUnless { it == Color.Unspecified }
         ?: StyledTheme.colorScheme.outline,
+    disabledActiveContainerColor = customization?.disabledColors?.filledBackground?.resolve()
+        ?.takeUnless { it == Color.Unspecified }
+        ?: Color.Unspecified,
+    disabledActiveContentColor = customization?.disabledColors?.filledForeground?.resolve()
+        ?.takeUnless { it == Color.Unspecified }
+        ?: Color.Unspecified,
+    disabledInactiveContentColor = customization?.disabledColors?.textForeground?.resolve()
+        ?.takeUnless { it == Color.Unspecified }
+        ?: Color.Unspecified,
 )
