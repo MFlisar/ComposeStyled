@@ -30,7 +30,7 @@ fun PreferenceCustomItem(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     PreferenceEntry(
-        title = "",
+        title = null,
         subtitle = null,
         filterTags = filterTags,
         key = key,

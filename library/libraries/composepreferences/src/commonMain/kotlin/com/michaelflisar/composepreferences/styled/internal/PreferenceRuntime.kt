@@ -382,7 +382,7 @@ internal data class PreferenceEntryVisuals(
 /** Registers one preference entry in the active screen and renders its content when applicable. */
 @Composable
 internal fun PreferenceEntry(
-    title: String,
+    title: String?,
     subtitle: String?,
     filterTags: List<String>,
     key: String?,
@@ -405,7 +405,7 @@ internal fun PreferenceEntry(
         .split(Regex("\\s+"))
         .filter(String::isNotEmpty)
     val searchable = buildList {
-        add(title)
+        title?.let { add(it) }
         subtitle?.let(::add)
         addAll(filterTags)
         if (runtime.includeHierarchyInFilter) {

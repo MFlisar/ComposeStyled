@@ -31,7 +31,7 @@ import com.michaelflisar.composestyled.UpdateStyledThemeLocals
 @OptIn(InternalComposeStyledApi::class)
 @Composable
 internal fun PreferenceStyledRow(
-    title: String,
+    title: String?,
     subtitle: String?,
     modifier: Modifier = Modifier,
     icon: IconComposable? = null,
@@ -94,10 +94,12 @@ internal fun PreferenceStyledRow(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    StyledText(
-                        text = title,
-                        style = titleStyle ?: style.item.titleTextStyle,
-                    )
+                    if (title != null) {
+                        StyledText(
+                            text = title,
+                            style = titleStyle ?: style.item.titleTextStyle,
+                        )
+                    }
                     if (subtitle != null) {
                         StyledText(
                             text = subtitle,
@@ -120,10 +122,12 @@ internal fun PreferenceStyledRow(
             }
             inlineContent.invoke(this)
         } else {
-            StyledText(
-                text = title,
-                style = titleStyle ?: style.item.titleTextStyle,
-            )
+            if (title != null) {
+                StyledText(
+                    text = title,
+                    style = titleStyle ?: style.item.titleTextStyle,
+                )
+            }
             if (subtitle != null) {
                 StyledText(
                     text = subtitle,

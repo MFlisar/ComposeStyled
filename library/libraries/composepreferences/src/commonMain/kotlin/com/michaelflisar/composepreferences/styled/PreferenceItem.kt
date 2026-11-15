@@ -13,10 +13,10 @@ import com.michaelflisar.composepreferences.styled.internal.PreferenceEntry
 import com.michaelflisar.composepreferences.styled.layout.PreferenceStyledRow
 import com.michaelflisar.composestyled.classes.IconComposable
 
-/** A standard preference row with a leading icon, title, supporting text and optional content below the text. */
+/** A standard preference row with a leading icon, optional title, supporting text and additional content. */
 @Composable
 fun PreferenceItem(
-    title: String,
+    title: String? = null,
     subtitle: String? = null,
     modifier: Modifier = Modifier,
     key: String? = null,

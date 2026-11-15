@@ -60,6 +60,16 @@ Preference value components also have controlled overloads that take `value` and
 `onValueChange`. Use those when the state is owned by a view model or another
 caller.
 
+`PreferenceItem`'s title is optional. When omitted, the row shows its subtitle
+and other content without a title; subtitles and `filterTags` remain searchable.
+
+```kotlin
+PreferenceItem(
+    subtitle = "A description without a heading",
+    filterTags = listOf("Example", "Titleless"),
+)
+```
+
 ## Sections, groups and state
 
 `PreferenceSection` is not expandable by default, so its rows stay visible.

@@ -1,6 +1,7 @@
 package com.michaelflisar.composestyled.foundation.layout
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterExitState
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.fadeIn
@@ -9,9 +10,11 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.animate
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.snap
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
@@ -25,8 +28,10 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
@@ -46,6 +51,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.semantics
@@ -273,36 +279,64 @@ abstract class FoundationDialog : StyledDialog.Implementation {
                                 },
                                 exit = fullscreenExitTransition(style.animation),
                             ) {
-                                val entering = !fullscreenVisibility.isIdle &&
-                                    fullscreenVisibility.targetState
-                                val exiting = !fullscreenVisibility.isIdle &&
-                                    !fullscreenVisibility.targetState
-                                val fullyVisible = fullscreenVisibility.isIdle &&
-                                    fullscreenVisibility.currentState
-                                val applyStatusBarStyle: Boolean
-                                val applyNavigationBarStyle: Boolean
-                                // Vertical slides apply the edge-adjacent bar first on entry and restore it last on exit.
+                                val transitionProgress by transition.animateFloat(
+                                    transitionSpec = {
+                                        if (
+                                            initialState == EnterExitState.PreEnter &&
+                                            targetState == EnterExitState.Visible &&
+                                            !LocalStyledDialogEnterAnimationEnabled.current
+                                        ) {
+                                            snap()
+                                        } else {
+                                            tween(DIALOG_VISIBILITY_ANIMATION_DURATION_MILLIS)
+                                        }
+                                    },
+                                    label = "fullscreenDialogVisibility",
+                                ) { state ->
+                                    if (state == EnterExitState.Visible) 1f else 0f
+                                }
+                                val windowHeight = LocalWindowInfo.current.containerSize.height
+                                    .coerceAtLeast(1)
+                                val density = LocalDensity.current
+                                val barInsets = WindowInsets.safeDrawing.exclude(WindowInsets.ime)
+                                val statusBarInset =
+                                    barInsets.getTop(density).coerceIn(0, windowHeight)
+                                val navigationBarInset =
+                                    barInsets.getBottom(density).coerceIn(0, windowHeight)
+                                val statusBarThreshold: Float
+                                val navigationBarThreshold: Float
                                 when (val animation = style.animation) {
                                     StyledDialog.FullscreenAnimation.Fade -> {
-                                        applyStatusBarStyle = fullyVisible
-                                        applyNavigationBarStyle = fullyVisible
+                                        statusBarThreshold = 1f
+                                        navigationBarThreshold = 1f
                                     }
                                     is StyledDialog.FullscreenAnimation.Slide -> when (animation.direction) {
                                         StyledDialog.FullscreenAnimation.SlideDirection.FromTop -> {
-                                            applyStatusBarStyle = entering || exiting || fullyVisible
-                                            applyNavigationBarStyle = fullyVisible
+                                            statusBarThreshold = 0f
+                                            navigationBarThreshold =
+                                                (windowHeight - navigationBarInset).toFloat() /
+                                                    windowHeight
                                         }
                                         StyledDialog.FullscreenAnimation.SlideDirection.FromBottom -> {
-                                            applyStatusBarStyle = fullyVisible
-                                            applyNavigationBarStyle = entering || exiting || fullyVisible
+                                            statusBarThreshold =
+                                                (windowHeight - statusBarInset).toFloat() /
+                                                    windowHeight
+                                            navigationBarThreshold =
+                                                navigationBarInset.toFloat() / windowHeight
                                         }
                                         StyledDialog.FullscreenAnimation.SlideDirection.FromLeft,
                                         StyledDialog.FullscreenAnimation.SlideDirection.FromRight -> {
-                                            applyStatusBarStyle = fullyVisible
-                                            applyNavigationBarStyle = fullyVisible
+                                            statusBarThreshold = 1f
+                                            navigationBarThreshold = 1f
                                         }
                                     }
                                 }
+                                val applyStatusBarStyle =
+                                    transitionProgress > 0f &&
+                                        transitionProgress >= statusBarThreshold
+                                val applyNavigationBarStyle =
+                                    transitionProgress > 0f &&
+                                        transitionProgress >= navigationBarThreshold
                                 Fullscreen(
                                     Modifier.fillMaxSize(), shape, title, buttons, content,
                                     edgeToEdge = true,

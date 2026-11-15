@@ -1,11 +1,8 @@
 package com.michaelflisar.demo.demos.libraries
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableFloatStateOf
@@ -46,20 +43,10 @@ import com.michaelflisar.composestyled.ui.layout.StyledRow
 import com.michaelflisar.composestyled.ui.layout.StyledScaffold
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.ui.state.rememberDialogState
-import com.michaelflisar.demo.PreferenceTest
 import com.michaelflisar.demo.helper.DemoTopBar
 
 @Composable
 internal fun DemoPagePreferences(onBack: () -> Unit) {
-
-    // TEST
-    // StyledScaffold {
-    //     Box(modifier = Modifier.height(400.dp).padding(it)) {
-    //         PreferenceTest()
-    //     }
-    // }
-    // return
-
     // "preferences"
     val notifications = rememberSaveable { mutableStateOf(true) }
     val cloudSync = rememberSaveable { mutableStateOf(true) }
@@ -203,173 +190,154 @@ internal fun DemoPagePreferences(onBack: () -> Unit) {
                 style = preferenceStyle
             ) {
                 PreferenceSection(
-                    title = "General",
+                    title = "Boolean Preferences",
                     isExpandable = false,
-                    filterTags = listOf("Basics", "Preferences"),
+                    filterTags = listOf("Toggle", "Switch", "Preferences"),
                 ) {
-                    PreferenceBool(
-                        value = notifications,
-                        title = "Notifications",
-                        subtitle = "Show updates and reminders",
-                        filterTags = listOf("Alerts"),
-                        icon = StyledIcons.Notifications
-                    )
-                    PreferenceList(
-                        items = themeModes,
-                        selected = themeMode,
-                        title = "Theme mode",
-                        subtitle = "Choose how the app follows your system appearance",
-                        filterTags = listOf("Appearance", "Light", "Dark"),
-                        icon = StyledIcons.Settings
-                    )
-                    PreferenceList(
-                        items = languages,
-                        selected = language,
-                        title = "Language",
-                        subtitle = "Language used for menus and messages",
-                        filterTags = listOf("Localization", "Locale"),
-                        icon = StyledIcons.Settings
-                    )
+                    PreferenceGroup(title = "Boolean preference") {
+                        PreferenceBool(
+                            value = notifications,
+                            title = "Notifications",
+                            subtitle = "Show updates and reminders",
+                            filterTags = listOf("Alerts"),
+                            icon = StyledIcons.Notifications
+                        )
+                        PreferenceBool(
+                            value = cloudSync,
+                            title = "Cloud Sync",
+                            subtitle = "Keep preferences in sync across devices",
+                            filterTags = listOf("Backup", "Account"),
+                        )
+                        PreferenceBool(
+                            value = usageAnalytics,
+                            title = "Usage Analytics",
+                            subtitle = "Share anonymous diagnostics to improve the app",
+                            filterTags = listOf("Telemetry", "Diagnostics"),
+                        )
+                    }
                 }
 
                 PreferenceSection(
-                    title = "Section with groups",
+                    title = "Selection Preferences",
                     isExpandable = false,
-                    filterTags = listOf("Basics", "Preferences"),
+                    filterTags = listOf("List", "Dropdown", "Selection"),
                 ) {
                     PreferenceGroup(
-                        title = "Appearance",
-                        subtitle = "Customize theme colors, typography, and layout",
-                        icon = StyledIcons.Settings,
-                        filterTags = listOf("Visuals", "Theme", "Design"),
-                        shape = StyledTheme.shapes.small,
+                        title = "Single selection",
+                        subtitle = "Choose one option from a list or dropdown",
+                        filterTags = listOf("Single-select", "List", "Dropdown"),
                     ) {
-                        PreferenceSection(
-                            title = "Theme Colors",
-                            isExpandable = true,
-                            filterTags = listOf("Palette", "Brand", "Background", "Foreground"),
-                        ) {
-                            PreferenceList(
-                                items = brandColors,
-                                selected = primaryColor,
-                                title = "Primary Color",
-                                subtitle = "Main brand color for prominent actions",
-                                filterTags = listOf("Accent", "Brand", "Actions"),
-                                presentation = PreferenceList.Presentation.Dropdown(
-                                    clickBehavior =
-                                        PreferenceList.Presentation.Dropdown.ClickBehavior.DropdownOnly,
-                                ),
-                                itemLeadingContent = { color ->
-                                    //if (color == primaryColor.value) {
-                                        StyledIcon(icon = StyledIcons.Check)
-                                    //}
-                                },
-                            )
-                            PreferenceList(
-                                items = secondaryColors,
-                                selected = secondaryColor,
-                                title = "Secondary Color",
-                                subtitle = "Supporting accent for less prominent elements",
-                                filterTags = listOf("Accent", "Supporting", "Brand"),
-                            )
-                            PreferenceList(
-                                items = backgroundColors,
-                                selected = backgroundColor,
-                                title = "Background Color",
-                                subtitle = "Default surface behind preference content",
-                                filterTags = listOf("Canvas", "Surface", "Dark mode"),
-                            )
-                            PreferenceList(
-                                items = foregroundColors,
-                                selected = foregroundColor,
-                                title = "Foreground Color",
-                                subtitle = "Text and icon color shown on surfaces",
-                                filterTags = listOf("Text", "Contrast", "Accessibility"),
-                            )
-                        }
-                        PreferenceSection(
-                            title = "Typography & Layout",
-                            isExpandable = true,
-                            filterTags = listOf("Font", "Text", "Spacing", "Density"),
-                        ) {
-                            PreferenceNumber(
-                                value = fontScale,
-                                title = "Font Scale",
-                                subtitle = "Adjust the overall text size",
-                                style = PreferenceNumber.Style.Slider,
-                                valueRange = 0.75f..1.5f,
-                                stepSize = 0.05f,
-                                filterTags = listOf("Typography", "Accessibility", "Text size"),
-                            )
-                            PreferenceList(
-                                items = densities,
-                                selected = density,
-                                title = "Layout Density",
-                                subtitle = "Choose the spacing between controls",
-                                filterTags = listOf("Compact", "Spacing")
-                            )
-                            PreferenceListMultiSelect(
-                                items = areas,
-                                selected = visibleAreas,
-                                title = "Visible Areas",
-                                presentation = PreferenceList.Presentation.Dropdown(),
-                                filter = PreferenceList.Filter(label = "Filter areas"),
-                                filterTags = listOf("Navigation", "Menu"),
-
-                            )
-                        }
+                        PreferenceList(
+                            items = themeModes,
+                            selected = themeMode,
+                            title = "Theme mode",
+                            subtitle = "Choose how the app follows your system appearance",
+                            filterTags = listOf("Appearance", "Light", "Dark"),
+                            icon = StyledIcons.Settings
+                        )
+                        PreferenceList(
+                            items = languages,
+                            selected = language,
+                            title = "Language",
+                            subtitle = "Language used for menus and messages",
+                            filterTags = listOf("Localization", "Locale"),
+                            icon = StyledIcons.Settings
+                        )
+                        PreferenceList(
+                            items = brandColors,
+                            selected = primaryColor,
+                            title = "Primary Color",
+                            subtitle = "Main brand color for prominent actions",
+                            filterTags = listOf("Accent", "Brand", "Actions"),
+                            presentation = PreferenceList.Presentation.Dropdown(
+                                clickBehavior =
+                                    PreferenceList.Presentation.Dropdown.ClickBehavior.DropdownOnly,
+                            ),
+                            itemLeadingContent = {
+                                StyledIcon(icon = StyledIcons.Check)
+                            },
+                        )
+                        PreferenceList(
+                            items = secondaryColors,
+                            selected = secondaryColor,
+                            title = "Secondary Color",
+                            subtitle = "Supporting accent for less prominent elements",
+                            filterTags = listOf("Accent", "Supporting", "Brand"),
+                        )
+                        PreferenceList(
+                            items = backgroundColors,
+                            selected = backgroundColor,
+                            title = "Background Color",
+                            subtitle = "Default surface behind preference content",
+                            filterTags = listOf("Canvas", "Surface", "Dark mode"),
+                        )
+                        PreferenceList(
+                            items = foregroundColors,
+                            selected = foregroundColor,
+                            title = "Foreground Color",
+                            subtitle = "Text and icon color shown on surfaces",
+                            filterTags = listOf("Text", "Contrast", "Accessibility"),
+                        )
+                        PreferenceList(
+                            items = densities,
+                            selected = density,
+                            title = "Layout Density",
+                            subtitle = "Choose the spacing between controls",
+                            filterTags = listOf("Compact", "Spacing")
+                        )
                     }
-
                     PreferenceGroup(
-                        title = "Privacy & Data",
-                        subtitle = "Manage sync and diagnostic information",
-                        filterTags = listOf("Account", "Cloud", "Diagnostics"),
+                        title = "Multiple selection",
+                        subtitle = "Select several options from a filtered dropdown",
+                        filterTags = listOf("Multi-select", "Dropdown", "Filter"),
                     ) {
-                        PreferenceSection(
-                            title = "Data & Privacy",
-                            isExpandable = true,
-                            filterTags = listOf("Permissions", "Telemetry"),
-                        ) {
-                            PreferenceBool(
-                                value = cloudSync,
-                                title = "Cloud Sync",
-                                subtitle = "Keep preferences in sync across devices",
-                                filterTags = listOf("Backup", "Account"),
-                            )
-                            PreferenceItem(
-                                title = "Custom shape",
-                                subtitle = "This row separates the section shape",
-                                contentColor = StyledTheme.colorScheme.warning,
-                                shape = StyledTheme.shapes.small,
-                            )
-                            PreferenceBool(
-                                value = usageAnalytics,
-                                title = "Usage Analytics",
-                                subtitle = "Share anonymous diagnostics to improve the app",
-                                filterTags = listOf("Telemetry", "Diagnostics"),
-                            )
-                        }
+                        PreferenceListMultiSelect(
+                            items = areas,
+                            selected = visibleAreas,
+                            title = "Visible Areas",
+                            presentation = PreferenceList.Presentation.Dropdown(),
+                            filter = PreferenceList.Filter(label = "Filter areas"),
+                            filterTags = listOf("Navigation", "Menu"),
+                        )
                     }
                 }
 
-                PreferenceGroup(
-                    title = "Advanced",
-                    subtitle = "Developer options and custom settings",
-                    filterTags = listOf("Developer", "Expert"),
-                    shape = StyledTheme.shapes.small,
+                PreferenceSection(
+                    title = "Value Preferences",
+                    isExpandable = false,
+                    filterTags = listOf("Input", "Value", "Preferences"),
                 ) {
-                    PreferenceBool(
-                        value = notifications,
-                        title = "Notifications",
-                        subtitle = "Show updates and reminders",
-                        filterTags = listOf("Alerts"),
-                        icon = StyledIcons.Notifications
-                    )
+                    PreferenceGroup(title = "Numeric preference") {
+                        PreferenceNumber(
+                            value = fontScale,
+                            title = "Font Scale",
+                            subtitle = "Adjust the overall text size",
+                            style = PreferenceNumber.Style.Slider,
+                            valueRange = 0.75f..1.5f,
+                            stepSize = 0.05f,
+                            filterTags = listOf("Typography", "Accessibility", "Text size"),
+                        )
+                    }
+                    PreferenceGroup(title = "Text input preference") {
+                        PreferenceInputText(
+                            value = profileLabel,
+                            title = "Profile Label",
+                            subtitle = "Custom label used in the account menu",
+                            filterTags = listOf("Account", "Name"),
+                            shape = StyledTheme.shapes.small,
+                        )
+                    }
+                }
 
-                    PreferenceSection(
-                        title = "Developer Options",
-                        isExpandable = false,
-                        filterTags = listOf("Debug", "Testing"),
+                PreferenceSection(
+                    title = "Actions",
+                    isExpandable = false,
+                    filterTags = listOf("Switch", "Dialog", "Interaction"),
+                ) {
+                    PreferenceGroup(
+                        title = "Split switch",
+                        subtitle = "Open details or toggle the value independently",
+                        filterTags = listOf("Dialog", "Advanced"),
                     ) {
                         PreferenceSplitSwitch(
                             value = advancedMode,
@@ -379,16 +347,28 @@ internal fun DemoPagePreferences(onBack: () -> Unit) {
                             filterTags = listOf("Experimental"),
                             shape = StyledTheme.shapes.small,
                         )
-                        PreferenceInputText(
-                            value = profileLabel,
-                            title = "Profile Label",
-                            subtitle = "Custom label used in the account menu",
-                            filterTags = listOf("Account", "Name"),
+                    }
+                }
+
+                PreferenceSection(
+                    title = "Item Content",
+                    isExpandable = false,
+                    filterTags = listOf("Custom", "Content", "Layout"),
+                ) {
+                    PreferenceGroup(
+                        title = "Standard item variations",
+                        subtitle = "Shape, trailing content, inline content, and titleless items",
+                        filterTags = listOf("Subtitle", "Inline", "Trailing", "Titleless"),
+                    ) {
+                        PreferenceItem(
+                            title = "Custom shape",
+                            subtitle = "This row separates the section shape",
+                            contentColor = StyledTheme.colorScheme.warning,
                             shape = StyledTheme.shapes.small,
                         )
                         PreferenceItem(
-                            title = "Custom Content",
-                            subtitle = "Trailing and inline content can be combined",
+                            title = "Trailing and inline content",
+                            subtitle = "Combine custom content slots",
                             content = {
                                 StyledText("Trailing")
                             },
@@ -397,45 +377,67 @@ internal fun DemoPagePreferences(onBack: () -> Unit) {
                             },
                             filterTags = listOf("Example", "Inline", "Trailing"),
                         )
-                        PreferenceCustomItem(
-                            filterTags = listOf("Example", "Custom"),
-                        ) {
+                        PreferenceItem(
+                            subtitle = "This preference has no title",
+                            filterTags = listOf("Example", "Titleless"),
+                        )
+                    }
+                    PreferenceGroup(
+                        title = "Custom item",
+                        subtitle = "Provide the complete content layout",
+                        filterTags = listOf("Example", "Custom"),
+                    ) {
+                        PreferenceCustomItem {
                             StyledText("This item owns its complete content layout.")
                             StyledText("It has no built-in title or subtitle.")
                         }
                     }
                 }
 
-                PreferenceGroup(
-                    title = "Test with simple items in group"
-                ) {
-                    PreferenceItem(title = "Item 1")
-                    PreferenceItem(title = "Item 2")
-                    PreferenceGroup(
-                        title = "Item 3 - with sub items"
-                    ) {
-                        PreferenceItem(title = "Item 1")
-                        PreferenceItem(title = "Item 2")
-                        PreferenceItem(title = "Item 3")
-                    }
-                    PreferenceItem(title = "Item 4")
-                }
-
-                PreferenceSection {
-                    PreferenceItem(title = "Grouped without a section title")
-                    PreferenceItem(title = "Another grouped item")
-                }
-
                 PreferenceSection(
-                    title = "More",
-                    isExpandable = true,
-                    isInitiallyExpanded = false,
-                    filterTags = listOf("Debug", "Testing"),
+                    title = "Sections and Groups",
+                    isExpandable = false,
+                    filterTags = listOf("Layout", "Nested", "Expandable"),
                 ) {
-                    PreferenceItem(
-                        title = "More",
-                        subtitle = "Item in section that is not initially expanded"
-                    )
+                    PreferenceGroup(
+                        title = "Nested groups",
+                        subtitle = "Place related items in nested groups",
+                    ) {
+                        PreferenceItem(title = "Item before nested group")
+                        PreferenceGroup(
+                            title = "Nested group",
+                            subtitle = "A group inside another group",
+                        ) {
+                            PreferenceItem(title = "Nested item 1")
+                            PreferenceItem(title = "Nested item 2")
+                        }
+                        PreferenceItem(title = "Item after nested group")
+                    }
+                    PreferenceGroup(
+                        title = "Expandable section",
+                        subtitle = "Sections can start collapsed",
+                    ) {
+                        PreferenceSection(
+                            title = "More options",
+                            isExpandable = true,
+                            isInitiallyExpanded = false,
+                            filterTags = listOf("Debug", "Testing"),
+                        ) {
+                            PreferenceItem(
+                                title = "Hidden until expanded",
+                                subtitle = "Expand the section to see this item",
+                            )
+                        }
+                    }
+                    PreferenceGroup(
+                        title = "Section without a title",
+                        subtitle = "Items can also be grouped without a section heading",
+                    ) {
+                        PreferenceSection {
+                            PreferenceItem(title = "Grouped without a section title")
+                            PreferenceItem(title = "Another grouped item")
+                        }
+                    }
                 }
             }
         }
