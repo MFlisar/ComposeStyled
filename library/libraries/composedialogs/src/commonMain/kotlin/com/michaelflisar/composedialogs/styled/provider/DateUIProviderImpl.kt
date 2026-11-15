@@ -1,19 +1,23 @@
 package com.michaelflisar.composedialogs.styled.provider
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.michaelflisar.composedialogs.dialogs.date.DateColor
 import com.michaelflisar.composedialogs.dialogs.date.DatePickerButtonType
+import com.michaelflisar.composedialogs.dialogs.date.DatePickerCellType
 import com.michaelflisar.composedialogs.dialogs.date.DatePickerIcon
 import com.michaelflisar.composedialogs.dialogs.date.DateTextStyle
 import com.michaelflisar.composedialogs.dialogs.date.DateUIProvider
@@ -22,8 +26,6 @@ import com.michaelflisar.composestyled.classes.CustomColors
 import com.michaelflisar.composestyled.tokens.LocalStyledContentColor
 import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.ui.components.StyledButtonDefaults
-import com.michaelflisar.composestyled.ui.components.StyledCard
-import com.michaelflisar.composestyled.ui.components.StyledCardDefaults
 import com.michaelflisar.composestyled.ui.components.StyledIcon
 import com.michaelflisar.composestyled.ui.components.StyledIconButton
 import com.michaelflisar.composestyled.ui.icons.StyledIcons
@@ -158,33 +160,63 @@ internal object DateUIProviderImpl : DateUIProvider {
     @Composable
     override fun CalendarCell(
         date: LocalDate,
-        selected: Boolean,
-        today: Boolean,
+        type: DatePickerCellType,
         modifier: Modifier,
-        onClick: () -> Unit,
+        onClick: () -> Unit
     ) {
-        StyledCard(
-            modifier = modifier,
-            shape = StyledTheme.shapes.small,
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp),
-            customization = if (!selected) {
-                val border = if (today) 2.dp else 1.dp
-                val color =
-                    if (today) StyledTheme.colorScheme.primary else StyledTheme.colorScheme.outline
-                StyledCardDefaults.customize(border = color, borderThickness = border)
-            } else StyledCardDefaults.customize(CustomColors.Primary),
-            onClick = if (selected) null else onClick,
-            applyContentPadding = false,
-            variant = if (selected) StyledCard.Variant.Filled else StyledCard.Variant.Outlined,
-        ) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center,
-            ) {
-                StyledText(
-                    text = date.day.toString(),
-                    color = if (selected) StyledTheme.colorScheme.onPrimary else Color.Unspecified,
-                )
+        when (type) {
+            is DatePickerCellType.OtherMonth -> {
+                val background = if (type.selected) {
+                    StyledTheme.colorScheme.primary.copy(alpha = 0.12f)
+                } else {
+                    Color.Transparent
+                }
+                val textColor = if (type.selected) {
+                    StyledTheme.colorScheme.primary.copy(alpha = 0.38f)
+                } else {
+                    StyledTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                }
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = modifier
+                        .clip(StyledTheme.shapes.small)
+                        .background(background)
+                ) {
+                    StyledText(date.day.toString(), color = textColor)
+                }
+            }
+
+            is DatePickerCellType.CurrentMonth -> {
+                if (type.selected) {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = modifier
+                            .clip(StyledTheme.shapes.small)
+                            .background(StyledTheme.colorScheme.primary)
+                    ) {
+                        StyledText(
+                            date.day.toString(),
+                            color = StyledTheme.colorScheme.onPrimary
+                        )
+                    }
+                } else {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = modifier
+                            .border(
+                                if (type.today) 2.dp else 1.dp,
+                                if (type.today) {
+                                    StyledTheme.colorScheme.primary
+                                } else {
+                                    StyledTheme.colorScheme.outline
+                                },
+                                StyledTheme.shapes.small
+                            )
+                            .clickable(onClick = onClick)
+                    ) {
+                        StyledText(date.day.toString())
+                    }
+                }
             }
         }
     }

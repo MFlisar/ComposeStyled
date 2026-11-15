@@ -7,6 +7,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import com.michaelflisar.composedialogs.dialogs.color.ColorPickerConfig
+import com.michaelflisar.composedialogs.dialogs.color.ColorPickerDefaults
 import com.michaelflisar.composedialogs.dialogs.date.DatePickerDefaults
 import com.michaelflisar.composedialogs.dialogs.frequency.classes.Frequency
 import com.michaelflisar.composedialogs.styled.DialogColor
@@ -143,7 +145,6 @@ internal fun DemoPageComposeDialogs(onBack: () -> Unit) {
         state = colorDialog,
         color = selectedColor,
         style = dialogStyle,
-        directEditSupported = true,
         title = { StyledText("Choose a color") },
         buttons = doneButton(),
     )

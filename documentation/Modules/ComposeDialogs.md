@@ -20,9 +20,10 @@ uses the `com.michaelflisar.composedialogs.styled.provider` implementations.
 
 `DialogDate` accepts a `DatePickerConfig` from `ui-date`, which can be created
 with `DatePickerDefaults.config()` to define the supported years, localized
-formatting, and picker behavior. In landscape, its title and icon move into the
-picker content and the date-selection buttons are arranged vertically alongside
-the calendar.
+formatting, and picker behavior. Its optional `buttonToday` content defaults to
+the picker's localized Today label; pass `null` to hide the button. In landscape,
+its title and icon move into the picker content and the date-selection buttons
+are arranged vertically alongside the calendar.
 
 `DialogFrequency` takes one `MutableState<Frequency>` from
 `ui-frequency`; the immutable frequency model contains its type, interval, and

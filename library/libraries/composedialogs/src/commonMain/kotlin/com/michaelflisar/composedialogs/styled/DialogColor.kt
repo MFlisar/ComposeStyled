@@ -4,13 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 import com.michaelflisar.composedialogs.dialogs.color.ColorPicker
+import com.michaelflisar.composedialogs.dialogs.color.ColorPickerConfig
 import com.michaelflisar.composedialogs.dialogs.color.ColorPickerDefaults
-import com.michaelflisar.composedialogs.dialogs.color.ColorPickerLabelStyle
 import com.michaelflisar.composedialogs.dialogs.color.ColorPickerTexts
 import com.michaelflisar.composedialogs.styled.provider.ColorUIProviderImpl
-import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.isLandscape
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
 import com.michaelflisar.composestyled.ui.layout.StyledDialogDefaults
@@ -23,11 +21,7 @@ fun DialogColor(
     color: MutableState<Color>,
     modifier: Modifier = Modifier,
     texts: ColorPickerTexts = ColorPickerDefaults.texts(),
-    alphaSupported: Boolean = true,
-    directEditSupported: Boolean = true,
-    shape: Shape = StyledTheme.shapes.small,
-    gridSize: Int = if (isLandscape) 6 else 4,
-    labelStyle: ColorPickerLabelStyle = ColorPickerLabelStyle.Value,
+    config: ColorPickerConfig = ColorPickerDefaults.config(),
     style: StyledDialog.Style = StyledDialogDefaults.style,
     properties: StyledDialog.Properties = StyledDialog.Properties(),
     title: (@Composable () -> Unit)? = null,
@@ -50,11 +44,7 @@ fun DialogColor(
                     uiProvider = ColorUIProviderImpl,
                     color = color,
                     texts = texts,
-                    alphaSupported = alphaSupported,
-                    directEditSupported = directEditSupported,
-                    shape = shape,
-                    gridSize = gridSize,
-                    labelStyle = labelStyle,
+                    config = config,
                     landscape = landscape,
                 )
             }

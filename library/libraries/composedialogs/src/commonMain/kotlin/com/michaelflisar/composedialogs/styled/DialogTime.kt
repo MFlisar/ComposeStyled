@@ -8,8 +8,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import com.michaelflisar.composedialogs.dialogs.time.TimePicker
+import com.michaelflisar.composedialogs.dialogs.time.TimePickerConfig
 import com.michaelflisar.composedialogs.dialogs.time.TimePickerDefaults
-import com.michaelflisar.composedialogs.dialogs.time.TimePickerSetup
 import com.michaelflisar.composedialogs.dialogs.time.TimePickerTexts
 import com.michaelflisar.composedialogs.styled.provider.TimeUIProviderImpl
 import com.michaelflisar.composedialogs.styled.shared.withPositiveButtonEnabled
@@ -24,7 +24,7 @@ fun DialogTime(
     state: DialogState,
     time: MutableState<LocalTime>,
     modifier: Modifier = Modifier,
-    setup: TimePickerSetup = TimePickerDefaults.setup(),
+    config: TimePickerConfig = TimePickerDefaults.config(),
     texts: TimePickerTexts = TimePickerDefaults.texts(),
     style: StyledDialog.Style = StyledDialogDefaults.style,
     properties: StyledDialog.Properties = StyledDialog.Properties(),
@@ -46,10 +46,7 @@ fun DialogTime(
             if (state.visible) {
                 TimePicker(
                     time = time,
-                    is24Hours = setup.is24Hours,
-                    minuteStep = setup.minuteStep,
-                    hourPickType = setup.hourPickType,
-                    minutePickType = setup.minutePickType,
+                    config = config,
                     texts = texts,
                     uiProvider = TimeUIProviderImpl,
                     onValidationChanged = { isValid = it },

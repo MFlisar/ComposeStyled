@@ -2,17 +2,21 @@ package com.michaelflisar.composedialogs.styled
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.michaelflisar.composedialogs.dialogs.date.DatePicker
 import com.michaelflisar.composedialogs.dialogs.date.DatePickerButtons
 import com.michaelflisar.composedialogs.dialogs.date.DatePickerConfig
 import com.michaelflisar.composedialogs.dialogs.date.DatePickerDefaults
-import com.michaelflisar.composedialogs.dialogs.date.DatePickerMain
+import com.michaelflisar.composedialogs.dialogs.date.rememberDatePickerState
 import com.michaelflisar.composedialogs.styled.provider.DateUIProviderImpl
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.UpdateStyledThemeLocals
@@ -20,6 +24,7 @@ import com.michaelflisar.composestyled.isLandscape
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
 import com.michaelflisar.composestyled.ui.layout.StyledDialogDefaults
+import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.ui.state.DialogState
 import kotlinx.datetime.LocalDate
 
@@ -28,6 +33,7 @@ import kotlinx.datetime.LocalDate
  *
  * @param date the selected date state
  * @param config the date picker's formatting, behavior, and supported year range
+ * @param buttonToday optional content for the Today button; pass null to hide it
  */
 @OptIn(InternalComposeStyledApi::class)
 @Composable
@@ -35,6 +41,9 @@ fun DialogDate(
     state: DialogState,
     date: MutableState<LocalDate>,
     config: DatePickerConfig = DatePickerDefaults.config(),
+    buttonToday: (@Composable () -> Unit)? = {
+        StyledText(text = DatePickerDefaults.texts().today)
+    },
     modifier: Modifier = Modifier,
     style: StyledDialog.Style = StyledDialogDefaults.style,
     properties: StyledDialog.Properties = StyledDialog.Properties(),
@@ -44,6 +53,9 @@ fun DialogDate(
     onDismissRequest: () -> Unit = state::dismiss,
 ) {
     val landscape = isLandscape
+    val pickerState = key(state.visible) {
+        rememberDatePickerState(date, config)
+    }
     StyledDialog(
         state = state,
         modifier = modifier,
@@ -57,19 +69,14 @@ fun DialogDate(
         onDismissRequest = onDismissRequest,
         content = StyledDialogDefaults.content {
             if (state.visible) {
-                DatePickerMain(
-                    uiProvider = DateUIProviderImpl,
-                    date = date,
-                    config = config,
-                    landscape = landscape,
-                ) { selectedDateEnabled, onSelectedDateClick, todayEnabled, onTodayClick ->
-                    if (landscape) {
+                if (landscape) {
+                    Row {
                         Column {
                             if (icon != null) {
                                 Box(modifier = Modifier.align(Alignment.CenterHorizontally)) {
                                     icon()
                                 }
-                                Spacer(modifier = Modifier.height(8.dp))
+                                Spacer(modifier = Modifier.height(StyledTheme.spacing.medium))
                             }
                             if (title != null) {
                                 UpdateStyledThemeLocals(
@@ -83,25 +90,37 @@ fun DialogDate(
                             }
                             DatePickerButtons(
                                 uiProvider = DateUIProviderImpl,
-                                date = date,
+                                state = pickerState,
                                 config = config,
-                                landscape = true,
-                                selectedDateEnabled = selectedDateEnabled,
-                                onSelectedDateClick = onSelectedDateClick,
-                                todayEnabled = todayEnabled,
-                                onTodayClick = onTodayClick,
+                                arrangeVertically = true,
+                                horizontalSpacing = StyledTheme.spacing.medium,
+                                buttonToday = buttonToday,
                             )
                         }
-                    } else {
+                        Spacer(modifier = Modifier.width(StyledTheme.spacing.medium))
+                        DatePicker(
+                            uiProvider = DateUIProviderImpl,
+                            state = pickerState,
+                            config = config,
+                            modifier = Modifier,
+                        )
+                    }
+                } else {
+                    Column {
                         DatePickerButtons(
                             uiProvider = DateUIProviderImpl,
-                            date = date,
+                            state = pickerState,
                             config = config,
-                            landscape = false,
-                            selectedDateEnabled = selectedDateEnabled,
-                            onSelectedDateClick = onSelectedDateClick,
-                            todayEnabled = todayEnabled,
-                            onTodayClick = onTodayClick,
+                            arrangeVertically = false,
+                            horizontalSpacing = StyledTheme.spacing.medium,
+                            buttonToday = buttonToday,
+                        )
+                        Spacer(modifier = Modifier.height(StyledTheme.spacing.medium))
+                        DatePicker(
+                            uiProvider = DateUIProviderImpl,
+                            state = pickerState,
+                            config = config,
+                            modifier = Modifier,
                         )
                     }
                 }

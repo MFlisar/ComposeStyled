@@ -3,7 +3,7 @@ package com.michaelflisar.composedialogs.styled.provider
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
@@ -17,15 +17,16 @@ import androidx.compose.ui.unit.dp
 import com.michaelflisar.composedialogs.dialogs.frequency.FrequencyTextStyle
 import com.michaelflisar.composedialogs.dialogs.frequency.FrequencyUIProvider
 import com.michaelflisar.composedialogs.dialogs.frequency.classes.Frequency
-import com.michaelflisar.composedialogs.dialogs.time.TimePickerSetup
+import com.michaelflisar.composedialogs.dialogs.time.TimePickerConfig
 import com.michaelflisar.composedialogs.styled.DialogTime
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.tokens.LocalStyledTextStyle
+import com.michaelflisar.composestyled.ui.components.StyledIcon
 import com.michaelflisar.composestyled.ui.components.StyledInput
 import com.michaelflisar.composestyled.ui.components.StyledPopupDropdown
 import com.michaelflisar.composestyled.ui.components.StyledTextButton
-import com.michaelflisar.composestyled.ui.components.StyledIcon
 import com.michaelflisar.composestyled.ui.icons.StyledIcons
+import com.michaelflisar.composestyled.ui.layout.StyledDialog
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.ui.state.rememberDialogState
 import kotlinx.datetime.DayOfWeek
@@ -65,6 +66,7 @@ internal object FrequencyUIProviderImpl : FrequencyUIProvider {
             FrequencyTextStyle.CurrentSmall -> currentStyle.copy(
                 fontSize = currentStyle.fontSize * 0.8f,
             )
+
             FrequencyTextStyle.TitleSmall -> StyledTheme.typography.titleSmall
         }
         StyledText(
@@ -158,37 +160,34 @@ internal object FrequencyUIProviderImpl : FrequencyUIProvider {
         selectedTime: LocalTime,
         onTimeSelected: (LocalTime) -> Unit,
         title: String,
-        setup: TimePickerSetup,
+        saveTime: String,
+        config: TimePickerConfig,
         modifier: Modifier,
     ) {
         val currentSelectedTime = rememberUpdatedState(selectedTime)
         val currentOnTimeSelected = rememberUpdatedState(onTimeSelected)
-        val selectedTimeState = remember {
-            // Bridge the value/callback API to DialogTime's MutableState API.
-            object : MutableState<LocalTime> {
-                override var value: LocalTime
-                    get() = currentSelectedTime.value
-                    set(value) {
-                        currentOnTimeSelected.value(value)
-                    }
-
-                override fun component1(): LocalTime = value
-
-                override fun component2(): (LocalTime) -> Unit = { value = it }
-            }
-        }
+        val editedTime = remember { mutableStateOf(selectedTime) }
         val dialogState = rememberDialogState()
         InputButton(
             modifier = modifier.fillMaxWidth(),
             title = title,
             value = selectedTime.toString(),
-            onClick = dialogState::show,
+            onClick = {
+                editedTime.value = currentSelectedTime.value
+                dialogState.show()
+            },
         )
         DialogTime(
             state = dialogState,
-            time = selectedTimeState,
-            setup = setup,
+            time = editedTime,
+            config = config,
             title = { StyledText(title) },
+            buttons = StyledDialog.Buttons(
+                positive = StyledDialog.Button(
+                    label = saveTime,
+                    onClick = { currentOnTimeSelected.value(editedTime.value) },
+                ),
+            ),
         )
     }
 

@@ -5,19 +5,16 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import com.michaelflisar.composedialogs.dialogs.frequency.FrequencyIntervalInputType
 import com.michaelflisar.composedialogs.dialogs.frequency.FrequencyPicker
+import com.michaelflisar.composedialogs.dialogs.frequency.FrequencyPickerConfig
 import com.michaelflisar.composedialogs.dialogs.frequency.FrequencyPickerDefaults
 import com.michaelflisar.composedialogs.dialogs.frequency.FrequencyPickerTexts
 import com.michaelflisar.composedialogs.dialogs.frequency.classes.Frequency
-import com.michaelflisar.composedialogs.dialogs.time.TimePickerDefaults
-import com.michaelflisar.composedialogs.dialogs.time.TimePickerSetup
 import com.michaelflisar.composedialogs.styled.provider.FrequencyUIProviderImpl
 import com.michaelflisar.composedialogs.styled.shared.withPositiveButtonEnabled
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
 import com.michaelflisar.composestyled.ui.layout.StyledDialogDefaults
 import com.michaelflisar.composestyled.ui.state.DialogState
-import kotlinx.datetime.DayOfWeek
 
 /** Shows the ComposeDialogs frequency editor in a Styled dialog. */
 @Composable
@@ -26,10 +23,7 @@ fun DialogFrequency(
     frequency: MutableState<Frequency>,
     modifier: Modifier = Modifier,
     texts: FrequencyPickerTexts = FrequencyPickerDefaults.texts(),
-    supportedTypes: List<Frequency.Type> = Frequency.Type.entries,
-    firstDayOffset: DayOfWeek = DayOfWeek.MONDAY,
-    intervalInputType: FrequencyIntervalInputType = FrequencyIntervalInputType.Input,
-    timeSetup: TimePickerSetup = TimePickerDefaults.setup(),
+    config: FrequencyPickerConfig = FrequencyPickerDefaults.config(),
     style: StyledDialog.Style = StyledDialogDefaults.style,
     properties: StyledDialog.Properties = StyledDialog.Properties(),
     title: (@Composable () -> Unit)? = null,
@@ -54,10 +48,7 @@ fun DialogFrequency(
                     uiProvider = FrequencyUIProviderImpl,
                     frequency = frequency,
                     texts = texts,
-                    supportedTypes = supportedTypes,
-                    firstDayOffset = firstDayOffset,
-                    intervalInputType = intervalInputType,
-                    timeSetup = timeSetup,
+                    config = config,
                 ) { isValid ->
                     intervalIsValid.value = isValid
                 }
