@@ -3,6 +3,8 @@ package com.michaelflisar.composechangelog
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
+import com.michaelflisar.composestyled.StyledTheme
+import com.michaelflisar.composestyled.utils.text.parseAnnotatedText
 
 class ChangelogSetup internal constructor(
     releases: List<ChangelogRelease>,
@@ -40,7 +42,7 @@ class ChangelogSetup internal constructor(
 
 object ChangelogDefaults {
 
-    /** Formats supported text tags and resolves named color tags from [color]. */
+    /** Formats supported text tags using Styled color roles and any names supplied through [color]. */
     fun textFormatter(
         color: Map<String, @Composable () -> Color> = emptyMap(),
     ): @Composable (String) -> AnnotatedString = { text ->
@@ -48,7 +50,11 @@ object ChangelogDefaults {
         for ((name, colorProvider) in color) {
             resolvedColors[name] = colorProvider()
         }
-        formatChangelogText(text, resolvedColors)
+        parseAnnotatedText(
+            text = text,
+            colorScheme = StyledTheme.colorScheme,
+            colors = resolvedColors,
+        )
     }
 
     /**

@@ -1,4 +1,4 @@
-package com.michaelflisar.composechangelog
+package com.michaelflisar.composestyled.utils.text
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
@@ -7,6 +7,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import com.michaelflisar.composestyled.tokens.StyledColorScheme
 
 private enum class MarkupKind {
     Bold,
@@ -34,19 +35,17 @@ private data class StyledRange(
     val style: SpanStyle,
 )
 
-internal fun formatChangelogText(
+/**
+ * Parses supported text markup into an [AnnotatedString].
+ *
+ * Supports nested `<b>`, `<i>`, and `<u>` tags, plus named color tags when [colors] contains
+ * their names. Color tags can use either `<name>text</name>` or `<color=name>text</color>`.
+ */
+fun parseAnnotatedText(
     text: String,
-    colors: Map<String, Color>,
+    colors: Map<String, Color> = emptyMap(),
 ): AnnotatedString {
-    colors.keys.forEach { name ->
-        require(
-            name.isNotBlank() &&
-                name !in setOf("b", "i", "u", "color") &&
-                name.none { it.isWhitespace() || it in "<>/=" },
-        ) {
-            "Color tag names must be non-blank, non-reserved, and contain no whitespace or tag delimiters."
-        }
-    }
+    validateColorNames(colors.keys)
 
     val tokens = findMarkupTokens(text, colors.keys)
     val pairedTokens = BooleanArray(tokens.size)
@@ -99,6 +98,32 @@ internal fun formatChangelogText(
         styledRanges
             .sortedWith(compareBy<StyledRange> { it.start }.thenByDescending { it.end })
             .forEach { addStyle(it.style, it.start, it.end) }
+    }
+}
+
+/**
+ * Parses text markup using every semantic color exposed by [colorScheme].
+ *
+ * [colors] adds custom names and overrides matching names from [colorScheme].
+ */
+fun parseAnnotatedText(
+    text: String,
+    colorScheme: StyledColorScheme,
+    colors: Map<String, Color> = emptyMap(),
+): AnnotatedString = parseAnnotatedText(
+    text = text,
+    colors = colorScheme.namedColors() + colors,
+)
+
+private fun validateColorNames(colorNames: Set<String>) {
+    colorNames.forEach { name ->
+        require(
+            name.isNotBlank() &&
+                name !in setOf("b", "i", "u", "color") &&
+                name.none { it.isWhitespace() || it in "<>/=" },
+        ) {
+            "Color tag names must be non-blank, non-reserved, and contain no whitespace or tag delimiters."
+        }
     }
 }
 
@@ -174,3 +199,48 @@ private fun MarkupTag.toSpanStyle(colors: Map<String, Color>): SpanStyle = when 
     MarkupKind.Underline -> SpanStyle(textDecoration = TextDecoration.Underline)
     MarkupKind.Color -> SpanStyle(color = requireNotNull(colors[colorName]))
 }
+
+private fun StyledColorScheme.namedColors(): Map<String, Color> = mapOf(
+    "background" to background,
+    "onBackground" to onBackground,
+    "surfaceLowest" to surfaceLowest,
+    "onSurfaceLowest" to onSurfaceLowest,
+    "surfaceLow" to surfaceLow,
+    "onSurfaceLow" to onSurfaceLow,
+    "surface" to surface,
+    "onSurface" to onSurface,
+    "surfaceHigh" to surfaceHigh,
+    "onSurfaceHigh" to onSurfaceHigh,
+    "surfaceHighest" to surfaceHighest,
+    "onSurfaceHighest" to onSurfaceHighest,
+    "surfaceVariant" to surfaceVariant,
+    "onSurfaceVariant" to onSurfaceVariant,
+    "inverseSurface" to inverseSurface,
+    "inverseOnSurface" to inverseOnSurface,
+    "primary" to primary,
+    "onPrimary" to onPrimary,
+    "primarySurface" to primarySurface,
+    "onPrimarySurface" to onPrimarySurface,
+    "secondary" to secondary,
+    "onSecondary" to onSecondary,
+    "secondarySurface" to secondarySurface,
+    "onSecondarySurface" to onSecondarySurface,
+    "tertiary" to tertiary,
+    "onTertiary" to onTertiary,
+    "tertiarySurface" to tertiarySurface,
+    "onTertiarySurface" to onTertiarySurface,
+    "error" to error,
+    "onError" to onError,
+    "errorSurface" to errorSurface,
+    "onErrorSurface" to onErrorSurface,
+    "success" to success,
+    "onSuccess" to onSuccess,
+    "successSurface" to successSurface,
+    "onSuccessSurface" to onSuccessSurface,
+    "warning" to warning,
+    "onWarning" to onWarning,
+    "warningSurface" to warningSurface,
+    "onWarningSurface" to onWarningSurface,
+    "outline" to outline,
+    "outlineVariant" to outlineVariant,
+)

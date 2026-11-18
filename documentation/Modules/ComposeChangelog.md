@@ -26,9 +26,7 @@ val setup = remember {
                 }
             }
         },
-        textFormatter = ChangelogDefaults.textFormatter(
-            color = mapOf("primary" to { StyledTheme.colorScheme.primary }),
-        ),
+        textFormatter = ChangelogDefaults.textFormatter(),
     )
 }
 ```
@@ -43,8 +41,11 @@ Each release uses `ChangelogVersion`, which stores the display `name` and an
 version for automatic update display, so at least one release is required.
 Codes determine release ordering and update filtering; names are displayed
 directly. Entry text supports nested `<b>`, `<i>`, and `<u>` tags. Named colors
-from the `color` map can be written as `<primary>text</primary>` or
-`<color=primary>text</color>`.
+from the active `StyledColorScheme` can be written as
+`<primary>text</primary>` or `<color=primary>text</color>`; all scheme roles,
+including `onPrimary`, `surfaceVariant`, and `errorSurface`, are available.
+Custom names can be added or existing role names overridden through the
+`color` map passed to `ChangelogDefaults.textFormatter`.
 Each release may include an optional `date` string, displayed as provided.
 Release names, codes, and dates are available eagerly so setup can determine
 the current app version. The groups and items inside each release block are

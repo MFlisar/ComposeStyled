@@ -126,6 +126,18 @@ white only as much as required. Applications should still check their complete
 UI and custom renderer colors, which may introduce additional color
 combinations.
 
+The standard surface role has five levels: `surfaceLowest`, `surfaceLow`,
+`surface`, `surfaceHigh` and `surfaceHighest`. In Material 3 these map to the
+five `surfaceContainer` roles, with `surface` as the middle level.
+`surfaceVariant`, `primarySurface`, `secondarySurface` and `tertiarySurface`
+remain separate semantic roles. `inverseSurface` and `inverseOnSurface` form a
+paired role for content shown on an inverted surface.
+
+`CustomColors` provides matching presets for the five surface levels,
+`SurfaceVariant` and `InverseSurface`, as well as the semantic surface roles
+`PrimarySurface`, `SecondarySurface`, `TertiarySurface`, `ErrorSurface`,
+`SuccessSurface` and `WarningSurface`.
+
 Use `StyledTheme.supportingContentColor(containerColor, contentColor)` to derive
 a less prominent foreground for supporting text. `containerColor` is required;
 `contentColor` defaults to `LocalStyledContentColor.current`. It blends the

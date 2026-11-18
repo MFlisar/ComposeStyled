@@ -48,14 +48,38 @@ sealed interface ColorToken {
         OnSecondary,
         SecondarySurface,
         OnSecondarySurface,
+        Tertiary,
+        OnTertiary,
         Background,
         OnBackground,
+        SurfaceLowest,
+        OnSurfaceLowest,
+        SurfaceLow,
+        OnSurfaceLow,
         Surface,
         OnSurface,
+        SurfaceHigh,
+        OnSurfaceHigh,
+        SurfaceHighest,
+        OnSurfaceHighest,
+        SurfaceVariant,
+        OnSurfaceVariant,
+        InverseSurface,
+        InverseOnSurface,
+        TertiarySurface,
+        OnTertiarySurface,
         Error,
         OnError,
         ErrorSurface,
         OnErrorSurface,
+        Success,
+        OnSuccess,
+        SuccessSurface,
+        OnSuccessSurface,
+        Warning,
+        OnWarning,
+        WarningSurface,
+        OnWarningSurface,
         Outline,
         OutlineVariant,
         LocalContentColor
@@ -73,14 +97,38 @@ sealed interface ColorToken {
                 OnSecondary -> StyledTheme.colorScheme.onSecondary
                 SecondarySurface -> StyledTheme.colorScheme.secondarySurface
                 OnSecondarySurface -> StyledTheme.colorScheme.onSecondarySurface
+                Tertiary -> StyledTheme.colorScheme.tertiary
+                OnTertiary -> StyledTheme.colorScheme.onTertiary
                 Background -> StyledTheme.colorScheme.background
                 OnBackground -> StyledTheme.colorScheme.onBackground
+                SurfaceLowest -> StyledTheme.colorScheme.surfaceLowest
+                OnSurfaceLowest -> StyledTheme.colorScheme.onSurfaceLowest
+                SurfaceLow -> StyledTheme.colorScheme.surfaceLow
+                OnSurfaceLow -> StyledTheme.colorScheme.onSurfaceLow
                 Surface -> StyledTheme.colorScheme.surface
                 OnSurface -> StyledTheme.colorScheme.onSurface
+                SurfaceHigh -> StyledTheme.colorScheme.surfaceHigh
+                OnSurfaceHigh -> StyledTheme.colorScheme.onSurfaceHigh
+                SurfaceHighest -> StyledTheme.colorScheme.surfaceHighest
+                OnSurfaceHighest -> StyledTheme.colorScheme.onSurfaceHighest
+                SurfaceVariant -> StyledTheme.colorScheme.surfaceVariant
+                OnSurfaceVariant -> StyledTheme.colorScheme.onSurfaceVariant
+                InverseSurface -> StyledTheme.colorScheme.inverseSurface
+                InverseOnSurface -> StyledTheme.colorScheme.inverseOnSurface
+                TertiarySurface -> StyledTheme.colorScheme.tertiarySurface
+                OnTertiarySurface -> StyledTheme.colorScheme.onTertiarySurface
                 Error -> StyledTheme.colorScheme.error
                 OnError -> StyledTheme.colorScheme.onError
                 ErrorSurface -> StyledTheme.colorScheme.errorSurface
                 OnErrorSurface -> StyledTheme.colorScheme.onErrorSurface
+                Success -> StyledTheme.colorScheme.success
+                OnSuccess -> StyledTheme.colorScheme.onSuccess
+                SuccessSurface -> StyledTheme.colorScheme.successSurface
+                OnSuccessSurface -> StyledTheme.colorScheme.onSuccessSurface
+                Warning -> StyledTheme.colorScheme.warning
+                OnWarning -> StyledTheme.colorScheme.onWarning
+                WarningSurface -> StyledTheme.colorScheme.warningSurface
+                OnWarningSurface -> StyledTheme.colorScheme.onWarningSurface
                 Outline -> StyledTheme.colorScheme.outline
                 OutlineVariant -> StyledTheme.colorScheme.outlineVariant
                 LocalContentColor -> LocalStyledContentColor.current

@@ -9,9 +9,8 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.lerp
-import androidx.compose.ui.graphics.luminance
 import com.michaelflisar.composestyled.StyledTheme
+import com.michaelflisar.composestyled.atTone
 import com.michaelflisar.composestyled.classes.StyledThemeDefinition
 import com.michaelflisar.composestyled.classes.StyledThemeProvider
 import com.michaelflisar.composestyled.material3.components.Material3Badge
@@ -49,6 +48,7 @@ import com.michaelflisar.composestyled.material3.components.Material3TabRow
 import com.michaelflisar.composestyled.material3.components.Material3Tooltip
 import com.michaelflisar.composestyled.material3.components.Material3TopBar
 import com.michaelflisar.composestyled.registry.StyledRegistry
+import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.ui.icons.material3.Material3FilledIconSet
 import com.michaelflisar.composestyled.themes.material3.Material3Themes
 import com.michaelflisar.composestyled.themes.StyledThemeVariant
@@ -112,7 +112,7 @@ class Material3ThemeProvider internal constructor(
  * BUT the default values of [StyledSizes], [StyledSpacing] and [StyledPadding] are set to the M3 defaults,
  * so that all components will look like M3 components
  *
- * Colors are mapped from StyledTheme, including derived surface and inverse roles.
+ * Colors are mapped from StyledTheme, including surface and inverse roles.
  * [Material3ThemeProvider] applies the native root before this factory runs.
  */
 @Composable
@@ -194,6 +194,7 @@ private fun StyledTypography.toMaterial3Typography() = Typography(
  * Missing roles approximate Material tonal targets using luminance, not HCT.
  * Independently supplied light/dark accents can yield different fixed colors.
  */
+@OptIn(InternalComposeStyledApi::class)
 private fun StyledColorScheme.toMaterial3ColorScheme(): ColorScheme {
     val defaults = if (isDarkTheme) darkColorScheme() else lightColorScheme()
     return defaults.copy(
@@ -217,8 +218,8 @@ private fun StyledColorScheme.toMaterial3ColorScheme(): ColorScheme {
         surfaceVariant = surfaceVariant,
         onSurfaceVariant = onSurfaceVariant,
         surfaceTint = primary,
-        inverseSurface = surface.atTone(if (isDarkTheme) 90f else 20f),
-        inverseOnSurface = surface.atTone(if (isDarkTheme) 20f else 95f),
+        inverseSurface = inverseSurface,
+        inverseOnSurface = inverseOnSurface,
         error = error,
         onError = onError,
         errorContainer = errorSurface,
@@ -228,11 +229,11 @@ private fun StyledColorScheme.toMaterial3ColorScheme(): ColorScheme {
         scrim = Color.Black,
         surfaceBright = surface.atTone(if (isDarkTheme) 24f else 98f),
         surfaceDim = surface.atTone(if (isDarkTheme) 6f else 87f),
-        surfaceContainerLowest = surface.atTone(if (isDarkTheme) 4f else 100f),
-        surfaceContainerLow = surface.atTone(if (isDarkTheme) 10f else 96f),
-        surfaceContainer = surface.atTone(if (isDarkTheme) 12f else 94f),
-        surfaceContainerHigh = surface.atTone(if (isDarkTheme) 17f else 92f),
-        surfaceContainerHighest = surface.atTone(if (isDarkTheme) 22f else 90f),
+        surfaceContainerLowest = surfaceLowest,
+        surfaceContainerLow = surfaceLow,
+        surfaceContainer = surface,
+        surfaceContainerHigh = surfaceHigh,
+        surfaceContainerHighest = surfaceHighest,
         primaryFixed = primary.atTone(90f),
         primaryFixedDim = primary.atTone(80f),
         onPrimaryFixed = primary.atTone(10f),
@@ -248,30 +249,6 @@ private fun StyledColorScheme.toMaterial3ColorScheme(): ColorScheme {
     )
 }
 
-private fun Color.atTone(tone: Float): Color {
-    // CIE L* -> relative luminance; interpolation does not preserve HCT chroma.
-
-    val f = (tone + 16f) / 116f
-    val target = if (tone > 8f) f * f * f else tone / 903.2963f
-    val opaque = copy(alpha = 1f)
-    val current = opaque.luminance()
-    val endpoint = if (target > current) Color.White else Color.Black
-    var low = 0f
-    var high = 1f
-    repeat(24) {
-        val fraction = (low + high) / 2f
-        val luminance = lerp(opaque, endpoint, fraction).luminance()
-        if ((target > current && luminance < target) ||
-            (target <= current && luminance > target)
-        ) {
-            low = fraction
-        } else {
-            high = fraction
-        }
-    }
-    return lerp(opaque, endpoint, (low + high) / 2f)
-}
-
 fun ColorScheme.toStyledColorScheme(
     isDarkTheme: Boolean,
 ): StyledColorScheme {
@@ -285,8 +262,13 @@ fun ColorScheme.toStyledColorScheme(
     return StyledColorScheme(
         isDarkTheme = isDarkTheme,
         backgroundDef = Definition(background, onBackground),
-        surfaceDef = Definition(surface, onSurface),
+        surfaceLowestDef = Definition(surfaceContainerLowest, onSurface),
+        surfaceLowDef = Definition(surfaceContainerLow, onSurface),
+        surfaceDef = Definition(surfaceContainer, onSurface),
+        surfaceHighDef = Definition(surfaceContainerHigh, onSurface),
+        surfaceHighestDef = Definition(surfaceContainerHighest, onSurface),
         surfaceVariantDef = Definition(surfaceVariant, onSurfaceVariant),
+        inverseSurfaceDef = Definition(inverseSurface, inverseOnSurface),
         primaryDef = Definition(primary, onPrimary),
         primarySurfaceDef = Definition(primaryContainer, onPrimaryContainer),
         secondaryDef = Definition(secondary, onSecondary),

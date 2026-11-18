@@ -2,8 +2,10 @@ package com.michaelflisar.composestyled
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.LocalWindowInfo
+import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 
 /** Whether this color's relative luminance is at most 50%. */
 val Color.isDark
@@ -29,6 +31,30 @@ fun Color.darken(factor: Float): Color {
     val g = green * (1 - factor)
     val b = blue * (1 - factor)
     return Color(r, g, b, alpha)
+}
+
+/** Adjusts this color to an approximate CIE L* tone by interpolating toward black or white. */
+@InternalComposeStyledApi
+fun Color.atTone(tone: Float): Color {
+    val f = (tone + 16f) / 116f
+    val target = if (tone > 8f) f * f * f else tone / 903.2963f
+    val opaque = copy(alpha = 1f)
+    val current = opaque.luminance()
+    val endpoint = if (target > current) Color.White else Color.Black
+    var low = 0f
+    var high = 1f
+    repeat(24) {
+        val fraction = (low + high) / 2f
+        val luminance = lerp(opaque, endpoint, fraction).luminance()
+        if ((target > current && luminance < target) ||
+            (target <= current && luminance > target)
+        ) {
+            low = fraction
+        } else {
+            high = fraction
+        }
+    }
+    return lerp(opaque, endpoint, (low + high) / 2f)
 }
 
 /**

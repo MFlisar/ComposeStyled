@@ -1,6 +1,7 @@
 package com.michaelflisar.composestyled.themes
 
 import androidx.compose.ui.graphics.Color
+import com.michaelflisar.composestyled.atTone
 import com.michaelflisar.composestyled.contrastRatio
 import com.michaelflisar.composestyled.onColorByContrastRatio
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
@@ -60,12 +61,19 @@ private fun schemes(
     darkHigh = scheme(true, StyledContrastLevel.High, dark),
 )
 
+@OptIn(InternalComposeStyledApi::class)
 private fun scheme(
     isDark: Boolean,
     contrast: StyledContrastLevel,
     accents: AccentColors,
 ): StyledColorScheme {
     val surface = if (isDark) Color(0xFF1B2028) else Color.White
+    val surfaceLowest = surface.atTone(if (isDark) 4f else 100f)
+    val surfaceLow = surface.atTone(if (isDark) 10f else 96f)
+    val surfaceColor = surface.atTone(if (isDark) 12f else 94f)
+    val surfaceHigh = surface.atTone(if (isDark) 17f else 92f)
+    val surfaceHighest = surface.atTone(if (isDark) 22f else 90f)
+    val inverseSurface = surface.atTone(if (isDark) 90f else 20f)
     val background = blend(surface, accents.primary, if (isDark) 0.035f else 0.025f)
     val surfaceVariant = blend(surface, accents.primary, if (isDark) 0.12f else 0.075f)
     val primarySurface = blend(surface, accents.primary, if (isDark) 0.34f else 0.14f)
@@ -79,8 +87,13 @@ private fun scheme(
     val warningSurface = blend(surface, warning, if (isDark) 0.32f else 0.13f)
 
     val backgroundDef = definition(background, contrast)
-    val surfaceDef = definition(surface, contrast)
+    val surfaceLowestDef = definition(surfaceLowest, contrast)
+    val surfaceLowDef = definition(surfaceLow, contrast)
+    val surfaceDef = definition(surfaceColor, contrast)
+    val surfaceHighDef = definition(surfaceHigh, contrast)
+    val surfaceHighestDef = definition(surfaceHighest, contrast)
     val surfaceVariantDef = definition(surfaceVariant, contrast)
+    val inverseSurfaceDef = definition(inverseSurface, contrast)
     val primaryDef = definition(accents.primary, contrast)
     val primarySurfaceDef = definition(primarySurface, contrast)
     val secondaryDef = definition(accents.secondary, contrast)
@@ -99,8 +112,13 @@ private fun scheme(
     return StyledColorScheme(
         isDarkTheme = isDark,
         backgroundDef = backgroundDef,
+        surfaceLowestDef = surfaceLowestDef,
+        surfaceLowDef = surfaceLowDef,
         surfaceDef = surfaceDef,
+        surfaceHighDef = surfaceHighDef,
+        surfaceHighestDef = surfaceHighestDef,
         surfaceVariantDef = surfaceVariantDef,
+        inverseSurfaceDef = inverseSurfaceDef,
         primaryDef = primaryDef,
         primarySurfaceDef = primarySurfaceDef,
         secondaryDef = secondaryDef,
