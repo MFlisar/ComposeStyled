@@ -1,5 +1,7 @@
 package com.michaelflisar.demo.demos.recipes.examples
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -15,7 +17,6 @@ import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.ui.components.StyledIcon
 import com.michaelflisar.composestyled.ui.components.StyledListItem
 import com.michaelflisar.composestyled.ui.components.StyledSelectionToolbar
-import com.michaelflisar.composestyled.ui.layout.StyledColumn
 import com.michaelflisar.composestyled.ui.layout.StyledScaffold
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.ui.state.LocalKeyboardModifiers
@@ -59,12 +60,12 @@ internal fun DemoRecipeSelection(
             )
         },
     ) { paddingValues ->
-        StyledColumn(
+        Column(
+            verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(StyledTheme.padding.content),
-            itemSpacing = StyledTheme.spacing.medium,
         ) {
             StyledText(
                 "Android/iOS: tap to toggle an item. Desktop/Web: click selects one item; " +

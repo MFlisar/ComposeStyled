@@ -121,7 +121,7 @@ private fun renderContent(
     } else {
         (if (selected) selectedColor else unselectedColor).let { color ->
             if (enabled) color else color.copy(
-                alpha = color.alpha * StyledTheme.colorScheme.disableFactors.content,
+                alpha = color.alpha * StyledTheme.colorScheme.disabledAlphaFactors.content,
             )
         }
     }

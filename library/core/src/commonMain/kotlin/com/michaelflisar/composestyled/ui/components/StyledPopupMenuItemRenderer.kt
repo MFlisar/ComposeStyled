@@ -194,13 +194,13 @@ object StyledPopupMenuItemRendererDefaults {
         leadingIconColor: Color = textColor,
         trailingIconColor: Color = textColor,
         disabledTextColor: Color = textColor.copy(
-            alpha = textColor.alpha * StyledTheme.colorScheme.disableFactors.content
+            alpha = textColor.alpha * StyledTheme.colorScheme.disabledAlphaFactors.content
         ),
         disabledLeadingIconColor: Color = leadingIconColor.copy(
-            alpha = leadingIconColor.alpha * StyledTheme.colorScheme.disableFactors.content
+            alpha = leadingIconColor.alpha * StyledTheme.colorScheme.disabledAlphaFactors.content
         ),
         disabledTrailingIconColor: Color = trailingIconColor.copy(
-            alpha = trailingIconColor.alpha * StyledTheme.colorScheme.disableFactors.content
+            alpha = trailingIconColor.alpha * StyledTheme.colorScheme.disabledAlphaFactors.content
         ),
     ) = StyledMenuItemColors(
         textColor, leadingIconColor, trailingIconColor,

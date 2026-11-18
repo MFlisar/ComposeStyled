@@ -120,9 +120,9 @@ private fun SegmentedItem(
         customization?.disabledColors?.textForeground?.resolve()
     }?.takeUnless { it == Color.Unspecified }
     val borderColor = customization?.border?.resolve() ?: colors.outline
-    val containerAlpha = if (enabled) 1f else colors.disableFactors.default
-    val contentAlpha = if (enabled) 1f else colors.disableFactors.content
-    val outlineAlpha = if (enabled) 1f else colors.disableFactors.outline
+    val containerAlpha = if (enabled) 1f else colors.disabledAlphaFactors.default
+    val contentAlpha = if (enabled) 1f else colors.disabledAlphaFactors.content
+    val outlineAlpha = if (enabled) 1f else colors.disabledAlphaFactors.outline
     val foreground = if (!enabled && disabledContent != null) {
         disabledContent
     } else {

@@ -1,10 +1,12 @@
 package com.michaelflisar.demo.demos.showcase.areas
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Remove
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -17,7 +19,6 @@ import com.michaelflisar.composestyled.classes.toIconComposable
 import com.michaelflisar.composestyled.ui.components.StyledCheckbox
 import com.michaelflisar.composestyled.ui.components.StyledSlider
 import com.michaelflisar.composestyled.ui.icons.StyledIcons
-import com.michaelflisar.composestyled.ui.layout.StyledRow
 import com.michaelflisar.composestyled.ui.primitives.StyledExpandIcon
 import com.michaelflisar.composestyled.ui.primitives.StyledHorizontalSpacer
 import com.michaelflisar.composestyled.ui.primitives.StyledInputAction
@@ -71,8 +72,8 @@ internal fun DemoPrimitives(
                 }
             },
         )
-        StyledRow(
-            itemSpacing = StyledTheme.spacing.medium,
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             StyledText("Add a breadcrumb item")
@@ -95,7 +96,10 @@ internal fun DemoPrimitives(
         StyledText("Content before a horizontal spacer")
         StyledHorizontalSpacer(size = 12.dp)
         StyledText("Content after a horizontal spacer")
-        StyledRow(itemSpacing = StyledTheme.spacing.medium, verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             StyledText("Before vertical spacer")
             StyledVerticalSpacer(size = 24.dp)
             StyledText("After vertical spacer")
@@ -107,7 +111,10 @@ internal fun DemoPrimitives(
             onClick = { showMessage("Input action clicked") },
             contentDescription = "Add",
         )
-        StyledRow(itemSpacing = StyledTheme.spacing.medium, verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             StyledText("Toggle details")
             StyledInputAction(
                 onClick = { expanded.value = !expanded.value },
@@ -124,7 +131,10 @@ internal fun DemoPrimitives(
         CompositionLocalProvider(
             LocalLayoutDirection provides if (rtl.value) LayoutDirection.Rtl else LayoutDirection.Ltr,
         ) {
-            StyledRow(itemSpacing = StyledTheme.spacing.medium, verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
                 for (direction in StyledExpandIcon.ExpandDirection.entries) {
                     StyledText(direction.name)
                     StyledExpandIcon(
@@ -136,7 +146,10 @@ internal fun DemoPrimitives(
         }
 
         SubTitle("Replace icons")
-        StyledRow(itemSpacing = StyledTheme.spacing.medium, verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             StyledText("Immediate")
             StyledExpandIcon(
                 expanded = expanded.value,
@@ -159,7 +172,10 @@ internal fun DemoPrimitives(
         SubTitle("Direct rotation progress")
         StyledText("Progress: ${(progress.value * 100).toInt()}%")
         StyledSlider(value = progress, valueRange = 0f..1f)
-        StyledRow(itemSpacing = StyledTheme.spacing.medium, verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             StyledText("Counterclockwise")
             StyledExpandIcon(expansionProgress = progress.value)
             StyledText("Clockwise")

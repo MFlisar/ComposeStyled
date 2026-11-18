@@ -1,5 +1,7 @@
 package com.michaelflisar.demo.demos.showcase.areas
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -8,14 +10,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import com.michaelflisar.composestyled.StyledTheme
-import com.michaelflisar.composestyled.ui.layout.StyledFlowRow
-import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.ui.components.StyledCheckbox
 import com.michaelflisar.composestyled.ui.components.StyledToggleBehavior
 import com.michaelflisar.composestyled.ui.components.StyledToggleLabelArrangement
+import com.michaelflisar.composestyled.ui.primitives.StyledText
+import com.michaelflisar.composestyled.utils.ExpandState
 import com.michaelflisar.demo.helper.RegionContainer
 import com.michaelflisar.demo.helper.SubTitle
-import com.michaelflisar.composestyled.utils.ExpandState
 
 @Composable
 internal fun DemoCheckboxes(baseId: Int, expandState: ExpandState) {
@@ -30,7 +31,10 @@ internal fun DemoCheckboxes(baseId: Int, expandState: ExpandState) {
         expanded = expandState
     ) {
         SubTitle("Default Checkboxes")
-        StyledFlowRow(spacing = StyledTheme.spacing.medium) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+            verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+        ) {
             StyledCheckbox(
                 checked = checked,
                 modifier = Modifier.semantics { contentDescription = "Default checkbox" },
@@ -53,7 +57,10 @@ internal fun DemoCheckboxes(baseId: Int, expandState: ExpandState) {
             StyledText("Checked: ${checked.value}; control only: ${controlOnlyChecked.value}")
         }
         SubTitle("Disabled Checkboxes")
-        StyledFlowRow(spacing = StyledTheme.spacing.medium) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+            verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+        ) {
             listOf(false, true).forEach { value ->
                 StyledCheckbox(
                     checked = value,
@@ -67,7 +74,10 @@ internal fun DemoCheckboxes(baseId: Int, expandState: ExpandState) {
             }
         }
         SubTitle("Checkboxes with Customization")
-        StyledFlowRow(spacing = StyledTheme.spacing.medium) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+            verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+        ) {
             StyledCheckbox(
                 checked = customChecked,
                 tint = Color.Magenta,

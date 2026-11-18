@@ -123,7 +123,7 @@ class Material3IconButton internal constructor(
             enabled -> color
             disabledColor != null -> disabledColor
             else -> color.copy(
-                alpha = color.alpha * StyledTheme.colorScheme.disableFactors.content,
+                alpha = color.alpha * StyledTheme.colorScheme.disabledAlphaFactors.content,
             )
         }
         when (variantMapping(variant, LocalStyledContext.current)) {

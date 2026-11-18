@@ -1,18 +1,19 @@
 package com.michaelflisar.demo.demos.showcase.areas
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import com.michaelflisar.composestyled.StyledTheme
-import com.michaelflisar.composestyled.ui.components.StyledOutlinedNumberPicker
 import com.michaelflisar.composestyled.ui.components.StyledNumberPicker
-import com.michaelflisar.composestyled.ui.layout.StyledColumn
+import com.michaelflisar.composestyled.ui.components.StyledOutlinedNumberPicker
 import com.michaelflisar.composestyled.ui.primitives.StyledText
-import com.michaelflisar.composestyled.utils.number.rememberNumberParser
-import com.michaelflisar.composestyled.utils.ValidationResult
 import com.michaelflisar.composestyled.utils.ExpandState
+import com.michaelflisar.composestyled.utils.ValidationResult
+import com.michaelflisar.composestyled.utils.number.rememberNumberParser
 import com.michaelflisar.composestyled.utils.rememberValidator
 import com.michaelflisar.demo.helper.RegionContainer
 import com.michaelflisar.demo.helper.SubTitle
@@ -53,7 +54,7 @@ internal fun DemoNumberPicker(baseId: Int, expandState: ExpandState) {
         id = baseId + 1,
         expanded = expandState,
     ) {
-        StyledColumn(itemSpacing = StyledTheme.spacing.medium) {
+        Column(verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium)) {
             SubTitle("Integer 0–10, step 1; buttons wrap at bounds, manual input enabled")
             StyledNumberPicker(
                 value = quantity,

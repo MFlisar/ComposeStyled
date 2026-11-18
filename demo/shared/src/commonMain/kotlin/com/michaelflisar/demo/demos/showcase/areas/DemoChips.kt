@@ -1,5 +1,7 @@
 package com.michaelflisar.demo.demos.showcase.areas
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
@@ -7,14 +9,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.unit.dp
-import com.michaelflisar.composestyled.classes.toIconComposable
 import com.michaelflisar.composestyled.StyledTheme
+import com.michaelflisar.composestyled.classes.toIconComposable
 import com.michaelflisar.composestyled.ui.components.StyledChip
 import com.michaelflisar.composestyled.ui.components.StyledChipDefaults
 import com.michaelflisar.composestyled.ui.components.StyledOutlinedChip
 import com.michaelflisar.composestyled.ui.components.StyledOutlinedSelectableChip
 import com.michaelflisar.composestyled.ui.components.StyledSelectableChip
-import com.michaelflisar.composestyled.ui.layout.StyledFlowRow
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.utils.ExpandState
 import com.michaelflisar.demo.helper.RegionContainer
@@ -33,7 +34,10 @@ internal fun DemoChips(
         expanded = expandState,
     ) {
         SubTitle("Clickable")
-        StyledFlowRow(spacing = StyledTheme.spacing.medium) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+            verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+        ) {
             StyledChip(
                 onClick = {},
                 leadingIcon = Icons.Default.Add.toIconComposable(),
@@ -70,7 +74,10 @@ internal fun DemoChips(
         }
 
         SubTitle("Selectable")
-        StyledFlowRow(spacing = StyledTheme.spacing.medium) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+            verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+        ) {
             StyledSelectableChip(
                 onClick = {},
                 selected = false,

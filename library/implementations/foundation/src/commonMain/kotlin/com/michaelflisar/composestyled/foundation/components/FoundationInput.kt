@@ -84,7 +84,7 @@ abstract class FoundationInput : StyledInput.Implementation {
         val isOutlined = variant == StyledInput.Variant.Outlined ||
             (variant == StyledInput.Variant.Auto &&
                 context == StyledInput.Context.DropdownFilter)
-        val alpha = if (enabled) 1f else colors.disableFactors.content
+        val alpha = if (enabled) 1f else colors.disabledAlphaFactors.content
         val customForeground = if (!isOutlined) {
             customization?.colors?.filledForeground?.resolve()
         } else {

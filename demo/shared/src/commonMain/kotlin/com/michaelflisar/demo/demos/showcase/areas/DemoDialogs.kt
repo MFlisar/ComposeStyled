@@ -1,6 +1,9 @@
 package com.michaelflisar.demo.demos.showcase.areas
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,16 +27,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import com.michaelflisar.composestyled.UpdateStyledCustomization
 import com.michaelflisar.composestyled.StyledTheme
+import com.michaelflisar.composestyled.UpdateStyledCustomization
 import com.michaelflisar.composestyled.adaptive.StyledAdaptive
 import com.michaelflisar.composestyled.classes.toIconComposable
 import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.ui.components.StyledSwitch
 import com.michaelflisar.composestyled.ui.layout.StyledBottomSheet
-import com.michaelflisar.composestyled.ui.layout.StyledColumn
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
-import com.michaelflisar.composestyled.ui.layout.StyledFlowRow
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.ui.state.rememberDialogState
 import com.michaelflisar.composestyled.utils.ExpandState
@@ -124,7 +125,10 @@ internal fun DemoDialogs(baseId: Int, expandState: ExpandState) {
         )
 
         SubTitle("Settings")
-        StyledFlowRow(spacing = StyledTheme.spacing.medium) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+            verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+        ) {
 
             StyledButton(onClick = {
                 actionPresentation = when (actionPresentation) {
@@ -285,7 +289,10 @@ internal fun DemoDialogs(baseId: Int, expandState: ExpandState) {
         }
 
         SubTitle("Dialogs and sheets")
-        StyledFlowRow(spacing = StyledTheme.spacing.medium) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+            verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+        ) {
             StyledButton(onClick = dialog::show) { StyledText("Modal dialog") }
             StyledButton(onClick = fullscreen::show) { StyledText("Fullscreen dialog") }
             StyledButton(onClick = toolbarDialog::show) { StyledText("Toolbar dialog") }
@@ -308,8 +315,8 @@ internal fun DemoDialogs(baseId: Int, expandState: ExpandState) {
             style = StyledDialog.Style.Dialog(maxWidth = if (narrowDialog) 400.dp else null),
             title = if (showTitle) ({ StyledText("Save changes?") }) else null,
         ) { contentPadding ->
-            StyledColumn(
-                itemSpacing = StyledTheme.spacing.medium,
+            Column(
+                verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
                 modifier = Modifier.padding(contentPadding),
             ) {
                 StyledText("Actions use the active StyledButton or StyledIconButton renderer. Apply keeps custom content.")
@@ -387,8 +394,8 @@ internal fun DemoDialogs(baseId: Int, expandState: ExpandState) {
             ),
             title = if (showTitle) ({ StyledText("Floating workspace") }) else null,
         ) { contentPadding ->
-            StyledColumn(
-                itemSpacing = StyledTheme.spacing.medium,
+            Column(
+                verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
                 modifier = Modifier.padding(contentPadding),
             ) {
                 StyledText("Drag the minimized bubble; it snaps to the nearest horizontal edge on release.")
@@ -450,8 +457,8 @@ internal fun DemoDialogs(baseId: Int, expandState: ExpandState) {
 
 @Composable
 private fun DialogDemoContent(shortContent: Boolean, contentPadding: PaddingValues) {
-    StyledColumn(
-        itemSpacing = StyledTheme.spacing.medium,
+    Column(
+        verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
         modifier = (if (shortContent) Modifier else Modifier.fillMaxSize())
             .verticalScroll(rememberScrollState())
             .padding(contentPadding),

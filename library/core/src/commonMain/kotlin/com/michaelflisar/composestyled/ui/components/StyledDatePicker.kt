@@ -20,8 +20,6 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import com.michaelflisar.composestyled.ui.layout.StyledColumn
-import com.michaelflisar.composestyled.ui.layout.StyledRow
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
@@ -74,11 +72,11 @@ fun StyledDatePicker(
     val daysInMonth = daysInMonth(firstDay)
     val leadingDays = firstDay.dayOfWeek.ordinal
 
-    StyledColumn(modifier = modifier, itemSpacing = 8.dp) {
-        StyledRow(
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = modifier) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.fillMaxWidth(),
-            itemSpacing = 8.dp,
-            verticalAlignment = Alignment.CenterVertically,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             StyledButton(
                 onClick = { visibleMonth = shiftMonth(visibleMonth, -1) },

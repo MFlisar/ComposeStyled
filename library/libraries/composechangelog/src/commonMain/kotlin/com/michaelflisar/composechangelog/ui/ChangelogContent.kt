@@ -1,8 +1,12 @@
 package com.michaelflisar.composechangelog.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
@@ -23,11 +27,7 @@ import com.michaelflisar.composechangelog.ChangelogSetup
 import com.michaelflisar.composechangelog.ChangelogState
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.ui.components.StyledOutlinedCard
-import com.michaelflisar.composestyled.ui.layout.StyledColumn
-import com.michaelflisar.composestyled.ui.layout.StyledColumnDefaults
-import com.michaelflisar.composestyled.ui.layout.StyledFlowRow
 import com.michaelflisar.composestyled.ui.layout.StyledLazyColumn
-import com.michaelflisar.composestyled.ui.layout.StyledRow
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 
 /** Renders visible changelog releases in a lazy, scrollable Styled list. */
@@ -60,7 +60,7 @@ fun ChangelogContent(
     CompositionLocalProvider(LocalChangelogSetup provides setup) {
         StyledLazyColumn(
             modifier = modifier,
-            itemSpacing = StyledColumnDefaults.itemSpacing,
+            itemSpacing = StyledTheme.spacing.medium,
             contentPadding = contentPadding
         ) {
             items(
@@ -68,9 +68,9 @@ fun ChangelogContent(
                 key = { it.version.code },
             ) { release ->
                 StyledOutlinedCard {
-                    StyledColumn(
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
                         modifier = Modifier.fillMaxWidth(),
-                        itemSpacing = StyledColumnDefaults.itemSpacing
                     ) {
                         // header mit farb kreisen + tags
                         ChangelogReleaseHeaderTags(release, categoryDotSize, categoryTextStyle)
@@ -110,13 +110,14 @@ private fun ChangelogReleaseHeaderTags(
             .map { it.category }
             .distinct()
     }
-    StyledFlowRow(
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+        verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
         modifier = Modifier.fillMaxWidth(),
-        spacing = StyledTheme.spacing.medium,
     ) {
         categories.forEach { category ->
             val color = category.color(StyledTheme.colorScheme)
-            StyledRow(itemSpacing = StyledTheme.spacing.medium) {
+            Row(horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium)) {
                 Box(
                     modifier = Modifier
                         .size(categoryDotSize)
@@ -136,9 +137,9 @@ private fun ChangelogReleaseHeaderTags(
 private fun ChangelogReleaseHeader(
     release: ChangelogRelease,
 ) {
-    StyledRow(
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
         modifier = Modifier.fillMaxWidth(),
-        itemSpacing = StyledColumnDefaults.itemSpacing
     ) {
         StyledText(
             text = release.version.name,

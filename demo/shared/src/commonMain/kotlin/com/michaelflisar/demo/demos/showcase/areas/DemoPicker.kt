@@ -1,5 +1,7 @@
 package com.michaelflisar.demo.demos.showcase.areas
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.runtime.Composable
@@ -8,7 +10,6 @@ import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.classes.toIconComposable
 import com.michaelflisar.composestyled.ui.components.StyledOutlinedPicker
 import com.michaelflisar.composestyled.ui.components.StyledPicker
-import com.michaelflisar.composestyled.ui.layout.StyledColumn
 import com.michaelflisar.composestyled.utils.ExpandState
 import com.michaelflisar.demo.helper.RegionContainer
 import com.michaelflisar.demo.helper.SubTitle
@@ -26,7 +27,7 @@ internal fun DemoPicker(
     ) {
         val modifier = Modifier
 
-        StyledColumn(itemSpacing = StyledTheme.spacing.medium) {
+        Column(verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium)) {
             SubTitle("Read-only value with a clickable end icon")
             StyledPicker(
                 modifier = modifier,

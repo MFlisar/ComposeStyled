@@ -65,7 +65,7 @@ private fun FoundationToggle(
         LocalInputModeManager.current.inputMode == InputMode.Keyboard
     val progress by animateFloatAsState(if (checked) 1f else 0f, label = "StyledToggle")
     val colors = StyledTheme.colorScheme
-    val alpha = if (enabled) 1f else colors.disableFactors.content
+    val alpha = if (enabled) 1f else colors.disabledAlphaFactors.content
     val active = tint.copy(alpha = tint.alpha * alpha)
     val inactive = colors.outline.copy(alpha = colors.outline.alpha * alpha)
     val foreground = onTint.copy(alpha = onTint.alpha * alpha)

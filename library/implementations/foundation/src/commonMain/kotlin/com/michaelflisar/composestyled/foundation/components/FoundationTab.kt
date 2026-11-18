@@ -62,7 +62,7 @@ class FoundationTab : StyledTab.Implementation {
         val drawIndicator = selected && !LocalFoundationTabRowHasIndicator.current
         val baseColor = if (selected) resolvedSelectedContentColor else resolvedUnselectedContentColor
         val contentColor = if (enabled) baseColor else baseColor.copy(
-            alpha = baseColor.alpha * StyledTheme.colorScheme.disableFactors.content
+            alpha = baseColor.alpha * StyledTheme.colorScheme.disabledAlphaFactors.content
         )
 
         UpdateStyledThemeLocals(

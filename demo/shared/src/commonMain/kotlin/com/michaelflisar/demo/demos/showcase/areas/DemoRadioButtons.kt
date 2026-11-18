@@ -1,5 +1,7 @@
 package com.michaelflisar.demo.demos.showcase.areas
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -9,9 +11,8 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.ui.components.StyledRadioButton
-import com.michaelflisar.composestyled.ui.layout.StyledFlowRow
-import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.ui.components.StyledToggleBehavior
+import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.utils.ExpandState
 import com.michaelflisar.demo.helper.RegionContainer
 import com.michaelflisar.demo.helper.SubTitle
@@ -25,7 +26,10 @@ internal fun DemoRadioButtons(baseId: Int, expandState: ExpandState) {
         expanded = expandState,
     ) {
         SubTitle("Default Radio Buttons")
-        StyledFlowRow(spacing = StyledTheme.spacing.medium) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+            verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+        ) {
             listOf("First", "Second").forEachIndexed { index, label ->
                 StyledRadioButton(
                     selected = selectedOption.value == index,
@@ -52,7 +56,10 @@ internal fun DemoRadioButtons(baseId: Int, expandState: ExpandState) {
             StyledText("Selected: ${selectedOption.value + 1}")
         }
         SubTitle("Disabled Radio Buttons")
-        StyledFlowRow(spacing = StyledTheme.spacing.medium) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+            verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+        ) {
             listOf(false, true).forEach { value ->
                 StyledRadioButton(
                     selected = value,
@@ -66,7 +73,10 @@ internal fun DemoRadioButtons(baseId: Int, expandState: ExpandState) {
             }
         }
         SubTitle("Radio Button with Customization")
-        StyledFlowRow(spacing = StyledTheme.spacing.medium) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+            verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+        ) {
             StyledRadioButton(
                 selected = true,
                 onClick = {},

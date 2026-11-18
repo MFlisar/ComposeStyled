@@ -2,8 +2,12 @@ package com.michaelflisar.demo.demos.showcase.areas
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,9 +31,7 @@ import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.ui.components.StyledPopupDropdownIndex
 import com.michaelflisar.composestyled.ui.layout.StyledCollapsibleHeader
 import com.michaelflisar.composestyled.ui.layout.StyledCollapsibleHeaderScrollBehavior
-import com.michaelflisar.composestyled.ui.layout.StyledColumn
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
-import com.michaelflisar.composestyled.ui.layout.StyledFlowRow
 import com.michaelflisar.composestyled.ui.layout.StyledGrid
 import com.michaelflisar.composestyled.ui.layout.StyledHorizontalScrollContainer
 import com.michaelflisar.composestyled.ui.layout.StyledLazyColumn
@@ -38,7 +40,6 @@ import com.michaelflisar.composestyled.ui.layout.StyledLazyRow
 import com.michaelflisar.composestyled.ui.layout.StyledLazyVerticalGrid
 import com.michaelflisar.composestyled.ui.layout.StyledPager
 import com.michaelflisar.composestyled.ui.layout.StyledPagerDefaults
-import com.michaelflisar.composestyled.ui.layout.StyledRow
 import com.michaelflisar.composestyled.ui.layout.StyledSplitPanel
 import com.michaelflisar.composestyled.ui.layout.StyledVerticalScrollContainer
 import com.michaelflisar.composestyled.ui.layout.rememberStyledCollapsibleHeaderState
@@ -62,16 +63,20 @@ internal fun DemoLayouts(baseId: Int, expandState: ExpandState) {
         id = baseId + 1,
         expanded = expandState,
     ) {
-        StyledRow(itemSpacing = StyledTheme.spacing.medium) {
+        Row(horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium)) {
             StyledText("Row item one")
             StyledText("Row item two")
             StyledText("Row item three")
         }
-        StyledColumn(itemSpacing = StyledTheme.spacing.medium) {
+        Column(verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium)) {
             StyledText("Column item one")
             StyledText("Column item two")
         }
-        StyledFlowRow(spacing = StyledTheme.spacing.medium, maxItemsInEachRow = 2) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+            verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+            maxItemsInEachRow = 2,
+        ) {
             items.forEach { item ->
                 StyledText(item)
             }
@@ -97,7 +102,7 @@ internal fun DemoLayouts(baseId: Int, expandState: ExpandState) {
         StyledVerticalScrollContainer(
             modifier = Modifier.fillMaxWidth().height(120.dp),
         ) {
-            StyledColumn(itemSpacing = StyledTheme.spacing.medium) {
+            Column(verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium)) {
                 (1..8).forEach { index ->
                     StyledText("Scrollable item $index")
                 }
@@ -113,9 +118,9 @@ internal fun DemoLayouts(baseId: Int, expandState: ExpandState) {
         StyledHorizontalScrollContainer(
             modifier = Modifier.fillMaxWidth().height(48.dp),
         ) {
-            StyledRow(
-                itemSpacing = StyledTheme.spacing.medium,
-                modifier = Modifier.fillMaxHeight()
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+                modifier = Modifier.fillMaxHeight(),
             ) {
                 (1..8).forEach { index ->
                     StyledText(
@@ -298,8 +303,8 @@ internal fun DemoLayouts(baseId: Int, expandState: ExpandState) {
                 )
             )
         ) { contentPadding ->
-            StyledColumn(
-                itemSpacing = StyledTheme.spacing.medium,
+            Column(
+                verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
                 modifier = Modifier.padding(contentPadding),
             ) {
                 StyledText(
@@ -317,7 +322,7 @@ internal fun DemoLayouts(baseId: Int, expandState: ExpandState) {
                     selectedIndex = selectedContentMode,
                     title = "Content type",
                 )
-                StyledRow(itemSpacing = StyledTheme.spacing.medium) {
+                Row(horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium)) {
                     StyledButton(onClick = { scope.launch { headerState.expand() } }) {
                         StyledText("Expand")
                     }

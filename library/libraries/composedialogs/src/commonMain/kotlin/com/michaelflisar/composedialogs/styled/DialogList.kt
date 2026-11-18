@@ -1,5 +1,7 @@
 package com.michaelflisar.composedialogs.styled
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,7 +14,6 @@ import androidx.compose.ui.unit.Dp
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.ui.components.StyledListItem
 import com.michaelflisar.composestyled.ui.components.StyledListItemDefaults
-import com.michaelflisar.composestyled.ui.layout.StyledColumn
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
 import com.michaelflisar.composestyled.ui.layout.StyledDialogDefaults
 import com.michaelflisar.composestyled.ui.layout.StyledVerticalScrollContainer
@@ -72,8 +73,8 @@ fun <T : Any> DialogList(
                 modifier = listModifier.fillMaxWidth(),
                 contentPadding = listContentPadding,
             ) {
-                StyledColumn(
-                    itemSpacing = itemSpacing,
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(itemSpacing),
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     if (items.isEmpty()) {

@@ -124,7 +124,7 @@ class Material3SideNavigation internal constructor() : StyledSideNavigation.Impl
         )
         val styledContentColor = (if (selected) selectedContent else unselectedContent).let { color ->
             if (enabled) color else color.copy(
-                alpha = color.alpha * StyledTheme.colorScheme.disableFactors.content,
+                alpha = color.alpha * StyledTheme.colorScheme.disabledAlphaFactors.content,
             )
         }
         FoundationSideNavigationItemFrame(modifier) {

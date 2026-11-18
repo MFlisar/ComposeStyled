@@ -49,7 +49,7 @@ class Material3Tab internal constructor() : StyledTab.Implementation {
             resolvedUnselectedContentColor
         }).let { color ->
             if (enabled) color else color.copy(
-                alpha = color.alpha * StyledTheme.colorScheme.disableFactors.content,
+                alpha = color.alpha * StyledTheme.colorScheme.disabledAlphaFactors.content,
             )
         }
         Tab(

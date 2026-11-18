@@ -1,6 +1,8 @@
 package com.michaelflisar.composestyled.ui.specials
 
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
@@ -21,7 +23,6 @@ import com.michaelflisar.composestyled.ui.components.StyledIcon
 import com.michaelflisar.composestyled.ui.icons.StyledIcons
 import com.michaelflisar.composestyled.ui.layout.StyledHorizontalScrollContainer
 import com.michaelflisar.composestyled.ui.layout.StyledHorizontalScrollbarLayout
-import com.michaelflisar.composestyled.ui.layout.StyledRow
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 
 /** One text and/or icon segment in a [StyledBreadcrumb]. */
@@ -112,8 +113,8 @@ fun StyledBreadcrumb(
     val firstVisibleIndex = if (showRootItem) 0 else 1
     if (items.size <= firstVisibleIndex) return
 
-    StyledRow(
-        itemSpacing = style.itemSpacing,
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(style.itemSpacing),
         modifier = modifier.horizontalScroll(scrollState),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -138,8 +139,8 @@ fun StyledBreadcrumb(
                 onClick = { onClick?.invoke() },
                 enabled = onClick != null,
             ) {
-                StyledRow(
-                    itemSpacing = style.itemSpacing,
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(style.itemSpacing),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     item.icon?.let {

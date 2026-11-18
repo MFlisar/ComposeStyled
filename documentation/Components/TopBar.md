@@ -57,7 +57,7 @@ StyledScaffold(
         StyledExpandableTopBar(
             behavior = scrollBehavior,
             title = {
-                StyledColumn(itemSpacing = StyledTheme.spacing.small) {
+                Column(verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.small)) {
                     StyledText("Settings")
                     StyledText(
                         "Account preferences",

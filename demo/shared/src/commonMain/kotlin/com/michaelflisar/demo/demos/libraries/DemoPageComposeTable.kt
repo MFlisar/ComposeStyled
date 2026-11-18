@@ -1,5 +1,8 @@
 package com.michaelflisar.demo.demos.libraries
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -35,8 +38,6 @@ import com.michaelflisar.composestyled.ui.components.StyledSnackbarHost
 import com.michaelflisar.composestyled.ui.components.StyledSnackbarHostState
 import com.michaelflisar.composestyled.ui.components.StyledSurface
 import com.michaelflisar.composestyled.ui.icons.StyledIcons
-import com.michaelflisar.composestyled.ui.layout.StyledColumn
-import com.michaelflisar.composestyled.ui.layout.StyledRow
 import com.michaelflisar.composestyled.ui.layout.StyledScaffold
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composetable.ColumnWidth
@@ -75,10 +76,10 @@ import com.michaelflisar.composetable.rememberTableState
 import com.michaelflisar.composetable.textColumn
 import com.michaelflisar.composetable.textFilter
 import com.michaelflisar.demo.helper.DemoTopBar
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 internal fun DemoPageComposeTable(onBack: () -> Unit) {
@@ -175,9 +176,9 @@ private fun ComposeTableDemo(
         ) { it.id }
     }
 
-    StyledColumn(
+    Column(
+        verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
         modifier = modifier,
-        itemSpacing = StyledTheme.spacing.medium,
     ) {
         StyledSurface(
             modifier = Modifier.fillMaxWidth(),
@@ -226,13 +227,13 @@ private fun ComposeTableDemo(
             showHeaderFilterIcon = showHeaderFilterIcon.value,
             headerFilterPresentation = headerFilterPresentation.value,
             emptyContent = {
-                StyledColumn {
+                Column {
                     if (customEmpty.value) StyledText("No data in the current provider.")
                     TableEmptyContent()
                 }
             },
             errorContent = { error ->
-                StyledColumn {
+                Column {
                     if (customErrors.value) {
                         StyledText(
                             "Provider ${error.kind.name.lowercase()} error" +
@@ -327,14 +328,14 @@ private fun TableSettings(
         }
     }
 
-    StyledColumn(
+    Column(
+        verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.small),
         modifier = modifier,
-        itemSpacing = StyledTheme.spacing.small,
     ) {
-        StyledRow(
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            itemSpacing = StyledTheme.spacing.medium
         ) {
             StyledText(
                 text = "Settings",

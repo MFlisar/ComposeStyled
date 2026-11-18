@@ -252,7 +252,7 @@ private fun StyledColorScheme.toMaterial3ColorScheme(): ColorScheme {
 fun ColorScheme.toStyledColorScheme(
     isDarkTheme: Boolean,
 ): StyledColorScheme {
-    // just needed for success and warning colors and disableFactors, which are not part of M3 color scheme
+    // just needed for success and warning colors and disabledAlphaFactors, which are not part of M3 color scheme
     val baseColorScheme = Material3Themes.blue.resolve(
         variant = StyledThemeVariant.Colorful,
         isDark = isDarkTheme,
@@ -289,7 +289,7 @@ fun ColorScheme.toStyledColorScheme(
             baseColorScheme.warningSurface,
             baseColorScheme.onWarningSurface
         ),
-        disableFactors = baseColorScheme.disableFactors,
+        disabledAlphaFactors = baseColorScheme.disabledAlphaFactors,
     )
 }
 

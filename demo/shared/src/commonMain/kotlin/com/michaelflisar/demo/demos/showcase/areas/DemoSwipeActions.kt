@@ -2,6 +2,8 @@ package com.michaelflisar.demo.demos.showcase.areas
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
@@ -16,7 +18,6 @@ import androidx.compose.ui.graphics.Color
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.classes.toIconComposable
 import com.michaelflisar.composestyled.tokens.LocalStyledContentColor
-import com.michaelflisar.composestyled.ui.layout.StyledColumn
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.ui.specials.StyledSwipeAction
 import com.michaelflisar.composestyled.ui.specials.StyledSwipeActionSide
@@ -38,7 +39,7 @@ internal fun DemoSwipeActions(baseId: Int, expandState: ExpandState) {
     ) {
         StyledText(text = message.value)
 
-        StyledColumn(itemSpacing = StyledTheme.spacing.medium) {
+        Column(verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium)) {
             StyledSwipeToActionBox(
                 modifier = Modifier.fillMaxWidth(),
                 shape = StyledTheme.shapes.medium,

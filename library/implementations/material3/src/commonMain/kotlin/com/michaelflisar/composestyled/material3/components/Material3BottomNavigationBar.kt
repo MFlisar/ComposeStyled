@@ -154,7 +154,7 @@ class Material3BottomNavigationBar internal constructor() : StyledBottomNavigati
         @Composable
         fun withEnabledState(color: Color) =
             if (enabled) color else color.copy(
-                alpha = color.alpha * StyledTheme.colorScheme.disableFactors.content,
+                alpha = color.alpha * StyledTheme.colorScheme.disabledAlphaFactors.content,
             )
         val iconColor = withEnabledState(
             if (selected) colors.selectedIconColor else colors.unselectedIconColor,

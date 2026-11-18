@@ -2,6 +2,9 @@ package com.michaelflisar.demo.demos.showcase.areas
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,33 +13,32 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.classes.toIconComposable
-import com.michaelflisar.composestyled.ui.components.StyledOutlinedCard
 import com.michaelflisar.composestyled.ui.components.StyledBottomNavigationBar
+import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.ui.components.StyledCenterAlignedTopBar
-import com.michaelflisar.composestyled.ui.components.StyledPopupDropdownIndex
 import com.michaelflisar.composestyled.ui.components.StyledExpandableTopBar
 import com.michaelflisar.composestyled.ui.components.StyledFloatingActionButton
 import com.michaelflisar.composestyled.ui.components.StyledIcon
 import com.michaelflisar.composestyled.ui.components.StyledLargeFloatingActionButton
 import com.michaelflisar.composestyled.ui.components.StyledNavigationItem
-import com.michaelflisar.composestyled.ui.components.StyledButton
-import com.michaelflisar.composestyled.ui.layout.StyledScaffold
+import com.michaelflisar.composestyled.ui.components.StyledOutlinedCard
+import com.michaelflisar.composestyled.ui.components.StyledPopupDropdownIndex
 import com.michaelflisar.composestyled.ui.components.StyledSideNavigation
 import com.michaelflisar.composestyled.ui.components.StyledSideNavigationDefaults
 import com.michaelflisar.composestyled.ui.components.StyledSideNavigationItem
@@ -46,10 +48,9 @@ import com.michaelflisar.composestyled.ui.components.StyledSnackbarData
 import com.michaelflisar.composestyled.ui.components.StyledSnackbarDuration
 import com.michaelflisar.composestyled.ui.components.StyledSwitch
 import com.michaelflisar.composestyled.ui.components.StyledTopBar
-import com.michaelflisar.composestyled.ui.layout.StyledColumn
-import com.michaelflisar.composestyled.ui.layout.StyledFlowRow
-import com.michaelflisar.composestyled.ui.primitives.StyledText
+import com.michaelflisar.composestyled.ui.layout.StyledScaffold
 import com.michaelflisar.composestyled.ui.primitives.StyledExpandIcon
+import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.ui.state.rememberStyledExpandableTopBarScrollBehavior
 import com.michaelflisar.composestyled.utils.ExpandState
 import com.michaelflisar.demo.helper.RegionContainer
@@ -113,7 +114,7 @@ internal fun ScaffoldExamples(
                     expandedContentColor = StyledTheme.colorScheme.onPrimarySurface,
                     windowInsets = WindowInsets(0, 0, 0, 0),
                     title = {
-                        StyledColumn(itemSpacing = StyledTheme.spacing.small) {
+                        Column(verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.small)) {
                             StyledText("Expandable toolbar")
                             StyledText(
                                 "The subtitle stays visible while expanded",
@@ -124,8 +125,8 @@ internal fun ScaffoldExamples(
                 )
             },
             content = { paddingValues ->
-                StyledColumn(
-                    itemSpacing = StyledTheme.spacing.medium,
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues)
@@ -282,9 +283,10 @@ internal fun DemoComponentParts(
         val showFooter = rememberSaveable { mutableStateOf(true) }
 
         StyledOutlinedCard {
-            StyledFlowRow(
-                spacing = StyledTheme.spacing.medium,
-                modifier = Modifier.fillMaxWidth()
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+                verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 StyledPopupDropdownIndex(
                     items = StyledSideNavigation.Mode.entries.map { it.name },
@@ -342,12 +344,12 @@ internal fun DemoComponentParts(
                     },
                     header = if (showHeader.value) {
                         {
-                            StyledColumn(
-                                itemSpacing = StyledTheme.spacing.medium,
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
                                 modifier = Modifier.padding(
                                     horizontal = StyledTheme.padding.medium,
                                     vertical = StyledTheme.padding.small
-                                ).background(StyledTheme.colorScheme.primarySurface)
+                                ).background(StyledTheme.colorScheme.primarySurface),
                             ) {
                                 StyledText("My workspace")
                                 StyledText("A multiline header with stable width while expanding and collapsing.")
@@ -356,12 +358,12 @@ internal fun DemoComponentParts(
                     } else null,
                     footer = if (showFooter.value) {
                         {
-                            StyledColumn(
-                                itemSpacing = StyledTheme.spacing.medium,
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
                                 modifier = Modifier.padding(
                                     horizontal = StyledTheme.padding.medium,
                                     vertical = StyledTheme.padding.small
-                                ).background(StyledTheme.colorScheme.primarySurface)
+                                ).background(StyledTheme.colorScheme.primarySurface),
                             ) {
                                 StyledText("Signed in")
                                 StyledText("Footer stays pinned below the scrolling destinations.")
@@ -398,7 +400,10 @@ internal fun DemoComponentParts(
         expanded = expandState
     ) {
         SubTitle("Default Floating Action Buttons")
-        StyledFlowRow(spacing = StyledTheme.spacing.medium) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+            verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+        ) {
             StyledFloatingActionButton.Variant.entries.forEach { variant ->
                 val content: @Composable () -> Unit = {
                     StyledIcon(
@@ -425,7 +430,10 @@ internal fun DemoComponentParts(
             }
         }
         SubTitle("Floating Action Buttons with Customization")
-        StyledFlowRow(spacing = StyledTheme.spacing.medium) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+            verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+        ) {
             StyledFloatingActionButton(
                 onClick = showSnackbar,
                 containerColor = Color.Magenta,

@@ -132,14 +132,14 @@ class Material3Input internal constructor(
             textColor
         } else {
             textColor.copy(
-                alpha = textColor.alpha * StyledTheme.colorScheme.disableFactors.content,
+                alpha = textColor.alpha * StyledTheme.colorScheme.disabledAlphaFactors.content,
             )
         }
         val unfocusedBorderColor = customBorder.takeIf { it != Color.Unspecified }
             ?: StyledTheme.colorScheme.outline
         val unfocusedDecorationColor = StyledTheme.colorScheme.onSurfaceVariant
         val disabledDecorationColor = unfocusedDecorationColor.copy(
-            alpha = unfocusedDecorationColor.alpha * StyledTheme.colorScheme.disableFactors.content,
+            alpha = unfocusedDecorationColor.alpha * StyledTheme.colorScheme.disabledAlphaFactors.content,
         )
         val labelColor = when {
             !isFieldEnabled -> disabledDecorationColor

@@ -1,5 +1,7 @@
 package com.michaelflisar.demo.demos.showcase.areas
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
@@ -7,7 +9,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.ui.components.StyledDatePicker
 import com.michaelflisar.composestyled.ui.components.StyledTimePicker
-import com.michaelflisar.composestyled.ui.layout.StyledColumn
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.utils.ExpandState
 import com.michaelflisar.demo.helper.RegionContainer
@@ -29,7 +30,7 @@ internal fun DemoDateTimePickers(baseId: Int, expandState: ExpandState) {
         id = baseId + 1,
         expanded = expandState,
     ) {
-        StyledColumn(itemSpacing = StyledTheme.spacing.medium) {
+        Column(verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium)) {
             SubTitle("Date selection, Monday-first calendar")
             StyledDatePicker(
                 value = date,

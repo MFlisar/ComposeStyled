@@ -60,14 +60,14 @@ class Fluent2Switch internal constructor() : StyledSwitch.Implementation {
                 else -> Color.Transparent
             },
             thumbColor = when {
-                !enabled -> colors.onSurface.copy(alpha = colors.disableFactors.content)
+                !enabled -> colors.onSurface.copy(alpha = colors.disabledAlphaFactors.content)
                 checked -> onTint
                 else -> neutral
             },
             outlineColor = when {
                 checked -> Color.Transparent
                 enabled -> neutral
-                else -> colors.outline.copy(alpha = colors.disableFactors.outline)
+                else -> colors.outline.copy(alpha = colors.disabledAlphaFactors.outline)
             },
             trackWidth = 40.dp,
             trackHeight = 20.dp,

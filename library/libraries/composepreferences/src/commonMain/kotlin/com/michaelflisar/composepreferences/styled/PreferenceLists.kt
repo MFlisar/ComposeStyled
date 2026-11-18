@@ -1,5 +1,8 @@
 package com.michaelflisar.composepreferences.styled
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -24,23 +27,21 @@ import com.michaelflisar.composepreferences.styled.internal.LocalPreferenceStyle
 import com.michaelflisar.composepreferences.styled.internal.PreferenceEntry
 import com.michaelflisar.composepreferences.styled.layout.PreferenceStyledRow
 import com.michaelflisar.composestyled.StyledTheme
-import com.michaelflisar.composestyled.classes.IconComposable
 import com.michaelflisar.composestyled.classes.CustomColors
+import com.michaelflisar.composestyled.classes.IconComposable
 import com.michaelflisar.composestyled.tokens.LocalStyledTextStyle
 import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.ui.components.StyledButtonDefaults
 import com.michaelflisar.composestyled.ui.components.StyledCheckbox
 import com.michaelflisar.composestyled.ui.components.StyledIcon
+import com.michaelflisar.composestyled.ui.components.StyledInput
+import com.michaelflisar.composestyled.ui.components.StyledListItem
 import com.michaelflisar.composestyled.ui.components.StyledPopupDropdown
 import com.michaelflisar.composestyled.ui.components.StyledPopupDropdownMultiSelect
 import com.michaelflisar.composestyled.ui.components.StyledPopupDropdownMultiSelectDefaults
-import com.michaelflisar.composestyled.ui.components.StyledInput
-import com.michaelflisar.composestyled.ui.components.StyledListItem
 import com.michaelflisar.composestyled.ui.components.StyledPopupMenu
 import com.michaelflisar.composestyled.ui.components.StyledRadioButton
-import com.michaelflisar.composestyled.ui.layout.StyledColumn
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
-import com.michaelflisar.composestyled.ui.layout.StyledRow
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.ui.state.rememberDialogState
 import com.michaelflisar.composestyled.utils.PointerInputBlocker
@@ -228,18 +229,18 @@ fun <T : Any> PreferenceList(
             isVisible = isVisible,
             shape = shape,
             trailing = {
-                StyledRow(itemSpacing = StyledTheme.spacing.medium) {
+                Row(horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium)) {
                     itemLeadingContent?.invoke(selected)
                     StyledText(itemText(selected))
                 }
             },
             onOpen = { query = "" },
         ) { dialogItems, dialogState, padding, visuals ->
-            StyledColumn(
+            Column(
+                verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(padding),
-                itemSpacing = StyledTheme.spacing.medium
             ) {
                 if (filter != null) {
                     StyledInput(
@@ -249,9 +250,9 @@ fun <T : Any> PreferenceList(
                         label = { StyledText(filter.label ?: strings.filterOptions) },
                     )
                 }
-                StyledColumn(
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
                     modifier = Modifier.verticalScroll(rememberScrollState()),
-                    itemSpacing = StyledTheme.spacing.medium
                 ) {
                     dialogItems.filter { filter?.test(query, it, itemText) != false }
                         .forEach { item ->
@@ -409,12 +410,14 @@ fun <T : Any> PreferenceListMultiSelect(
                                 ?: visuals.style.toDropdownCustomization(),
                             content = {
                                 selection { selectedItems ->
-                                    StyledRow(itemSpacing = 0.dp) {
+                                    Row(horizontalArrangement = Arrangement.spacedBy(0.dp)) {
                                         selectedItems.forEachIndexed { index, item ->
                                             if (index > 0) {
                                                 StyledText(", ", style = textStyle)
                                             }
-                                            StyledRow(itemSpacing = StyledTheme.spacing.medium) {
+                                            Row(
+                                                horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+                                            ) {
                                                 itemLeadingContent?.invoke(item)
                                                 StyledText(
                                                     itemText(item),
@@ -476,12 +479,12 @@ fun <T : Any> PreferenceListMultiSelect(
                 )
             },
             trailing = {
-                StyledRow(itemSpacing = 0.dp) {
+                Row(horizontalArrangement = Arrangement.spacedBy(0.dp)) {
                     selected.forEachIndexed { index, item ->
                         if (index > 0) {
                             StyledText(", ")
                         }
-                        StyledRow(itemSpacing = StyledTheme.spacing.medium) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium)) {
                             itemLeadingContent?.invoke(item)
                             StyledText(itemText(item))
                         }
@@ -493,11 +496,11 @@ fun <T : Any> PreferenceListMultiSelect(
                 query = ""
             },
         ) { dialogItems, _, padding, visuals ->
-            StyledColumn(
+            Column(
+                verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(padding),
-                itemSpacing = StyledTheme.spacing.medium
             ) {
                 if (filter != null) {
                     StyledInput(
@@ -507,9 +510,9 @@ fun <T : Any> PreferenceListMultiSelect(
                         label = { StyledText(filter.label ?: strings.filterOptions) },
                     )
                 }
-                StyledColumn(
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
                     modifier = Modifier.verticalScroll(rememberScrollState()),
-                    itemSpacing = StyledTheme.spacing.medium
                 ) {
                     dialogItems.filter { filter?.test(query, it, itemText) != false }
                         .forEach { item ->
@@ -570,9 +573,9 @@ private fun <T : Any> PreferenceListDropdownItem(
     selected: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
-    StyledRow(
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
         modifier = modifier,
-        itemSpacing = StyledTheme.spacing.medium,
     ) {
         itemLeadingContent?.invoke(item)
         StyledText(

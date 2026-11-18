@@ -29,7 +29,7 @@ StyledVerticalScrollContainer(
         .consumeWindowInsets(paddingValues),
     contentPadding = StyledTheme.padding.content,
 ) {
-    StyledColumn(itemSpacing = StyledTheme.spacing.medium) {
+    Column(verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium)) {
         StyledText("First item")
         StyledText("Second item")
     }

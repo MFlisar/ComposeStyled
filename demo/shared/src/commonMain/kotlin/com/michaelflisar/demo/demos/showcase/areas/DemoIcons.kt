@@ -1,5 +1,7 @@
 package com.michaelflisar.demo.demos.showcase.areas
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
@@ -7,12 +9,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.StyledTheme
-import com.michaelflisar.composestyled.ui.layout.StyledFlowRow
-import com.michaelflisar.composestyled.ui.icons.StyledIcons
 import com.michaelflisar.composestyled.ui.components.StyledIcon
+import com.michaelflisar.composestyled.ui.icons.StyledIcons
+import com.michaelflisar.composestyled.utils.ExpandState
 import com.michaelflisar.demo.helper.RegionContainer
 import com.michaelflisar.demo.helper.SubTitle
-import com.michaelflisar.composestyled.utils.ExpandState
 
 @Composable
 internal fun DemoIcons(baseId: Int, expandState: ExpandState) {
@@ -22,7 +23,10 @@ internal fun DemoIcons(baseId: Int, expandState: ExpandState) {
         expanded = expandState
     ) {
         SubTitle("Theme Icons")
-        StyledFlowRow(spacing = StyledTheme.spacing.medium) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+            verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+        ) {
             StyledIcon(icon = StyledIcons.NavigateBack, contentDescription = "Navigate back")
             StyledIcon(icon = StyledIcons.NavigateForward, contentDescription = "Navigate forward")
             StyledIcon(icon = StyledIcons.Submenu, contentDescription = "Open submenu")
@@ -52,12 +56,18 @@ internal fun DemoIcons(baseId: Int, expandState: ExpandState) {
             StyledIcon(icon = StyledIcons.Cut, contentDescription = "Cut")
         }
         SubTitle("Custom Icons")
-        StyledFlowRow(spacing = StyledTheme.spacing.medium) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+            verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+        ) {
             StyledIcon(imageVector = Icons.Default.Check, contentDescription = "Check")
             StyledIcon(imageVector = Icons.Default.Add, contentDescription = "Add")
         }
         SubTitle("Icons with Customization")
-        StyledFlowRow(spacing = StyledTheme.spacing.medium) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+            verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+        ) {
             StyledIcon(imageVector = Icons.Default.Check, tint = Color.Magenta, size = 32.dp, contentDescription = "Custom check")
             StyledIcon(imageVector = Icons.Default.Add, tint = Color.Blue, size = 48.dp, contentDescription = "Custom add")
         }

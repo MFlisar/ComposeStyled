@@ -18,7 +18,7 @@ Box(Modifier.fillMaxSize()) {
         expandedSize = StyledSheet.Size.Fraction(0.8f),
         triggerSize = 24.dp,
     ) {
-        StyledColumn(Modifier.fillMaxSize().padding(16.dp)) {
+        Column(Modifier.fillMaxSize().padding(16.dp)) {
             StyledText("Sheet content")
             StyledButton(onClick = { sheetState.collapse() }) {
                 StyledText("Close")

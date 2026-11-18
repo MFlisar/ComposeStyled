@@ -123,12 +123,12 @@ abstract class FoundationSideNavigation(
             LocalStyledContentColor.current
         }
         val foreground = if (enabled) base else base.copy(
-            alpha = base.alpha * StyledTheme.colorScheme.disableFactors.content,
+            alpha = base.alpha * StyledTheme.colorScheme.disabledAlphaFactors.content,
         )
         val shape = RoundedCornerShape(8.dp)
         val selectionBackground = if (selected && showSelectionBackground) {
             if (enabled) indicator else indicator.copy(
-                alpha = indicator.alpha * StyledTheme.colorScheme.disableFactors.default,
+                alpha = indicator.alpha * StyledTheme.colorScheme.disabledAlphaFactors.default,
             )
         } else Color.Transparent
         val background = when {

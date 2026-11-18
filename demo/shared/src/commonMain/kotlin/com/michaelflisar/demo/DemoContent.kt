@@ -1,6 +1,8 @@
 package com.michaelflisar.demo
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -36,7 +38,6 @@ import com.michaelflisar.composestyled.themes.StyledThemeVariant
 import com.michaelflisar.composestyled.themes.rememberThemeColors
 import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.ui.components.StyledSurface
-import com.michaelflisar.composestyled.ui.layout.StyledColumn
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
 import com.michaelflisar.composestyled.ui.layout.StyledGrid
 import com.michaelflisar.composestyled.ui.layout.StyledScaffold
@@ -144,7 +145,7 @@ fun DemoContent(
         }
     ) {
         StyledSurface {
-            StyledColumn {
+            Column {
 
                 // 1) menu bar
                 menuBar?.invoke()
@@ -215,8 +216,8 @@ fun DemoContent(
                 title = { StyledText("Setup") },
             ) { contentPadding ->
                 StyledVerticalScrollContainer {
-                    StyledColumn(
-                        itemSpacing = StyledTheme.spacing.medium,
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
                         modifier = Modifier.padding(contentPadding),
                     ) {
                         if (showSetupPanel) {
@@ -265,12 +266,12 @@ private fun SelectDemo(
             )
         },
     ) { paddingValues ->
-        StyledColumn(
+        Column(
+            verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(StyledTheme.padding.content),
-            itemSpacing = StyledTheme.spacing.medium,
         ) {
             StyledText("Demos", style = StyledTheme.typography.titleLarge)
 

@@ -1,6 +1,7 @@
 package com.michaelflisar.composestyled.ui.internal
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -22,7 +23,6 @@ import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.ui.components.StyledCheckbox
 import com.michaelflisar.composestyled.ui.components.StyledPopupMenu
 import com.michaelflisar.composestyled.ui.components.StyledPopupMenuDefaults
-import com.michaelflisar.composestyled.ui.layout.StyledRow
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 
 // -------------------------
@@ -50,7 +50,7 @@ internal object StyledDropdownMultiSelectDefaults {
         selectAllLabel: String = "Select all",
         clearSelectionLabel: String = "Clear selection",
     ): @Composable (StyledDropdownMultiSelect.Actions) -> Unit = { actions ->
-        StyledRow(
+        Row(
             modifier = Modifier.fillMaxWidth().padding(StyledTheme.padding.medium),
             horizontalArrangement = Arrangement.spacedBy(
                 StyledTheme.spacing.medium,
@@ -129,7 +129,7 @@ internal object StyledDropdownMultiSelectDefaults {
     ): @Composable (StyledDropdown.RenderContext.Selection<List<T>>) -> Unit = { context ->
         val resolvedTextStyle = textStyle?.let(LocalStyledTextStyle.current::merge)
             ?: LocalStyledTextStyle.current
-        StyledRow(itemSpacing = StyledTheme.spacing.medium) {
+        Row(horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium)) {
             leadingContent()
             StyledText(
                 text = formatter(context.selection.map { mapper(it) }),
@@ -155,9 +155,9 @@ internal object StyledDropdownMultiSelectDefaults {
     ): @Composable (StyledDropdown.RenderContext.DropdownItem<T>) -> Unit = { context ->
         val resolvedTextStyle = textStyle?.let(LocalStyledTextStyle.current::merge)
             ?: LocalStyledTextStyle.current
-        StyledRow(
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
             modifier = Modifier.fillMaxWidth(),
-            itemSpacing = StyledTheme.spacing.medium
         ) {
             StyledCheckbox(
                 checked = context.selected,

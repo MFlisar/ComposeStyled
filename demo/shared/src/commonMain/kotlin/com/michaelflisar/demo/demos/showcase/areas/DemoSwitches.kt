@@ -1,5 +1,7 @@
 package com.michaelflisar.demo.demos.showcase.areas
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -8,11 +10,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import com.michaelflisar.composestyled.StyledTheme
-import com.michaelflisar.composestyled.ui.layout.StyledFlowRow
-import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.ui.components.StyledSwitch
 import com.michaelflisar.composestyled.ui.components.StyledToggleBehavior
 import com.michaelflisar.composestyled.ui.components.StyledToggleLabelArrangement
+import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.utils.ExpandState
 import com.michaelflisar.demo.helper.RegionContainer
 import com.michaelflisar.demo.helper.SubTitle
@@ -29,7 +30,10 @@ internal fun DemoSwitches(baseId: Int, expandState: ExpandState) {
         expanded = expandState
     ) {
         SubTitle("Default Switches")
-        StyledFlowRow(spacing = StyledTheme.spacing.medium) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+            verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+        ) {
             StyledSwitch(
                 checked = switched.value,
                 onCheckedChange = { switched.value = it },
@@ -52,7 +56,10 @@ internal fun DemoSwitches(baseId: Int, expandState: ExpandState) {
             )
         }
         SubTitle("Disabled Switches")
-        StyledFlowRow(spacing = StyledTheme.spacing.medium) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+            verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+        ) {
             listOf(false, true).forEach { value ->
                 StyledSwitch(
                     checked = value,
@@ -65,7 +72,10 @@ internal fun DemoSwitches(baseId: Int, expandState: ExpandState) {
             }
         }
         SubTitle("Switches with Customization")
-        StyledFlowRow(spacing = StyledTheme.spacing.medium) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+            verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+        ) {
             StyledSwitch(
                 checked = customSwitched.value,
                 onCheckedChange = { customSwitched.value = it },

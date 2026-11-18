@@ -1,5 +1,7 @@
 package com.michaelflisar.composestyled.ui.internal
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -14,7 +16,6 @@ import com.michaelflisar.composestyled.tokens.LocalStyledTextStyle
 import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.ui.components.StyledPopupMenu
 import com.michaelflisar.composestyled.ui.components.StyledPopupMenuDefaults
-import com.michaelflisar.composestyled.ui.layout.StyledRow
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 
 /**
@@ -108,7 +109,7 @@ internal object StyledDropdownDefaults {
     ): @Composable (StyledDropdown.RenderContext.Selection<T?>) -> Unit = { context ->
         val resolvedTextStyle = textStyle?.let(LocalStyledTextStyle.current::merge)
             ?: LocalStyledTextStyle.current
-        StyledRow(itemSpacing = StyledTheme.spacing.medium) {
+        Row(horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium)) {
             leadingContent()
             StyledText(
                 text = if (context.selection != null) mapper(context.selection) else "",
@@ -134,9 +135,9 @@ internal object StyledDropdownDefaults {
     ): @Composable (StyledDropdown.RenderContext.DropdownItem<T>) -> Unit = { context ->
         val resolvedTextStyle = textStyle?.let(LocalStyledTextStyle.current::merge)
             ?: LocalStyledTextStyle.current
-        StyledRow(
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
             modifier = Modifier.fillMaxWidth(),
-            itemSpacing = StyledTheme.spacing.medium
         ) {
             leadingContent()
             StyledText(

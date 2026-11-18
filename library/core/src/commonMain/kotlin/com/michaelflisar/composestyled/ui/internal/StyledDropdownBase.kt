@@ -55,7 +55,6 @@ import com.michaelflisar.composestyled.ui.components.StyledIcon
 import com.michaelflisar.composestyled.ui.components.StyledInput
 import com.michaelflisar.composestyled.ui.components.StyledPopupMenu
 import com.michaelflisar.composestyled.ui.icons.StyledIcons
-import com.michaelflisar.composestyled.ui.layout.StyledColumn
 import com.michaelflisar.composestyled.ui.overlay.StyledPopupContainer
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 import kotlinx.coroutines.launch
@@ -111,8 +110,8 @@ internal fun <T : Any, S> StyledDropdownBase(
                 popupHeader = if (filter == null && popupHeader == null) null else {
                     {
                         if (filter != null) {
-                            StyledColumn(
-                                itemSpacing = StyledTheme.spacing.medium,
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
                                 modifier = Modifier.fillMaxWidth().padding(StyledTheme.padding.medium)
                             ) {
                                 if (title.isNotEmpty()) {

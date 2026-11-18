@@ -1,6 +1,8 @@
 package com.michaelflisar.demo.demos.libraries
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -11,24 +13,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.michaelflisar.composepreferences.styled.navigation.PreferenceBreadcrumb
-import com.michaelflisar.composepreferences.styled.PreferenceFilter
-import com.michaelflisar.composepreferences.styled.PreferenceOpenGroupHeaderStyle
-import com.michaelflisar.composepreferences.styled.PreferenceSectionContentSeparatorStyle
-import com.michaelflisar.composepreferences.styled.PreferenceStyleDefaults
-import com.michaelflisar.composepreferences.styled.layout.PreferenceScreen
 import com.michaelflisar.composepreferences.styled.PreferenceBool
 import com.michaelflisar.composepreferences.styled.PreferenceCustomItem
+import com.michaelflisar.composepreferences.styled.PreferenceFilter
 import com.michaelflisar.composepreferences.styled.PreferenceInputText
 import com.michaelflisar.composepreferences.styled.PreferenceItem
 import com.michaelflisar.composepreferences.styled.PreferenceList
 import com.michaelflisar.composepreferences.styled.PreferenceListMultiSelect
 import com.michaelflisar.composepreferences.styled.PreferenceNumber
+import com.michaelflisar.composepreferences.styled.PreferenceOpenGroupHeaderStyle
+import com.michaelflisar.composepreferences.styled.PreferenceSectionContentSeparatorStyle
 import com.michaelflisar.composepreferences.styled.PreferenceSplitSwitch
+import com.michaelflisar.composepreferences.styled.PreferenceStyleDefaults
 import com.michaelflisar.composepreferences.styled.layout.PreferenceGroup
+import com.michaelflisar.composepreferences.styled.layout.PreferenceScreen
 import com.michaelflisar.composepreferences.styled.layout.PreferenceSection
-import com.michaelflisar.composepreferences.styled.rememberPreferenceFilter
 import com.michaelflisar.composepreferences.styled.layout.rememberPreferenceScreenState
+import com.michaelflisar.composepreferences.styled.navigation.PreferenceBreadcrumb
+import com.michaelflisar.composepreferences.styled.rememberPreferenceFilter
 import com.michaelflisar.composepreferences.styled.rememberPreferenceStyle
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.platform.SystemBarStyleEffectIfNeeded
@@ -39,7 +41,6 @@ import com.michaelflisar.composestyled.ui.components.StyledPopupDropdown
 import com.michaelflisar.composestyled.ui.components.StyledPopupMenu
 import com.michaelflisar.composestyled.ui.icons.StyledIcons
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
-import com.michaelflisar.composestyled.ui.layout.StyledRow
 import com.michaelflisar.composestyled.ui.layout.StyledScaffold
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.ui.state.rememberDialogState
@@ -120,8 +121,8 @@ internal fun DemoPagePreferences(onBack: () -> Unit) {
                 label = { StyledText("Search preferences") },
             )
 
-            StyledRow(
-                itemSpacing = StyledTheme.spacing.medium,
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
                 modifier = Modifier.fillMaxWidth().padding(preferenceStyle.outerPadding),
             ) {
 

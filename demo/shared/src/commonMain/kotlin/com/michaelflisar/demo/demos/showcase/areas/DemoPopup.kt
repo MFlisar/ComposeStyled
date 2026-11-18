@@ -1,5 +1,7 @@
 package com.michaelflisar.demo.demos.showcase.areas
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
@@ -12,7 +14,6 @@ import com.michaelflisar.composestyled.classes.toIconComposable
 import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.ui.components.StyledIcon
 import com.michaelflisar.composestyled.ui.components.StyledPopup
-import com.michaelflisar.composestyled.ui.layout.StyledColumn
 import com.michaelflisar.composestyled.ui.overlay.StyledPopupContainer
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.utils.ExpandState
@@ -32,8 +33,8 @@ internal fun DemoPopup(baseId: Int, expandState: ExpandState) {
                 StyledPopup(
                     visible = expanded,
                     content = {
-                        StyledColumn(
-                            itemSpacing = StyledTheme.spacing.medium,
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
                             modifier = Modifier.padding(StyledTheme.padding.medium),
                         ) {
                             StyledText(
@@ -63,8 +64,8 @@ internal fun DemoPopup(baseId: Int, expandState: ExpandState) {
                 StyledPopup(
                     visible = expanded1,
                     content = {
-                        StyledColumn(
-                            itemSpacing = StyledTheme.spacing.medium,
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
                             modifier = Modifier.padding(StyledTheme.padding.medium),
                         ) {
                             StyledText("Some text")

@@ -1,5 +1,7 @@
 package com.michaelflisar.demo
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -13,7 +15,6 @@ import com.michaelflisar.composestyled.themes.StyledThemeContrast
 import com.michaelflisar.composestyled.themes.StyledThemeVariant
 import com.michaelflisar.composestyled.ui.components.StyledPopupDropdownIndex
 import com.michaelflisar.composestyled.ui.components.StyledSwitch
-import com.michaelflisar.composestyled.ui.layout.StyledRow
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.ui.specials.StyledThemeColorsPicker
 import com.michaelflisar.demo.helper.SubTitle
@@ -32,8 +33,8 @@ fun DemoSetup(
     themeDynamic: MutableState<Boolean>,
 ) {
     SubTitle("Platform / Implementation")
-    StyledRow(
-        itemSpacing = StyledTheme.spacing.medium
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
     ) {
         StyledPopupDropdownIndex(
             modifier = Modifier.weight(1f),

@@ -1,5 +1,7 @@
 package com.michaelflisar.demo.helper
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -8,7 +10,6 @@ import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.ui.components.StyledCardDefaults
-import com.michaelflisar.composestyled.ui.layout.StyledColumn
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.ui.specials.StyledExpandableSection
 import com.michaelflisar.composestyled.utils.ExpandState
@@ -49,9 +50,9 @@ internal fun RegionContainer(
         },
     ) {
         stateHolder.SaveableStateProvider(id.toString()) {
-            StyledColumn(
-                itemSpacing = StyledTheme.spacing.medium,
-                modifier = Modifier.fillMaxWidth().padding(StyledCardDefaults.contentPadding)
+            Column(
+                verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+                modifier = Modifier.fillMaxWidth().padding(StyledCardDefaults.contentPadding),
             ) {
                 content()
             }

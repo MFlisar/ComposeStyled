@@ -16,9 +16,9 @@ Choose the rendering model before implementing it:
 
 - **Theme-specific rendering:** follow `StyledButton` and `StyledIcon` when
   themes need different renderers, native controls or visual behavior.
-- **Generic layout or compound:** follow `StyledColumn`, `StyledRow` and
-  `StyledFlowRow` when the same composition works across themes. A compound
-  composes existing Styled components and inherits their registered renderers.
+- **Generic layout or compound:** use Foundation `Column`, `Row` and `FlowRow`
+  for shared layout, and compose existing Styled components in compounds so
+  their registered renderers are inherited.
 
 For renderer implementation and mapping requirements, follow
 [the renderer guide](styled-component-renderer.instructions.md). For compounds,

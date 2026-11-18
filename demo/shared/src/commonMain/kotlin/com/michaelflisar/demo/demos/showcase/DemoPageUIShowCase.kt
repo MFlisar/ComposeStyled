@@ -1,5 +1,7 @@
 package com.michaelflisar.demo.demos.showcase
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
@@ -37,7 +39,6 @@ import com.michaelflisar.composestyled.ui.components.StyledSideNavigation
 import com.michaelflisar.composestyled.ui.components.StyledSnackbarHost
 import com.michaelflisar.composestyled.ui.components.StyledSnackbarHostState
 import com.michaelflisar.composestyled.ui.components.StyledSnackbarResult
-import com.michaelflisar.composestyled.ui.layout.StyledColumn
 import com.michaelflisar.composestyled.ui.layout.StyledScaffold
 import com.michaelflisar.composestyled.ui.layout.StyledVerticalScrollContainer
 import com.michaelflisar.composestyled.ui.primitives.StyledHorizontalSpacer
@@ -525,7 +526,7 @@ private fun Content(
             StyledHorizontalSpacer(size = StyledTheme.padding.content.calculateTopPadding())
 
             CompositionLocalProvider(LocalShowcaseScrollToTopRequester provides scrollToTopRequester) {
-                StyledColumn(itemSpacing = StyledTheme.spacing.medium) {
+                Column(verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium)) {
                     val area = remember(areas, areaIndex) { areas[areaIndex] }
                     area.contents.forEachIndexed { index, content ->
                         content(areaIndex * 10_000 + index * 100, area.expandState)

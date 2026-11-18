@@ -1,8 +1,11 @@
 package com.michaelflisar.demo
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -13,9 +16,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
+import com.michaelflisar.composepreferences.styled.PreferenceCustomItem
 import com.michaelflisar.composepreferences.styled.PreferenceItem
 import com.michaelflisar.composepreferences.styled.PreferenceOpenGroupHeaderStyle
-import com.michaelflisar.composepreferences.styled.PreferenceCustomItem
 import com.michaelflisar.composepreferences.styled.layout.PreferenceGroup
 import com.michaelflisar.composepreferences.styled.layout.PreferenceScreen
 import com.michaelflisar.composepreferences.styled.layout.PreferenceSection
@@ -26,8 +29,6 @@ import com.michaelflisar.composepreferences.styled.rememberPreferenceStyle
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.tokens.LocalStyledContentColor
 import com.michaelflisar.composestyled.ui.components.StyledInput
-import com.michaelflisar.composestyled.ui.layout.StyledColumn
-import com.michaelflisar.composestyled.ui.layout.StyledRow
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 
 @Composable
@@ -43,9 +44,9 @@ fun PreferenceTest(
         openedGroupHeader = PreferenceOpenGroupHeaderStyle.Disabled,
     )
 
-    StyledColumn(
+    Column(
+        verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
         modifier = Modifier.fillMaxSize().padding(paddingValues),
-        itemSpacing = StyledTheme.spacing.medium,
     ) {
         if (supportFiltering) {
             StyledInput(
@@ -148,16 +149,16 @@ private fun PreferenceTestHeader() {
         contentPadding = PaddingValues(0.dp),
         shape = RectangleShape,
     ) {
-        StyledRow(
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
             modifier = Modifier.fillMaxWidth(),
-            itemSpacing = StyledTheme.spacing.medium,
         ) {
             Box(
                 modifier = Modifier
                     .size(64.dp)
                     .background(StyledTheme.colorScheme.primary, CircleShape),
             )
-            StyledColumn(modifier = Modifier.weight(1f)) {
+            Column(modifier = Modifier.weight(1f)) {
                 StyledText("Toolbox", style = StyledTheme.typography.titleLarge)
                 StyledText("1.0 (1)", style = StyledTheme.typography.bodySmall)
                 StyledText("By Developer", style = StyledTheme.typography.bodySmall)

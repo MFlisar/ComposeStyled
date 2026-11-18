@@ -28,6 +28,8 @@ data class StyledColorScheme(
     internal val primarySurfaceDef: Definition,
     internal val secondaryDef: Definition,
     internal val secondarySurfaceDef: Definition,
+    internal val tertiaryDef: Definition = secondaryDef,
+    internal val tertiarySurfaceDef: Definition = secondarySurfaceDef,
 
     // Lines
     val outline: Color,
@@ -42,9 +44,7 @@ data class StyledColorScheme(
     internal val warningSurfaceDef: Definition,
 
     // Disable handling
-    val disableFactors: StyledDisableFactors,
-    internal val tertiaryDef: Definition = secondaryDef,
-    internal val tertiarySurfaceDef: Definition = secondarySurfaceDef,
+    val disabledAlphaFactors: StyledDisabledAlphaFactors,
 ) {
     /** A semantic color role with a color and its default foreground color. */
     @Immutable

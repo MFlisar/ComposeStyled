@@ -48,7 +48,7 @@ abstract class FoundationRadioButton : StyledRadioButton.Implementation {
         val keyboardFocus = focused && enabled && onClick != null &&
             LocalInputModeManager.current.inputMode == InputMode.Keyboard
         val colors = StyledTheme.colorScheme
-        val alpha = if (enabled) 1f else colors.disableFactors.content
+        val alpha = if (enabled) 1f else colors.disabledAlphaFactors.content
         val active = tint.copy(alpha = tint.alpha * alpha)
         val inactive = colors.outline.copy(alpha = colors.outline.alpha * alpha)
         val progress by animateFloatAsState(if (selected) 1f else 0f, label = "StyledRadioButton")

@@ -1,8 +1,11 @@
 package com.michaelflisar.demo.pages
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
@@ -39,8 +42,6 @@ import com.michaelflisar.composestyled.ui.components.StyledNavigationItem
 import com.michaelflisar.composestyled.ui.components.StyledSideNavigation
 import com.michaelflisar.composestyled.ui.components.StyledSwitch
 import com.michaelflisar.composestyled.ui.components.StyledTopBar
-import com.michaelflisar.composestyled.ui.layout.StyledColumn
-import com.michaelflisar.composestyled.ui.layout.StyledRow
 import com.michaelflisar.composestyled.ui.layout.StyledScaffold
 import com.michaelflisar.composestyled.ui.layout.StyledScaffoldDefaults
 import com.michaelflisar.composestyled.ui.layout.StyledVerticalScrollContainer
@@ -217,10 +218,12 @@ private fun InsetsContent(
                         .fillMaxSize()
                         .padding(StyledTheme.padding.content),
                 ) {
-                    StyledColumn(itemSpacing = StyledTheme.spacing.medium) {
+                    Column(verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium)) {
                         InsetsLegend(paddingValues)
                         options.forEach { (label, state) ->
-                            StyledRow(itemSpacing = StyledTheme.spacing.medium) {
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+                            ) {
                                 StyledText(
                                     modifier = Modifier.weight(1f),
                                     text = label,

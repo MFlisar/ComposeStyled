@@ -162,7 +162,7 @@ class FoundationBottomNavigationBar(
             .takeUnless { it == Color.Unspecified }
             ?: StyledTheme.colorScheme.primary
         val indicatorColor = if (enabled) indicatorTint else indicatorTint.copy(
-            alpha = indicatorTint.alpha * StyledTheme.colorScheme.disableFactors.default,
+            alpha = indicatorTint.alpha * StyledTheme.colorScheme.disabledAlphaFactors.default,
         )
         val bottomIndicatorProgress = if (indicatorStyle == IndicatorStyle.Bottom) {
             animateFloatAsState(
@@ -184,10 +184,10 @@ class FoundationBottomNavigationBar(
             barContentColor
         }
         val iconColor = if (enabled) baseIconColor else baseIconColor.copy(
-            alpha = baseIconColor.alpha * StyledTheme.colorScheme.disableFactors.content
+            alpha = baseIconColor.alpha * StyledTheme.colorScheme.disabledAlphaFactors.content
         )
         val textColor = if (enabled) baseTextColor else baseTextColor.copy(
-            alpha = baseTextColor.alpha * StyledTheme.colorScheme.disableFactors.content
+            alpha = baseTextColor.alpha * StyledTheme.colorScheme.disabledAlphaFactors.content
         )
         val shape = RoundedCornerShape(8.dp)
         UpdateStyledThemeLocals(

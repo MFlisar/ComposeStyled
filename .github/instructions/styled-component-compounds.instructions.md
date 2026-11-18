@@ -20,21 +20,15 @@ For Core component APIs and renderer implementation details, follow the
    layouts and existing Styled components directly, without a new `StyledKey`,
    renderer or registration; theme-specific layouts use the registered contract
    from the Core guide. Mirror the functional classification in renderer folders.
-2. `StyledColumn` and `StyledRow` accept explicit arrangements and default to
-   no spacing. Their spacing overloads require `itemSpacing`, accept main-axis
-   alignment and delegate to the arrangement overload using `Arrangement.spacedBy`.
-   Do not default `itemSpacing`: calls without layout arguments must remain
-   unambiguous. Callers can use `StyledTheme.spacing.medium` for themed spacing.
-   `StyledFlowRow` and lazy layouts also provide spacing overloads with
-   required spacing parameters. Flow rows require item and row spacing, and
-   also provide a `spacing` overload to set both to the same value; lazy lists
-   require item spacing, and lazy grids require spacing on both axes.
-   Flow layouts expose separate item/row spacing, item alignment and line/item
-   limits. Preserve the underlying layout's `ColumnScope`, `RowScope` or
-   `FlowRowScope` content receiver and forward its modifier and layout arguments.
-   Spacing overloads delegate to their corresponding public Styled layout,
-   changing only arrangements rather than duplicating the underlying
-   Foundation call.
+2. Use Foundation `Column`, `Row` and `FlowRow` directly for simple layouts,
+   retaining their standard arrangement and alignment parameters. For themed
+   gaps, pass values such as
+   `Arrangement.spacedBy(StyledTheme.spacing.medium)`. Styled lazy lists and
+   grids remain Styled APIs because they add theme-configured scrollbar
+   behavior; their spacing overloads require item spacing for lists and
+   spacing on both axes for grids. Preserve the underlying layout's
+   `ColumnScope`, `RowScope` or `FlowRowScope` content receiver and forward its
+   modifier and layout arguments.
 3. For compounds, use existing Styled controls for themed parts and Styled
    tokens for shared layout defaults. Do not branch on the theme name or import
    concrete Cupertino, Fluent 2 or Material 3 implementations into `core`.

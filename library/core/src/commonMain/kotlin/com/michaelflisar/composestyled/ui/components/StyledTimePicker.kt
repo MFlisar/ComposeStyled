@@ -1,5 +1,6 @@
 package com.michaelflisar.composestyled.ui.components
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,7 +14,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.michaelflisar.composestyled.ui.layout.StyledRow
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 import kotlinx.datetime.LocalTime
 
@@ -51,9 +51,9 @@ fun StyledTimePicker(
         "minuteStep must be between 1 and 59."
     }
 
-    StyledRow(
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
         modifier = modifier.fillMaxWidth(),
-        itemSpacing = 12.dp,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         TimeField(

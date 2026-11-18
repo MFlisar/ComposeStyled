@@ -1,5 +1,8 @@
 package com.michaelflisar.demo.custom
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,8 +21,6 @@ import com.michaelflisar.composestyled.registry.StyledKey
 import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.ui.components.StyledIcon
 import com.michaelflisar.composestyled.ui.components.StyledSurface
-import com.michaelflisar.composestyled.ui.layout.StyledColumn
-import com.michaelflisar.composestyled.ui.layout.StyledRow
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 
 /**
@@ -63,7 +64,7 @@ class StyledCustomComponent(
                 Variant.SecondarySurface -> RoundedCornerShape(size = 4.dp)
             }
         ) {
-            StyledColumn(
+            Column(
                 modifier = Modifier.padding(StyledTheme.padding.medium),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -73,7 +74,7 @@ class StyledCustomComponent(
                     }
 
                     Variant.Secondary -> {
-                        StyledRow(itemSpacing = StyledTheme.spacing.medium) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium)) {
                             StyledIcon(
                                 icon = Icons.Default.Help.toIconComposable()
                             )
@@ -89,7 +90,7 @@ class StyledCustomComponent(
                     }
 
                     Variant.SecondarySurface -> {
-                        StyledRow(itemSpacing = StyledTheme.spacing.medium) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium)) {
                             StyledIcon(
                                 icon = Icons.Default.Help.toIconComposable()
                             )

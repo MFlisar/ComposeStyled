@@ -142,7 +142,7 @@ class Material3Button internal constructor(
             enabled -> color
             disabledColor != null -> disabledColor
             else -> color.copy(
-                alpha = color.alpha * StyledTheme.colorScheme.disableFactors.content,
+                alpha = color.alpha * StyledTheme.colorScheme.disabledAlphaFactors.content,
             )
         }
         val textForeground = customization?.colors?.textForeground?.resolve()

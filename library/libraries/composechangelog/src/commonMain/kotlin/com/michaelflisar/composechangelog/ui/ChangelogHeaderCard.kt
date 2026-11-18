@@ -1,5 +1,7 @@
 package com.michaelflisar.composechangelog.ui
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
@@ -10,7 +12,6 @@ import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.classes.CustomColors
 import com.michaelflisar.composestyled.ui.components.StyledCard
 import com.michaelflisar.composestyled.ui.components.StyledCardDefaults
-import com.michaelflisar.composestyled.ui.layout.StyledColumn
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 
 /** A reusable card with a bold heading and custom Styled content. */
@@ -29,7 +30,7 @@ fun ChangelogHeaderCard(
         modifier = modifier,
         customization = customization,
     ) {
-        StyledColumn(itemSpacing = StyledTheme.spacing.medium) {
+        Column(verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium)) {
             StyledText(
                 text = title,
                 style = StyledTheme.typography.bodyMedium,

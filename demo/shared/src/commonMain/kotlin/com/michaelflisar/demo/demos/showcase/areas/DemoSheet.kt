@@ -1,6 +1,9 @@
 package com.michaelflisar.demo.demos.showcase.areas
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,8 +19,6 @@ import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.ui.components.StyledSurface
-import com.michaelflisar.composestyled.ui.layout.StyledColumn
-import com.michaelflisar.composestyled.ui.layout.StyledRow
 import com.michaelflisar.composestyled.ui.layout.StyledSheet
 import com.michaelflisar.composestyled.ui.layout.rememberStyledSheetState
 import com.michaelflisar.composestyled.ui.primitives.StyledText
@@ -33,7 +34,7 @@ internal fun DemoSheet(baseId: Int, expandState: ExpandState) {
         var edgeTapCount by remember { mutableStateOf(0) }
 
         SubTitle("Choose an edge, tap through it, or swipe inward to open the sheet")
-        StyledRow(itemSpacing = 8.dp) {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             StyledButton(onClick = { edge = StyledSheet.Edge.Start }) {
                 StyledText("Start")
             }
@@ -41,7 +42,7 @@ internal fun DemoSheet(baseId: Int, expandState: ExpandState) {
                 StyledText("End")
             }
         }
-        StyledRow(itemSpacing = 8.dp) {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             StyledButton(onClick = { edge = StyledSheet.Edge.Top }) {
                 StyledText("Top")
             }
@@ -61,7 +62,7 @@ internal fun DemoSheet(baseId: Int, expandState: ExpandState) {
             Box(
                 Modifier.fillMaxWidth().height(280.dp)
             ) {
-                StyledRow {
+                Row {
                     StyledText(
                         text = "The sheet overlays this content. Tap the scrim or press Back to close it.",
                         modifier = Modifier.padding(16.dp),
@@ -87,9 +88,9 @@ internal fun DemoSheet(baseId: Int, expandState: ExpandState) {
                     containerColor = StyledTheme.colorScheme.secondarySurface,
                     contentColor = StyledTheme.colorScheme.onSecondarySurface,
                 ) {
-                    StyledColumn(
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
                         modifier = Modifier.fillMaxSize().padding(16.dp),
-                        itemSpacing = 12.dp,
                     ) {
                         StyledText("Sheet content")
                         StyledText("Its size is 82% of the available width or height.")

@@ -1,5 +1,7 @@
 package com.michaelflisar.demo.demos.libraries
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -16,7 +18,6 @@ import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.classes.CustomColors
 import com.michaelflisar.composestyled.platform.SystemBarStyleEffectIfNeeded
 import com.michaelflisar.composestyled.ui.components.StyledButton
-import com.michaelflisar.composestyled.ui.layout.StyledColumn
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
 import com.michaelflisar.composestyled.ui.layout.StyledScaffold
 import com.michaelflisar.composestyled.ui.primitives.StyledText
@@ -102,13 +103,13 @@ internal fun DemoPageChangelog(onBack: () -> Unit) {
             )
         },
     ) { paddingValues ->
-        StyledColumn(
+        Column(
+            verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
             modifier = Modifier.fillMaxSize().padding(paddingValues),
-            itemSpacing = StyledTheme.spacing.medium,
         ) {
-            StyledColumn(
+            Column(
+                verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
                 modifier = Modifier.padding(StyledTheme.padding.content),
-                itemSpacing = StyledTheme.spacing.medium,
             ) {
                 StyledText("Manual state")
                 StyledButton(onClick = {

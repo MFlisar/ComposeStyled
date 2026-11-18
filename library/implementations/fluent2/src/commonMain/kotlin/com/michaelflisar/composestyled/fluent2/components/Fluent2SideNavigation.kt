@@ -51,7 +51,7 @@ class Fluent2SideNavigation internal constructor() : FoundationSideNavigation(sh
         val base = LocalStyledSelectionColors.current?.indicatorColor?.takeUnless { it == Color.Unspecified }
             ?: StyledTheme.colorScheme.primary
         val color = if (enabled) base else base.copy(
-            alpha = base.alpha * StyledTheme.colorScheme.disableFactors.default,
+            alpha = base.alpha * StyledTheme.colorScheme.disabledAlphaFactors.default,
         )
         Canvas(modifier) {
             val width = 3.dp.toPx()

@@ -33,7 +33,7 @@ class CupertinoFlatSwitch internal constructor() : StyledSwitch.Implementation {
         interactionSource: MutableInteractionSource?,
     ) {
         val colors = StyledTheme.colorScheme
-        val opacity = if (enabled) 1f else colors.disableFactors.content
+        val opacity = if (enabled) 1f else colors.disabledAlphaFactors.content
         val track = if (checked) tint else colors.onSurface.copy(alpha = 0.16f)
         val thumb = if (checked) onTint else Color.White
         FoundationSwitch(

@@ -1,5 +1,7 @@
 package com.michaelflisar.demo.demos.showcase.areas
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -19,7 +21,6 @@ import com.michaelflisar.composestyled.ui.components.StyledIconPlainButton
 import com.michaelflisar.composestyled.ui.components.StyledOutlinedButton
 import com.michaelflisar.composestyled.ui.components.StyledSurface
 import com.michaelflisar.composestyled.ui.components.StyledTextButton
-import com.michaelflisar.composestyled.ui.layout.StyledFlowRow
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.utils.ExpandState
 import com.michaelflisar.demo.helper.RegionContainer
@@ -37,7 +38,10 @@ internal fun DemoButtons(
         expanded = expandState
     ) {
         SubTitle("Default Buttons")
-        StyledFlowRow(spacing = StyledTheme.spacing.medium) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+            verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+        ) {
             StyledButton.Variant.entries.forEach {
                 ButtonForVariant(
                     variant = it,
@@ -53,7 +57,10 @@ internal fun DemoButtons(
         }
 
         SubTitle("Icon Buttons")
-        StyledFlowRow(spacing = StyledTheme.spacing.medium) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+            verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+        ) {
             StyledButton.Variant.entries.forEach { variant ->
                 IconButtonForVariant(
                     variant = variant,
@@ -66,7 +73,10 @@ internal fun DemoButtons(
                 }
             }
         }
-        StyledFlowRow(spacing = StyledTheme.spacing.medium) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+            verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+        ) {
             StyledButton.Variant.entries.forEach { variant ->
                 IconButtonForVariant(
                     variant = variant,
@@ -80,7 +90,10 @@ internal fun DemoButtons(
                 }
             }
         }
-        StyledFlowRow(spacing = StyledTheme.spacing.medium) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+            verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+        ) {
             val customization = StyledIconButtonDefaults.customize(
                 colors = CustomColors(Color.Magenta, Color.White, Color.Magenta),
                 border = Color.Magenta,
@@ -101,7 +114,10 @@ internal fun DemoButtons(
         }
 
         SubTitle("Disabled Buttons")
-        StyledFlowRow(spacing = StyledTheme.spacing.medium) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+            verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+        ) {
             StyledButton.Variant.entries.forEach {
                 ButtonForVariant(
                     variant = it,
@@ -114,7 +130,10 @@ internal fun DemoButtons(
         }
 
         SubTitle("Buttons with Customization")
-        StyledFlowRow(spacing = StyledTheme.spacing.medium) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+            verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+        ) {
             val colors = listOf(
                 Color.Red,
                 Color.Green,
@@ -146,7 +165,10 @@ internal fun DemoButtons(
         }
 
         SubTitle("Buttons with Leading and Trailing Icons")
-        StyledFlowRow(spacing = StyledTheme.spacing.medium) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+            verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+        ) {
             StyledButton(
                 onClick = { showMessage("Icon button clicked") },
                 leadingIcon = Icons.Default.Add.toIconComposable(),
@@ -170,7 +192,10 @@ internal fun DemoButtons(
             color = StyledTheme.colorScheme.primary,
             contentColor = StyledTheme.colorScheme.onPrimary,
         ) {
-            StyledFlowRow(spacing = StyledTheme.spacing.medium) {
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+                verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+            ) {
                 StyledTextButton(
                     onClick = { showMessage("Plain icon-text button clicked") },
                     leadingIcon = Icons.Default.Add.toIconComposable(),

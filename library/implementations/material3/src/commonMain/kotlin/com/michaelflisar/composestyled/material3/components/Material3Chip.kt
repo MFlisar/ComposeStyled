@@ -344,7 +344,7 @@ class Material3Chip internal constructor(
 @Composable
 private fun styledChipSlotColor(color: Color, enabled: Boolean) =
     if (enabled) color else color.copy(
-        alpha = color.alpha * StyledTheme.colorScheme.disableFactors.content,
+        alpha = color.alpha * StyledTheme.colorScheme.disabledAlphaFactors.content,
     )
 
 @Composable

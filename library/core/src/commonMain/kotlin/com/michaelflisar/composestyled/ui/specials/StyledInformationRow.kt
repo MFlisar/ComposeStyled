@@ -2,6 +2,8 @@ package com.michaelflisar.composestyled.ui.specials
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -15,8 +17,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import com.michaelflisar.composestyled.StyledTheme
-import com.michaelflisar.composestyled.ui.layout.StyledRow
-import com.michaelflisar.composestyled.ui.layout.StyledColumn
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 
 object StyledInformationRowDefaults {
@@ -70,9 +70,9 @@ fun StyledInformationRow(
     modifier: Modifier = Modifier,
     content: @Composable (modifier: Modifier) -> Unit,
 ) {
-    StyledColumn(
+    Column(
+        verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
         modifier = modifier,
-        itemSpacing = StyledTheme.spacing.medium,
     ) {
         InfoRowContent(
             label = label,
@@ -108,7 +108,7 @@ fun StyledInformationRowHorizontal(
         labelStyle = labelStyle,
         modifier = modifier,
     ) { infoModifier ->
-        StyledRow(
+        Row(
             modifier = infoModifier,
             horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
             verticalAlignment = Alignment.CenterVertically,
@@ -136,9 +136,9 @@ fun StyledInformationRowHorizontal(
     modifier: Modifier = Modifier,
     content: @Composable (modifier: Modifier) -> Unit,
 ) {
-    StyledRow(
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
         modifier = modifier,
-        itemSpacing = StyledTheme.spacing.medium,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         InfoRowContent(

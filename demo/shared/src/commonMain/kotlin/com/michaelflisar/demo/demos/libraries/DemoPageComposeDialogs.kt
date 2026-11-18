@@ -1,5 +1,8 @@
 package com.michaelflisar.demo.demos.libraries
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -29,10 +32,8 @@ import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.ui.components.StyledInput
 import com.michaelflisar.composestyled.ui.components.StyledInputDefaults
 import com.michaelflisar.composestyled.ui.components.StyledPopupDropdown
-import com.michaelflisar.composestyled.ui.layout.StyledColumn
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
 import com.michaelflisar.composestyled.ui.layout.StyledDialog.SheetOptions
-import com.michaelflisar.composestyled.ui.layout.StyledFlowRow
 import com.michaelflisar.composestyled.ui.layout.StyledScaffold
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.ui.state.rememberDialogState
@@ -102,8 +103,8 @@ internal fun DemoPageComposeDialogs(onBack: () -> Unit) {
             )
         },
     ) { paddingValues ->
-        StyledColumn(
-            itemSpacing = StyledTheme.spacing.medium,
+        Column(
+            verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
             modifier = Modifier.fillMaxSize()
                 .padding(paddingValues)
                 .padding(StyledTheme.padding.content),
@@ -117,7 +118,10 @@ internal fun DemoPageComposeDialogs(onBack: () -> Unit) {
             StyledText(
                 "These picker dialogs reuse ComposeDialogs content with Styled controls, colors, and dialog actions."
             )
-            StyledFlowRow(spacing = StyledTheme.spacing.medium) {
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+                verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+            ) {
                 StyledButton(onClick = colorDialog::show) { StyledText("Color picker") }
                 StyledButton(onClick = dateDialog::show) { StyledText("Date picker") }
                 StyledButton(onClick = frequencyDialog::show) { StyledText("Frequency picker") }

@@ -6,8 +6,8 @@ import com.michaelflisar.composestyled.contrastRatio
 import com.michaelflisar.composestyled.onColorByContrastRatio
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.tokens.StyledColorScheme
-import com.michaelflisar.composestyled.tokens.darkDisableFactors
-import com.michaelflisar.composestyled.tokens.lightDisableFactors
+import com.michaelflisar.composestyled.tokens.darkDisabledAlphaFactors
+import com.michaelflisar.composestyled.tokens.lightDisabledAlphaFactors
 
 @InternalComposeStyledApi
 fun createStyledThemeColors(
@@ -133,7 +133,7 @@ private fun scheme(
         successSurfaceDef = successSurfaceDef,
         warningDef = warningDef,
         warningSurfaceDef = warningSurfaceDef,
-        disableFactors = if (isDark) darkDisableFactors() else lightDisableFactors(),
+        disabledAlphaFactors = if (isDark) darkDisabledAlphaFactors() else lightDisabledAlphaFactors(),
     )
 }
 

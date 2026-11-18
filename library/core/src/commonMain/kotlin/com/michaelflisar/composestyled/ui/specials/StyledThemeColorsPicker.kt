@@ -24,7 +24,6 @@ import com.michaelflisar.composestyled.themes.StyledThemeVariant
 import com.michaelflisar.composestyled.tokens.LocalStyledContentColor
 import com.michaelflisar.composestyled.ui.components.StyledPopupDropdownIndex
 import com.michaelflisar.composestyled.ui.components.StyledSegmentedButtonRow
-import com.michaelflisar.composestyled.ui.layout.StyledRow
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 
 /**
@@ -108,8 +107,8 @@ fun StyledThemeColorsPicker(
         )
 
         StyledText("Theme and Color")
-        StyledRow(
-            itemSpacing = StyledTheme.spacing.medium
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium)
         ) {
             StyledPopupDropdownIndex(
                 modifier = Modifier.weight(1f),
@@ -193,7 +192,7 @@ private fun ThemeColorsPreview(themeColors: StyledThemeColors, themeVariant: Sty
 @Composable
 private fun ThemeColorsOption(themeColors: StyledThemeColors, themeVariant: StyledThemeVariant) {
     val colors = themeColors.resolve(themeVariant, isDark = false, contrast = StyledContrastLevel.Normal)
-    StyledRow(itemSpacing = StyledTheme.spacing.medium) {
+    Row(horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium)) {
         Canvas(
             Modifier.size(16.dp).border(1.dp, LocalStyledContentColor.current, CircleShape),
         ) {

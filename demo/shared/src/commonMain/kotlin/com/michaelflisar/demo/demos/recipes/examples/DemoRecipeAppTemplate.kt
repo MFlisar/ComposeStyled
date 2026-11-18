@@ -2,8 +2,11 @@ package com.michaelflisar.demo.demos.recipes.examples
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -31,8 +34,8 @@ import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.StyledThemeConfig
 import com.michaelflisar.composestyled.adaptive.StyledAdaptive
-import com.michaelflisar.composestyled.adaptive.StyledAdaptiveInfo
 import com.michaelflisar.composestyled.adaptive.StyledAdaptiveContainer
+import com.michaelflisar.composestyled.adaptive.StyledAdaptiveInfo
 import com.michaelflisar.composestyled.adaptive.StyledAdaptiveMasterDetailMode
 import com.michaelflisar.composestyled.adaptive.StyledAdaptiveScaffold
 import com.michaelflisar.composestyled.adaptive.StyledAdaptiveScaffoldState
@@ -58,10 +61,8 @@ import com.michaelflisar.composestyled.ui.components.StyledListItem
 import com.michaelflisar.composestyled.ui.components.StyledNavigationItem
 import com.michaelflisar.composestyled.ui.components.StyledSwitch
 import com.michaelflisar.composestyled.ui.icons.StyledIcons
-import com.michaelflisar.composestyled.ui.layout.StyledColumn
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
 import com.michaelflisar.composestyled.ui.layout.StyledMasterDetail
-import com.michaelflisar.composestyled.ui.layout.StyledRow
 import com.michaelflisar.composestyled.ui.layout.StyledScaffold
 import com.michaelflisar.composestyled.ui.layout.StyledScaffoldDefaults
 import com.michaelflisar.composestyled.ui.layout.StyledVerticalScrollContainer
@@ -462,9 +463,9 @@ private fun SubPageSettings(
         modifier = Modifier.fillMaxSize(),
         contentPadding = contentPadding,
     ) {
-        StyledColumn(itemSpacing = StyledTheme.spacing.medium) {
+        Column(verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium)) {
             StyledCard(modifier = Modifier.fillMaxWidth()) {
-                StyledColumn(itemSpacing = StyledTheme.spacing.medium) {
+                Column(verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium)) {
 
                     SubTitle("Scaffold")
                     TemplateSwitchRow("Adaptive scaffold", adaptive)
@@ -480,7 +481,7 @@ private fun SubPageSettings(
             }
             adaptiveInfo?.let { info ->
                 StyledCard(modifier = Modifier.fillMaxWidth()) {
-                    StyledColumn(itemSpacing = StyledTheme.spacing.small) {
+                    Column(verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.small)) {
                         SubTitle("Adaptive info")
                         StyledInformationRow(
                             label = "Platform",
@@ -536,9 +537,9 @@ private fun SubPageStyling(
         modifier = Modifier.fillMaxSize(),
         contentPadding = contentPadding,
     ) {
-        StyledColumn(itemSpacing = StyledTheme.spacing.medium) {
+        Column(verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium)) {
             StyledCard(modifier = Modifier.fillMaxWidth()) {
-                StyledColumn(itemSpacing = StyledTheme.spacing.medium) {
+                Column(verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium)) {
                     SubTitle("Theme")
                     StyledThemeColorsPicker(
                         themeColors = themeColors,
@@ -552,7 +553,7 @@ private fun SubPageStyling(
             }
 
             StyledCard(modifier = Modifier.fillMaxWidth()) {
-                StyledColumn(itemSpacing = StyledTheme.spacing.medium) {
+                Column(verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium)) {
                     SubTitle("Options")
                     TemplateSwitchRow("Show toolbar", showToolbar)
                     TemplateSwitchRow("Primary toolbar", primaryToolbar)
@@ -586,12 +587,12 @@ private fun TemplateScrollPreview() {
         } else {
             StyledTheme.colorScheme.surfaceVariant
         }
-        StyledColumn(
+        Column(
+            verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.small),
             modifier = Modifier
                 .fillMaxWidth()
                 .background(color)
                 .padding(StyledTheme.padding.large),
-            itemSpacing = StyledTheme.spacing.small,
         ) {
             StyledText("Scroll preview $index / 12", color = StyledTheme.contentColorFor(color))
             StyledText(
@@ -607,7 +608,7 @@ private fun TemplateSwitchRow(
     label: String,
     checked: MutableState<Boolean>,
 ) {
-    StyledRow(itemSpacing = StyledTheme.spacing.medium) {
+    Row(horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium)) {
         StyledText(
             modifier = Modifier.weight(1f),
             text = label,
@@ -631,9 +632,9 @@ private fun SubPageMasterPane(contentPadding: PaddingValues) {
                         .background(StyledTheme.colorScheme.surface),
                     contentPadding = contentPadding,
                 ) {
-                    StyledColumn(
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
                         modifier = Modifier.fillMaxWidth(),
-                        itemSpacing = StyledTheme.spacing.medium,
                     ) {
                         SubTitle("Items")
                         for (item in 1..5) {
@@ -664,12 +665,12 @@ private fun SubPageMasterPane(contentPadding: PaddingValues) {
                         StyledText("Select an item to see its details.")
                     }
                 } else {
-                    StyledColumn(
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
                         modifier = Modifier
                             .fillMaxSize()
                             .background(StyledTheme.colorScheme.surfaceVariant)
                             .padding(contentPadding),
-                        itemSpacing = StyledTheme.spacing.medium,
                     ) {
                         StyledText(
                             text = "Details $item",
@@ -698,7 +699,7 @@ private fun SubPagePlaceholder(
         contentPadding = contentPadding,
     ) {
         StyledCard(modifier = Modifier.fillMaxWidth()) {
-            StyledColumn(itemSpacing = StyledTheme.spacing.medium) {
+            Column(verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium)) {
                 StyledButton(onClick = fullscreenSettingsDialog::show) {
                     StyledText("Open Test Fullscreen Test Settings")
                 }
@@ -730,7 +731,7 @@ private fun SubPagePlaceholder(
             modifier = Modifier.fillMaxSize(),
             contentPadding = dialogContentPadding,
         ) {
-            StyledColumn {
+            Column {
                 repeat(5) {
                     StyledText("Settings Content $it")
                 }

@@ -72,9 +72,9 @@ class FoundationChip internal constructor(
             filled -> unselectedContainer
             else -> Color.Transparent
         }
-        val contentAlpha = if (enabled) 1f else colors.disableFactors.content
-        val containerAlpha = if (enabled) 1f else colors.disableFactors.default
-        val outlineAlpha = if (enabled) 1f else colors.disableFactors.outline
+        val contentAlpha = if (enabled) 1f else colors.disabledAlphaFactors.content
+        val containerAlpha = if (enabled) 1f else colors.disabledAlphaFactors.default
+        val outlineAlpha = if (enabled) 1f else colors.disabledAlphaFactors.outline
         val borderColor = when {
             active -> customization?.selectedBorder?.resolve()
             customBorder != null -> customBorder

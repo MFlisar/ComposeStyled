@@ -16,7 +16,10 @@ import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 
 
-/** A lazy horizontal list that uses Styled theme defaults for its content layout. */
+/**
+ * A lazy horizontal list that shows a platform scrollbar when content overflows and the Styled
+ * theme enables it.
+ */
 @Composable
 @OptIn(InternalComposeStyledApi::class)
 fun StyledLazyRow(
@@ -24,8 +27,8 @@ fun StyledLazyRow(
     state: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
     reverseLayout: Boolean = false,
-    horizontalArrangement: Arrangement.Horizontal = StyledRowDefaults.horizontalArrangement,
-    verticalAlignment: Alignment.Vertical = StyledRowDefaults.verticalAlignment,
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
+    verticalAlignment: Alignment.Vertical = Alignment.Top,
     flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
     userScrollEnabled: Boolean = true,
     content: LazyListScope.() -> Unit,
@@ -53,7 +56,7 @@ fun StyledLazyRow(
 fun StyledLazyRow(
     itemSpacing: Dp,
     modifier: Modifier = Modifier,
-    verticalAlignment: Alignment.Vertical = StyledRowDefaults.verticalAlignment,
+    verticalAlignment: Alignment.Vertical = Alignment.Top,
     state: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
     reverseLayout: Boolean = false,

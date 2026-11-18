@@ -72,7 +72,7 @@ fun FoundationListItem(
         ?: contentColor.takeUnless { it == Color.Unspecified }
         ?: defaultSupportingColor
     val border = borderColor.takeUnless { it == Color.Unspecified }
-    val factor = if (enabled) 1f else StyledTheme.colorScheme.disableFactors.content
+    val factor = if (enabled) 1f else StyledTheme.colorScheme.disabledAlphaFactors.content
     val mainColor = foreground.copy(alpha = foreground.alpha * factor)
     val secondaryColor = secondary.copy(alpha = secondary.alpha * factor)
     val semantic = content as? StyledListItem.Content.Semantic
