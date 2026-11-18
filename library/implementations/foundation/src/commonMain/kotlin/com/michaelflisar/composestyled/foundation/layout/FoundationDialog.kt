@@ -111,6 +111,7 @@ abstract class FoundationDialog : StyledDialog.Implementation {
         @Composable get() = StyledTheme.colorScheme.surface
     protected open val fullscreenContainerColor: Color
         @Composable get() = containerColor
+    protected open val modalScrimAlpha: Float? = null
 
     @Composable
     @OptIn(InternalComposeStyledApi::class)
@@ -231,7 +232,9 @@ abstract class FoundationDialog : StyledDialog.Implementation {
                     usePlatformDefaultWidth = false,
                 ),
             ) {
-                DialogScrimEffect(transparent = style is StyledDialog.Style.Fullscreen)
+                DialogScrimEffect(
+                    dimAmount = if (style is StyledDialog.Style.Fullscreen) 0f else modalScrimAlpha,
+                )
                 if (style is StyledDialog.Style.BottomSheet) {
                     FoundationDialogSheet(
                         onDismissRequest, onDismissRequestWithoutAnimation,
@@ -409,6 +412,7 @@ abstract class FoundationDialog : StyledDialog.Implementation {
                 usePlatformDefaultWidth = false,
             ),
         ) {
+            DialogScrimEffect(dimAmount = modalScrimAlpha)
             FoundationDialogBounds(
                 maxWidth, maxHeightFraction, edgeMargin, properties, onDismissRequest,
             ) { bounds ->

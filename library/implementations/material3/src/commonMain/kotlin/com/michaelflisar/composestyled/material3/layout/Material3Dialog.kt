@@ -18,8 +18,9 @@ import com.michaelflisar.composestyled.foundation.layout.FoundationDialog
 import com.michaelflisar.composestyled.foundation.layout.FoundationDialogBounds
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
-import com.michaelflisar.composestyled.ui.layout.StyledDialog
+import com.michaelflisar.composestyled.ui.internal.DialogScrimEffect
 import com.michaelflisar.composestyled.ui.internal.dialogInput
+import com.michaelflisar.composestyled.ui.layout.StyledDialog
 
 @OptIn(InternalComposeStyledApi::class)
 class Material3Dialog internal constructor(
@@ -53,6 +54,7 @@ class Material3Dialog internal constructor(
         @Composable get() = MaterialTheme.colorScheme.surfaceContainerHigh
     override val fullscreenContainerColor
         @Composable get() = StyledTheme.colorScheme.surface
+    override val modalScrimAlpha = 0.32f
 
     companion object {
 
@@ -101,6 +103,7 @@ class Material3Dialog internal constructor(
                 usePlatformDefaultWidth = false,
             ),
         ) {
+            DialogScrimEffect(dimAmount = modalScrimAlpha)
             FoundationDialogBounds(
                 maxWidth, maxHeightFraction, edgeMargin, properties, onDismissRequest,
             ) { bounds ->

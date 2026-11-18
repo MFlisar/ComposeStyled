@@ -289,6 +289,9 @@ internal fun DemoDialogs(baseId: Int, expandState: ExpandState) {
         }
 
         SubTitle("Dialogs and sheets")
+        StyledText(
+            "On Android, Material 3 modal dialogs use a 32% black scrim; other themes keep the platform dim.",
+        )
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
             verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),

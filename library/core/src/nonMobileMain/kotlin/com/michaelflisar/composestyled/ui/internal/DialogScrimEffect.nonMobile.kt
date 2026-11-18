@@ -5,4 +5,4 @@ import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 
 @InternalComposeStyledApi
 @Composable
-actual fun DialogScrimEffect(transparent: Boolean) = Unit
+actual fun DialogScrimEffect(dimAmount: Float?) = Unit

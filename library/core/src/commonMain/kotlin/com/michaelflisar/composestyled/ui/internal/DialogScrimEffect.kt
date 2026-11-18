@@ -5,4 +5,4 @@ import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 
 @InternalComposeStyledApi
 @Composable
-expect fun DialogScrimEffect(transparent: Boolean)
+expect fun DialogScrimEffect(dimAmount: Float?)

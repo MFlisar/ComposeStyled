@@ -98,14 +98,15 @@ The slide direction identifies the entering edge (`FromLeft`, `FromRight`,
 `FromTop` or `FromBottom`); dismissal slides back toward that same edge. The
 default is `FromRight`.
 All modal styles, including fullscreen, use the platform's Compose `Dialog`.
-Fullscreen requests a transparent scrim while remaining modal; other modal
-styles use the platform's default scrim. Fullscreen's fade or slide animation
-applies to its content. System-bar icon styling follows the animated dialog
-position: when sliding vertically, each bar changes as the dialog reaches it,
-using the corresponding system-bar inset, and changes back as the dialog
-leaves it. A fade or horizontal slide changes both bars when the dialog becomes
-fully visible; dismissal reverses that timing. Nested modal styles use the same
-dialog path.
+On Android, the Material 3 renderer uses a black scrim with 32% opacity for
+modal styles, matching Material 3's standard dim. Other themes and platforms
+retain their platform behavior. Fullscreen requests a transparent scrim while
+remaining modal. Fullscreen's fade or slide animation applies to its content.
+System-bar icon styling follows the animated dialog position: when sliding
+vertically, each bar changes as the dialog reaches it, using the corresponding
+system-bar inset, and changes back as the dialog leaves it. A fade or
+horizontal slide changes both bars when the dialog becomes fully visible;
+dismissal reverses that timing. Nested modal styles use the same dialog path.
 
 Fullscreen dialogs can opt into a scroll-driven expandable header:
 
