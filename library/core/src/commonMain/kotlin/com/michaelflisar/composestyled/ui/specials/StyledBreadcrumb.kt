@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import com.michaelflisar.composestyled.StyledTheme
+import com.michaelflisar.composestyled.supportingVariant
 import com.michaelflisar.composestyled.classes.IconComposable
 import com.michaelflisar.composestyled.ui.components.StyledClickable
 import com.michaelflisar.composestyled.ui.components.StyledIcon
@@ -51,13 +52,10 @@ data class StyledBreadcrumbStyle(
 fun rememberStyledBreadcrumbStyle(
     itemColor: Color = StyledTheme.colorScheme.onSurfaceVariant,
     currentItemColor: Color = StyledTheme.colorScheme.onSurface,
-    separatorColor: Color = StyledTheme.supportingContentColor(
-        containerColor = StyledTheme.colorScheme.surfaceVariant,
-        contentColor = StyledTheme.contentColorFor(
-            backgroundColor = StyledTheme.colorScheme.surfaceVariant,
-            fallback = StyledTheme.ContentColorFallback.BlackWhite,
-        ),
-    ),
+    separatorColor: Color = StyledTheme.contentColorFor(
+        backgroundColor = StyledTheme.colorScheme.surfaceVariant,
+        fallback = StyledTheme.ContentColorFallback.BlackWhite,
+    ).supportingVariant(containerColor = StyledTheme.colorScheme.surfaceVariant),
     itemTextStyle: TextStyle = StyledTheme.typography.bodyMedium,
     currentItemTextStyle: TextStyle = itemTextStyle.copy(fontWeight = FontWeight.Medium),
     itemSpacing: Dp = StyledTheme.spacing.small,

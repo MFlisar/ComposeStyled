@@ -138,10 +138,12 @@ paired role for content shown on an inverted surface.
 `PrimarySurface`, `SecondarySurface`, `TertiarySurface`, `ErrorSurface`,
 `SuccessSurface` and `WarningSurface`.
 
-Use `StyledTheme.supportingContentColor(containerColor, contentColor)` to derive
-a less prominent foreground for supporting text. `containerColor` is required;
-`contentColor` defaults to `LocalStyledContentColor.current`. It blends the
-content color toward the container and keeps at least a 4.5:1 contrast ratio
-when the original pair allows it. Pass `minimumContrastRatio` to choose a
-different floor. This is a color calculation;
+Use `Color.supportingVariant(factor)` to derive a less prominent color when the
+container color is unknown. This scales the color's alpha by `factor`, so it is
+composited against the actual background when drawn, but does not guarantee a
+minimum contrast ratio. When the container is known, the overload
+`Color.supportingVariant(containerColor, factor, minimumContrastRatio)` blends
+the color toward the container and keeps the requested contrast floor when the
+original pair allows it. Both variants default `factor` to `0.65f`; the
+container-aware overload defaults `minimumContrastRatio` to `4.5f`.
 `StyledTheme.contentColorFor(backgroundColor)` remains the theme-role lookup.

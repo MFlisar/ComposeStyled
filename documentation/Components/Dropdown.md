@@ -80,9 +80,12 @@ All popup dropdowns accept a `StyledButton.Variant` for their input-like
 trigger, plus `shape` and button `customization`. The default variant is
 `Auto`, allowing the theme to choose an appropriate treatment. Fluent 2 maps
 `Auto` dropdown anchors and built-in multi-selection actions to outlined
-buttons; explicit variants remain authoritative. Use `popupWidthConfig` to
-choose `StyledPopupMenu.WidthConfig.MatchAnchor` (the default),
-`AtLeastAnchor`, `Auto`, `WrapContent` or `Fixed(width)`. The filter field fills
+buttons; explicit variants remain authoritative. Use
+`StyledOutlinedPopupDropdown` when the single-selection anchor should always be
+outlined; it has both `MutableState` and controlled-value overloads. Use
+`popupWidthConfig` to choose `StyledPopupMenu.WidthConfig.AtLeastAnchor` (the
+default),
+`MatchAnchor`, `Auto`, `WrapContent` or `Fixed(width)`. The filter field fills
 the resolved popup width but does not contribute its intrinsic width when
 content-sized modes choose that width. Width is constrained by the window.
 `popupHorizontalAlignment` defaults to `StyledPopupMenu.HorizontalAlignment.Start`;

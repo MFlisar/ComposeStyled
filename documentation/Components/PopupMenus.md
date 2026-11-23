@@ -112,10 +112,12 @@ StyledPopupContainer(
 This anchored overload supports a popup header, width and placement rules,
 horizontal alignment, scroll state, shape, colors, elevation, border, maximum
 height, content padding, outside-tap behavior and animation.
-`StyledPopupMenu.WidthConfig.Auto` wraps
-content with an optional width cap; `MatchParent` matches the measured anchor
-width (optionally capped). `MatchAnchor`, `AtLeastAnchor`, `WrapContent` and
-`Fixed` are also available. Anchored menus prefer opening below the anchor and
+`StyledPopupMenuDefaults.widthConfig` defaults to
+`StyledPopupMenu.WidthConfig.AtLeastAnchor`, which lets the menu grow wider
+than its anchor when needed. `StyledPopupMenu.WidthConfig.Auto` wraps content
+with an optional width cap; `MatchParent` matches the measured anchor width
+(optionally capped). `MatchAnchor`, `WrapContent` and `Fixed` are also
+available. Anchored menus prefer opening below the anchor and
 move above it when needed. Submenus open beside their parent and flip to the
 opposite side when space is limited.
 

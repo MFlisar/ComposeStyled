@@ -3,7 +3,6 @@ package com.michaelflisar.composestyled.ui.components
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -357,7 +356,6 @@ private fun <T : Number> StyledNumberPickerImpl(
         {
             AnimatedVisibility(visible = enabled && !validator.isValid.value) {
                 StyledText(
-                    modifier = Modifier.fillMaxWidth(),
                     text = errorMessage,
                     textAlign = TextAlign.Center,
                 )
@@ -374,7 +372,7 @@ private fun <T : Number> StyledNumberPickerImpl(
             variant = variant,
             enabled = enabled,
             readOnly = !allowManualInput,
-            interactionEnabled = enabled && allowManualInput,
+            interactionEnabled = enabled,
             isError = parseError || !validator.isValid.value,
             errorMessage = errorMessage,
             keyboardOptions = KeyboardOptions.Default.copy(

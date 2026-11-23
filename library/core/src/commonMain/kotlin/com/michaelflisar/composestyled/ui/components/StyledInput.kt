@@ -1303,7 +1303,7 @@ private fun StyledInputImpl(
             )
         }
     }
-    val inputModifier = if (interactionEnabled) {
+    val inputModifier = if (interactionEnabled && !readOnly) {
         modifier
     } else {
         modifier.pointerHoverIcon(PointerIcon.Default, overrideDescendants = true)

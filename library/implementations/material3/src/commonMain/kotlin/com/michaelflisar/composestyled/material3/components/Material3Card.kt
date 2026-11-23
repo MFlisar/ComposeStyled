@@ -58,7 +58,6 @@ class Material3Card internal constructor(
 
     enum class Variant { Filled, Outlined }
 
-    @OptIn(InternalComposeStyledApi::class)
     @Composable
     override fun Render(
         variant: StyledCard.Variant,

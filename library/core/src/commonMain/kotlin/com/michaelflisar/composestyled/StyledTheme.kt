@@ -110,6 +110,8 @@ object StyledTheme {
      * Returns the matching theme content color, or [fallback] when no matching color is defined.
      * The [ContentColorFallback.BlackWhite] option selects the color with the higher contrast.
      *
+     * If background color is [Color.Unspecified], [Color.Unspecified] is returned.
+     *
      * Inverse matching may not work well with black/white content colors, so [checkInversely] is
      * disabled by default.
      */
@@ -120,6 +122,10 @@ object StyledTheme {
         checkInversely: Boolean = false,
         fallback: ContentColorFallback = ContentColorFallback.LocalContentColor,
     ): Color {
+
+        if (backgroundColor == Color.Unspecified)
+            return Color.Unspecified
+
         val def = colorScheme.allDefinitions
         // first - check all definitions
         // if backgroundColor is a "color", return the corresponding "onColor"
@@ -148,48 +154,6 @@ object StyledTheme {
         }
     }
 
-    /**
-     * Returns a less prominent content color against [containerColor].
-     *
-     * The result targets 65% of the original contrast, with [minimumContrastRatio] as its floor
-     * when the original pair allows it.
-     */
-    @Composable
-    @ReadOnlyComposable
-    fun supportingContentColor(
-        containerColor: Color,
-        contentColor: Color = LocalStyledContentColor.current,
-        minimumContrastRatio: Float = 4.5f,
-    ): Color {
-        require(minimumContrastRatio in 1f..21f) {
-            "Minimum contrast ratio must be between 1 and 21"
-        }
-
-        val originalContrast = contentColor.contrastRatio(containerColor)
-        val targetContrast = maxOf(minimumContrastRatio, originalContrast * 0.65f)
-        if (targetContrast >= originalContrast) return contentColor
-
-        fun blendTowardContainer(amount: Float) = Color(
-            red = contentColor.red + (containerColor.red - contentColor.red) * amount,
-            green = contentColor.green + (containerColor.green - contentColor.green) * amount,
-            blue = contentColor.blue + (containerColor.blue - contentColor.blue) * amount,
-            alpha = contentColor.alpha + (containerColor.alpha - contentColor.alpha) * amount,
-        )
-
-        var low = 0f
-        var high = 1f
-        repeat(24) {
-            val amount = (low + high) / 2f
-            val candidate = blendTowardContainer(amount)
-            if (candidate.contrastRatio(containerColor) >= targetContrast) {
-                low = amount
-            } else {
-                high = amount
-            }
-        }
-
-        return blendTowardContainer(low)
-    }
 }
 
 /**

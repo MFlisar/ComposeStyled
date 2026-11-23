@@ -21,6 +21,7 @@ import com.michaelflisar.composestyled.tokens.LocalStyledContentColor
 import com.michaelflisar.composestyled.tokens.LocalStyledTextStyle
 import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.ui.components.StyledCheckbox
+import com.michaelflisar.composestyled.ui.components.StyledPopupDropdown
 import com.michaelflisar.composestyled.ui.components.StyledPopupMenu
 import com.michaelflisar.composestyled.ui.components.StyledPopupMenuDefaults
 import com.michaelflisar.composestyled.ui.primitives.StyledText
@@ -214,9 +215,9 @@ internal fun <T : Any> StyledDropdownMultiSelect(
     variant: StyledButton.Variant = StyledButton.Variant.Auto,
     // defaults / customisation
     customization: StyledButton.Customization? = null,
-    filter: StyledDropdown.Filter<T>? = null,
+    filter: StyledPopupDropdown.Filter<T>? = null,
     shape: Shape = StyledDropdownMultiSelectDefaults.shape(),
-    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenu.WidthConfig.MatchAnchor,
+    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenuDefaults.widthConfig,
     popupHorizontalAlignment: StyledPopupMenu.HorizontalAlignment =
         StyledPopupMenu.HorizontalAlignment.Start,
     sortSelectionByItems: Boolean = StyledDropdownMultiSelectDefaults.sortSelectionByItems,
@@ -264,9 +265,9 @@ internal fun <T : Any> StyledDropdownMultiSelect(
     variant: StyledButton.Variant = StyledButton.Variant.Auto,
     // defaults / customisation
     customization: StyledButton.Customization? = null,
-    filter: StyledDropdown.Filter<T>? = null,
+    filter: StyledPopupDropdown.Filter<T>? = null,
     shape: Shape = StyledDropdownMultiSelectDefaults.shape(),
-    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenu.WidthConfig.MatchAnchor,
+    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenuDefaults.widthConfig,
     popupHorizontalAlignment: StyledPopupMenu.HorizontalAlignment =
         StyledPopupMenu.HorizontalAlignment.Start,
     sortSelectionByItems: Boolean = StyledDropdownMultiSelectDefaults.sortSelectionByItems,
@@ -312,9 +313,9 @@ internal fun <T : Any> StyledDropdownMultiSelectIndex(
     variant: StyledButton.Variant = StyledButton.Variant.Auto,
     // defaults / customisation
     customization: StyledButton.Customization? = null,
-    filter: StyledDropdown.Filter<T>? = null,
+    filter: StyledPopupDropdown.Filter<T>? = null,
     shape: Shape = StyledDropdownMultiSelectDefaults.shape(),
-    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenu.WidthConfig.MatchAnchor,
+    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenuDefaults.widthConfig,
     popupHorizontalAlignment: StyledPopupMenu.HorizontalAlignment =
         StyledPopupMenu.HorizontalAlignment.Start,
     sortSelectionByItems: Boolean = StyledDropdownMultiSelectDefaults.sortSelectionByItems,
@@ -362,9 +363,9 @@ internal fun <T : Any> StyledDropdownMultiSelectIndex(
     variant: StyledButton.Variant = StyledButton.Variant.Auto,
     // defaults / customisation
     customization: StyledButton.Customization? = null,
-    filter: StyledDropdown.Filter<T>? = null,
+    filter: StyledPopupDropdown.Filter<T>? = null,
     shape: Shape = StyledDropdownMultiSelectDefaults.shape(),
-    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenu.WidthConfig.MatchAnchor,
+    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenuDefaults.widthConfig,
     popupHorizontalAlignment: StyledPopupMenu.HorizontalAlignment =
         StyledPopupMenu.HorizontalAlignment.Start,
     sortSelectionByItems: Boolean = StyledDropdownMultiSelectDefaults.sortSelectionByItems,
@@ -407,9 +408,9 @@ internal fun <T : Any> StyledOutlinedDropdownMultiSelect(
     enabled: Boolean = true,
     // defaults / customisation
     customization: StyledButton.Customization? = null,
-    filter: StyledDropdown.Filter<T>? = null,
+    filter: StyledPopupDropdown.Filter<T>? = null,
     shape: Shape = StyledDropdownMultiSelectDefaults.shape(),
-    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenu.WidthConfig.MatchAnchor,
+    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenuDefaults.widthConfig,
     sortSelectionByItems: Boolean = StyledDropdownMultiSelectDefaults.sortSelectionByItems,
     // content
     content: @Composable (context: StyledDropdown.RenderContext<T, List<T>>) -> Unit = StyledDropdownMultiSelectDefaults.defaultRenderer(),
@@ -448,9 +449,9 @@ internal fun <T : Any> StyledOutlinedDropdownMultiSelect(
     enabled: Boolean = true,
     // defaults / customisation
     customization: StyledButton.Customization? = null,
-    filter: StyledDropdown.Filter<T>? = null,
+    filter: StyledPopupDropdown.Filter<T>? = null,
     shape: Shape = StyledDropdownMultiSelectDefaults.shape(),
-    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenu.WidthConfig.MatchAnchor,
+    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenuDefaults.widthConfig,
     sortSelectionByItems: Boolean = StyledDropdownMultiSelectDefaults.sortSelectionByItems,
     // content
     content: @Composable (context: StyledDropdown.RenderContext<T, List<T>>) -> Unit = StyledDropdownMultiSelectDefaults.defaultRenderer(),
@@ -489,9 +490,9 @@ internal fun <T : Any> StyledOutlinedDropdownMultiSelectIndex(
     enabled: Boolean = true,
     // defaults / customisation
     customization: StyledButton.Customization? = null,
-    filter: StyledDropdown.Filter<T>? = null,
+    filter: StyledPopupDropdown.Filter<T>? = null,
     shape: Shape = StyledDropdownMultiSelectDefaults.shape(),
-    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenu.WidthConfig.MatchAnchor,
+    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenuDefaults.widthConfig,
     sortSelectionByItems: Boolean = StyledDropdownMultiSelectDefaults.sortSelectionByItems,
     // content
     content: @Composable (context: StyledDropdown.RenderContext<T, List<T>>) -> Unit = StyledDropdownMultiSelectDefaults.defaultRenderer(),
@@ -530,9 +531,9 @@ internal fun <T : Any> StyledOutlinedDropdownMultiSelectIndex(
     enabled: Boolean = true,
     // defaults / customisation
     customization: StyledButton.Customization? = null,
-    filter: StyledDropdown.Filter<T>? = null,
+    filter: StyledPopupDropdown.Filter<T>? = null,
     shape: Shape = StyledDropdownMultiSelectDefaults.shape(),
-    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenu.WidthConfig.MatchAnchor,
+    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenuDefaults.widthConfig,
     sortSelectionByItems: Boolean = StyledDropdownMultiSelectDefaults.sortSelectionByItems,
     // content
     content: @Composable (context: StyledDropdown.RenderContext<T, List<T>>) -> Unit = StyledDropdownMultiSelectDefaults.defaultRenderer(),
@@ -573,7 +574,7 @@ private fun <T : Any> StyledDropdownMultiSelectImpl(
     selected: List<Int>,
     enabled: Boolean,
     customization: StyledButton.Customization?,
-    filter: StyledDropdown.Filter<T>?,
+    filter: StyledPopupDropdown.Filter<T>?,
     shape: Shape,
     popupWidthConfig: StyledPopupMenu.WidthConfig,
     popupHorizontalAlignment: StyledPopupMenu.HorizontalAlignment,

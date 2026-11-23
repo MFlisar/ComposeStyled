@@ -10,6 +10,10 @@ Number pickers accept the input `Auto`, `Filled` and `Outlined` variants;
 `Auto` follows the filled Material 3 default, and
 `StyledOutlinedNumberPicker` fixes the input style to `Outlined`.
 
+Set `allowManualInput` to `false` to make the value field read-only while keeping
+the increment and decrement buttons in their normal enabled state. `enabled`
+controls the whole picker, including its visual enabled state and buttons.
+
 Supported numeric types are `Int`, `Long`, `Float` and `Double`. Byte, Short and
 custom Number subclasses are rejected with `IllegalArgumentException`, including
 when a custom parser is supplied. `rememberNumberParser` requires `sample` and

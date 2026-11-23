@@ -10,7 +10,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import com.michaelflisar.composestyled.StyledTheme
-import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.ui.internal.StyledDropdown
 import com.michaelflisar.composestyled.ui.internal.StyledDropdownDefaults
 import com.michaelflisar.composestyled.ui.internal.StyledDropdownIndex
@@ -68,7 +67,7 @@ object StyledPopupDropdownDefaults {
         textStyle: TextStyle? = null,
         dropdownTextStyle: TextStyle? = textStyle,
     ): @Composable StyledPopupDropdownScope<T>.() -> Unit {
-        val legacyRenderer = StyledDropdownDefaults.defaultRenderer(
+        val renderer = StyledDropdownDefaults.defaultRenderer(
             mapper = mapper,
             color = color,
             fontWeight = fontWeight,
@@ -85,10 +84,10 @@ object StyledPopupDropdownDefaults {
         )
         return {
             selection { value ->
-                legacyRenderer(StyledDropdown.RenderContext.Selection(value))
+                renderer(StyledDropdown.RenderContext.Selection(value))
             }
             item { value, selected ->
-                legacyRenderer(StyledDropdown.RenderContext.DropdownItem(value, selected))
+                renderer(StyledDropdown.RenderContext.DropdownItem(value, selected))
             }
         }
     }
@@ -98,7 +97,6 @@ object StyledPopupDropdownDefaults {
  * Renders selected-value content through [StyledPopupDropdownScope.selection] and each option
  * through [StyledPopupDropdownScope.item]. Pass [expanded] to control the popup externally.
  */
-@OptIn(InternalComposeStyledApi::class)
 @Composable
 fun <T : Any> StyledPopupDropdown(
     items: List<T>,
@@ -110,7 +108,7 @@ fun <T : Any> StyledPopupDropdown(
     variant: StyledButton.Variant = StyledButton.Variant.Auto,
     customization: StyledButton.Customization? = null,
     shape: Shape = StyledTheme.shapes.small,
-    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenu.WidthConfig.MatchAnchor,
+    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenuDefaults.widthConfig,
     popupHorizontalAlignment: StyledPopupMenu.HorizontalAlignment =
         StyledPopupMenu.HorizontalAlignment.Start,
     popupMaxHeight: Dp = StyledPopupMenuDefaults.maxHeight,
@@ -126,7 +124,7 @@ fun <T : Any> StyledPopupDropdown(
         title = title,
         enabled = enabled,
         expanded = expanded,
-        filter = filter?.toLegacyFilter(),
+        filter = filter,
         variant = variant,
         customization = customization,
         shape = shape,
@@ -139,7 +137,6 @@ fun <T : Any> StyledPopupDropdown(
 }
 
 /** Controlled-value overload for [StyledPopupDropdown]. Pass [expanded] to control the popup externally. */
-@OptIn(InternalComposeStyledApi::class)
 @Composable
 fun <T : Any> StyledPopupDropdown(
     items: List<T>,
@@ -152,7 +149,7 @@ fun <T : Any> StyledPopupDropdown(
     variant: StyledButton.Variant = StyledButton.Variant.Auto,
     customization: StyledButton.Customization? = null,
     shape: Shape = StyledTheme.shapes.small,
-    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenu.WidthConfig.MatchAnchor,
+    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenuDefaults.widthConfig,
     popupHorizontalAlignment: StyledPopupMenu.HorizontalAlignment =
         StyledPopupMenu.HorizontalAlignment.Start,
     popupMaxHeight: Dp = StyledPopupMenuDefaults.maxHeight,
@@ -167,7 +164,7 @@ fun <T : Any> StyledPopupDropdown(
         title = title,
         enabled = enabled,
         expanded = expanded,
-        filter = filter?.toLegacyFilter(),
+        filter = filter,
         variant = variant,
         customization = customization,
         shape = shape,
@@ -179,11 +176,85 @@ fun <T : Any> StyledPopupDropdown(
     )
 }
 
-private fun <T : Any> StyledPopupDropdown.Filter<T>.toLegacyFilter() =
-    StyledDropdown.Filter(label, filter)
+/** Outlined single-selection popup dropdown backed by [MutableState]. */
+@Composable
+fun <T : Any> StyledOutlinedPopupDropdown(
+    items: List<T>,
+    selected: MutableState<T>,
+    modifier: Modifier = Modifier,
+    title: String = "",
+    enabled: Boolean = true,
+    filter: StyledPopupDropdown.Filter<T>? = null,
+    customization: StyledButton.Customization? = null,
+    shape: Shape = StyledTheme.shapes.small,
+    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenuDefaults.widthConfig,
+    popupHorizontalAlignment: StyledPopupMenu.HorizontalAlignment =
+        StyledPopupMenu.HorizontalAlignment.Start,
+    popupMaxHeight: Dp = StyledPopupMenuDefaults.maxHeight,
+    content: @Composable StyledPopupDropdownScope<T>.() -> Unit =
+        StyledPopupDropdownDefaults.defaultRenderer(),
+    onSelectionChange: ((index: Int, item: T) -> Unit)? = null,
+    expanded: MutableState<Boolean>? = null,
+) {
+    StyledPopupDropdown(
+        items = items,
+        selected = selected,
+        modifier = modifier,
+        title = title,
+        enabled = enabled,
+        filter = filter,
+        variant = StyledButton.Variant.Outlined,
+        customization = customization,
+        shape = shape,
+        popupWidthConfig = popupWidthConfig,
+        popupHorizontalAlignment = popupHorizontalAlignment,
+        popupMaxHeight = popupMaxHeight,
+        content = content,
+        onSelectionChange = onSelectionChange,
+        expanded = expanded,
+    )
+}
+
+/** Controlled-value overload for [StyledOutlinedPopupDropdown]. */
+@Composable
+fun <T : Any> StyledOutlinedPopupDropdown(
+    items: List<T>,
+    selected: T,
+    onSelectionChange: (index: Int, item: T) -> Unit,
+    modifier: Modifier = Modifier,
+    title: String = "",
+    enabled: Boolean = true,
+    filter: StyledPopupDropdown.Filter<T>? = null,
+    customization: StyledButton.Customization? = null,
+    shape: Shape = StyledTheme.shapes.small,
+    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenuDefaults.widthConfig,
+    popupHorizontalAlignment: StyledPopupMenu.HorizontalAlignment =
+        StyledPopupMenu.HorizontalAlignment.Start,
+    popupMaxHeight: Dp = StyledPopupMenuDefaults.maxHeight,
+    content: @Composable StyledPopupDropdownScope<T>.() -> Unit =
+        StyledPopupDropdownDefaults.defaultRenderer(),
+    expanded: MutableState<Boolean>? = null,
+) {
+    StyledPopupDropdown(
+        items = items,
+        selected = selected,
+        onSelectionChange = onSelectionChange,
+        modifier = modifier,
+        title = title,
+        enabled = enabled,
+        filter = filter,
+        variant = StyledButton.Variant.Outlined,
+        customization = customization,
+        shape = shape,
+        popupWidthConfig = popupWidthConfig,
+        popupHorizontalAlignment = popupHorizontalAlignment,
+        popupMaxHeight = popupMaxHeight,
+        content = content,
+        expanded = expanded,
+    )
+}
 
 /** Index-backed overload for lists containing equal values that must remain distinct. */
-@OptIn(InternalComposeStyledApi::class)
 @Composable
 fun <T : Any> StyledPopupDropdownIndex(
     items: List<T>,
@@ -195,7 +266,7 @@ fun <T : Any> StyledPopupDropdownIndex(
     variant: StyledButton.Variant = StyledButton.Variant.Auto,
     customization: StyledButton.Customization? = null,
     shape: Shape = StyledTheme.shapes.small,
-    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenu.WidthConfig.MatchAnchor,
+    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenuDefaults.widthConfig,
     popupHorizontalAlignment: StyledPopupMenu.HorizontalAlignment =
         StyledPopupMenu.HorizontalAlignment.Start,
     popupMaxHeight: Dp = StyledPopupMenuDefaults.maxHeight,
@@ -209,7 +280,7 @@ fun <T : Any> StyledPopupDropdownIndex(
         modifier = modifier,
         title = title,
         enabled = enabled,
-        filter = filter?.toLegacyFilter(),
+        filter = filter,
         variant = variant,
         customization = customization,
         shape = shape,
@@ -222,7 +293,6 @@ fun <T : Any> StyledPopupDropdownIndex(
 }
 
 /** Controlled index-backed overload for [StyledPopupDropdownIndex]. */
-@OptIn(InternalComposeStyledApi::class)
 @Composable
 fun <T : Any> StyledPopupDropdownIndex(
     items: List<T>,
@@ -235,7 +305,7 @@ fun <T : Any> StyledPopupDropdownIndex(
     variant: StyledButton.Variant = StyledButton.Variant.Auto,
     customization: StyledButton.Customization? = null,
     shape: Shape = StyledTheme.shapes.small,
-    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenu.WidthConfig.MatchAnchor,
+    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenuDefaults.widthConfig,
     popupHorizontalAlignment: StyledPopupMenu.HorizontalAlignment =
         StyledPopupMenu.HorizontalAlignment.Start,
     popupMaxHeight: Dp = StyledPopupMenuDefaults.maxHeight,
@@ -248,7 +318,7 @@ fun <T : Any> StyledPopupDropdownIndex(
         modifier = modifier,
         title = title,
         enabled = enabled,
-        filter = filter?.toLegacyFilter(),
+        filter = filter,
         variant = variant,
         customization = customization,
         shape = shape,

@@ -176,6 +176,14 @@ internal fun DemoButtons(
             ) {
                 StyledText("Button")
             }
+            StyledButton(
+                onClick = { showMessage("Icons at button edges clicked") },
+                leadingIcon = Icons.Default.Add.toIconComposable(),
+                trailingIcon = Icons.Default.Add.toIconComposable(),
+                iconPosition = StyledButton.IconPosition.AtButtonEdges,
+            ) {
+                StyledText("Icons at edges")
+            }
             StyledOutlinedButton(
                 onClick = { showMessage("Outlined button clicked") },
                 leadingIcon = Icons.Default.Add.toIconComposable(),

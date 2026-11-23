@@ -66,7 +66,7 @@ internal fun DemoNumberPicker(baseId: Int, expandState: ExpandState) {
             )
             StyledText("Current value: ${quantity.value}")
 
-            SubTitle("Integer 0–10, step 1; buttons wrap at bounds, manual input disabled")
+            SubTitle("Integer 0–10, step 1; buttons wrap at bounds, text input disabled")
             StyledNumberPicker(
                 value = buttonOnlyQuantity,
                 validator = buttonOnlyQuantityValidator,

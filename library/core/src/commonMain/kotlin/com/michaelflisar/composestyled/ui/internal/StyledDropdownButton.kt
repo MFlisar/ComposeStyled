@@ -20,7 +20,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.classes.IconComposable
@@ -63,8 +62,7 @@ internal fun StyledMenuBarItem(
     menuProperties: PopupProperties = StyledPopupDefaults.properties(
         focusable = LocalStyledMenuBarLevel.current == null,
     ),
-    menuWidthConfig: StyledPopupMenu.WidthConfig =
-        StyledPopupMenu.WidthConfig.Auto(maxWidth = 260.dp),
+    menuWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenuDefaults.widthConfig,
     menuShape: Shape = StyledPopupMenuDefaults.shape,
     menuContainerColor: Color = StyledPopupMenuDefaults.containerColor,
     menuContentColor: Color = StyledPopupMenuDefaults.contentColor(menuContainerColor),

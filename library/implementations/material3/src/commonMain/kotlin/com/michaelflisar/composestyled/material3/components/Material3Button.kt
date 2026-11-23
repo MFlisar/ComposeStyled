@@ -2,8 +2,10 @@ package com.michaelflisar.composestyled.material3.components
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,8 +18,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.material3.CopyStyledLocals
@@ -41,7 +45,11 @@ class Material3Button internal constructor(
 ) : StyledButton.Implementation {
 
     override val defaults: StyledButton.Defaults
-        @Composable get() = StyledButton.Defaults(shape = RoundedCornerShape(percent = 50))
+        @Composable get() = StyledButton.Defaults(
+            shape = RoundedCornerShape(percent = 50),
+            iconPosition = StyledButton.IconPosition.AdjacentToContent,
+            iconSpacing = ButtonDefaults.IconSpacing,
+        )
 
     companion object {
 
@@ -94,6 +102,7 @@ class Material3Button internal constructor(
                     StyledButton.Variant.Plain -> Variant.Text
                 }
             }
+
         }
     }
 
@@ -115,6 +124,8 @@ class Material3Button internal constructor(
         modifier: Modifier,
         enabled: Boolean,
         shape: Shape,
+        iconPosition: StyledButton.IconPosition,
+        iconSpacing: Dp,
         interactionSource: MutableInteractionSource?,
         customization: StyledButton.Customization?,
         content: @Composable (RowScope.() -> Unit),
@@ -179,7 +190,7 @@ class Material3Button internal constructor(
                         ),
                         textStyle = StyledTheme.typography.labelLarge,
                     ) {
-                        content()
+                        buttonContent(iconPosition, iconSpacing, content)
                     }
                 }
             }
@@ -214,7 +225,7 @@ class Material3Button internal constructor(
                         ),
                         textStyle = StyledTheme.typography.labelLarge,
                     ) {
-                        content()
+                        buttonContent(iconPosition, iconSpacing, content)
                     }
                 }
             }
@@ -251,7 +262,7 @@ class Material3Button internal constructor(
                         ),
                         textStyle = StyledTheme.typography.labelLarge,
                     ) {
-                        content()
+                        buttonContent(iconPosition, iconSpacing, content)
                     }
                 }
             }
@@ -286,7 +297,7 @@ class Material3Button internal constructor(
                         ),
                         textStyle = StyledTheme.typography.labelLarge,
                     ) {
-                        content()
+                        buttonContent(iconPosition, iconSpacing, content)
                     }
                 }
             }
@@ -337,7 +348,7 @@ class Material3Button internal constructor(
                             ),
                             textStyle = StyledTheme.typography.labelLarge,
                         ) {
-                            content()
+                            buttonContent(iconPosition, iconSpacing, content)
                         }
                     }
                 }
@@ -372,11 +383,27 @@ class Material3Button internal constructor(
                         ),
                         textStyle = StyledTheme.typography.labelLarge,
                     ) {
-                        content()
+                        buttonContent(iconPosition, iconSpacing, content)
                     }
                 }
 
             }
         }
     }
+}
+
+@Composable
+private fun buttonContent(
+    iconPosition: StyledButton.IconPosition,
+    iconSpacing: Dp,
+    content: @Composable RowScope.() -> Unit,
+) {
+    Row(
+        horizontalArrangement = when (iconPosition) {
+            StyledButton.IconPosition.AdjacentToContent -> Arrangement.spacedBy(iconSpacing)
+            StyledButton.IconPosition.AtButtonEdges -> Arrangement.SpaceBetween
+        },
+        verticalAlignment = Alignment.CenterVertically,
+        content = content,
+    )
 }

@@ -35,7 +35,15 @@ StyledButtonDefaults.customize(
 For caller-defined content that needs click feedback without a button's minimum
 width, use [`StyledClickable`](Clickable.md).
 
-Buttons support `leadingIcon` and `trailingIcon` slots using `IconComposable`.
+Buttons support optional `leadingIcon` and `trailingIcon` slots using
+`IconComposable`. By default, the leading and trailing icons sit next to the
+content. Set `iconPosition = StyledButton.IconPosition.AtButtonEdges` to place
+the leading icon at the start and the trailing icon at the end of the button.
+`AdjacentToContent` keeps the icons with the content as a centered group.
+`iconSpacing` defines the exact spacing between adjacent elements in that
+group. Defaults match each renderer: Material 3 uses `8.dp`, while Cupertino
+and Fluent 2 use `6.dp`.
+
 The icons are rendered through `StyledIcon`, inherit the button's content color,
 and use a compact button-specific icon size:
 
@@ -44,8 +52,27 @@ StyledButton(
     onClick = { save() },
     leadingIcon = Icons.Default.Save.toIconComposable(),
     trailingIcon = Icons.Default.ArrowForward.toIconComposable(),
+    iconPosition = StyledButton.IconPosition.AdjacentToContent,
+    iconSpacing = 4.dp,
 ) {
     StyledText("Save")
+}
+```
+
+The positions and spacing can be changed globally through the button defaults:
+
+```kotlin
+StyledTheme(
+customization = {
+    update(StyledButton.DefaultsKey) {
+        copy(
+            iconPosition = StyledButton.IconPosition.AtButtonEdges,
+            iconSpacing = 8.dp,
+        )
+    }
+},
+) {
+// ...
 }
 ```
 
@@ -102,9 +129,9 @@ StyledTheme(
 ```
 
 Use `CustomColors` to customize filled foreground/background, plain foreground
-and optional outline border. Each theme registers fixed button defaults
-(currently only `shape`) together with its renderer; update them through
-`StyledTheme(customization)` or a scoped `UpdateStyledRegistry`.
+and optional outline border. Each theme registers its button defaults together
+with its renderer; update them through `StyledTheme(customization)` or a scoped
+`UpdateStyledRegistry`.
 
 Cupertino buttons retain `bodyMedium` typography and compact vertical padding.
 Buttons have a minimum 44 dp footprint, increased when the platform's minimum

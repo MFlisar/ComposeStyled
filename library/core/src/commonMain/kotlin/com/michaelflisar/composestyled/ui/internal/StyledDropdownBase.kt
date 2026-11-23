@@ -50,10 +50,11 @@ import com.michaelflisar.composestyled.runtime.LocalStyledContext
 import com.michaelflisar.composestyled.tokens.LocalStyledContentColor
 import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.ui.components.StyledDropdownMenuItem
-import com.michaelflisar.composestyled.ui.components.StyledPopupMenuItemRendererDefaults
 import com.michaelflisar.composestyled.ui.components.StyledIcon
 import com.michaelflisar.composestyled.ui.components.StyledInput
+import com.michaelflisar.composestyled.ui.components.StyledPopupDropdown
 import com.michaelflisar.composestyled.ui.components.StyledPopupMenu
+import com.michaelflisar.composestyled.ui.components.StyledPopupMenuItemRendererDefaults
 import com.michaelflisar.composestyled.ui.icons.StyledIcons
 import com.michaelflisar.composestyled.ui.overlay.StyledPopupContainer
 import com.michaelflisar.composestyled.ui.primitives.StyledText
@@ -70,7 +71,7 @@ internal fun <T : Any, S> StyledDropdownBase(
     closeOnItemClick: Boolean,
     enabled: Boolean,
     customization: StyledButton.Customization?,
-    filter: StyledDropdown.Filter<T>?,
+    filter: StyledPopupDropdown.Filter<T>?,
     variant: StyledButton.Variant,
     shape: Shape,
     popupWidthConfig: StyledPopupMenu.WidthConfig,
@@ -281,7 +282,7 @@ private object DropdownFilterInputMeasurePolicy : MeasurePolicy {
 
 @Composable
 private fun <T : Any, S> DropdownItems(
-    filter: StyledDropdown.Filter<T>?,
+    filter: StyledPopupDropdown.Filter<T>?,
     filterText: String,
     items: List<T>,
     isSelected: (Int) -> Boolean,

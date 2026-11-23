@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.StyledTheme
+import com.michaelflisar.composestyled.supportingVariant
 import com.michaelflisar.composestyled.foundation.components.FoundationListItem
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.ui.components.StyledListItem
@@ -76,13 +77,10 @@ class Fluent2ListItem internal constructor() : StyledListItem.Implementation {
             content = content,
             defaultContainerColor = StyledTheme.colorScheme.surface,
             defaultContentColor = StyledTheme.colorScheme.onSurface,
-            defaultSupportingColor = StyledTheme.supportingContentColor(
-                containerColor = StyledTheme.colorScheme.surface,
-                contentColor = StyledTheme.contentColorFor(
-                    backgroundColor = StyledTheme.colorScheme.surface,
-                    fallback = StyledTheme.ContentColorFallback.BlackWhite,
-                ),
-            ),
+            defaultSupportingColor = StyledTheme.contentColorFor(
+                backgroundColor = StyledTheme.colorScheme.surface,
+                fallback = StyledTheme.ContentColorFallback.BlackWhite,
+            ).supportingVariant(containerColor = StyledTheme.colorScheme.surface),
             headlineStyle = StyledTheme.typography.bodyMedium,
             supportingStyle = StyledTheme.typography.bodySmall,
             overlineStyle = StyledTheme.typography.labelSmall,

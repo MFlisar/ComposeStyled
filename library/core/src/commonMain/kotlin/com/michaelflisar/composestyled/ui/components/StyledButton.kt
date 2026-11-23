@@ -40,6 +40,8 @@ object StyledButton {
     @Stable
     data class Defaults(
         val shape: Shape,
+        val iconPosition: IconPosition,
+        val iconSpacing: Dp,
     )
 
     // -------------
@@ -52,6 +54,11 @@ object StyledButton {
         Filled,
         Outlined,
         Plain,
+    }
+
+    enum class IconPosition {
+        AdjacentToContent,
+        AtButtonEdges,
     }
 
     @InternalComposeStyledApi
@@ -90,6 +97,8 @@ object StyledButton {
             modifier: Modifier,
             enabled: Boolean,
             shape: Shape,
+            iconPosition: IconPosition,
+            iconSpacing: Dp,
             interactionSource: MutableInteractionSource?,
             customization: Customization?,
             content: @Composable RowScope.() -> Unit,
@@ -105,6 +114,12 @@ object StyledButtonDefaults {
 
     val shape: Shape
         @Composable get() = LocalStyledRegistry.current[StyledButton.DefaultsKey].shape
+
+    val iconPosition: StyledButton.IconPosition
+        @Composable get() = LocalStyledRegistry.current[StyledButton.DefaultsKey].iconPosition
+
+    val iconSpacing: Dp
+        @Composable get() = LocalStyledRegistry.current[StyledButton.DefaultsKey].iconSpacing
 
     fun customize(
         colors: CustomColors? = null,
@@ -145,6 +160,8 @@ fun StyledButton(
     // content
     leadingIcon: IconComposable? = null,
     trailingIcon: IconComposable? = null,
+    iconPosition: StyledButton.IconPosition = StyledButtonDefaults.iconPosition,
+    iconSpacing: Dp = StyledButtonDefaults.iconSpacing,
     content: @Composable RowScope.() -> Unit,
 ) {
     StyledButtonImpl(
@@ -154,9 +171,11 @@ fun StyledButton(
         enabled = enabled,
         interactionSource = interactionSource,
         shape = shape,
+        iconSpacing = iconSpacing,
         customization = customization,
         leadingIcon = leadingIcon,
         trailingIcon = trailingIcon,
+        iconPosition = iconPosition,
         content = content,
     )
 }
@@ -172,6 +191,8 @@ fun StyledOutlinedButton(
     customization: Customization? = null,
     leadingIcon: IconComposable? = null,
     trailingIcon: IconComposable? = null,
+    iconPosition: StyledButton.IconPosition = StyledButtonDefaults.iconPosition,
+    iconSpacing: Dp = StyledButtonDefaults.iconSpacing,
     content: @Composable RowScope.() -> Unit,
 ) {
     StyledButton(
@@ -184,6 +205,8 @@ fun StyledOutlinedButton(
         customization = customization,
         leadingIcon = leadingIcon,
         trailingIcon = trailingIcon,
+        iconPosition = iconPosition,
+        iconSpacing = iconSpacing,
         content = content,
     )
 }
@@ -197,8 +220,10 @@ fun StyledTextButton(
     interactionSource: MutableInteractionSource? = null,
     shape: Shape = StyledButtonDefaults.shape,
     customization: Customization? = null,
-    leadingIcon: com.michaelflisar.composestyled.classes.IconComposable? = null,
-    trailingIcon: com.michaelflisar.composestyled.classes.IconComposable? = null,
+    leadingIcon: IconComposable? = null,
+    trailingIcon: IconComposable? = null,
+    iconPosition: StyledButton.IconPosition = StyledButtonDefaults.iconPosition,
+    iconSpacing: Dp = StyledButtonDefaults.iconSpacing,
     content: @Composable RowScope.() -> Unit,
 ) {
     StyledButton(
@@ -211,6 +236,8 @@ fun StyledTextButton(
         customization = customization,
         leadingIcon = leadingIcon,
         trailingIcon = trailingIcon,
+        iconPosition = iconPosition,
+        iconSpacing = iconSpacing,
         content = content,
     )
 }
@@ -231,6 +258,8 @@ private fun StyledButtonImpl(
     customization: Customization?,
     leadingIcon: IconComposable?,
     trailingIcon: IconComposable?,
+    iconPosition: StyledButton.IconPosition,
+    iconSpacing: Dp,
     content: @Composable RowScope.() -> Unit,
 ) {
     val buttonModifier = modifier.withStyledInputPointerIcon()
@@ -240,20 +269,39 @@ private fun StyledButtonImpl(
         modifier = buttonModifier,
         enabled = enabled,
         shape = shape,
+        iconPosition = iconPosition,
+        iconSpacing = iconSpacing,
         interactionSource = interactionSource,
         customization = customization,
         content = {
-            leadingIcon?.let { icon ->
-                CompositionLocalProvider(LocalStyledContext provides StyledButton.Context.Icon) {
-                    StyledIcon(icon = icon)
-                }
-            }
-            content()
-            trailingIcon?.let { icon ->
-                CompositionLocalProvider(LocalStyledContext provides StyledButton.Context.Icon) {
-                    StyledIcon(icon = icon)
-                }
-            }
+            renderButtonContent(
+                leadingIcon = leadingIcon,
+                trailingIcon = trailingIcon,
+                content = content,
+            )
         }
     )
+}
+
+// -------------------------
+// private functions
+// -------------------------
+
+@Composable
+private fun RowScope.renderButtonContent(
+    leadingIcon: IconComposable?,
+    trailingIcon: IconComposable?,
+    content: @Composable RowScope.() -> Unit,
+) {
+    leadingIcon?.let { renderButtonIcon(it) }
+    content()
+    trailingIcon?.let { renderButtonIcon(it) }
+}
+
+@OptIn(InternalComposeStyledApi::class)
+@Composable
+private fun renderButtonIcon(icon: IconComposable) {
+    CompositionLocalProvider(LocalStyledContext provides StyledButton.Context.Icon) {
+        StyledIcon(icon = icon)
+    }
 }

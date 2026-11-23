@@ -69,6 +69,59 @@ fun Color.contrastRatio(other: Color): Float {
 }
 
 /**
+ * Returns a less prominent variant by scaling this color's alpha by [factor].
+ *
+ * This variant is composited against the actual background when drawn and does not guarantee a
+ * minimum contrast ratio.
+ */
+fun Color.supportingVariant(factor: Float = 0.65f): Color {
+    require(factor in 0f..1f) { "Factor must be between 0 and 1" }
+    return copy(alpha = alpha * factor)
+}
+
+/**
+ * Returns a less prominent variant against [containerColor].
+ *
+ * The result targets [factor] of the original contrast, with [minimumContrastRatio] as its floor
+ * when the original pair allows it.
+ */
+fun Color.supportingVariant(
+    containerColor: Color,
+    factor: Float = 0.65f,
+    minimumContrastRatio: Float = 4.5f,
+): Color {
+    require(factor in 0f..1f) { "Factor must be between 0 and 1" }
+    require(minimumContrastRatio in 1f..21f) {
+        "Minimum contrast ratio must be between 1 and 21"
+    }
+
+    val originalContrast = contrastRatio(containerColor)
+    val targetContrast = maxOf(minimumContrastRatio, originalContrast * factor)
+    if (targetContrast >= originalContrast) return this
+
+    fun blendTowardContainer(amount: Float) = Color(
+        red = red + (containerColor.red - red) * amount,
+        green = green + (containerColor.green - green) * amount,
+        blue = blue + (containerColor.blue - blue) * amount,
+        alpha = alpha + (containerColor.alpha - alpha) * amount,
+    )
+
+    var low = 0f
+    var high = 1f
+    repeat(24) {
+        val amount = (low + high) / 2f
+        val candidate = blendTowardContainer(amount)
+        if (candidate.contrastRatio(containerColor) >= targetContrast) {
+            low = amount
+        } else {
+            high = amount
+        }
+    }
+
+    return blendTowardContainer(low)
+}
+
+/**
  * Returns black or white, whichever has the higher contrast ratio against this color.
  */
 fun Color.onColorByContrastRatio(): Color =

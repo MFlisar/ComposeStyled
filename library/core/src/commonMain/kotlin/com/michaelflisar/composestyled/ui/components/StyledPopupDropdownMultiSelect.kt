@@ -138,7 +138,7 @@ fun <T : Any> StyledPopupDropdownMultiSelect(
     customization: StyledButton.Customization? = null,
     filter: StyledPopupDropdown.Filter<T>? = null,
     shape: Shape = StyledPopupDropdownMultiSelectDefaults.shape(),
-    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenu.WidthConfig.MatchAnchor,
+    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenuDefaults.widthConfig,
     popupHorizontalAlignment: StyledPopupMenu.HorizontalAlignment =
         StyledPopupMenu.HorizontalAlignment.Start,
     sortSelectionByItems: Boolean = StyledPopupDropdownMultiSelectDefaults.sortSelectionByItems,
@@ -159,7 +159,7 @@ fun <T : Any> StyledPopupDropdownMultiSelect(
         expanded = expanded,
         variant = variant,
         customization = customization,
-        filter = filter?.toLegacyFilter(),
+        filter = filter,
         shape = shape,
         popupWidthConfig = popupWidthConfig,
         popupHorizontalAlignment = popupHorizontalAlignment,
@@ -188,7 +188,7 @@ fun <T : Any> StyledPopupDropdownMultiSelect(
     customization: StyledButton.Customization? = null,
     filter: StyledPopupDropdown.Filter<T>? = null,
     shape: Shape = StyledPopupDropdownMultiSelectDefaults.shape(),
-    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenu.WidthConfig.MatchAnchor,
+    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenuDefaults.widthConfig,
     popupHorizontalAlignment: StyledPopupMenu.HorizontalAlignment =
         StyledPopupMenu.HorizontalAlignment.Start,
     sortSelectionByItems: Boolean = StyledPopupDropdownMultiSelectDefaults.sortSelectionByItems,
@@ -208,7 +208,7 @@ fun <T : Any> StyledPopupDropdownMultiSelect(
         expanded = expanded,
         variant = variant,
         customization = customization,
-        filter = filter?.toLegacyFilter(),
+        filter = filter,
         shape = shape,
         popupWidthConfig = popupWidthConfig,
         popupHorizontalAlignment = popupHorizontalAlignment,
@@ -219,9 +219,6 @@ fun <T : Any> StyledPopupDropdownMultiSelect(
         onSelectionChange = onSelectionChange,
     )
 }
-
-private fun <T : Any> StyledPopupDropdown.Filter<T>.toLegacyFilter() =
-    StyledDropdown.Filter(label, filter)
 
 /** Index-backed overload for multi-select lists that contain equal values. */
 @OptIn(InternalComposeStyledApi::class)
@@ -236,7 +233,7 @@ fun <T : Any> StyledPopupDropdownMultiSelectIndex(
     customization: StyledButton.Customization? = null,
     filter: StyledPopupDropdown.Filter<T>? = null,
     shape: Shape = StyledPopupDropdownMultiSelectDefaults.shape(),
-    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenu.WidthConfig.MatchAnchor,
+    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenuDefaults.widthConfig,
     popupHorizontalAlignment: StyledPopupMenu.HorizontalAlignment =
         StyledPopupMenu.HorizontalAlignment.Start,
     sortSelectionByItems: Boolean = StyledPopupDropdownMultiSelectDefaults.sortSelectionByItems,
@@ -255,7 +252,7 @@ fun <T : Any> StyledPopupDropdownMultiSelectIndex(
         enabled = enabled,
         variant = variant,
         customization = customization,
-        filter = filter?.toLegacyFilter(),
+        filter = filter,
         shape = shape,
         popupWidthConfig = popupWidthConfig,
         popupHorizontalAlignment = popupHorizontalAlignment,
@@ -281,7 +278,7 @@ fun <T : Any> StyledPopupDropdownMultiSelectIndex(
     customization: StyledButton.Customization? = null,
     filter: StyledPopupDropdown.Filter<T>? = null,
     shape: Shape = StyledPopupDropdownMultiSelectDefaults.shape(),
-    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenu.WidthConfig.MatchAnchor,
+    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenuDefaults.widthConfig,
     popupHorizontalAlignment: StyledPopupMenu.HorizontalAlignment =
         StyledPopupMenu.HorizontalAlignment.Start,
     sortSelectionByItems: Boolean = StyledPopupDropdownMultiSelectDefaults.sortSelectionByItems,
@@ -299,7 +296,7 @@ fun <T : Any> StyledPopupDropdownMultiSelectIndex(
         enabled = enabled,
         variant = variant,
         customization = customization,
-        filter = filter?.toLegacyFilter(),
+        filter = filter,
         shape = shape,
         popupWidthConfig = popupWidthConfig,
         popupHorizontalAlignment = popupHorizontalAlignment,

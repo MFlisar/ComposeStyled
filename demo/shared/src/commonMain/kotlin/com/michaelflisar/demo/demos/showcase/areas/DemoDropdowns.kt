@@ -17,6 +17,7 @@ import com.michaelflisar.composestyled.ui.components.StyledButtonDefaults
 import com.michaelflisar.composestyled.ui.components.StyledPopupDropdown
 import com.michaelflisar.composestyled.ui.components.StyledPopupDropdownDefaults
 import com.michaelflisar.composestyled.ui.components.StyledPopupMenu
+import com.michaelflisar.composestyled.ui.components.StyledOutlinedPopupDropdown
 import com.michaelflisar.composestyled.ui.components.StyledPopupDropdownMultiSelect
 import com.michaelflisar.composestyled.ui.components.StyledPopupDropdownMultiSelectDefaults
 import com.michaelflisar.composestyled.ui.components.StyledIcon
@@ -52,11 +53,11 @@ internal fun DemoDropdowns(baseId: Int, expandState: ExpandState) {
         expanded = expandState
     ) {
         SubTitle("Single selection")
-        StyledPopupDropdown(
+        StyledOutlinedPopupDropdown(
             items = items,
             selected = selected,
             modifier = Modifier.fillMaxWidth(),
-            title = "Fruit",
+            title = "Outlined fruit",
             filter = filter,
             popupWidthConfig = StyledPopupMenu.WidthConfig.Auto(),
         )

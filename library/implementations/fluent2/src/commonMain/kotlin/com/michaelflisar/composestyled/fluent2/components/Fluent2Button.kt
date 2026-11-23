@@ -34,6 +34,7 @@ import androidx.compose.ui.input.InputMode
 import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.michaelflisar.composestyled.UpdateStyledThemeLocals
@@ -57,7 +58,11 @@ class Fluent2Button internal constructor(
 ) : StyledButton.Implementation {
 
     override val defaults: StyledButton.Defaults
-        @Composable get() = StyledButton.Defaults(shape = RoundedCornerShape(4.dp))
+        @Composable get() = StyledButton.Defaults(
+            shape = RoundedCornerShape(4.dp),
+            iconPosition = StyledButton.IconPosition.AdjacentToContent,
+            iconSpacing = 6.dp,
+        )
 
     companion object {
 
@@ -126,6 +131,8 @@ class Fluent2Button internal constructor(
         modifier: Modifier,
         enabled: Boolean,
         shape: Shape,
+        iconPosition: StyledButton.IconPosition,
+        iconSpacing: Dp,
         interactionSource: MutableInteractionSource?,
         customization: StyledButton.Customization?,
         content: @Composable RowScope.() -> Unit,
@@ -137,6 +144,8 @@ class Fluent2Button internal constructor(
             modifier = modifier,
             enabled = enabled,
             shape = shape,
+            iconPosition = iconPosition,
+            iconSpacing = iconSpacing,
             interactionSource = interactionSource,
             customization = customization,
             defaultContentColor = if (variant == StyledButton.Variant.Plain ||
@@ -165,6 +174,8 @@ private fun Fluent2Button(
     variant: Fluent2Button.Variant,
     enabled: Boolean,
     shape: Shape,
+    iconPosition: StyledButton.IconPosition,
+    iconSpacing: Dp,
     interactionSource: MutableInteractionSource?,
     customization: StyledButton.Customization?,
     defaultContentColor: Color?,
@@ -225,8 +236,6 @@ private fun Fluent2Button(
     } else {
         PaddingValues(horizontal = 12.dp, vertical = 6.dp)
     }
-    val spacing = 6.dp
-
     UpdateStyledThemeLocals(
         contentColor = foreground,
         textStyle = textStyle
@@ -262,7 +271,11 @@ private fun Fluent2Button(
                     }
                 )
                 .padding(buttonPadding),
-            horizontalArrangement = Arrangement.spacedBy(spacing, Alignment.CenterHorizontally),
+            horizontalArrangement = when (iconPosition) {
+                StyledButton.IconPosition.AdjacentToContent ->
+                    Arrangement.spacedBy(iconSpacing, Alignment.CenterHorizontally)
+                StyledButton.IconPosition.AtButtonEdges -> Arrangement.SpaceBetween
+            },
             verticalAlignment = Alignment.CenterVertically,
             content = content,
         )

@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.Dp
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.tokens.LocalStyledTextStyle
 import com.michaelflisar.composestyled.ui.components.StyledButton
+import com.michaelflisar.composestyled.ui.components.StyledPopupDropdown
 import com.michaelflisar.composestyled.ui.components.StyledPopupMenu
 import com.michaelflisar.composestyled.ui.components.StyledPopupMenuDefaults
 import com.michaelflisar.composestyled.ui.primitives.StyledText
@@ -22,11 +23,6 @@ import com.michaelflisar.composestyled.ui.primitives.StyledText
  * Shared types and content helpers for single- and multi-selection dropdowns.
  */
 internal object StyledDropdown {
-
-    class Filter<T : Any>(
-        val label: String,
-        val filter: (filter: String, item: T) -> Boolean,
-    )
 
     sealed interface RenderContext<out T : Any, out S> {
         data class Selection<S>(val selection: S) : RenderContext<Nothing, S>
@@ -173,12 +169,12 @@ internal fun <T : Any> StyledDropdown(
     modifier: Modifier = Modifier,
     title: String = "",
     enabled: Boolean = true,
-    filter: StyledDropdown.Filter<T>? = null,
+    filter: StyledPopupDropdown.Filter<T>? = null,
     variant: StyledButton.Variant = StyledButton.Variant.Auto,
     // defaults / customisation
     customization: StyledButton.Customization? = null,
     shape: Shape = StyledTheme.shapes.small,
-    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenu.WidthConfig.MatchAnchor,
+    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenuDefaults.widthConfig,
     popupHorizontalAlignment: StyledPopupMenu.HorizontalAlignment =
         StyledPopupMenu.HorizontalAlignment.Start,
     popupMaxHeight: Dp = StyledPopupMenuDefaults.maxHeight,
@@ -220,12 +216,12 @@ internal fun <T : Any> StyledDropdown(
     modifier: Modifier = Modifier,
     title: String = "",
     enabled: Boolean = true,
-    filter: StyledDropdown.Filter<T>? = null,
+    filter: StyledPopupDropdown.Filter<T>? = null,
     variant: StyledButton.Variant = StyledButton.Variant.Auto,
     // defaults / customisation
     customization: StyledButton.Customization? = null,
     shape: Shape = StyledTheme.shapes.small,
-    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenu.WidthConfig.MatchAnchor,
+    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenuDefaults.widthConfig,
     popupHorizontalAlignment: StyledPopupMenu.HorizontalAlignment =
         StyledPopupMenu.HorizontalAlignment.Start,
     popupMaxHeight: Dp = StyledPopupMenuDefaults.maxHeight,
@@ -264,12 +260,12 @@ internal fun <T : Any> StyledDropdownIndex(
     modifier: Modifier = Modifier,
     title: String = "",
     enabled: Boolean = true,
-    filter: StyledDropdown.Filter<T>? = null,
+    filter: StyledPopupDropdown.Filter<T>? = null,
     variant: StyledButton.Variant = StyledButton.Variant.Auto,
     // defaults / customisation
     customization: StyledButton.Customization? = null,
     shape: Shape = StyledTheme.shapes.small,
-    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenu.WidthConfig.MatchAnchor,
+    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenuDefaults.widthConfig,
     popupHorizontalAlignment: StyledPopupMenu.HorizontalAlignment =
         StyledPopupMenu.HorizontalAlignment.Start,
     popupMaxHeight: Dp = StyledPopupMenuDefaults.maxHeight,
@@ -316,12 +312,12 @@ internal fun <T : Any> StyledDropdownIndex(
     modifier: Modifier = Modifier,
     title: String = "",
     enabled: Boolean = true,
-    filter: StyledDropdown.Filter<T>? = null,
+    filter: StyledPopupDropdown.Filter<T>? = null,
     variant: StyledButton.Variant = StyledButton.Variant.Auto,
     // defaults / customisation
     customization: StyledButton.Customization? = null,
     shape: Shape = StyledTheme.shapes.small,
-    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenu.WidthConfig.MatchAnchor,
+    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenuDefaults.widthConfig,
     popupHorizontalAlignment: StyledPopupMenu.HorizontalAlignment =
         StyledPopupMenu.HorizontalAlignment.Start,
     popupMaxHeight: Dp = StyledPopupMenuDefaults.maxHeight,
@@ -359,11 +355,11 @@ internal fun <T : Any> StyledOutlinedDropdown(
     modifier: Modifier = Modifier,
     title: String = "",
     enabled: Boolean = true,
-    filter: StyledDropdown.Filter<T>? = null,
+    filter: StyledPopupDropdown.Filter<T>? = null,
     // defaults / customisation
     customization: StyledButton.Customization? = null,
     shape: Shape = StyledTheme.shapes.small,
-    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenu.WidthConfig.MatchAnchor,
+    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenuDefaults.widthConfig,
     popupMaxHeight: Dp = StyledPopupMenuDefaults.maxHeight,
     // content
     content: @Composable (context: StyledDropdown.RenderContext<T, T?>) -> Unit = StyledDropdownDefaults.defaultRenderer(),
@@ -396,11 +392,11 @@ internal fun <T : Any> StyledOutlinedDropdown(
     modifier: Modifier = Modifier,
     title: String = "",
     enabled: Boolean = true,
-    filter: StyledDropdown.Filter<T>? = null,
+    filter: StyledPopupDropdown.Filter<T>? = null,
     // defaults / customisation
     customization: StyledButton.Customization? = null,
     shape: Shape = StyledTheme.shapes.small,
-    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenu.WidthConfig.MatchAnchor,
+    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenuDefaults.widthConfig,
     popupMaxHeight: Dp = StyledPopupMenuDefaults.maxHeight,
     // content
     content: @Composable (context: StyledDropdown.RenderContext<T, T?>) -> Unit = StyledDropdownDefaults.defaultRenderer(),
@@ -433,11 +429,11 @@ internal fun <T : Any> StyledOutlinedDropdownIndex(
     modifier: Modifier = Modifier,
     title: String = "",
     enabled: Boolean = true,
-    filter: StyledDropdown.Filter<T>? = null,
+    filter: StyledPopupDropdown.Filter<T>? = null,
     // defaults / customisation
     customization: StyledButton.Customization? = null,
     shape: Shape = StyledTheme.shapes.small,
-    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenu.WidthConfig.MatchAnchor,
+    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenuDefaults.widthConfig,
     popupMaxHeight: Dp = StyledPopupMenuDefaults.maxHeight,
     // content
     content: @Composable (context: StyledDropdown.RenderContext<T, T?>) -> Unit = StyledDropdownDefaults.defaultRenderer(),
@@ -470,11 +466,11 @@ internal fun <T : Any> StyledOutlinedDropdownIndex(
     modifier: Modifier = Modifier,
     title: String = "",
     enabled: Boolean = true,
-    filter: StyledDropdown.Filter<T>? = null,
+    filter: StyledPopupDropdown.Filter<T>? = null,
     // defaults / customisation
     customization: StyledButton.Customization? = null,
     shape: Shape = StyledTheme.shapes.small,
-    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenu.WidthConfig.MatchAnchor,
+    popupWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenuDefaults.widthConfig,
     popupMaxHeight: Dp = StyledPopupMenuDefaults.maxHeight,
     // content
     content: @Composable (context: StyledDropdown.RenderContext<T, T?>) -> Unit = StyledDropdownDefaults.defaultRenderer(),
@@ -508,7 +504,7 @@ private fun <T : Any> StyledDropdownImpl(
     modifier: Modifier,
     title: String,
     enabled: Boolean,
-    filter: StyledDropdown.Filter<T>?,
+    filter: StyledPopupDropdown.Filter<T>?,
     customization: StyledButton.Customization?,
     shape: Shape,
     popupWidthConfig: StyledPopupMenu.WidthConfig,

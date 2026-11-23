@@ -26,6 +26,8 @@ import com.michaelflisar.composechangelog.ChangelogRelease
 import com.michaelflisar.composechangelog.ChangelogSetup
 import com.michaelflisar.composechangelog.ChangelogState
 import com.michaelflisar.composestyled.StyledTheme
+import com.michaelflisar.composestyled.supportingVariant
+import com.michaelflisar.composestyled.tokens.LocalStyledContentColor
 import com.michaelflisar.composestyled.ui.components.StyledOutlinedCard
 import com.michaelflisar.composestyled.ui.layout.StyledLazyColumn
 import com.michaelflisar.composestyled.ui.primitives.StyledText
@@ -150,7 +152,7 @@ private fun ChangelogReleaseHeader(
         if (release.date != null) {
             StyledText(
                 text = release.date,
-                color = StyledTheme.supportingContentColor(
+                color = LocalStyledContentColor.current.supportingVariant(
                     containerColor = StyledTheme.colorScheme.background,
                 ),
                 fontWeight = FontWeight.Bold,
