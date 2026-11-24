@@ -8,12 +8,13 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.SubcomposeLayout
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 
 /**
- * Measures side navigation between bars; body padding follows its current animated width.
- * Both Scaffold implementations use this so content has identical coordinates.
+ * Measures side navigation between the bars; body padding follows its animated width. Beside-bar
+ * navigation is coordinated by [FoundationScaffoldLayout] with the bars in the outer layout.
  */
 @InternalComposeStyledApi
 @Composable
@@ -23,7 +24,7 @@ fun FoundationScaffoldSideNavigationLayout(
     modifier: Modifier = Modifier,
     content: @Composable (PaddingValues) -> Unit,
 ) {
-    SubcomposeLayout(modifier) { constraints ->
+    SubcomposeLayout(modifier = modifier) { constraints ->
         val top = padding.calculateTopPadding().roundToPx()
         val bottom = padding.calculateBottomPadding().roundToPx()
         val start = padding.calculateStartPadding(layoutDirection).roundToPx()
@@ -45,7 +46,9 @@ fun FoundationScaffoldSideNavigationLayout(
                 } else constraints.maxWidth,
                 maxHeight = if (constraints.hasBoundedHeight) {
                     (constraints.maxHeight - top - bottom).coerceAtLeast(0)
-                } else constraints.maxHeight,
+                } else {
+                    constraints.maxHeight
+                },
             )
         )
         val bodyPadding = PaddingValues(
@@ -64,7 +67,11 @@ fun FoundationScaffoldSideNavigationLayout(
             )
         }
         val height = if (constraints.hasBoundedHeight) constraints.maxHeight else {
-            maxOf(constraints.minHeight, body.height, top + navigation.height + bottom)
+            maxOf(
+                constraints.minHeight,
+                body.height,
+                top + navigation.height + bottom,
+            )
         }
         layout(width, height) {
             body.place(0, 0)

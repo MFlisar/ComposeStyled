@@ -3,6 +3,7 @@ package com.michaelflisar.composestyled.ui.layout
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,6 +41,22 @@ object StyledScaffold {
         End,
     }
 
+    @Immutable
+    data class SideNavigationLayout(
+        val topBehavior: TopBehavior = TopBehavior.BelowTopBar,
+        val bottomBehavior: BottomBehavior = BottomBehavior.AboveBottomBar,
+    ) {
+        enum class TopBehavior {
+            BelowTopBar,
+            BesideTopBar,
+        }
+
+        enum class BottomBehavior {
+            AboveBottomBar,
+            BesideBottomBar,
+        }
+    }
+
     // -------------
     // 5) implementation
     // -------------
@@ -57,6 +74,7 @@ object StyledScaffold {
             topBar: @Composable () -> Unit,
             bottomBar: @Composable () -> Unit,
             sideNavigation: @Composable () -> Unit,
+            sideNavigationLayout: SideNavigationLayout,
             snackbarHost: @Composable () -> Unit,
             floatingActionButton: @Composable () -> Unit,
             floatingActionButtonPosition: FloatingActionButtonPosition,
@@ -85,10 +103,15 @@ object StyledScaffoldDefaults {
  * Slots are composed directly by the renderer. Keep state that must survive renderer changes
  * above this Scaffold; remembered slot state is not transferred between implementations.
  *
- * Bars handle their own insets. Content receives padding for bars, navigation and remaining
- * [contentWindowInsets]; apply it and consume it on the content root to protect nested layouts.
- * Side navigation is positioned at the start edge and handles its start safe-area inset itself,
- * while the scaffold consumes the top and bottom padding for the bars.
+ * The scaffold reserves space for its bars and side navigation and includes the remaining
+ * [contentWindowInsets] in the content padding; apply and consume that padding on the content
+ * root to protect nested layouts. [StyledTopBar] and [StyledBottomNavigationBar] handle their
+ * own insets by default; custom bar slots must handle their insets themselves.
+ * [SideNavigationLayout] configures the top and bottom edges independently. The defaults,
+ * [SideNavigationLayout.TopBehavior.BelowTopBar] and
+ * [SideNavigationLayout.BottomBehavior.AboveBottomBar], place side navigation between the bars.
+ * The corresponding `Beside` behaviors extend it to that scaffold edge and place that bar in the
+ * remaining width.
  *
  * A typical scaffold with a top bar and bottom navigation can style both system bars from the
  * colors drawn behind them:
@@ -136,6 +159,8 @@ fun StyledScaffold(
     contentColor: Color = StyledTheme.contentColorFor(containerColor),
     contentWindowInsets: WindowInsets = StyledScaffoldDefaults.contentWindowInsets,
     sideNavigation: @Composable () -> Unit = {},
+    sideNavigationLayout: StyledScaffold.SideNavigationLayout =
+        StyledScaffold.SideNavigationLayout(),
     content: @Composable (PaddingValues) -> Unit,
 ) {
     LocalStyledRegistry.current[StyledScaffold.Key].Render(
@@ -143,6 +168,7 @@ fun StyledScaffold(
         topBar = topBar,
         bottomBar = bottomBar,
         sideNavigation = sideNavigation,
+        sideNavigationLayout = sideNavigationLayout,
         snackbarHost = snackbarHost,
         floatingActionButton = floatingActionButton,
         floatingActionButtonPosition = floatingActionButtonPosition,

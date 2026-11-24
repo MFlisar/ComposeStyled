@@ -118,6 +118,8 @@ internal fun DemoRecipeAppTemplate(
     val primaryToolbar = rememberSaveable { mutableStateOf(true) }
     val translucentToolbar = rememberSaveable { mutableStateOf(false) }
     val showNavigation = rememberSaveable { mutableStateOf(true) }
+    val sideNavigationBesideTopBar = rememberSaveable { mutableStateOf(false) }
+    val sideNavigationBesideBottomBar = rememberSaveable { mutableStateOf(false) }
     val primaryNavigation = rememberSaveable { mutableStateOf(false) }
     val translucentBottomNavigation = rememberSaveable { mutableStateOf(false) }
     val selectedDestination = rememberSaveable { mutableStateOf(0) }
@@ -169,6 +171,8 @@ internal fun DemoRecipeAppTemplate(
                     primaryToolbar = primaryToolbar,
                     translucentToolbar = translucentToolbar,
                     showNavigation = showNavigation,
+                    sideNavigationBesideTopBar = sideNavigationBesideTopBar,
+                    sideNavigationBesideBottomBar = sideNavigationBesideBottomBar,
                     primaryNavigation = primaryNavigation,
                     translucentBottomNavigation = translucentBottomNavigation,
                 )
@@ -180,6 +184,8 @@ internal fun DemoRecipeAppTemplate(
                 navigationItems = navigationItems,
                 selectedDestination = selectedDestination,
                 sideNavigationExpanded = sideNavigationExpanded,
+                sideNavigationBesideTopBar = sideNavigationBesideTopBar,
+                sideNavigationBesideBottomBar = sideNavigationBesideBottomBar,
                 showToolbar = showToolbar,
                 expandableToolbar = expandableToolbar,
                 toolbarScrollBehavior = toolbarScrollBehavior,
@@ -284,6 +290,8 @@ private fun AdaptiveScaffoldDemo(
     navigationItems: List<StyledNavigationItem<Int>>,
     selectedDestination: MutableState<Int>,
     sideNavigationExpanded: MutableState<Boolean>,
+    sideNavigationBesideTopBar: MutableState<Boolean>,
+    sideNavigationBesideBottomBar: MutableState<Boolean>,
     showToolbar: MutableState<Boolean>,
     expandableToolbar: MutableState<Boolean>,
     toolbarScrollBehavior: StyledExpandableTopBarScrollBehavior,
@@ -323,6 +331,18 @@ private fun AdaptiveScaffoldDemo(
         platform = platform,
         state = scaffoldState,
         sideNavigationExpanded = sideNavigationExpanded,
+        sideNavigationLayout = StyledScaffold.SideNavigationLayout(
+            topBehavior = if (sideNavigationBesideTopBar.value) {
+                StyledScaffold.SideNavigationLayout.TopBehavior.BesideTopBar
+            } else {
+                StyledScaffold.SideNavigationLayout.TopBehavior.BelowTopBar
+            },
+            bottomBehavior = if (sideNavigationBesideBottomBar.value) {
+                StyledScaffold.SideNavigationLayout.BottomBehavior.BesideBottomBar
+            } else {
+                StyledScaffold.SideNavigationLayout.BottomBehavior.AboveBottomBar
+            },
+        ),
         modifier = Modifier
             .fillMaxSize()
             .then(
@@ -386,6 +406,8 @@ private fun TemplateContent(
     primaryToolbar: MutableState<Boolean>,
     translucentToolbar: MutableState<Boolean>,
     showNavigation: MutableState<Boolean>,
+    sideNavigationBesideTopBar: MutableState<Boolean>,
+    sideNavigationBesideBottomBar: MutableState<Boolean>,
     primaryNavigation: MutableState<Boolean>,
     translucentBottomNavigation: MutableState<Boolean>,
 ) {
@@ -440,6 +462,8 @@ private fun TemplateContent(
                     primaryToolbar = primaryToolbar,
                     translucentToolbar = translucentToolbar,
                     showNavigation = showNavigation,
+                    sideNavigationBesideTopBar = sideNavigationBesideTopBar,
+                    sideNavigationBesideBottomBar = sideNavigationBesideBottomBar,
                     primaryNavigation = primaryNavigation,
                     translucentBottomNavigation = translucentBottomNavigation,
                     contentPadding = contentPadding,
@@ -529,6 +553,8 @@ private fun SubPageStyling(
     primaryToolbar: MutableState<Boolean>,
     translucentToolbar: MutableState<Boolean>,
     showNavigation: MutableState<Boolean>,
+    sideNavigationBesideTopBar: MutableState<Boolean>,
+    sideNavigationBesideBottomBar: MutableState<Boolean>,
     primaryNavigation: MutableState<Boolean>,
     translucentBottomNavigation: MutableState<Boolean>,
     contentPadding: PaddingValues,
@@ -562,6 +588,15 @@ private fun SubPageStyling(
                         translucentToolbar,
                     )
                     TemplateSwitchRow("Show navigation", showNavigation)
+                    TemplateSwitchRow("Side navigation beside top bar", sideNavigationBesideTopBar)
+                    TemplateSwitchRow(
+                        "Side navigation beside bottom bar",
+                        sideNavigationBesideBottomBar,
+                    )
+                    StyledText(
+                        "These options are independent and only affect adaptive side navigation. " +
+                                "When enabled, that bar starts beside the sidebar.",
+                    )
                     TemplateSwitchRow("Primary navigation", primaryNavigation)
                     TemplateSwitchRow(
                         "Semi-transparent bottom navigation + content behind",
@@ -608,7 +643,10 @@ private fun TemplateSwitchRow(
     label: String,
     checked: MutableState<Boolean>,
 ) {
-    Row(horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium)) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         StyledText(
             modifier = Modifier.weight(1f),
             text = label,

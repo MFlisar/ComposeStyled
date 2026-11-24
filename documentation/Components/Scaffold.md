@@ -87,10 +87,17 @@ The Foundation Scaffold also incorporates the styled horizontal
 content padding. No additional generic emphasis variants or duplicate
 customization objects are required for these containers.
 
-Use `sideNavigation` for logical-start navigation between the top and bottom
-bars. This replaces the former rail slot. Its measured width is included in
-body padding on every animation frame, so expanded side navigation reserves
-the correct content space. FABs and snackbars retain Scaffold-wide placement.
+Use `sideNavigation` for logical-start navigation. This replaces the former rail
+slot. `SideNavigationLayout` configures the top and bottom edges independently.
+By default, the sidebar starts below the top bar and ends above the bottom bar;
+both bars span the full width. Set `topBehavior = BesideTopBar` or
+`bottomBehavior = BesideBottomBar` to extend the sidebar to that scaffold edge
+and place the corresponding bar beside it. `StyledSideNavigation` pads its
+content only for the system safe areas at those extended edges, not for the
+adjacent bars. Its measured width is
+included in body padding on every animation frame, so expanded side navigation
+reserves the correct content space. FABs and snackbars retain Scaffold-wide
+placement.
 See [Side navigation](SideNavigation.md) for modes, fixed slots and scrolling.
 
 ## Scrolling behind semi-transparent bars
@@ -120,11 +127,15 @@ the target device.
 
 ## Safe areas and inset ownership
 
-`StyledTopBar` and `StyledCenterAlignedTopBar` handle top and horizontal
-`WindowInsets.safeDrawing` by default. `StyledBottomNavigationBar` handles bottom
-and horizontal safe-area insets. Their backgrounds extend behind those insets,
-while their controls are padded and the insets are consumed for their descendants.
-Custom bars must provide their own inset handling.
+`StyledTopBar`, `StyledCenterAlignedTopBar` and `StyledExpandableTopBar` handle
+top and horizontal `WindowInsets.safeDrawing` by default. When
+`BesideTopBar` is active, Scaffold consumes the logical-start safe inset on the
+top-bar slot because the sidebar already covers that area; the top and
+logical-end insets remain. `BesideBottomBar` applies the same consumption to
+the bottom-bar slot. This uses standard `consumeWindowInsets` behavior, so the
+bar renderers need no special inset override. Bar backgrounds extend behind
+their insets, while controls are padded and the insets are consumed for
+descendants. Custom bars must provide their own inset handling.
 
 Scaffold uses the measured bars, including their inset padding, to reserve space.
 Without bars, `contentWindowInsets` supplies safe-area padding instead.
@@ -134,11 +145,15 @@ parent are excluded. This applies to Android system bars/cutouts and iOS safe
 areas as provided by the host; it does not enable edge-to-edge or configure the
 native host.
 
-The side-navigation slot is positioned inside the reserved area and consumes the
-offsets already covered by that placement, only for its own descendants.
-`StyledSideNavigation` therefore does not add the same safe-area padding twice.
-No padding argument is needed for the bar or side-navigation slots; content
-continues receiving `PaddingValues` to apply explicitly.
+By default, the side-navigation slot is measured between the bars. Each `Beside`
+behavior extends it to that scaffold edge. At an extended edge, the scaffold
+preserves the sidebar's safe-area inset so its content stays clear of system
+bars while its background extends behind them. On an edge where the sidebar is
+below or above a bar, Scaffold consumes the space already reserved outside the
+sidebar, avoiding duplicate inset padding. The adjacent toolbar or bottom bar
+does not add vertical padding to the sidebar. Its default insets also preserve
+the logical-start safe area. Content continues receiving `PaddingValues` to
+apply explicitly.
 
 Insets can be overridden independently: `contentWindowInsets = WindowInsets(0, 0, 0, 0)`
 disables Scaffold's own safe-area contribution, not the bars' own `windowInsets`.

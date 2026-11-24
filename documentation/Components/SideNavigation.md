@@ -178,11 +178,17 @@ Pass a `ScrollState` to control or preserve position. `showScrollbar` defaults
 to the desktop/web platform preference and is independent of scrolling:
 `showScrollbar = false` keeps touch and wheel scrolling available.
 
-Scaffold places `sideNavigation` at logical start (left in LTR, right in RTL),
-between the top and bottom bars. Body padding follows its measured width,
-including intermediate animation widths. Apply that padding to body content.
-No extra system-bar padding is needed for navigation inside Scaffold; FABs and
-snackbars remain Scaffold-wide overlays.
+Scaffold places `sideNavigation` at logical start (left in LTR, right in RTL).
+`SideNavigationLayout.topBehavior` and `.bottomBehavior` configure each edge
+independently. The defaults, `BelowTopBar` and `AboveBottomBar`, place the
+sidebar between the bars, which span the full width. `BesideTopBar` and
+`BesideBottomBar` extend the sidebar to the corresponding scaffold edge and
+place that bar in the remaining width. Scaffold consumes safe insets within
+each bar slot's descendants when the sidebar occupies that logical-start safe
+area. The sidebar retains safe-area padding at extended edges and does not add
+the adjacent bar's height to its content padding. Body padding follows the
+navigation's measured width, including intermediate animation widths; apply
+that padding to body content. FABs and snackbars remain Scaffold-wide overlays.
 
 ### Safe-area insets
 
@@ -198,11 +204,13 @@ describe the navigation area before additional horizontal inset padding; a
 remaining start inset increases the total measured width rather than reducing
 the space available for labels. Already consumed insets are not applied again.
 
-Inside Scaffold, placement already reserves space between bars and within the
-Scaffold's inset area. Scaffold consumes those covered offsets for the navigation
-slot, leaving side navigation to handle only any remaining requested insets.
-The body padding still includes its entire measured width, including any
-remaining inset padding and intermediate animation widths.
+When an edge is extended, the navigation keeps its normal safe-area insets so
+its content stays clear of system bars while its background extends behind
+them. At a non-extended edge, Scaffold consumes the space reserved before the
+sidebar within its descendants, preventing the default safe inset from being
+applied twice. Explicit `windowInsets` values follow the same ancestor
+consumption rules. Body padding includes the navigation's full measured width
+and intermediate animation widths.
 
 To disable the navigation's own inset handling, for example in an embedded
 component preview, pass `windowInsets = WindowInsets(0, 0, 0, 0)`. This is independent

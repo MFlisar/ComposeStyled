@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.Color
 import com.michaelflisar.composestyled.material3.ProvideStyledLocals
 import com.michaelflisar.composestyled.ui.layout.StyledScaffold
 import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
+import com.michaelflisar.composestyled.foundation.layout.FoundationScaffoldLayout
 import com.michaelflisar.composestyled.foundation.layout.FoundationScaffoldSideNavigationLayout
 
 class Material3Scaffold internal constructor() : StyledScaffold.Implementation {
@@ -37,6 +38,7 @@ class Material3Scaffold internal constructor() : StyledScaffold.Implementation {
         topBar: @Composable () -> Unit,
         bottomBar: @Composable () -> Unit,
         sideNavigation: @Composable () -> Unit,
+        sideNavigationLayout: StyledScaffold.SideNavigationLayout,
         snackbarHost: @Composable () -> Unit,
         floatingActionButton: @Composable () -> Unit,
         floatingActionButtonPosition: StyledScaffold.FloatingActionButtonPosition,
@@ -50,25 +52,46 @@ class Material3Scaffold internal constructor() : StyledScaffold.Implementation {
             StyledScaffold.FloatingActionButtonPosition.Center -> FabPosition.Center
             StyledScaffold.FloatingActionButtonPosition.End -> FabPosition.End
         }
+        val sideNavigationBesideBars =
+            sideNavigationLayout.topBehavior ==
+                StyledScaffold.SideNavigationLayout.TopBehavior.BesideTopBar ||
+                sideNavigationLayout.bottomBehavior ==
+                StyledScaffold.SideNavigationLayout.BottomBehavior.BesideBottomBar
         ProvideStyledLocals(contentColor = contentColor) {
-            Scaffold(
-                modifier = modifier,
-                topBar = topBar,
-                bottomBar = bottomBar,
-                snackbarHost = snackbarHost,
-                floatingActionButton = floatingActionButton,
-                floatingActionButtonPosition = fabPosition,
-                containerColor = containerColor,
-                contentColor = contentColor,
-                contentWindowInsets = contentWindowInsets,
-                content = { padding ->
-                    FoundationScaffoldSideNavigationLayout(
-                        padding = padding,
-                        sideNavigation = sideNavigation,
-                        content = content,
-                    )
-                },
-            )
+            if (sideNavigationBesideBars) {
+                FoundationScaffoldLayout(
+                    modifier = modifier,
+                    topBar = topBar,
+                    bottomBar = bottomBar,
+                    sideNavigation = sideNavigation,
+                    sideNavigationLayout = sideNavigationLayout,
+                    snackbarHost = snackbarHost,
+                    floatingActionButton = floatingActionButton,
+                    floatingActionButtonPosition = floatingActionButtonPosition,
+                    containerColor = containerColor,
+                    contentWindowInsets = contentWindowInsets,
+                    content = content,
+                )
+            } else {
+                Scaffold(
+                    modifier = modifier,
+                    topBar = topBar,
+                    bottomBar = bottomBar,
+                    snackbarHost = snackbarHost,
+                    floatingActionButton = floatingActionButton,
+                    floatingActionButtonPosition = fabPosition,
+                    containerColor = containerColor,
+                    contentColor = contentColor,
+                    contentWindowInsets = contentWindowInsets,
+                    content = { padding ->
+                        FoundationScaffoldSideNavigationLayout(
+                            padding = padding,
+                            sideNavigation = sideNavigation,
+                            content = content,
+                        )
+                    },
+                )
+            }
         }
     }
 }

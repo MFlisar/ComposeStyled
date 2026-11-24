@@ -148,9 +148,8 @@ fun StyledSideNavigation(
     title: @Composable (() -> Unit)? = null,
     header: @Composable (() -> Unit)? = null,
     footer: @Composable (() -> Unit)? = null,
-    windowInsets: WindowInsets = WindowInsets.safeDrawing.only(
-        WindowInsetsSides.Vertical + WindowInsetsSides.Start
-    ),
+    windowInsets: WindowInsets =
+        WindowInsets.safeDrawing.only(WindowInsetsSides.Vertical + WindowInsetsSides.Start),
     toggleIcon: @Composable (StyledSideNavigation.ToggleState) -> Unit = { StyledSideNavigationDefaults.ToggleIcon(it) },
     content: @Composable ColumnScope.() -> Unit,
 ) = StyledSideNavigation(
@@ -190,9 +189,8 @@ fun StyledSideNavigation(
     title: @Composable (() -> Unit)? = null,
     header: @Composable (() -> Unit)? = null,
     footer: @Composable (() -> Unit)? = null,
-    windowInsets: WindowInsets = WindowInsets.safeDrawing.only(
-        WindowInsetsSides.Vertical + WindowInsetsSides.Start
-    ),
+    windowInsets: WindowInsets =
+        WindowInsets.safeDrawing.only(WindowInsetsSides.Vertical + WindowInsetsSides.Start),
     toggleIcon: @Composable (StyledSideNavigation.ToggleState) -> Unit = { StyledSideNavigationDefaults.ToggleIcon(it) },
     content: @Composable ColumnScope.() -> Unit,
 ) {
@@ -244,9 +242,8 @@ fun <K> StyledSideNavigation(
     title: @Composable (() -> Unit)? = null,
     header: @Composable (() -> Unit)? = null,
     footer: @Composable (() -> Unit)? = null,
-    windowInsets: WindowInsets = WindowInsets.safeDrawing.only(
-        WindowInsetsSides.Vertical + WindowInsetsSides.Start
-    ),
+    windowInsets: WindowInsets =
+        WindowInsets.safeDrawing.only(WindowInsetsSides.Vertical + WindowInsetsSides.Start),
     toggleIcon: @Composable (StyledSideNavigation.ToggleState) -> Unit = { StyledSideNavigationDefaults.ToggleIcon(it) },
 ) = StyledSideNavigation(
     items = items,
@@ -290,9 +287,8 @@ fun <K> StyledSideNavigation(
     title: @Composable (() -> Unit)? = null,
     header: @Composable (() -> Unit)? = null,
     footer: @Composable (() -> Unit)? = null,
-    windowInsets: WindowInsets = WindowInsets.safeDrawing.only(
-        WindowInsetsSides.Vertical + WindowInsetsSides.Start
-    ),
+    windowInsets: WindowInsets =
+        WindowInsets.safeDrawing.only(WindowInsetsSides.Vertical + WindowInsetsSides.Start),
     toggleIcon: @Composable (StyledSideNavigation.ToggleState) -> Unit = { StyledSideNavigationDefaults.ToggleIcon(it) },
 ) {
     StyledSideNavigation(

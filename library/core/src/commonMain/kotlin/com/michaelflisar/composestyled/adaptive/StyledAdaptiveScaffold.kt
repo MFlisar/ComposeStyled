@@ -79,6 +79,8 @@ fun <T> StyledAdaptiveScaffold(
     navigationContainerColor: Color = StyledTheme.colorScheme.surfaceVariant,
     navigationContentColor: Color = StyledTheme.contentColorFor(containerColor),
     sideNavigationExpanded: MutableState<Boolean> = remember { mutableStateOf(false) },
+    sideNavigationLayout: StyledScaffold.SideNavigationLayout =
+        StyledScaffold.SideNavigationLayout(),
     state: StyledAdaptiveScaffoldState = remember { StyledAdaptiveScaffoldState() },
     sideNavigationToggleIcon: @Composable (StyledSideNavigation.ToggleState) -> Unit = {
         StyledSideNavigationDefaults.ToggleIcon(it)
@@ -138,6 +140,7 @@ fun <T> StyledAdaptiveScaffold(
                     )
                 }
             },
+            sideNavigationLayout = sideNavigationLayout,
             snackbarHost = snackbarHost,
             floatingActionButton = floatingActionButton,
             floatingActionButtonPosition = floatingActionButtonPosition,
@@ -180,6 +183,8 @@ fun StyledAdaptiveScaffold(
         },
     state: StyledAdaptiveScaffoldState = remember { StyledAdaptiveScaffoldState() },
     sideNavigationExpanded: MutableState<Boolean> = remember { mutableStateOf(false) },
+    sideNavigationLayout: StyledScaffold.SideNavigationLayout =
+        StyledScaffold.SideNavigationLayout(),
     collapseSideNavigationOnModeChange: Boolean = true,
     navigation: @Composable (navigationMode: StyledNavigationMode) -> Unit,
     content: @Composable (PaddingValues, State<StyledAdaptiveInfo>) -> Unit,
@@ -216,6 +221,7 @@ fun StyledAdaptiveScaffold(
                     navigation(navigationMode)
                 }
             },
+            sideNavigationLayout = sideNavigationLayout,
             snackbarHost = snackbarHost,
             floatingActionButton = floatingActionButton,
             floatingActionButtonPosition = floatingActionButtonPosition,
