@@ -120,12 +120,6 @@ fun createDemoAreas(
                         )
                     },
                     { baseId, expandState ->
-                        com.michaelflisar.demo.demos.showcase.areas.DemoDateTimePickers(
-                            baseId,
-                            expandState
-                        )
-                    },
-                    { baseId, expandState ->
                         com.michaelflisar.demo.demos.showcase.areas.DemoDropdowns(
                             baseId,
                             expandState
