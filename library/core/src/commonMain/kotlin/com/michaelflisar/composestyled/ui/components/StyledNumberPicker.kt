@@ -190,9 +190,439 @@ fun <T : Number> StyledOutlinedNumberPicker(
     )
 }
 
+/** State-backed numeric stepper that treats `null` as an unset value. */
+@Composable
+fun <T : Number> StyledOptionalNumberPicker(
+    value: MutableState<T?>,
+    validator: Validator<T>,
+    parser: NumberParser<T>,
+    initialValue: T = parser.zero
+        ?: error("Pass initialValue when the NumberParser does not define zero."),
+    modifier: Modifier = Modifier,
+    label: String = "",
+    placeholder: @Composable (() -> Unit)? = null,
+    enabled: Boolean = true,
+    showButtons: Boolean = true,
+    showClearButton: Boolean = true,
+    overrun: Pair<T, T>? = null,
+    allowManualInput: Boolean = true,
+    clearFocusOnButtonPress: Boolean = true,
+    textStyle: TextStyle = StyledTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center),
+    prefix: @Composable (() -> Unit)? = null,
+    suffix: @Composable (() -> Unit)? = null,
+    onCurrentValueIsInvalid: (text: String) -> Unit = {},
+    variant: StyledInput.Variant = StyledInput.Variant.Auto,
+) {
+    StyledOptionalNumberPicker(
+        value = value.value,
+        validator = validator,
+        parser = parser,
+        initialValue = initialValue,
+        onValueChange = { value.value = it },
+        modifier = modifier,
+        label = label,
+        placeholder = placeholder,
+        enabled = enabled,
+        showButtons = showButtons,
+        showClearButton = showClearButton,
+        overrun = overrun,
+        allowManualInput = allowManualInput,
+        clearFocusOnButtonPress = clearFocusOnButtonPress,
+        textStyle = textStyle,
+        prefix = prefix,
+        suffix = suffix,
+        onCurrentValueIsInvalid = onCurrentValueIsInvalid,
+        variant = variant,
+    )
+}
+
+/** Controlled numeric stepper that treats `null` as an unset value. */
+@Composable
+fun <T : Number> StyledOptionalNumberPicker(
+    value: T?,
+    validator: Validator<T>,
+    parser: NumberParser<T>,
+    initialValue: T = parser.zero
+        ?: error("Pass initialValue when the NumberParser does not define zero."),
+    onValueChange: (T?) -> Unit = {},
+    modifier: Modifier = Modifier,
+    label: String = "",
+    placeholder: @Composable (() -> Unit)? = null,
+    enabled: Boolean = true,
+    showButtons: Boolean = true,
+    showClearButton: Boolean = true,
+    overrun: Pair<T, T>? = null,
+    allowManualInput: Boolean = true,
+    clearFocusOnButtonPress: Boolean = true,
+    textStyle: TextStyle = StyledTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center),
+    prefix: @Composable (() -> Unit)? = null,
+    suffix: @Composable (() -> Unit)? = null,
+    onCurrentValueIsInvalid: (text: String) -> Unit = {},
+    variant: StyledInput.Variant = StyledInput.Variant.Auto,
+) = StyledOptionalNumberPickerImpl(
+    value = value,
+    validator = validator,
+    parser = parser,
+    initialValue = initialValue,
+    onValueChange = onValueChange,
+    modifier = modifier,
+    label = label,
+    placeholder = placeholder,
+    enabled = enabled,
+    showButtons = showButtons,
+    showClearButton = showClearButton,
+    overrun = overrun,
+    allowManualInput = allowManualInput,
+    clearFocusOnButtonPress = clearFocusOnButtonPress,
+    textStyle = textStyle,
+    prefix = prefix,
+    suffix = suffix,
+    onCurrentValueIsInvalid = onCurrentValueIsInvalid,
+    variant = variant,
+)
+
+/** State-backed optional numeric stepper with a fixed outlined input style. */
+@Composable
+fun <T : Number> StyledOutlinedOptionalNumberPicker(
+    value: MutableState<T?>,
+    validator: Validator<T>,
+    parser: NumberParser<T>,
+    initialValue: T = parser.zero
+        ?: error("Pass initialValue when the NumberParser does not define zero."),
+    modifier: Modifier = Modifier,
+    label: String = "",
+    placeholder: @Composable (() -> Unit)? = null,
+    enabled: Boolean = true,
+    showButtons: Boolean = true,
+    showClearButton: Boolean = true,
+    overrun: Pair<T, T>? = null,
+    allowManualInput: Boolean = true,
+    clearFocusOnButtonPress: Boolean = true,
+    textStyle: TextStyle = StyledTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center),
+    prefix: @Composable (() -> Unit)? = null,
+    suffix: @Composable (() -> Unit)? = null,
+    onCurrentValueIsInvalid: (text: String) -> Unit = {},
+) {
+    StyledOutlinedOptionalNumberPicker(
+        value = value.value,
+        validator = validator,
+        parser = parser,
+        initialValue = initialValue,
+        onValueChange = { value.value = it },
+        modifier = modifier,
+        label = label,
+        placeholder = placeholder,
+        enabled = enabled,
+        showButtons = showButtons,
+        showClearButton = showClearButton,
+        overrun = overrun,
+        allowManualInput = allowManualInput,
+        clearFocusOnButtonPress = clearFocusOnButtonPress,
+        textStyle = textStyle,
+        prefix = prefix,
+        suffix = suffix,
+        onCurrentValueIsInvalid = onCurrentValueIsInvalid,
+    )
+}
+
+/** Controlled optional numeric stepper with a fixed outlined input style. */
+@Composable
+fun <T : Number> StyledOutlinedOptionalNumberPicker(
+    value: T?,
+    validator: Validator<T>,
+    parser: NumberParser<T>,
+    initialValue: T = parser.zero
+        ?: error("Pass initialValue when the NumberParser does not define zero."),
+    onValueChange: (T?) -> Unit = {},
+    modifier: Modifier = Modifier,
+    label: String = "",
+    placeholder: @Composable (() -> Unit)? = null,
+    enabled: Boolean = true,
+    showButtons: Boolean = true,
+    showClearButton: Boolean = true,
+    overrun: Pair<T, T>? = null,
+    allowManualInput: Boolean = true,
+    clearFocusOnButtonPress: Boolean = true,
+    textStyle: TextStyle = StyledTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center),
+    prefix: @Composable (() -> Unit)? = null,
+    suffix: @Composable (() -> Unit)? = null,
+    onCurrentValueIsInvalid: (text: String) -> Unit = {},
+) {
+    StyledOptionalNumberPickerImpl(
+        value = value,
+        validator = validator,
+        parser = parser,
+        initialValue = initialValue,
+        onValueChange = onValueChange,
+        modifier = modifier,
+        label = label,
+        placeholder = placeholder,
+        enabled = enabled,
+        showButtons = showButtons,
+        showClearButton = showClearButton,
+        overrun = overrun,
+        allowManualInput = allowManualInput,
+        clearFocusOnButtonPress = clearFocusOnButtonPress,
+        textStyle = textStyle,
+        prefix = prefix,
+        suffix = suffix,
+        onCurrentValueIsInvalid = onCurrentValueIsInvalid,
+        variant = StyledInput.Variant.Outlined,
+    )
+}
+
 // -------------------------
 // private API
 // -------------------------
+
+@Composable
+@OptIn(InternalComposeStyledApi::class)
+private fun <T : Number> StyledOptionalNumberPickerImpl(
+    value: T?,
+    validator: Validator<T>,
+    parser: NumberParser<T>,
+    initialValue: T,
+    onValueChange: (T?) -> Unit = {},
+    modifier: Modifier = Modifier,
+    label: String = "",
+    placeholder: @Composable (() -> Unit)? = null,
+    enabled: Boolean = true,
+    showButtons: Boolean = true,
+    showClearButton: Boolean = true,
+    overrun: Pair<T, T>? = null,
+    allowManualInput: Boolean = true,
+    clearFocusOnButtonPress: Boolean = true,
+    textStyle: TextStyle = StyledTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center),
+    prefix: @Composable (() -> Unit)? = null,
+    suffix: @Composable (() -> Unit)? = null,
+    onCurrentValueIsInvalid: (text: String) -> Unit = {},
+    variant: StyledInput.Variant = StyledInput.Variant.Auto,
+) {
+    NumberUtil.requireSupported(initialValue)
+    val normalizedInitialValue = parser.normalize(initialValue)
+    NumberUtil.requireSupported(normalizedInitialValue)
+    val normalizedValue = value?.let { parser.normalize(it) }
+    normalizedValue?.let { NumberUtil.requireSupported(it) }
+
+    var currentValue by rememberSaveable { mutableStateOf<T?>(normalizedValue) }
+    var inputText by rememberSaveable {
+        mutableStateOf(normalizedValue?.let { parser.format(it) } ?: "")
+    }
+    var lastEmittedValue by rememberSaveable { mutableStateOf<T?>(null) }
+    var hasEmittedValue by rememberSaveable { mutableStateOf(false) }
+    var lastExternalValue by rememberSaveable { mutableStateOf<T?>(normalizedValue) }
+    var lastExternalText by rememberSaveable {
+        mutableStateOf(normalizedValue?.let { parser.format(it) } ?: "")
+    }
+    var parseError by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(normalizedValue, parser, validator) {
+        val formattedValue = normalizedValue?.let { parser.format(it) } ?: ""
+        if (lastExternalValue != normalizedValue || lastExternalText != formattedValue) {
+            if (!(hasEmittedValue && lastEmittedValue == normalizedValue)) {
+                inputText = formattedValue
+                parseError = false
+            }
+            lastEmittedValue = null
+            hasEmittedValue = false
+            lastExternalValue = normalizedValue
+            lastExternalText = formattedValue
+        }
+        currentValue = normalizedValue
+        if (normalizedValue == null) {
+            validator.clear()
+        } else {
+            validator.update(normalizedValue)
+        }
+    }
+
+    val focusManager = LocalFocusManager.current
+    val validationError = validator.error.value
+
+    fun canChange(next: T): Boolean = validator.check(
+        value = parser.normalize(next),
+        updateError = false,
+    )
+
+    fun updateValue(next: T?, clearFocus: Boolean = true) {
+        if (next == null) {
+            currentValue = null
+            parseError = false
+            inputText = ""
+            lastEmittedValue = null
+            hasEmittedValue = true
+            validator.clear()
+            onValueChange(null)
+        } else {
+            val normalized = parser.normalize(next)
+            if (!validator.check(normalized)) return
+
+            currentValue = normalized
+            parseError = false
+            inputText = parser.format(normalized)
+            lastEmittedValue = normalized
+            hasEmittedValue = true
+            onValueChange(normalized)
+        }
+        if (clearFocus && clearFocusOnButtonPress) {
+            focusManager.clearFocus()
+        }
+    }
+
+    fun decrease() {
+        val candidate = parser.normalize(
+            currentValue?.let { parser.decrement(it) }
+                ?: parser.decrement(normalizedInitialValue)
+        )
+        val next = if (overrun != null && !canChange(candidate)) {
+            parser.normalize(overrun.second)
+        } else {
+            candidate
+        }
+        updateValue(next)
+    }
+
+    fun increase() {
+        val candidate = parser.normalize(
+            currentValue?.let { parser.increment(it) } ?: normalizedInitialValue
+        )
+        val next = if (overrun != null && !canChange(candidate)) {
+            parser.normalize(overrun.first)
+        } else {
+            candidate
+        }
+        updateValue(next)
+    }
+
+    val leadingIcon: @Composable (() -> Unit)? =
+        if (showButtons || prefix != null) {
+            {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (showButtons) {
+                        val candidate = parser.normalize(
+                            currentValue?.let { parser.decrement(it) }
+                                ?: parser.decrement(normalizedInitialValue)
+                        )
+                        PickerButton(
+                            onClick = ::decrease,
+                            enabled = enabled && (
+                                overrun != null || canChange(candidate)
+                            ),
+                            label = "Decrease",
+                            icon = StyledIcons.Remove,
+                        )
+                    }
+                    prefix?.invoke()
+                }
+            }
+        } else {
+            null
+        }
+
+    val trailingIcon: @Composable (() -> Unit)? =
+        if (showButtons || showClearButton && currentValue != null || suffix != null) {
+            {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    suffix?.invoke()
+                    if (showClearButton && currentValue != null) {
+                        StyledInputAction(
+                            icon = StyledIcons.Clear,
+                            contentDescription = "Clear value",
+                            onClick = { updateValue(null) },
+                            enabled = enabled,
+                        )
+                    }
+                    if (showButtons) {
+                        val candidate = parser.normalize(
+                            currentValue?.let { parser.increment(it) } ?: normalizedInitialValue
+                        )
+                        PickerButton(
+                            onClick = ::increase,
+                            enabled = enabled && (
+                                overrun != null || canChange(candidate)
+                            ),
+                            label = "Increase",
+                            icon = StyledIcons.Add,
+                        )
+                    }
+                }
+            }
+        } else {
+            null
+        }
+
+    val styledLabel: @Composable (() -> Unit)? = if (label.isNotEmpty()) {
+        { StyledText(label) }
+    } else {
+        null
+    }
+    val supportingText: (@Composable () -> Unit)? = if (validationError != null) {
+        {
+            AnimatedVisibility(visible = enabled && !validator.isValid.value) {
+                StyledText(
+                    text = validationError,
+                    textAlign = TextAlign.Center,
+                )
+            }
+        }
+    } else {
+        null
+    }
+
+    val onInputValueChange: (String) -> Unit = { text ->
+        if (text.isBlank()) {
+            updateValue(null, clearFocus = false)
+        } else {
+            inputText = text
+            val parsed = parser.parse(text)?.let { parser.normalize(it) }
+            if (parsed == null) {
+                parseError = true
+                lastEmittedValue = null
+                hasEmittedValue = false
+                validator.clear()
+                onCurrentValueIsInvalid(text)
+            } else if (validator.check(parsed)) {
+                parseError = false
+                currentValue = parsed
+                lastEmittedValue = parsed
+                hasEmittedValue = true
+                onValueChange(parsed)
+            } else {
+                parseError = false
+                lastEmittedValue = null
+                hasEmittedValue = false
+                onCurrentValueIsInvalid(text)
+            }
+        }
+    }
+
+    CompositionLocalProvider(LocalStyledContext provides StyledInput.Context.NumberPicker) {
+        StyledInput(
+            value = inputText,
+            onValueChange = onInputValueChange,
+            modifier = modifier,
+            variant = variant,
+            enabled = enabled,
+            readOnly = !allowManualInput,
+            interactionEnabled = enabled,
+            isError = parseError || !validator.isValid.value,
+            errorMessage = validationError,
+            keyboardOptions = KeyboardOptions.Default.copy(
+                keyboardType = if (NumberUtil.supportsDecimal(normalizedInitialValue)) {
+                    KeyboardType.Decimal
+                } else {
+                    KeyboardType.Number
+                }
+            ),
+            textStyle = textStyle,
+            label = styledLabel,
+            placeholder = placeholder,
+            leadingIcon = leadingIcon,
+            trailingIcon = trailingIcon,
+            supportingText = supportingText,
+        )
+    }
+}
 
 @Composable
 @OptIn(InternalComposeStyledApi::class)

@@ -9,6 +9,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.ui.components.StyledNumberPicker
+import com.michaelflisar.composestyled.ui.components.StyledOptionalNumberPicker
 import com.michaelflisar.composestyled.ui.components.StyledOutlinedNumberPicker
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.utils.ExpandState
@@ -22,6 +23,7 @@ import com.michaelflisar.demo.helper.SubTitle
 internal fun DemoNumberPicker(baseId: Int, expandState: ExpandState) {
     val quantity = rememberSaveable { mutableStateOf(5) }
     val buttonOnlyQuantity = rememberSaveable { mutableStateOf(5) }
+    val optionalQuantity = rememberSaveable { mutableStateOf<Int?>(null) }
     val decimal = rememberSaveable { mutableStateOf(2.5) }
     val integerParser = rememberNumberParser(sample = 0, stepSize = 1)
     val decimalParser = rememberNumberParser(sample = 0.0, stepSize = 0.25, commas = 2)
@@ -43,8 +45,21 @@ internal fun DemoNumberPicker(baseId: Int, expandState: ExpandState) {
             }
         }
     }
+    val optionalQuantityValidation = remember {
+        { candidate: Int? ->
+            if (candidate != null && candidate !in 0..10) {
+                ValidationResult.Invalid("Enter a value between 0 and 10")
+            } else {
+                ValidationResult.Valid
+            }
+        }
+    }
     val quantityValidator = rememberValidator(quantity.value, quantityValidation)
     val buttonOnlyQuantityValidator = rememberValidator(buttonOnlyQuantity.value, quantityValidation)
+    val optionalQuantityValidator = rememberValidator(
+        optionalQuantity.value ?: 0,
+        optionalQuantityValidation,
+    )
     val decimalValidator = rememberValidator(decimal.value, decimalValidation)
 
     val modifier = Modifier
@@ -77,6 +92,17 @@ internal fun DemoNumberPicker(baseId: Int, expandState: ExpandState) {
                 allowManualInput = false,
             )
             StyledText("Current value: ${buttonOnlyQuantity.value}")
+
+            SubTitle("Optional integer 0–10; null means not defined")
+            StyledOptionalNumberPicker(
+                value = optionalQuantity,
+                validator = optionalQuantityValidator,
+                parser = integerParser,
+                modifier = modifier,
+                label = "Optional quantity",
+                placeholder = { StyledText("Not defined") },
+            )
+            StyledText("Current value: ${optionalQuantity.value ?: "Not defined"}")
 
             SubTitle("Decimal 0–5, step 0.25; manual input enabled")
             StyledOutlinedNumberPicker(

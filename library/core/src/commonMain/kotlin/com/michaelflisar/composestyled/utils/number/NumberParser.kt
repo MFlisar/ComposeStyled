@@ -13,6 +13,8 @@ class NumberParser<T : Number>(
     val format: (value: T) -> String = { it.toString() },
     val decrement: (value: T) -> T,
     val increment: (value: T) -> T,
+    /** Zero for this number type, used as the default initial value by optional number pickers. */
+    val zero: T? = null,
 )
 
 /**
@@ -42,7 +44,8 @@ fun <T : Number> rememberNumberParser(
                     it.toString()
             },
             decrement = { NumberUtil.minus(it, stepSize) },
-            increment = { NumberUtil.plus(it, stepSize) }
+            increment = { NumberUtil.plus(it, stepSize) },
+            zero = NumberUtil.zero(sample),
         )
     }
 }
