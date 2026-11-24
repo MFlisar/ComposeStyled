@@ -32,7 +32,7 @@ import com.michaelflisar.composestyled.platform.SystemBarStyleEffectIfNeeded
 import com.michaelflisar.composestyled.ui.components.StyledCheckbox
 import com.michaelflisar.composestyled.ui.components.StyledIcon
 import com.michaelflisar.composestyled.ui.components.StyledIconButton
-import com.michaelflisar.composestyled.ui.components.StyledPopupMenu
+import com.michaelflisar.composestyled.ui.components.StyledPopupButtonMenu
 import com.michaelflisar.composestyled.ui.components.StyledPopupMenuScope
 import com.michaelflisar.composestyled.ui.components.StyledSnackbarHost
 import com.michaelflisar.composestyled.ui.components.StyledSnackbarHostState
@@ -343,8 +343,9 @@ private fun TableSettings(
                 style = StyledTheme.typography.titleMedium,
             )
 
-            StyledPopupMenu(
+            StyledPopupButtonMenu(
                 triggerContent = { StyledIcon(StyledIcons.Settings) },
+                showExpandIcon = true,
                 menuMaxHeight = 600.dp
             ) {
                 header("Table")
@@ -430,9 +431,10 @@ private fun TableSettings(
             }
 
             // Actions
-            StyledPopupMenu(
+            StyledPopupButtonMenu(
                 triggerContent = { StyledIcon(Icons.AutoMirrored.Filled.DirectionsRun.toIconComposable()) },
                 enabled = !replacing,
+                showExpandIcon = true,
                 menuMaxHeight = 600.dp
             ) {
                 item(

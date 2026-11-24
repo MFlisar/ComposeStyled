@@ -1,13 +1,20 @@
 # Popup Menus
 
-Use `StyledPopup` for arbitrary popup content and `StyledPopupMenu` for a
-button-triggered command menu. `StyledPopupMenu` is the menu entry point: its
-`StyledPopupMenuScope` provides standard menu rows while retaining escape
-hatches for custom composables.
+Use `StyledPopup` for arbitrary popup content. For a button-triggered command
+menu, use `StyledPopupButtonMenu`. It renders a `StyledButton` without an
+indicator by default; set `showExpandIcon = true` to add an animated expand
+indicator. `StyledPopupIconButtonMenu` renders a `StyledIconButton` trigger
+using a typed icon and optional accessibility description. Both use
+`StyledPopupMenuScope` for standard menu rows and custom composables.
 
 ```kotlin
-StyledPopupMenu(
-    triggerContent = { StyledText("Actions") },
+StyledPopupButtonMenu(triggerContent = { StyledText("Actions") }) {
+    item("Save", onClick = { save() })
+}
+
+StyledPopupButtonMenu(
+    triggerContent = { StyledText("More actions") },
+    showExpandIcon = true,
 ) {
     item("Save", onClick = { save() })
     divider()
@@ -32,6 +39,13 @@ StyledPopupMenu(
         StyledText("Custom row content")
     }
 }
+
+StyledPopupIconButtonMenu(
+    icon = StyledIcons.Settings,
+    contentDescription = "Settings",
+) {
+    item("Preferences", onClick = { openPreferences() })
+}
 ```
 
 Simple `item` entries dismiss the menu after their callback by default.
@@ -48,11 +62,12 @@ inserts custom content directly into the popup column. Call `dismiss()` from a
 selection callback to close the complete menu hierarchy, or `dismissSubmenu()`
 to close only the current submenu and its descendants.
 
-The button-like menu trigger uses a `StyledButton` variant and supports
-`enabled`, `interactionSource`, `shape` and button `customization`. Its
-caller-owned `expanded` state is a `MutableState<Boolean>`; when omitted, the
-state is remembered. Menu width, shape, colors, offset, maximum height and
-animation can be configured through the `menu*` parameters. Set
+`StyledPopupButtonMenu` uses a `StyledButton` variant and supports `enabled`,
+`interactionSource`, `shape` and button `customization`. Its caller-owned
+`expanded` state is a `MutableState<Boolean>`; when omitted, it is remembered.
+`StyledPopupIconButtonMenu` uses `StyledIconButton.Customization` and also
+supports `iconSize`, `iconPaddingValues` and `tint`. Both APIs share the same
+menu width, shape, colors, offset, maximum height and animation options. Set
 `menuHorizontalAlignment` to `StyledPopupMenu.HorizontalAlignment.End` to align
 the menu's logical end edge with its anchor; `Start` is the default.
 

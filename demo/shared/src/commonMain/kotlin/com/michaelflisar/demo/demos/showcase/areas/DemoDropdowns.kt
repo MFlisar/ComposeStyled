@@ -23,7 +23,10 @@ import com.michaelflisar.composestyled.ui.components.StyledPopupDropdownMultiSel
 import com.michaelflisar.composestyled.ui.components.StyledIcon
 import com.michaelflisar.composestyled.ui.components.StyledPopupDropdownIndex
 import com.michaelflisar.composestyled.ui.components.StyledPopupDropdownMultiSelectIndex
+import com.michaelflisar.composestyled.ui.components.StyledPopupButtonMenu
+import com.michaelflisar.composestyled.ui.components.StyledPopupIconButtonMenu
 import com.michaelflisar.composestyled.ui.components.StyledPopupMenuScope
+import com.michaelflisar.composestyled.ui.icons.StyledIcons
 import com.michaelflisar.composestyled.ui.overlay.StyledPopupContainer
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.utils.ExpandState
@@ -134,7 +137,7 @@ internal fun DemoDropdowns(baseId: Int, expandState: ExpandState) {
         )
         StyledText("Selected index: ${index.value}; selection order: ${selectedIndices.value}")
 
-        SubTitle("Dropdown buttons")
+        SubTitle("Dropdown menus")
         val action = rememberSaveable { mutableStateOf("No action") }
         val buttonMenu: @Composable StyledPopupMenuScope.() -> Unit = {
             item(
@@ -161,24 +164,54 @@ internal fun DemoDropdowns(baseId: Int, expandState: ExpandState) {
                 onClick = {},
             )
         }
-        StyledPopupMenu(triggerContent = { StyledText("Actions") }, variant = StyledButton.Variant.Filled, menu = buttonMenu)
-        StyledPopupMenu(triggerContent = { StyledText("Secondary actions") }, variant = StyledButton.Variant.Outlined, menu = buttonMenu)
-        StyledPopupMenu(triggerContent = { StyledText("Tertiary actions") }, variant = StyledButton.Variant.Plain, menu = buttonMenu)
+        StyledPopupButtonMenu(
+            triggerContent = { StyledText("Actions") },
+            variant = StyledButton.Variant.Filled,
+            showExpandIcon = true,
+            menu = buttonMenu,
+        )
+        StyledPopupButtonMenu(
+            triggerContent = { StyledText("Secondary actions") },
+            variant = StyledButton.Variant.Outlined,
+            showExpandIcon = true,
+            menu = buttonMenu,
+        )
+        StyledPopupButtonMenu(
+            triggerContent = { StyledText("Tertiary actions") },
+            variant = StyledButton.Variant.Plain,
+            showExpandIcon = true,
+            menu = buttonMenu,
+        )
         StyledButton(onClick = { action.value = "Direct action" }, variant = StyledButton.Variant.Filled) {
             StyledText("Direct action")
         }
-        StyledPopupMenu(
+        StyledPopupButtonMenu(
             menu = buttonMenu,
             enabled = false,
             variant = StyledButton.Variant.Filled,
+            showExpandIcon = true,
             triggerContent = {
                 StyledText("Disabled actions")
             },
         )
         StyledText(action.value)
 
+        SubTitle("Menus")
+        SubTitle("Popup menu triggers")
+        StyledPopupButtonMenu(
+            triggerContent = { StyledText("Text trigger") },
+            menu = buttonMenu,
+        )
+        StyledPopupIconButtonMenu(
+            icon = StyledIcons.Settings,
+            contentDescription = "Settings",
+            menu = buttonMenu,
+        )
+
         SubTitle("Standalone menu")
         val menuExpanded = remember { mutableStateOf(false) }
+        val sortMode = rememberSaveable { mutableStateOf("Name") }
+        val favoritesOnly = rememberSaveable { mutableStateOf(false) }
         StyledPopupContainer(
             popup = {
                 StyledPopupMenu(
@@ -186,9 +219,10 @@ internal fun DemoDropdowns(baseId: Int, expandState: ExpandState) {
                     onDismissRequest = { menuExpanded.value = false },
                     widthConfig = StyledPopupMenu.WidthConfig.Auto(limitToContainerWidth = true),
                 ) {
+                    header("Fruit")
                     items.forEach { value ->
-                    item(
-                        text = value,
+                        item(
+                            text = value,
                             leadingIcon = {
                                 if (selected.value == value) {
                                     StyledIcon(
@@ -201,6 +235,22 @@ internal fun DemoDropdowns(baseId: Int, expandState: ExpandState) {
                                 selected.value = value
                             },
                         )
+                    }
+                    divider()
+                    selection(
+                        title = "Sort by",
+                        items = listOf("Name", "Type"),
+                        selected = sortMode.value,
+                        label = { it },
+                        onSelectionChange = { sortMode.value = it },
+                    )
+                    checkbox(
+                        text = "Favorites only",
+                        checked = favoritesOnly.value,
+                        onCheckedChange = { favoritesOnly.value = it },
+                    )
+                    submenu("More actions") {
+                        item("Refresh", onClick = { action.value = "Refreshed menu" })
                     }
                     item(
                         text = "Unavailable action",
@@ -224,5 +274,6 @@ internal fun DemoDropdowns(baseId: Int, expandState: ExpandState) {
                 }
             }
         )
+        StyledText("Sort: ${sortMode.value}; favorites only: ${favoritesOnly.value}")
     }
 }

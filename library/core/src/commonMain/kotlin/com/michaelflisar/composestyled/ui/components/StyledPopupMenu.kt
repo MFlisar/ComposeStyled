@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
 import com.michaelflisar.composestyled.StyledTheme
+import com.michaelflisar.composestyled.classes.IconComposable
 import com.michaelflisar.composestyled.registry.LocalStyledRegistry
 import com.michaelflisar.composestyled.registry.StyledComponent
 import com.michaelflisar.composestyled.registry.StyledKey
@@ -41,6 +42,7 @@ import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
 import com.michaelflisar.composestyled.ui.icons.StyledIcons
 import com.michaelflisar.composestyled.ui.internal.LocalStyledMenuBarPopupContext
 import com.michaelflisar.composestyled.ui.internal.StyledDropdownButton
+import com.michaelflisar.composestyled.ui.internal.StyledPopupMenuAnchor
 import com.michaelflisar.composestyled.ui.overlay.StyledPopupContainerScope
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 import kotlin.math.roundToInt
@@ -415,16 +417,20 @@ class StyledPopupMenuScope internal constructor(
 }
 
 /**
- * Shows a button-triggered menu. Compose menu entries through the receiver scope rather than
- * calling standalone menu-item composables.
+ * Shows a command menu from a [StyledButton] trigger. Menu entries are composed through the
+ * [StyledPopupMenuScope] receiver rather than standalone menu-item composables.
+ *
+ * @param triggerContent Content displayed inside the button trigger.
+ * @param showExpandIcon Whether to show the animated dropdown indicator. Defaults to `false`.
  */
 @Composable
-fun StyledPopupMenu(
+fun StyledPopupButtonMenu(
     triggerContent: @Composable RowScope.() -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource? = null,
     variant: StyledButton.Variant = StyledButton.Variant.Auto,
+    showExpandIcon: Boolean = false,
     shape: Shape = StyledButtonDefaults.shape,
     customization: StyledButton.Customization? = null,
     expanded: MutableState<Boolean> = remember { mutableStateOf(false) },
@@ -445,6 +451,7 @@ fun StyledPopupMenu(
         enabled = enabled,
         interactionSource = interactionSource,
         variant = variant,
+        showExpandIcon = showExpandIcon,
         shape = shape,
         customization = customization,
         expanded = expanded,
@@ -458,6 +465,70 @@ fun StyledPopupMenu(
         menuAnimation = menuAnimation,
         content = triggerContent,
     )
+}
+
+/**
+ * Shows a command menu from an icon-only [StyledIconButton] trigger.
+ *
+ * @param icon Icon displayed by the trigger button.
+ * @param contentDescription Accessibility description for the trigger icon.
+ */
+@Composable
+fun StyledPopupIconButtonMenu(
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    interactionSource: MutableInteractionSource? = null,
+    variant: StyledButton.Variant = StyledButton.Variant.Auto,
+    // defaults / customisation
+    shape: Shape = StyledIconButtonDefaults.shape(),
+    customization: StyledIconButton.Customization? = null,
+    // menu
+    expanded: MutableState<Boolean> = remember { mutableStateOf(false) },
+    menuWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenuDefaults.widthConfig,
+    menuShape: Shape = StyledPopupMenuDefaults.shape,
+    menuContainerColor: Color = StyledPopupMenuDefaults.containerColor,
+    menuContentColor: Color = StyledPopupMenuDefaults.contentColor(menuContainerColor),
+    menuOffset: DpOffset = StyledPopupMenuDefaults.offset,
+    menuHorizontalAlignment: StyledPopupMenu.HorizontalAlignment =
+        StyledPopupMenu.HorizontalAlignment.Start,
+    menuMaxHeight: Dp = StyledPopupMenuDefaults.maxHeight,
+    menuAnimation: StyledPopup.Animation = StyledPopupDefaults.Animations.unfoldAwayFromAnchor,
+    // content
+    icon: IconComposable,
+    contentDescription: String? = null,
+    iconSize: Dp? = StyledTheme.sizes.iconSize,
+    iconPaddingValues: PaddingValues = PaddingValues(0.dp),
+    tint: Color? = null,
+    menu: @Composable StyledPopupMenuScope.() -> Unit,
+) {
+    StyledPopupMenuAnchor(
+        menu = menu,
+        enabled = enabled,
+        expanded = expanded,
+        menuWidthConfig = menuWidthConfig,
+        menuShape = menuShape,
+        menuContainerColor = menuContainerColor,
+        menuContentColor = menuContentColor,
+        menuOffset = menuOffset,
+        menuHorizontalAlignment = menuHorizontalAlignment,
+        menuMaxHeight = menuMaxHeight,
+        menuAnimation = menuAnimation,
+    ) { onClick, _ ->
+        StyledIconButton(
+            onClick = onClick,
+            modifier = modifier,
+            enabled = enabled,
+            interactionSource = interactionSource,
+            variant = variant,
+            shape = shape,
+            customization = customization,
+            icon = icon,
+            contentDescription = contentDescription,
+            iconSize = iconSize,
+            iconPaddingValues = iconPaddingValues,
+            tint = tint,
+        )
+    }
 }
 
 /**

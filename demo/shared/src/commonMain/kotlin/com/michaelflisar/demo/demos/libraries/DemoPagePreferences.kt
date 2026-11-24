@@ -38,7 +38,7 @@ import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.ui.components.StyledIcon
 import com.michaelflisar.composestyled.ui.components.StyledOutlinedInput
 import com.michaelflisar.composestyled.ui.components.StyledPopupDropdown
-import com.michaelflisar.composestyled.ui.components.StyledPopupMenu
+import com.michaelflisar.composestyled.ui.components.StyledPopupButtonMenu
 import com.michaelflisar.composestyled.ui.icons.StyledIcons
 import com.michaelflisar.composestyled.ui.layout.StyledDialog
 import com.michaelflisar.composestyled.ui.layout.StyledScaffold
@@ -146,10 +146,11 @@ internal fun DemoPagePreferences(onBack: () -> Unit) {
                     },
                 )
 
-                StyledPopupMenu(
+                StyledPopupButtonMenu(
                     triggerContent = {
                         StyledIcon(StyledIcons.Settings)
                     },
+                    showExpandIcon = true,
                     modifier = Modifier,//.fillMaxHeight(),
                 ) {
                     item(

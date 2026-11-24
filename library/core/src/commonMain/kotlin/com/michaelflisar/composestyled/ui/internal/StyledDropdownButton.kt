@@ -243,6 +243,7 @@ internal fun StyledDropdownButton(
 )
 
 /** A themed button that toggles a popup menu. */
+@OptIn(InternalComposeStyledApi::class)
 @Composable
 internal fun StyledDropdownButton(
     menu: @Composable StyledPopupMenuScope.() -> Unit,
@@ -250,6 +251,7 @@ internal fun StyledDropdownButton(
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource? = null,
     variant: StyledButton.Variant = StyledButton.Variant.Auto,
+    showExpandIcon: Boolean = true,
     // defaults / customisation
     shape: Shape = StyledButtonDefaults.shape,
     customization: StyledButton.Customization? = null,
@@ -266,25 +268,92 @@ internal fun StyledDropdownButton(
     menuAnimation: StyledPopup.Animation = StyledPopupDefaults.Animations.unfoldAwayFromAnchor,
     // content
     content: @Composable RowScope.() -> Unit,
-) = StyledDropdownButtonImpl(
-    variant = variant,
-    menu = menu,
-    expanded = expanded,
-    modifier = modifier,
-    enabled = enabled,
-    interactionSource = interactionSource,
-    shape = shape,
-    customization = customization,
-    menuWidthConfig = menuWidthConfig,
-    menuShape = menuShape,
-    menuContainerColor = menuContainerColor,
-    menuContentColor = menuContentColor,
-    menuOffset = menuOffset,
-    menuHorizontalAlignment = menuHorizontalAlignment,
-    menuMaxHeight = menuMaxHeight,
-    menuAnimation = menuAnimation,
-    content = content,
-)
+) {
+    StyledPopupMenuAnchor(
+        menu = menu,
+        enabled = enabled,
+        expanded = expanded,
+        menuWidthConfig = menuWidthConfig,
+        menuShape = menuShape,
+        menuContainerColor = menuContainerColor,
+        menuContentColor = menuContentColor,
+        menuOffset = menuOffset,
+        menuHorizontalAlignment = menuHorizontalAlignment,
+        menuMaxHeight = menuMaxHeight,
+        menuAnimation = menuAnimation,
+    ) { onClick, isExpanded ->
+        val buttonContext = if (showExpandIcon) {
+            StyledButton.Context.Dropdown
+        } else {
+            LocalStyledContext.current
+        }
+        CompositionLocalProvider(LocalStyledContext provides buttonContext) {
+            StyledButton(
+                onClick = onClick,
+                variant = variant,
+                modifier = modifier,
+                enabled = enabled,
+                interactionSource = interactionSource,
+                shape = shape,
+                customization = customization,
+                content = {
+                    if (showExpandIcon) {
+                        DropdownButtonContent(
+                            expanded = isExpanded,
+                            content = content,
+                        )
+                    } else {
+                        content()
+                    }
+                },
+            )
+        }
+    }
+}
+
+@Composable
+internal fun StyledPopupMenuAnchor(
+    menu: @Composable StyledPopupMenuScope.() -> Unit,
+    enabled: Boolean,
+    expanded: MutableState<Boolean>,
+    menuWidthConfig: StyledPopupMenu.WidthConfig,
+    menuShape: Shape,
+    menuContainerColor: Color,
+    menuContentColor: Color,
+    menuOffset: DpOffset,
+    menuHorizontalAlignment: StyledPopupMenu.HorizontalAlignment,
+    menuMaxHeight: Dp,
+    menuAnimation: StyledPopup.Animation,
+    anchor: @Composable (onClick: () -> Unit, isExpanded: Boolean) -> Unit,
+) {
+    LaunchedEffect(enabled) {
+        if (!enabled) expanded.value = false
+    }
+
+    StyledPopupContainer(
+        popup = {
+            StyledPopupMenu(
+                expanded = expanded.value && enabled,
+                onDismissRequest = { expanded.value = false },
+                widthConfig = menuWidthConfig,
+                shape = menuShape,
+                containerColor = menuContainerColor,
+                contentColor = menuContentColor,
+                offset = menuOffset,
+                horizontalAlignment = menuHorizontalAlignment,
+                maxHeight = menuMaxHeight,
+                animation = menuAnimation,
+                content = menu,
+            )
+        },
+        content = {
+            anchor(
+                { expanded.value = !expanded.value },
+                expanded.value && enabled,
+            )
+        },
+    )
+}
 
 // -------------------------
 // private API
@@ -318,74 +387,6 @@ private fun StyledDropdownButtonImpl(
             content = { DropdownButtonContent(expanded = false, content = content) },
         )
     }
-}
-
-@OptIn(InternalComposeStyledApi::class)
-@Composable
-private fun StyledDropdownButtonImpl(
-    variant: StyledButton.Variant,
-    menu: @Composable StyledPopupMenuScope.() -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    interactionSource: MutableInteractionSource? = null,
-    // defaults / customisation
-    shape: Shape = StyledButtonDefaults.shape,
-    customization: StyledButton.Customization? = null,
-    // menu
-
-    expanded: MutableState<Boolean> = remember { mutableStateOf(false) },
-    menuWidthConfig: StyledPopupMenu.WidthConfig = StyledPopupMenuDefaults.widthConfig,
-    menuShape: Shape = StyledPopupMenuDefaults.shape,
-    menuContainerColor: Color = StyledPopupMenuDefaults.containerColor,
-    menuContentColor: Color = StyledPopupMenuDefaults.contentColor(menuContainerColor),
-    menuOffset: DpOffset = StyledPopupMenuDefaults.offset,
-    menuHorizontalAlignment: StyledPopupMenu.HorizontalAlignment =
-        StyledPopupMenu.HorizontalAlignment.Start,
-    menuMaxHeight: Dp = StyledPopupMenuDefaults.maxHeight,
-    menuAnimation: StyledPopup.Animation = StyledPopupDefaults.Animations.unfoldAwayFromAnchor,
-    // content
-    content: @Composable RowScope.() -> Unit,
-) {
-    LaunchedEffect(enabled) {
-        if (!enabled) expanded.value = false
-    }
-
-    StyledPopupContainer(
-        popup = {
-            StyledPopupMenu(
-                expanded = expanded.value && enabled,
-                onDismissRequest = { expanded.value = false },
-                widthConfig = menuWidthConfig,
-                shape = menuShape,
-                containerColor = menuContainerColor,
-                contentColor = menuContentColor,
-                offset = menuOffset,
-                horizontalAlignment = menuHorizontalAlignment,
-                maxHeight = menuMaxHeight,
-                animation = menuAnimation,
-            ) {
-                menu()
-            }
-        },
-        content = {
-            CompositionLocalProvider(
-                LocalStyledContext provides StyledButton.Context.Dropdown,
-            ) {
-                StyledButton(
-                    onClick = { expanded.value = !expanded.value },
-                    variant = variant,
-                    modifier = modifier,
-                    enabled = enabled,
-                    interactionSource = interactionSource,
-                    shape = shape,
-                    customization = customization,
-                    content = {
-                        DropdownButtonContent(expanded = expanded.value && enabled, content = content)
-                    },
-                )
-            }
-        }
-    )
 }
 
 // -------------------------
