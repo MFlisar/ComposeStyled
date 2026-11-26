@@ -28,7 +28,7 @@ internal fun DemoPicker(
         val modifier = Modifier
 
         Column(verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.medium)) {
-            SubTitle("Read-only value with a clickable end icon")
+            SubTitle("Enabled picker with a clickable end icon")
             StyledPicker(
                 modifier = modifier,
                 value = "Picker",

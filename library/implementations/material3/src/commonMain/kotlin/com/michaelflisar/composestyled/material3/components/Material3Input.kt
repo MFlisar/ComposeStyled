@@ -112,7 +112,7 @@ class Material3Input internal constructor(
         val mappedVariant = variantMapping(variant, LocalStyledContext.current)
         val resolvedInteractionSource = interactionSource ?: remember { MutableInteractionSource() }
         val isFocused = resolvedInteractionSource.collectIsFocusedAsState().value
-        val isFieldEnabled = enabled && interactionEnabled
+        val isVisualEnabled = enabled
         val filledBackground = if (mappedVariant == Variant.Filled) {
             customization?.colors?.filledBackground?.resolve()
                 ?.takeIf { it != Color.Unspecified } ?: StyledTheme.colorScheme.surfaceVariant
@@ -128,7 +128,7 @@ class Material3Input internal constructor(
             ?.takeIf { it != Color.Unspecified } ?: Color.Unspecified
         val textColor = contentColor.takeIf { it != Color.Unspecified }
             ?: StyledTheme.colorScheme.onSurface
-        val iconContentColor = if (isFieldEnabled) {
+        val iconContentColor = if (isVisualEnabled) {
             textColor
         } else {
             textColor.copy(
@@ -142,13 +142,13 @@ class Material3Input internal constructor(
             alpha = unfocusedDecorationColor.alpha * StyledTheme.colorScheme.disabledAlphaFactors.content,
         )
         val labelColor = when {
-            !isFieldEnabled -> disabledDecorationColor
+            !isVisualEnabled -> disabledDecorationColor
             isError -> StyledTheme.colorScheme.error
             isFocused -> StyledTheme.colorScheme.primary
             else -> unfocusedDecorationColor
         }
         val styledSupportingColor = when {
-            !isFieldEnabled -> disabledDecorationColor
+            !isVisualEnabled -> disabledDecorationColor
             isError -> StyledTheme.colorScheme.error
             else -> unfocusedDecorationColor
         }
@@ -228,7 +228,7 @@ class Material3Input internal constructor(
                             innerTextField = innerTextField,
                             placeholder = styledInputSlot(
                                 placeholder,
-                                if (isFieldEnabled) unfocusedDecorationColor else disabledDecorationColor,
+                                if (isVisualEnabled) unfocusedDecorationColor else disabledDecorationColor,
                                 textStyle,
                             ),
                             label = styledInputSlot(
@@ -244,13 +244,13 @@ class Material3Input internal constructor(
                                 StyledTheme.typography.bodySmall,
                             ),
                             singleLine = singleLine,
-                            enabled = enabled && interactionEnabled,
+                            enabled = enabled,
                             isError = isError,
                             interactionSource = resolvedInteractionSource,
                             colors = colors,
                             container = {
                                 OutlinedTextFieldDefaults.Container(
-                                    enabled = enabled && interactionEnabled,
+                                    enabled = enabled,
                                     isError = isError,
                                     interactionSource = resolvedInteractionSource,
                                     colors = colors,
@@ -325,7 +325,7 @@ class Material3Input internal constructor(
                         TextFieldDefaults.DecorationBox(
                             value = value.text,
                             innerTextField = innerTextField,
-                            enabled = enabled && interactionEnabled,
+                            enabled = enabled,
                             singleLine = singleLine,
                             visualTransformation = visualTransformation,
                             interactionSource = resolvedInteractionSource,
@@ -337,7 +337,7 @@ class Material3Input internal constructor(
                             ),
                             placeholder = styledInputSlot(
                                 placeholder,
-                                if (isFieldEnabled) unfocusedDecorationColor else disabledDecorationColor,
+                                if (isVisualEnabled) unfocusedDecorationColor else disabledDecorationColor,
                                 textStyle,
                             ),
                             leadingIcon = styledInputSlot(leadingIcon, iconContentColor),
@@ -351,7 +351,7 @@ class Material3Input internal constructor(
                             colors = colors,
                             container = {
                                 TextFieldDefaults.Container(
-                                    enabled = enabled && interactionEnabled,
+                                    enabled = enabled,
                                     isError = isError,
                                     interactionSource = resolvedInteractionSource,
                                     colors = colors,
