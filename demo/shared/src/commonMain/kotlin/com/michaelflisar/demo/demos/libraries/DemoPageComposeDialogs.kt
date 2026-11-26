@@ -37,9 +37,14 @@ import com.michaelflisar.composestyled.ui.layout.StyledDialog.SheetOptions
 import com.michaelflisar.composestyled.ui.layout.StyledScaffold
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.ui.state.rememberDialogState
+import com.michaelflisar.composestyled.utils.ValidationResult
+import com.michaelflisar.composestyled.utils.rememberValidator
 import com.michaelflisar.demo.helper.DemoTopBar
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
 
 @Composable
 internal fun DemoPageComposeDialogs(onBack: () -> Unit) {
@@ -56,6 +61,15 @@ internal fun DemoPageComposeDialogs(onBack: () -> Unit) {
     val initialColor = StyledTheme.colorScheme.primary
     val selectedColor = remember { mutableStateOf(initialColor) }
     val selectedDate = remember { mutableStateOf(LocalDate(2026, 11, 7)) }
+    val dateValidator = rememberValidator(selectedDate.value) { date ->
+        if (date != null &&
+            date > Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+        ) {
+            ValidationResult.Invalid("Future dates are not allowed")
+        } else {
+            ValidationResult.Valid
+        }
+    }
     val selectedTime = remember { mutableStateOf(LocalTime(14, 45)) }
     val selectedFrequency = remember {
         mutableStateOf<Frequency>(Frequency.Daily(time = LocalTime(8, 30), interval = 1))
@@ -156,6 +170,7 @@ internal fun DemoPageComposeDialogs(onBack: () -> Unit) {
         state = dateDialog,
         date = selectedDate,
         config = datePickerConfig,
+        validator = dateValidator,
         style = dialogStyle,
         title = { StyledText("Choose a date") },
         buttons = doneButton(),

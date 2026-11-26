@@ -1,18 +1,24 @@
 package com.michaelflisar.composestyled.material3.components
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MultiChoiceSegmentedButtonRow
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.StyledTheme
 import com.michaelflisar.composestyled.material3.ProvideStyledLocals
+import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
+import com.michaelflisar.composestyled.runtime.LocalStyledContext
 import com.michaelflisar.composestyled.ui.components.StyledButton
 import com.michaelflisar.composestyled.ui.components.StyledSegmentedButton as StyledSegmentedButtonApi
 
@@ -34,6 +40,7 @@ class Material3SegmentedButton internal constructor() : StyledSegmentedButtonApi
         fun create(): Material3SegmentedButton = remember { Material3SegmentedButton() }
     }
 
+    @OptIn(InternalComposeStyledApi::class)
     @Composable
     override fun Render(
         selected: Boolean,
@@ -47,6 +54,7 @@ class Material3SegmentedButton internal constructor() : StyledSegmentedButtonApi
         content: @Composable () -> Unit,
         onClick: () -> Unit,
     ) {
+        val isVerticalGroup = LocalStyledContext.current == StyledSegmentedButtonApi.Context.VerticalGroup
         val colors = segmentedButtonColors(customization)
         val borderThickness = customization?.borderThickness ?: SegmentedButtonDefaults.BorderWidth
         val borderColor = when {
@@ -56,42 +64,49 @@ class Material3SegmentedButton internal constructor() : StyledSegmentedButtonApi
             else -> colors.disabledInactiveBorderColor
         }
         val border = SegmentedButtonDefaults.borderStroke(borderColor, borderThickness)
-        if (multiSelect) {
-            MultiChoiceSegmentedButtonRow(modifier = modifier, space = borderThickness) {
-                SegmentedButton(
-                    checked = selected,
-                    onCheckedChange = { onClick() },
-                    enabled = enabled,
-                    shape = itemShape,
-                    colors = colors,
-                    border = border,
-                    icon = {
-                        if (showSelectedIcon) {
-                            SegmentedButtonDefaults.Icon(active = selected)
-                        }
-                    },
-                    contentPadding = itemContentPadding,
-                ) {
-                    renderContent(content, selected, enabled, customization)
+        CompositionLocalProvider(
+            LocalMinimumInteractiveComponentSize provides
+                if (isVerticalGroup) 0.dp else LocalMinimumInteractiveComponentSize.current,
+        ) {
+            if (multiSelect) {
+                MultiChoiceSegmentedButtonRow(modifier = modifier, space = borderThickness) {
+                    SegmentedButton(
+                        checked = selected,
+                        onCheckedChange = { onClick() },
+                        modifier = if (isVerticalGroup) Modifier.fillMaxHeight() else Modifier,
+                        enabled = enabled,
+                        shape = itemShape,
+                        colors = colors,
+                        border = border,
+                        icon = {
+                            if (showSelectedIcon) {
+                                SegmentedButtonDefaults.Icon(active = selected)
+                            }
+                        },
+                        contentPadding = itemContentPadding,
+                    ) {
+                        renderContent(content, selected, enabled, customization)
+                    }
                 }
-            }
-        } else {
-            SingleChoiceSegmentedButtonRow(modifier = modifier, space = borderThickness) {
-                SegmentedButton(
-                    selected = selected,
-                    onClick = onClick,
-                    enabled = enabled,
-                    shape = itemShape,
-                    colors = colors,
-                    border = border,
-                    icon = {
-                        if (showSelectedIcon) {
-                            SegmentedButtonDefaults.Icon(active = selected)
-                        }
-                    },
-                    contentPadding = itemContentPadding,
-                ) {
-                    renderContent(content, selected, enabled, customization)
+            } else {
+                SingleChoiceSegmentedButtonRow(modifier = modifier, space = borderThickness) {
+                    SegmentedButton(
+                        selected = selected,
+                        onClick = onClick,
+                        modifier = if (isVerticalGroup) Modifier.fillMaxHeight() else Modifier,
+                        enabled = enabled,
+                        shape = itemShape,
+                        colors = colors,
+                        border = border,
+                        icon = {
+                            if (showSelectedIcon) {
+                                SegmentedButtonDefaults.Icon(active = selected)
+                            }
+                        },
+                        contentPadding = itemContentPadding,
+                    ) {
+                        renderContent(content, selected, enabled, customization)
+                    }
                 }
             }
         }

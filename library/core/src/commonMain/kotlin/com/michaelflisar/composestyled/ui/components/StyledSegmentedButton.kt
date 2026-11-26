@@ -9,6 +9,8 @@ import com.michaelflisar.composestyled.registry.LocalStyledRegistry
 import com.michaelflisar.composestyled.registry.StyledComponent
 import com.michaelflisar.composestyled.registry.StyledComponentWithDefaults
 import com.michaelflisar.composestyled.registry.StyledKey
+import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
+import com.michaelflisar.composestyled.runtime.StyledContext
 import com.michaelflisar.composestyled.ui.components.StyledButton.Customization
 
 object StyledSegmentedButton {
@@ -20,15 +22,24 @@ object StyledSegmentedButton {
     val Key = StyledKey<Implementation>("StyledSegmentedButton")
     val DefaultsKey = StyledKey<Defaults>("StyledSegmentedButtonDefaults")
 
-        // -------------
-        // 2) defaults
-        // -------------
+    // -------------
+    // 2) defaults
+    // -------------
 
-        @Stable
-        data class Defaults(
-            val itemShape: Shape,
-            val itemContentPadding: PaddingValues,
-        )
+    @Stable
+    data class Defaults(
+        val itemShape: Shape,
+        val itemContentPadding: PaddingValues,
+    )
+
+    // -------------
+    // 3) roles / variants / context
+    // -------------
+
+    @InternalComposeStyledApi
+    enum class Context : StyledContext {
+        VerticalGroup,
+    }
 
     // -------------
     // 5) implementation

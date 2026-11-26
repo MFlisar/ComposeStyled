@@ -7,8 +7,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.key
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -26,6 +28,8 @@ import com.michaelflisar.composestyled.ui.layout.StyledDialog
 import com.michaelflisar.composestyled.ui.layout.StyledDialogDefaults
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 import com.michaelflisar.composestyled.ui.state.DialogState
+import com.michaelflisar.composestyled.utils.Validator
+import com.michaelflisar.composestyled.utils.rememberValidator
 import kotlinx.datetime.LocalDate
 
 /**
@@ -33,6 +37,7 @@ import kotlinx.datetime.LocalDate
  *
  * @param date the selected date state
  * @param config the date picker's formatting, behavior, and supported year range
+ * @param validator validates dates selected in the picker
  * @param buttonToday optional content for the Today button; pass null to hide it
  */
 @OptIn(InternalComposeStyledApi::class)
@@ -41,6 +46,7 @@ fun DialogDate(
     state: DialogState,
     date: MutableState<LocalDate>,
     config: DatePickerConfig = DatePickerDefaults.config(),
+    validator: Validator<LocalDate> = rememberValidator(date.value),
     buttonToday: (@Composable () -> Unit)? = {
         StyledText(text = DatePickerDefaults.texts().today)
     },
@@ -53,8 +59,26 @@ fun DialogDate(
     onDismissRequest: () -> Unit = state::dismiss,
 ) {
     val landscape = isLandscape
+    LaunchedEffect(date.value, validator) {
+        validator.update(date.value)
+    }
+    val validatedDate = remember(date, validator) {
+        object : MutableState<LocalDate> {
+            override var value: LocalDate
+                get() = date.value
+                set(value) {
+                    if (validator.check(value)) {
+                        date.value = value
+                    }
+                }
+
+            override operator fun component1(): LocalDate = value
+
+            override operator fun component2(): (LocalDate) -> Unit = { value = it }
+        }
+    }
     val pickerState = key(state.visible) {
-        rememberDatePickerState(date, config)
+        rememberDatePickerState(validatedDate, config)
     }
     StyledDialog(
         state = state,

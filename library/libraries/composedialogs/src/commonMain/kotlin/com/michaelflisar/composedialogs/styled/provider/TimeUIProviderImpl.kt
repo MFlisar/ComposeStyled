@@ -1,16 +1,19 @@
 package com.michaelflisar.composedialogs.styled.provider
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
@@ -18,10 +21,13 @@ import androidx.compose.ui.unit.dp
 import com.michaelflisar.composedialogs.dialogs.time.TimePickerPeriod
 import com.michaelflisar.composedialogs.dialogs.time.TimeUIProvider
 import com.michaelflisar.composestyled.StyledTheme
+import com.michaelflisar.composestyled.runtime.InternalComposeStyledApi
+import com.michaelflisar.composestyled.runtime.LocalStyledContext
 import com.michaelflisar.composestyled.tokens.LocalStyledContentColor
 import com.michaelflisar.composestyled.ui.components.StyledInput
 import com.michaelflisar.composestyled.ui.components.StyledPopupDropdown
-import com.michaelflisar.composestyled.ui.components.StyledRadioButton
+import com.michaelflisar.composestyled.ui.components.StyledSegmentedButton
+import com.michaelflisar.composestyled.ui.components.StyledSegmentedButtonRowDefaults
 import com.michaelflisar.composestyled.ui.primitives.StyledText
 
 internal object TimeUIProviderImpl : TimeUIProvider {
@@ -103,6 +109,7 @@ internal object TimeUIProviderImpl : TimeUIProvider {
         )
     }
 
+    @OptIn(InternalComposeStyledApi::class)
     @Composable
     override fun PeriodSelector(
         modifier: Modifier,
@@ -111,25 +118,36 @@ internal object TimeUIProviderImpl : TimeUIProvider {
         pmText: String,
         onItemSelected: (TimePickerPeriod) -> Unit,
     ) {
-        Column(
-            modifier = modifier,
-            verticalArrangement = Arrangement.spacedBy(StyledTheme.spacing.small),
+        CompositionLocalProvider(
+            LocalStyledContext provides StyledSegmentedButton.Context.VerticalGroup,
         ) {
-            listOf(TimePickerPeriod.AM, TimePickerPeriod.PM).forEach { period ->
-                val text = if (period == TimePickerPeriod.AM) amText else pmText
-                Row(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth()
-                        .padding(horizontal = StyledTheme.padding.small),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    StyledRadioButton(
+            Column(
+                modifier = modifier.selectableGroup(),
+                verticalArrangement = Arrangement.spacedBy(-1.dp),
+            ) {
+                val shape = StyledSegmentedButtonRowDefaults.itemShape
+                listOf(TimePickerPeriod.AM, TimePickerPeriod.PM).forEachIndexed { index, period ->
+                    val text = if (period == TimePickerPeriod.AM) amText else pmText
+                    StyledSegmentedButton(
                         selected = period == selected,
                         onClick = { onItemSelected(period) },
-                        modifier = Modifier.fillMaxWidth(),
-                        label = { StyledText(text) },
-                    )
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(StyledTheme.sizes.minimumInteractiveSize),
+                        itemShape = when (index) {
+                            0 -> shape.copy(
+                                bottomStart = CornerSize(0.dp),
+                                bottomEnd = CornerSize(0.dp),
+                            )
+
+                            else -> shape.copy(
+                                topStart = CornerSize(0.dp),
+                                topEnd = CornerSize(0.dp),
+                            )
+                        },
+                    ) {
+                        StyledText(text)
+                    }
                 }
             }
         }

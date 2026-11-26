@@ -24,13 +24,13 @@ object StyledSegmentedButtonRow {
     val Key = StyledKey<Implementation>("StyledSegmentedButtonRow")
     val DefaultsKey = StyledKey<Defaults>("StyledSegmentedButtonRowDefaults")
 
-        // -------------
-        // 2) defaults
-        // -------------
+    // -------------
+    // 2) defaults
+    // -------------
 
-        @Stable
-        data class Defaults(
-            val itemShape: CornerBasedShape,
+    @Stable
+    data class Defaults(
+        val itemShape: CornerBasedShape,
         val itemContentPadding: PaddingValues,
         val minItemWidth: Dp = 58.dp,
     )
@@ -39,7 +39,8 @@ object StyledSegmentedButtonRow {
     // 5) implementation
     // -------------
 
-    interface Implementation : StyledComponent<Implementation>, StyledComponentWithDefaults<Defaults> {
+    interface Implementation : StyledComponent<Implementation>,
+        StyledComponentWithDefaults<Defaults> {
         override val key: StyledKey<Implementation>
             get() = Key
 
@@ -126,7 +127,10 @@ fun <T : Any> StyledSegmentedButtonRow(
         if (indices.isNotEmpty()) {
             selected.value = items[indices.first()]
         }
-        onSelectionChange?.invoke(if (indices.isEmpty()) -1 else indices.first(), items[clickedIndex])
+        onSelectionChange?.invoke(
+            if (indices.isEmpty()) -1 else indices.first(),
+            items[clickedIndex]
+        )
     }
 }
 
@@ -344,6 +348,7 @@ internal fun <T : Any> renderSegmentRow(
             val nextIndices = when {
                 multiSelect && clickedIndex in currentIndices ->
                     currentIndices.filterNot { it == clickedIndex }
+
                 multiSelect -> (currentIndices + clickedIndex).sorted()
                 clickedIndex in currentIndices && !forceSelection -> emptyList()
                 else -> listOf(clickedIndex)

@@ -17,13 +17,19 @@ The `DialogColor`, `DialogDate`, `DialogFrequency`, and `DialogTime` APIs take a
 Styled `DialogState` and wrap the picker content
 in a Styled dialog. Their picker UI is rendered through Styled controls and
 uses the `com.michaelflisar.composedialogs.styled.provider` implementations.
+The time picker's AM/PM options use a vertically stacked Styled segmented
+control.
 
 `DialogDate` accepts a `DatePickerConfig` from `ui-date`, which can be created
 with `DatePickerDefaults.config()` to define the supported years, localized
-formatting, and picker behavior. Its optional `buttonToday` content defaults to
-the picker's localized Today label; pass `null` to hide the button. In landscape,
-its title and icon move into the picker content and the date-selection buttons
-are arranged vertically alongside the calendar.
+formatting, and picker behavior. Its `validator` defaults to
+`rememberValidator(date.value)` and can reject selections while preserving the
+current date. For example, return `ValidationResult.Invalid(...)` when the
+candidate date is after today to prevent future dates from being selected. Its
+optional `buttonToday` content defaults to the picker's localized Today label;
+pass `null` to hide the button. In landscape, its title and icon move into the
+picker content and the date-selection buttons are arranged vertically alongside
+the calendar.
 
 `DialogFrequency` takes one `MutableState<Frequency>` from
 `ui-frequency`; the immutable frequency model contains its type, interval, and
