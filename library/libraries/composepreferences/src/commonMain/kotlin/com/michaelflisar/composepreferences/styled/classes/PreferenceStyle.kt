@@ -11,7 +11,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.michaelflisar.composestyled.StyledTheme
-import com.michaelflisar.composestyled.supportingVariant
 
 /** Colors shared by a preference row's title, icon and supporting text. */
 @Immutable
@@ -143,7 +142,8 @@ object PreferenceStyleDefaults {
     fun rowColors(
         containerColor: Color = StyledTheme.colorScheme.surfaceVariant,
         contentColor: Color = StyledTheme.colorScheme.onSurfaceVariant,
-        supportingColor: Color = contentColor.supportingVariant(
+        supportingColor: Color = StyledTheme.supportingContentColor(
+            contentColor = contentColor,
             containerColor = containerColor,
         ),
     ): PreferenceRowColors = PreferenceRowColors(

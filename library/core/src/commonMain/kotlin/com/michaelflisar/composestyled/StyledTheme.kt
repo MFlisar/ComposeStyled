@@ -154,6 +154,43 @@ object StyledTheme {
         }
     }
 
+    /**
+     * Returns the theme-defined supporting color for [contentColor]. If no unambiguous matching
+     * definition is found, it falls back to an alpha-reduced variant of [contentColor].
+     *
+     * Pass [containerColor] when it is known to disambiguate definitions that share a content
+     * color. [Color.Unspecified] is returned unchanged.
+     */
+    @Composable
+    @ReadOnlyComposable
+    fun supportingContentColor(
+        contentColor: Color = LocalStyledContentColor.current,
+        containerColor: Color? = null,
+    ): Color {
+        if (contentColor == Color.Unspecified) return contentColor
+
+        val hasContainerColor = containerColor != null && containerColor != Color.Unspecified
+        var foundMatch = false
+        var supportingColor = Color.Unspecified
+        for (definition in colorScheme.allDefinitions) {
+            val matches = if (hasContainerColor) {
+                definition.color == containerColor && definition.onColor == contentColor
+            } else {
+                definition.onColor == contentColor
+            }
+            if (!matches) continue
+
+            if (!foundMatch) {
+                foundMatch = true
+                supportingColor = definition.onColorSupporting
+            } else if (supportingColor != definition.onColorSupporting) {
+                return contentColor.supportingVariant()
+            }
+        }
+
+        return if (foundMatch) supportingColor else contentColor.supportingVariant()
+    }
+
 }
 
 /**

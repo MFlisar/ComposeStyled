@@ -4,6 +4,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import com.michaelflisar.composestyled.classes.StyledLocalMissingException
+import com.michaelflisar.composestyled.contrastRatio
 
 /** Semantic color roles resolved for one light/dark theme and contrast level. */
 @Immutable
@@ -46,11 +47,12 @@ data class StyledColorScheme(
     // Disable handling
     val disabledAlphaFactors: StyledDisabledAlphaFactors,
 ) {
-    /** A semantic color role with a color and its default foreground color. */
+    /** A semantic color role with its default and supporting foreground colors. */
     @Immutable
     data class Definition(
         val color: Color,
         val onColor: Color,
+        val onColorSupporting: Color = supportingColor(color, onColor),
     )
 
     internal val allDefinitions = listOf(
@@ -139,6 +141,32 @@ data class StyledColorScheme(
 
     val warningSurface: Color get() = warningSurfaceDef.color
     val onWarningSurface: Color get() = warningSurfaceDef.onColor
+}
+
+private fun supportingColor(containerColor: Color, contentColor: Color): Color {
+    val originalContrast = contentColor.contrastRatio(containerColor)
+    val targetContrast = maxOf(4.5f, originalContrast * 0.65f)
+    if (targetContrast >= originalContrast) return contentColor
+
+    fun blendTowardContainer(amount: Float) = Color(
+        red = contentColor.red + (containerColor.red - contentColor.red) * amount,
+        green = contentColor.green + (containerColor.green - contentColor.green) * amount,
+        blue = contentColor.blue + (containerColor.blue - contentColor.blue) * amount,
+        alpha = contentColor.alpha + (containerColor.alpha - contentColor.alpha) * amount,
+    )
+
+    var low = 0f
+    var high = 1f
+    repeat(24) {
+        val amount = (low + high) / 2f
+        if (blendTowardContainer(amount).contrastRatio(containerColor) >= targetContrast) {
+            low = amount
+        } else {
+            high = amount
+        }
+    }
+
+    return blendTowardContainer(low)
 }
 
 

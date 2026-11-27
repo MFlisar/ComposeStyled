@@ -138,12 +138,13 @@ paired role for content shown on an inverted surface.
 `PrimarySurface`, `SecondarySurface`, `TertiarySurface`, `ErrorSurface`,
 `SuccessSurface` and `WarningSurface`.
 
-Use `Color.supportingVariant(factor)` to derive a less prominent color when the
-container color is unknown. This scales the color's alpha by `factor`, so it is
-composited against the actual background when drawn, but does not guarantee a
-minimum contrast ratio. When the container is known, the overload
-`Color.supportingVariant(containerColor, factor, minimumContrastRatio)` blends
-the color toward the container and keeps the requested contrast floor when the
-original pair allows it. Both variants default `factor` to `0.65f`; the
-container-aware overload defaults `minimumContrastRatio` to `4.5f`.
-`StyledTheme.contentColorFor(backgroundColor)` remains the theme-role lookup.
+Use `StyledTheme.supportingContentColor()` to resolve the less prominent
+foreground for the current content color. It looks up the matching theme color
+definition; pass `containerColor` when known to disambiguate definitions that
+share a content color. If no unique match exists, it falls back to
+`Color.supportingVariant()`, which scales alpha by `0.65f` and does not guarantee
+a minimum contrast ratio. Theme definitions derive their supporting foreground
+with a `4.5:1` contrast floor when the original color pair allows it. In
+Material 3, surface container definitions use `onSurfaceVariant` as their
+supporting foreground. `StyledTheme.contentColorFor(backgroundColor)` remains
+the lookup for the standard foreground color.
