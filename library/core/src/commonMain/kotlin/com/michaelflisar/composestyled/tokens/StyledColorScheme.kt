@@ -84,63 +84,83 @@ data class StyledColorScheme(
 
     val background: Color get() = backgroundDef.color
     val onBackground: Color get() = backgroundDef.onColor
+    val onBackgroundSupporting: Color get() = backgroundDef.onColorSupporting
 
     val surfaceLowest: Color get() = surfaceLowestDef.color
     val onSurfaceLowest: Color get() = surfaceLowestDef.onColor
+    val onSurfaceLowestSupporting: Color get() = surfaceLowestDef.onColorSupporting
 
     val surfaceLow: Color get() = surfaceLowDef.color
     val onSurfaceLow: Color get() = surfaceLowDef.onColor
+    val onSurfaceLowSupporting: Color get() = surfaceLowDef.onColorSupporting
 
     val surface: Color get() = surfaceDef.color
     val onSurface: Color get() = surfaceDef.onColor
+    val onSurfaceSupporting: Color get() = surfaceDef.onColorSupporting
 
     val surfaceHigh: Color get() = surfaceHighDef.color
     val onSurfaceHigh: Color get() = surfaceHighDef.onColor
+    val onSurfaceHighSupporting: Color get() = surfaceHighDef.onColorSupporting
 
     val surfaceHighest: Color get() = surfaceHighestDef.color
     val onSurfaceHighest: Color get() = surfaceHighestDef.onColor
+    val onSurfaceHighestSupporting: Color get() = surfaceHighestDef.onColorSupporting
 
     val surfaceVariant: Color get() = surfaceVariantDef.color
     val onSurfaceVariant: Color get() = surfaceVariantDef.onColor
+    val onSurfaceVariantSupporting: Color get() = surfaceVariantDef.onColorSupporting
 
     val inverseSurface: Color get() = inverseSurfaceDef.color
     val inverseOnSurface: Color get() = inverseSurfaceDef.onColor
+    val inverseOnSurfaceSupporting: Color get() = inverseSurfaceDef.onColorSupporting
 
     val primary: Color get() = primaryDef.color
     val onPrimary: Color get() = primaryDef.onColor
+    val onPrimarySupporting: Color get() = primaryDef.onColorSupporting
 
     val primarySurface: Color get() = primarySurfaceDef.color
     val onPrimarySurface: Color get() = primarySurfaceDef.onColor
+    val onPrimarySurfaceSupporting: Color get() = primarySurfaceDef.onColorSupporting
 
     val secondary: Color get() = secondaryDef.color
     val onSecondary: Color get() = secondaryDef.onColor
+    val onSecondarySupporting: Color get() = secondaryDef.onColorSupporting
 
     val secondarySurface: Color get() = secondarySurfaceDef.color
     val onSecondarySurface: Color get() = secondarySurfaceDef.onColor
+    val onSecondarySurfaceSupporting: Color get() = secondarySurfaceDef.onColorSupporting
 
     val tertiary: Color get() = tertiaryDef.color
     val onTertiary: Color get() = tertiaryDef.onColor
+    val onTertiarySupporting: Color get() = tertiaryDef.onColorSupporting
 
     val tertiarySurface: Color get() = tertiarySurfaceDef.color
     val onTertiarySurface: Color get() = tertiarySurfaceDef.onColor
+    val onTertiarySurfaceSupporting: Color get() = tertiarySurfaceDef.onColorSupporting
 
     val error: Color get() = errorDef.color
     val onError: Color get() = errorDef.onColor
+    val onErrorSupporting: Color get() = errorDef.onColorSupporting
 
     val errorSurface: Color get() = errorSurfaceDef.color
     val onErrorSurface: Color get() = errorSurfaceDef.onColor
+    val onErrorSurfaceSupporting: Color get() = errorSurfaceDef.onColorSupporting
 
     val success: Color get() = successDef.color
     val onSuccess: Color get() = successDef.onColor
+    val onSuccessSupporting: Color get() = successDef.onColorSupporting
 
     val successSurface: Color get() = successSurfaceDef.color
     val onSuccessSurface: Color get() = successSurfaceDef.onColor
+    val onSuccessSurfaceSupporting: Color get() = successSurfaceDef.onColorSupporting
 
     val warning: Color get() = warningDef.color
     val onWarning: Color get() = warningDef.onColor
+    val onWarningSupporting: Color get() = warningDef.onColorSupporting
 
     val warningSurface: Color get() = warningSurfaceDef.color
     val onWarningSurface: Color get() = warningSurfaceDef.onColor
+    val onWarningSurfaceSupporting: Color get() = warningSurfaceDef.onColorSupporting
 }
 
 private fun supportingColor(containerColor: Color, contentColor: Color): Color {
